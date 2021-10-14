@@ -41,6 +41,12 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
+    externalNativeBuild {
+        cmake {
+            path file('src/main/cpp/CMakeLists.txt')
+        }
+    }
+
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.example.mpc_demo"
