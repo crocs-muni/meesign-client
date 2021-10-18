@@ -74,6 +74,8 @@ jobs:
     # Checkout code, recreate missing files, and get packages.
     - name: Checkout code
       uses: actions/checkout@v2
+      with:
+        submodules: recursive
     - run: flutter pub get
 
     # Build the application.
