@@ -1,0 +1,3 @@
+[submodule "lib-native/mpc-sigs"]
+	path = lib-native/mpc-sigs
+	url = https://github.com/jjanku/mpc-sigs.git
