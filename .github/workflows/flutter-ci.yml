@@ -64,6 +64,7 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: '12.x'
+
     - name: Enable desktop support
       if: matrix.target != 'Android'
       run: |
@@ -77,6 +78,15 @@ jobs:
       with:
         submodules: recursive
     - run: flutter pub get
+
+    - name: Set up Rust
+      if: matrix.target == 'Android'
+      env:
+        ANDROID_API: 30
+      run: |
+        rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android i686-linux-android
+        bash ./.github/cargo-gen-android-config.sh >> ~/.cargo/config.toml
+        cat ~/.cargo/config.toml
 
     # Build the application.
     - run: flutter build -v ${{ matrix.build_target }} --release
