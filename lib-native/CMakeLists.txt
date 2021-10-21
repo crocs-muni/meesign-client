@@ -24,12 +24,12 @@ if(WIN32)
   set(MPC_SIGS_IMPLIB "${MPC_SIGS_LIB}.lib")
 endif()
 
-add_custom_command(
-  OUTPUT ${MPC_SIGS_LIB} ${MPC_SIGS_IMPLIB}
+add_custom_target(
+  cargo_mpc_sigs
   COMMAND cargo build --target ${RUST_TARGET} ${CARGO_BUILD_TYPE_OPT}
   WORKING_DIRECTORY ${MPC_SIGS_DIR}
+  BYPRODUCTS ${MPC_SIGS_LIB} ${MPC_SIGS_IMPLIB}
 )
-add_custom_target(cargo_mpc_sigs DEPENDS ${MPC_SIGS_LIB} ${MPC_SIGS_IMPLIB})
 
 add_library(mpc_sigs INTERFACE)
 add_dependencies(mpc_sigs cargo_mpc_sigs)
