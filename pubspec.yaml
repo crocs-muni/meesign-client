@@ -100,3 +100,5 @@ ffigen:
     # so specify only the headers we need (most notably avoid system headers)
     include-directives:
       - '**bindings.h'
+  preamble: |
+    // ignore_for_file: non_constant_identifier_names
