@@ -85,7 +85,7 @@ jobs:
         ANDROID_API: 30
       run: |
         rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android i686-linux-android
-        bash ./.github/cargo-gen-android-config.sh >> ~/.cargo/config.toml
+        bash ./tool/cargo-config-gen-android.sh >> ~/.cargo/config.toml
         cat ~/.cargo/config.toml
 
     # Build the application.
