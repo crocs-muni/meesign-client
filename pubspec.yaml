@@ -90,17 +90,3 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
-
-ffigen:
-  name: 'MpcSigsLib'
-  description: 'Bindings to mpc-sigs C API'
-  output: 'lib/native/mpc_sigs_lib.dart'
-  headers:
-    entry-points:
-      - 'lib-native/mpc-sigs/include/bindings.h'
-    # by default, code is generated recursively for all included headers,
-    # so specify only the headers we need (most notably avoid system headers)
-    include-directives:
-      - '**bindings.h'
-  preamble: |
-    // ignore_for_file: camel_case_types, non_constant_identifier_names

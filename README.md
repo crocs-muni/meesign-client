@@ -43,7 +43,7 @@ A new Flutter project.
 If you modify native libraries in [lib-native](lib-native), update Dart bindings by running:
 
 ```bash
-flutter pub run ffigen
+flutter pub run ffigen --config ffigen/changed-lib.yaml
 ```
 
 This regenerates the files as specified by the ffigen configuration in [pubspec.yaml](pubspec.yaml). (Note that [ffigen requires LLVM](https://pub.dev/packages/ffigen).)
