@@ -3,19 +3,12 @@ import 'package:provider/provider.dart';
 
 void main() {
   runApp(ChangeNotifierProvider(
-    create: (context) => Counter(),
+    create: (context) => AppState(),
     child: const MyApp(),
   ));
 }
 
-class Counter with ChangeNotifier {
-  int value = 0;
-
-  void increment() {
-    value += 1;
-    notifyListeners();
-  }
-}
+class AppState with ChangeNotifier {}
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -43,27 +36,9 @@ class MyHomePage extends StatelessWidget {
       appBar: AppBar(
         title: Text(title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Consumer<Counter>(
-              builder: (context, counter, child) => Text(
-                '${counter.value}',
-                style: Theme.of(context).textTheme.headline4,
-              ),
-            ),
-          ],
-        ),
-      ),
+      body: Center(),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          var counter = context.read<Counter>();
-          counter.increment();
-        },
+        onPressed: () {},
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),
