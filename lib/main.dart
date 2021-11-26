@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:mpc_demo/mpc_model.dart';
 import 'package:provider/provider.dart';
 
 void main() {
   runApp(ChangeNotifierProvider(
-    create: (context) => AppState(),
+    create: (context) => MpcModel(),
     child: const MyApp(),
   ));
 }
-
-class AppState with ChangeNotifier {}
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
