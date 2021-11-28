@@ -107,7 +107,9 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Center(child: pages[_index]),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          if (_index == 1) Navigator.pushNamed(context, '/new_group');
+        },
         tooltip: 'New',
         child: const Icon(Icons.add),
       ),

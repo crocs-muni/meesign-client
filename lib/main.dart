@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mpc_demo/mpc_model.dart';
+import 'package:mpc_demo/widget/new_group_page.dart';
 import 'package:provider/provider.dart';
 
 import 'widget/home_page.dart';
@@ -21,7 +22,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const HomePage(),
+      routes: {
+        '/': (context) => const HomePage(),
+        '/new_group': (context) => const NewGroupPage(),
+      },
     );
   }
 }
