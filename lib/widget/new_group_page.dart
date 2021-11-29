@@ -89,7 +89,26 @@ class _NewGroupPageState extends State<NewGroupPage> {
                       ListTile(
                         leading: const Icon(Icons.contactless_outlined),
                         title: const Text('Add NFC card'),
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.pop(context);
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return const SimpleDialog(
+                                  children: [
+                                    Icon(
+                                      Icons.contactless_outlined,
+                                      color: Colors.amber,
+                                      size: 64,
+                                    ),
+                                    Text(
+                                      'Hold a card near the back of the device',
+                                      textAlign: TextAlign.center,
+                                    )
+                                  ],
+                                );
+                              });
+                        },
                       ),
                       ListTile(
                         leading: const Icon(Icons.search),
