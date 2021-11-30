@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mpc_demo/mpc_model.dart';
 
+import 'dart:io';
+
 class NewGroupPage extends StatefulWidget {
   const NewGroupPage({Key? key}) : super(key: key);
 
@@ -84,11 +86,13 @@ class _NewGroupPageState extends State<NewGroupPage> {
                       ListTile(
                         leading: const Icon(Icons.qr_code),
                         title: const Text('Scan QR code'),
+                        enabled: Platform.isAndroid || Platform.isIOS,
                         onTap: () {},
                       ),
                       ListTile(
                         leading: const Icon(Icons.contactless_outlined),
                         title: const Text('Add NFC card'),
+                        enabled: Platform.isAndroid || Platform.isIOS,
                         onTap: () {
                           Navigator.pop(context);
                           showDialog(
@@ -113,7 +117,9 @@ class _NewGroupPageState extends State<NewGroupPage> {
                       ListTile(
                         leading: const Icon(Icons.search),
                         title: const Text('Search peer'),
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.pushNamed(context, '/new_group/search');
+                        },
                       ),
                     ],
                   );

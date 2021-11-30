@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mpc_demo/mpc_model.dart';
 import 'package:mpc_demo/widget/new_group_page.dart';
+import 'package:mpc_demo/widget/search_peer_page.dart';
 import 'package:provider/provider.dart';
 
 import 'widget/home_page.dart';
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const HomePage(),
         '/new_group': (context) => const NewGroupPage(),
+        '/new_group/search': (context) => const SearchPeerPage(),
       },
     );
   }
