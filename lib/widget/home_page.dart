@@ -101,19 +101,26 @@ class _HomePageState extends State<HomePage> {
       GroupsSubPage(),
     ];
 
+    final signFab = FloatingActionButton.extended(
+      key: const ValueKey('SignFab'),
+      onPressed: () {},
+      label: const Text('Sign'),
+      icon: const Icon(Icons.add),
+    );
+    final groupFab = FloatingActionButton.extended(
+      onPressed: () {
+        Navigator.pushNamed(context, '/new_group');
+      },
+      label: const Text('New'),
+      icon: const Icon(Icons.add),
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('MPC Demo'),
       ),
       body: Center(child: pages[_index]),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          if (_index == 1) Navigator.pushNamed(context, '/new_group');
-        },
-        tooltip: 'New',
-        child: const Icon(Icons.add),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: _index == 0 ? signFab : groupFab,
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
