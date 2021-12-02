@@ -1,8 +1,61 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class SearchPeerPage extends StatelessWidget {
+import '../mpc_model.dart';
+
+class SearchPeerPage extends StatefulWidget {
   const SearchPeerPage({Key? key}) : super(key: key);
+
+  @override
+  State<SearchPeerPage> createState() => _SearchPeerPageState();
+}
+
+class _SearchPeerPageState extends State<SearchPeerPage> {
+  final _queryController = TextEditingController();
+  List<Cosigner> _queryResults = [];
+
+  void _query(String query) {
+    setState(() {
+      _queryResults = MpcModel.searchForPeers(_queryController.text);
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _queryController.addListener(() {
+      _query(_queryController.text);
+    });
+    _query('');
+  }
+
+  @override
+  void dispose() {
+    _queryController.dispose();
+    super.dispose();
+  }
+
+  // TODO: this should probably be replaced with
+  // ListView.builder() once the results get big
+  Iterable<Widget> get _queryResultTiles sync* {
+    yield ListTile(
+      title: Text(
+        'LOCAL NETWORK',
+        style: Theme.of(context).textTheme.button,
+      ),
+    );
+
+    for (final cosigner in _queryResults) {
+      yield ListTile(
+        leading: const Icon(Icons.network_wifi),
+        title: Text(cosigner.name),
+        onTap: () {
+          Navigator.pop(context, cosigner);
+        },
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,11 +70,12 @@ class SearchPeerPage extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
-                    BackButton(),
+                  children: [
+                    const BackButton(),
                     Expanded(
                       child: TextField(
-                        decoration: InputDecoration.collapsed(
+                        controller: _queryController,
+                        decoration: const InputDecoration.collapsed(
                           hintText: 'Search for peer',
                         ),
                       ),
@@ -31,23 +85,8 @@ class SearchPeerPage extends StatelessWidget {
               ),
               const Divider(thickness: 1),
               Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ListTile(
-                        title: Text(
-                          'LOCAL NETWORK',
-                          style: Theme.of(context).textTheme.button,
-                        ),
-                      ),
-                      ListTile(
-                        leading: Icon(Icons.network_wifi),
-                        title: Text('192.168.1.5'),
-                        onTap: () {},
-                      ),
-                    ],
-                  ),
+                child: ListView(
+                  children: _queryResultTiles.toList(),
                 ),
               ),
             ],

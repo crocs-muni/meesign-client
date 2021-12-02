@@ -81,4 +81,8 @@ class MpcModel with ChangeNotifier {
       [cosigners[0], cosigners[2]],
     )..round = 2,
   ];
+
+  static List<Cosigner> searchForPeers(String query) {
+    return cosigners;
+  }
 }

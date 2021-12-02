@@ -14,11 +14,7 @@ class NewGroupPage extends StatefulWidget {
 
 class _NewGroupPageState extends State<NewGroupPage> {
   int _threshold = 1;
-  final List _members = [
-    Cosigner('Peer 1', CosignerType.peer),
-    Cosigner('Peer 2', CosignerType.peer),
-    Cosigner('Card 2', CosignerType.card),
-  ];
+  final List _members = [];
   final nameController = TextEditingController();
 
   @override
@@ -43,6 +39,14 @@ class _NewGroupPageState extends State<NewGroupPage> {
         },
       );
     }
+  }
+
+  void _selectSearchedPeer() async {
+    final peer = await Navigator.pushNamed(context, '/new_group/search');
+    if (peer is! Cosigner || _members.contains(peer)) return;
+    setState(() {
+      _members.add(peer);
+    });
   }
 
   @override
@@ -117,9 +121,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                       ListTile(
                         leading: const Icon(Icons.search),
                         title: const Text('Search peer'),
-                        onTap: () {
-                          Navigator.pushNamed(context, '/new_group/search');
-                        },
+                        onTap: _selectSearchedPeer,
                       ),
                     ],
                   );
