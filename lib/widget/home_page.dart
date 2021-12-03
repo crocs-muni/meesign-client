@@ -147,6 +147,14 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('MPC Demo'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.qr_code),
+            onPressed: () {
+              Navigator.pushNamed(context, '/qr_identity');
+            },
+          ),
+        ],
       ),
       body: Center(child: pages[_index]),
       floatingActionButton: _index == 0 ? signFab : groupFab,
