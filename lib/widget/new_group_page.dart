@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:mpc_demo/mpc_model.dart';
+import 'package:mpc_demo/rnd_name_generator.dart';
 import 'package:provider/provider.dart';
 
 import 'dart:io';
@@ -23,6 +24,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
   void initState() {
     super.initState();
     _nameController.addListener(_checkCreatable);
+    _nameController.text = RndNameGenerator().next();
   }
 
   @override
