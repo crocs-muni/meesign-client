@@ -65,4 +65,9 @@ class MpcModel with ChangeNotifier {
     }
     return cosigners;
   }
+
+  void addGroup(String name, List<Cosigner> members, int threshold) {
+    groups.add(Group(name, members, const Ecdsa(), threshold));
+    notifyListeners();
+  }
 }

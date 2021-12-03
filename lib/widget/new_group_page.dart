@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:mpc_demo/mpc_model.dart';
+import 'package:provider/provider.dart';
 
 import 'dart:io';
 
@@ -14,7 +15,7 @@ class NewGroupPage extends StatefulWidget {
 
 class _NewGroupPageState extends State<NewGroupPage> {
   int _threshold = 1;
-  final List _members = [];
+  final List<Cosigner> _members = [];
   final _nameController = TextEditingController();
   bool _creatable = false;
 
@@ -63,6 +64,12 @@ class _NewGroupPageState extends State<NewGroupPage> {
     });
   }
 
+  void _finishCreate() {
+    final model = context.read<MpcModel>();
+    model.addGroup(_nameController.text, _members, _threshold);
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,11 +77,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
         title: const Text('New Group'),
         actions: [
           TextButton(
-            onPressed: _creatable
-                ? () {
-                    Navigator.pop(context);
-                  }
-                : null,
+            onPressed: _creatable ? _finishCreate : null,
             style: TextButton.styleFrom(
                 primary: Theme.of(context).colorScheme.onPrimary),
             child: const Text('CREATE'),
