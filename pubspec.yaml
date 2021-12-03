@@ -38,6 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   qr_flutter: ^4.0.0
   animations: ^2.0.2
+  file_picker: ^4.2.7
 
 dev_dependencies:
   flutter_test:
