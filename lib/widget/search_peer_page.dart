@@ -16,7 +16,8 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
 
   void _query(String query) {
     setState(() {
-      _queryResults = MpcModel.searchForPeers(_queryController.text);
+      _queryResults =
+          context.read<MpcModel>().searchForPeers(_queryController.text);
     });
   }
 

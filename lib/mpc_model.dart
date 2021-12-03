@@ -53,36 +53,16 @@ class SignedFile {
 }
 
 class MpcModel with ChangeNotifier {
-  static var cosigners = [
-    Cosigner('user 1', CosignerType.peer),
-    Cosigner('user 2', CosignerType.peer),
-    Cosigner('user 3', CosignerType.peer),
-    Cosigner('user 4', CosignerType.card),
-    Cosigner('user 5', CosignerType.card),
-  ];
+  final cosigners = [];
+  final groups = [];
 
-  static var groups = [
-    Group(
-      'Group 1',
-      [
-        cosigners[0],
-        cosigners[2],
-        cosigners[3],
-      ],
-      const Ecdsa(),
-      2,
-    )
-  ];
+  var files = [];
 
-  static var files = [
-    SignedFile(
-      'signed-document',
-      groups[0],
-      [cosigners[0], cosigners[2]],
-    )..round = 2,
-  ];
-
-  static List<Cosigner> searchForPeers(String query) {
+  List<Cosigner> searchForPeers(String query) {
+    List<Cosigner> cosigners = [];
+    for (int i = 0; i < 5; i++) {
+      cosigners.add(Cosigner('User $i', CosignerType.peer));
+    }
     return cosigners;
   }
 }

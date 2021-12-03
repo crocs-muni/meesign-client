@@ -26,21 +26,23 @@ class SigningSubPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      itemCount: MpcModel.files.length,
-      itemBuilder: (context, i) {
-        final file = MpcModel.files[i];
-        double progress =
-            file.round.toDouble() / file.group.protocol.signRounds;
+    return Consumer<MpcModel>(builder: (context, model, child) {
+      return ListView.separated(
+        itemCount: model.files.length,
+        itemBuilder: (context, i) {
+          final file = model.files[i];
+          double progress =
+              file.round.toDouble() / file.group.protocol.signRounds;
 
-        return ListTile(
-          title: Text(file.path),
-          trailing: ProgressCheck(progress),
-          onTap: () {},
-        );
-      },
-      separatorBuilder: (context, i) => const Divider(),
-    );
+          return ListTile(
+            title: Text(file.path),
+            trailing: ProgressCheck(progress),
+            onTap: () {},
+          );
+        },
+        separatorBuilder: (context, i) => const Divider(),
+      );
+    });
   }
 }
 
@@ -58,27 +60,29 @@ class GroupsSubPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-        itemCount: MpcModel.groups.length,
-        itemBuilder: (context, i) {
-          // final model = context.read<MpcModel>();
-          final group = MpcModel.groups[i];
-          double progress =
-              group.round.toDouble() / group.protocol.keygenRounds;
+    return Consumer<MpcModel>(builder: (context, model, child) {
+      return ListView.builder(
+          itemCount: model.groups.length,
+          itemBuilder: (context, i) {
+            // final model = context.read<MpcModel>();
+            final group = model.groups[i];
+            double progress =
+                group.round.toDouble() / group.protocol.keygenRounds;
 
-          return ListTile(
-            title: Text(group.name),
-            subtitle: Text('${group.protocol.runtimeType}: '
-                '${group.threshold} out of ${group.members.length}'),
-            onTap: () {},
-            leading: CircleAvatar(
-              child: Text(
-                _groupInitials(group),
+            return ListTile(
+              title: Text(group.name),
+              subtitle: Text('${group.protocol.runtimeType}: '
+                  '${group.threshold} out of ${group.members.length}'),
+              onTap: () {},
+              leading: CircleAvatar(
+                child: Text(
+                  _groupInitials(group),
+                ),
               ),
-            ),
-            trailing: ProgressCheck(progress),
-          );
-        });
+              trailing: ProgressCheck(progress),
+            );
+          });
+    });
   }
 }
 
