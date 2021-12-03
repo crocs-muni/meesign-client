@@ -1,0 +1,9 @@
+name: 'PdfSigLib'
+output: 'lib/native/pdf_sig_lib.dart'
+headers:
+  entry-points:
+    - 'lib-native/pdf-sig/pdf-sig.h'
+  include-directives:
+    - '**pdf-sig.h'
+preamble: |
+  // ignore_for_file: camel_case_types, non_constant_identifier_names
