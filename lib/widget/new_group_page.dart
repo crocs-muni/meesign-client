@@ -15,11 +15,18 @@ class NewGroupPage extends StatefulWidget {
 class _NewGroupPageState extends State<NewGroupPage> {
   int _threshold = 1;
   final List _members = [];
-  final nameController = TextEditingController();
+  final _nameController = TextEditingController();
+  bool _creatable = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.addListener(_checkCreatable);
+  }
 
   @override
   void dispose() {
-    nameController.dispose();
+    _nameController.dispose();
     super.dispose();
   }
 
@@ -41,11 +48,18 @@ class _NewGroupPageState extends State<NewGroupPage> {
     }
   }
 
+  void _checkCreatable() {
+    setState(() {
+      _creatable = _members.length >= 2 && _nameController.text.isNotEmpty;
+    });
+  }
+
   void _selectSearchedPeer() async {
     final peer = await Navigator.pushNamed(context, '/new_group/search');
     if (peer is! Cosigner || _members.contains(peer)) return;
     setState(() {
       _members.add(peer);
+      _checkCreatable();
     });
   }
 
@@ -56,12 +70,14 @@ class _NewGroupPageState extends State<NewGroupPage> {
         title: const Text('New Group'),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
+            onPressed: _creatable
+                ? () {
+                    Navigator.pop(context);
+                  }
+                : null,
             style: TextButton.styleFrom(
                 primary: Theme.of(context).colorScheme.onPrimary),
-            child: const Text('Create'),
+            child: const Text('CREATE'),
           ),
         ],
       ),
@@ -70,7 +86,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
         children: [
           const SizedBox(height: 16),
           TextField(
-            controller: nameController,
+            controller: _nameController,
             decoration: const InputDecoration(
               hintText: 'Group name',
               border: OutlineInputBorder(),
