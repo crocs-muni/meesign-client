@@ -21,12 +21,35 @@ class ProgressCheck extends StatelessWidget {
   }
 }
 
+class EmptyList extends StatelessWidget {
+  const EmptyList({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '0',
+            style: Theme.of(context).textTheme.headline3,
+          ),
+          const SizedBox(height: 4),
+          const Text('Nothing here yet.'),
+        ],
+      ),
+    );
+  }
+}
+
 class SigningSubPage extends StatelessWidget {
   const SigningSubPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Consumer<MpcModel>(builder: (context, model, child) {
+      if (model.files.isEmpty) return const EmptyList();
+
       return ListView.separated(
         itemCount: model.files.length,
         itemBuilder: (context, i) {
@@ -61,6 +84,8 @@ class GroupsSubPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<MpcModel>(builder: (context, model, child) {
+      if (model.groups.isEmpty) return const EmptyList();
+
       return ListView.builder(
           itemCount: model.groups.length,
           itemBuilder: (context, i) {
