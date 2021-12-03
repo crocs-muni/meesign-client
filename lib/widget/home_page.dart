@@ -121,6 +121,30 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _index = 0;
 
+  void _showSignRequest(String group, String file) {
+    ScaffoldMessenger.of(context).showMaterialBanner(
+      MaterialBanner(
+        content: Text('Group $group asks you to sign $file.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
+              // TODO: do sign
+            },
+            child: const Text('SIGN'),
+          ),
+          TextButton(
+            onPressed: () {
+              ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
+            },
+            child: const Text('IGNORE'),
+          ),
+        ],
+        leading: const Icon(Icons.warning),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // final model = context.read<MpcModel>();
