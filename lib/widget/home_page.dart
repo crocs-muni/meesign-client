@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:mpc_demo/mpc_model.dart';
 import 'package:provider/provider.dart';
@@ -180,7 +181,17 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: Center(child: pages[_index]),
+      body: PageTransitionSwitcher(
+        transitionBuilder: (child, primaryAnimation, secondaryAnimation) {
+          return FadeThroughTransition(
+            fillColor: Colors.transparent,
+            animation: primaryAnimation,
+            secondaryAnimation: secondaryAnimation,
+            child: child,
+          );
+        },
+        child: pages[_index],
+      ),
       floatingActionButton: _index == 0 ? signFab : groupFab,
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
