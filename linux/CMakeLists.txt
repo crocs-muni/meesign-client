@@ -73,6 +73,7 @@ set(RUST_TARGET "x86_64-unknown-linux-gnu")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../lib-native" lib-native)
 
 target_link_libraries(${BINARY_NAME} PRIVATE mpc_sigs)
+target_link_libraries(${BINARY_NAME} PRIVATE pdf-sig)
 
 # === Installation ===
 # By default, "installing" just makes a relocatable bundle in the build
@@ -106,6 +107,8 @@ if(PLUGIN_BUNDLED_LIBRARIES)
 endif()
 
 install(FILES "${MPC_SIGS_LIB}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
+  COMPONENT Runtime)
+install(TARGETS pdf-sig DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
   COMPONENT Runtime)
 
 # Fully re-copy the assets directory on each build to avoid having stale files

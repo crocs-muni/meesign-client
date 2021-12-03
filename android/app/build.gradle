@@ -44,6 +44,7 @@ android {
     externalNativeBuild {
         cmake {
             path file('src/main/cpp/CMakeLists.txt')
+            version '3.18.1'
         }
     }
 
@@ -54,6 +55,12 @@ android {
         targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+
+        externalNativeBuild {
+            cmake {
+                arguments '-DANDROID_STL=c++_shared'
+            }
+        }
     }
 
     buildTypes {
@@ -63,6 +70,10 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+
+    buildFeatures {
+        prefab true
+    }
 }
 
 flutter {
@@ -71,4 +82,6 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "com.android.ndk.thirdparty:openssl:1.1.1d-alpha-1"
+    implementation "com.android.ndk.thirdparty:podofo:0.9.7"
 }

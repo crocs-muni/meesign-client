@@ -1,6 +1,8 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.15)
 
 project(mpc_demo)
+
+set(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
 
 if(CMAKE_ANDROID_ARCH_ABI STREQUAL "arm64-v8a")
   set(RUST_TARGET "aarch64-linux-android")

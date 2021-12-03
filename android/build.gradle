@@ -15,6 +15,9 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url "file:///home/jjanku/src/ndkports/build/repository"
+        }
     }
 }
 

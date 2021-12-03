@@ -24,6 +24,16 @@ if(WIN32)
   set(MPC_SIGS_IMPLIB "${MPC_SIGS_LIB}.lib")
 endif()
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
+
+find_package(OpenSSL REQUIRED)
+find_package(PoDoFo REQUIRED)
+
+if(ANDROID)
+  add_library(OpenSSL::Crypto ALIAS openssl::crypto)
+  add_library(PoDoFo ALIAS podofo::podofo)
+endif()
+
 add_custom_target(
   cargo_mpc_sigs
   COMMAND cargo build --target ${RUST_TARGET} ${CARGO_BUILD_TYPE_OPT}
@@ -40,3 +50,5 @@ else()
 endif()
 
 set(MPC_SIGS_LIB "${MPC_SIGS_LIB}" PARENT_SCOPE)
+
+add_subdirectory(pdf-sig)
