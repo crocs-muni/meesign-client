@@ -54,7 +54,7 @@ class GroupsSubPage extends StatelessWidget {
         .split(' ')
         .where((w) => w.isNotEmpty)
         .take(2)
-        .map((w) => w[0])
+        .map((w) => w[0].toUpperCase())
         .join();
   }
 
