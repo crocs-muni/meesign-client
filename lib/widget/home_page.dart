@@ -1,4 +1,5 @@
 import 'package:animations/animations.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:mpc_demo/mpc_model.dart';
 import 'package:provider/provider.dart';
@@ -45,6 +46,18 @@ class EmptyList extends StatelessWidget {
 
 class SigningSubPage extends StatelessWidget {
   const SigningSubPage({Key? key}) : super(key: key);
+
+  Future<FilePickerResult?> _pickPdfFile() async =>
+      FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+        withData: false,
+        withReadStream: false,
+      );
+
+  void beginSign() async {
+    await _pickPdfFile();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -157,7 +170,7 @@ class _HomePageState extends State<HomePage> {
 
     final signFab = FloatingActionButton.extended(
       key: const ValueKey('SignFab'),
-      onPressed: () {},
+      onPressed: (pages[0] as SigningSubPage).beginSign,
       label: const Text('Sign'),
       icon: const Icon(Icons.add),
     );
