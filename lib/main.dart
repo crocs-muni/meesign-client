@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mpc_demo/mpc_model.dart';
+import 'package:mpc_demo/widget/card_reader_page.dart';
 import 'package:mpc_demo/widget/new_group_page.dart';
 import 'package:mpc_demo/widget/qr_identity_page.dart';
 import 'package:mpc_demo/widget/search_peer_page.dart';
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => const HomePage(),
         '/new_group': (context) => const NewGroupPage(),
         '/new_group/search': (context) => const SearchPeerPage(),
+        '/new_group/card_reader': (context) => const CardReaderPage(),
         '/qr_identity': (context) => const QrIdentityPage(),
       },
     );

@@ -119,24 +119,10 @@ class _NewGroupPageState extends State<NewGroupPage> {
                         title: const Text('Add NFC card'),
                         enabled: Platform.isAndroid || Platform.isIOS,
                         onTap: () {
-                          Navigator.pop(context);
-                          showDialog(
-                              context: context,
-                              builder: (context) {
-                                return const SimpleDialog(
-                                  children: [
-                                    Icon(
-                                      Icons.contactless_outlined,
-                                      color: Colors.amber,
-                                      size: 64,
-                                    ),
-                                    Text(
-                                      'Hold a card near the back of the device',
-                                      textAlign: TextAlign.center,
-                                    )
-                                  ],
-                                );
-                              });
+                          Navigator.pushNamed(
+                            context,
+                            '/new_group/card_reader',
+                          );
                         },
                       ),
                       ListTile(
