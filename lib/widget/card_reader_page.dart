@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 
 class CardReaderPage extends StatefulWidget {
   const CardReaderPage({Key? key}) : super(key: key);
@@ -8,7 +11,57 @@ class CardReaderPage extends StatefulWidget {
 }
 
 class _CardReaderPageState extends State<CardReaderPage> {
-  bool _working = true;
+  bool _working = false;
+
+  // TODO: check for availability
+
+  void _pollTag() async {
+    try {
+      final tag = await FlutterNfcKit.poll(
+        androidCheckNDEF: false,
+      );
+
+      setState(() {
+        _working = true;
+      });
+
+      Uint8List apdu = Uint8List.fromList([0x00, 0xa4, 0x04, 0x00, 3, 1, 2, 3]);
+      final response = await FlutterNfcKit.transceive(apdu);
+
+      await Future.delayed(const Duration(seconds: 1));
+
+      await FlutterNfcKit.finish();
+      setState(() {
+        _working = false;
+      });
+
+      Navigator.pop(context);
+    } catch (e) {
+      setState(() {
+        _working = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to read card'),
+        ),
+      );
+      _pollTag();
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _pollTag();
+  }
+
+  @override
+  void dispose() {
+    FlutterNfcKit.finish();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
