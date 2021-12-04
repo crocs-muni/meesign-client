@@ -40,6 +40,8 @@ A new Flutter project.
 
 ## Contributing
 
+### Regenerate Dart-C bindings
+
 If you modify native libraries in [lib-native](lib-native), update Dart bindings by running:
 
 ```bash
@@ -47,3 +49,23 @@ flutter pub run ffigen --config ffigen/changed-lib.yaml
 ```
 
 This regenerates the files as specified by the ffigen configuration in [pubspec.yaml](pubspec.yaml). (Note that [ffigen requires LLVM](https://pub.dev/packages/ffigen).)
+
+### Regenerate gRPC code
+
+If you modify a file in [proto](proto), regenerate the Dart gRPC code:
+
+1. Install [Protocol buffers compiler](https://github.com/protocolbuffers/protobuf#protocol-compiler-installation)
+
+2. Install [Dart plugin for protoc](https://pub.dev/packages/protoc_plugin):
+
+   ```bash
+   flutter pub global activate protoc_plugin
+   ```
+
+   Note the path to the plugin executable or make sure it is available through `PATH`.
+
+3. Generate Dart code:
+
+   ```bash
+   protoc --experimental_allow_proto3_optional --plugin=/path/to/bin/protoc-gen-dart --dart_out=grpc:lib/grpc/ -I proto proto/mpc.proto
+   ```
