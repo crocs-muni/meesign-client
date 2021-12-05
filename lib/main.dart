@@ -3,6 +3,7 @@ import 'package:mpc_demo/mpc_model.dart';
 import 'package:mpc_demo/widget/card_reader_page.dart';
 import 'package:mpc_demo/widget/new_group_page.dart';
 import 'package:mpc_demo/widget/qr_identity_page.dart';
+import 'package:mpc_demo/widget/qr_reader_page.dart';
 import 'package:mpc_demo/widget/search_peer_page.dart';
 import 'package:provider/provider.dart';
 
@@ -31,6 +32,7 @@ class MyApp extends StatelessWidget {
         '/new_group': (context) => const NewGroupPage(),
         '/new_group/search': (context) => const SearchPeerPage(),
         '/new_group/card_reader': (context) => const CardReaderPage(),
+        '/new_group/qr_reader': (context) => const QrReaderPage(),
         '/qr_identity': (context) => const QrIdentityPage(),
       },
     );

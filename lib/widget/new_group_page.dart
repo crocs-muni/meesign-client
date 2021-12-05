@@ -75,6 +75,10 @@ class _NewGroupPageState extends State<NewGroupPage> {
     _addMember(card);
   }
 
+  void _selectQr() async {
+    await Navigator.pushNamed(context, '/new_group/qr_reader');
+  }
+
   void _finishCreate() {
     final model = context.read<MpcModel>();
     model.addGroup(_nameController.text, _members, _threshold);
@@ -121,7 +125,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                         leading: const Icon(Icons.qr_code),
                         title: const Text('Scan QR code'),
                         enabled: Platform.isAndroid || Platform.isIOS,
-                        onTap: () {},
+                        onTap: _selectQr,
                       ),
                       ListTile(
                         leading: const Icon(Icons.contactless_outlined),
