@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -13,6 +14,10 @@ class QrReaderPage extends StatefulWidget {
 class _QrReaderPageState extends State<QrReaderPage> {
   final GlobalKey _qrKey = GlobalKey(debugLabel: 'QR');
   QRViewController? _controller;
+  StreamSubscription? _dataStream;
+
+  bool _recentError = false;
+  Timer? _errorTimer;
 
   @override
   void reassemble() {
@@ -33,7 +38,24 @@ class _QrReaderPageState extends State<QrReaderPage> {
   }
 
   void _onData(Barcode data) {
-    print(data.code);
+    _errorTimer?.cancel();
+
+    final code = data.code;
+    if (code == null || !code.startsWith('application/mpc;')) {
+      setState(() {
+        _recentError = true;
+      });
+      _errorTimer = Timer(const Duration(seconds: 1), () {
+        setState(() {
+          _recentError = false;
+        });
+      });
+      return;
+    }
+
+    // TODO: is the stream always recreated after a pop?
+    _dataStream?.cancel();
+    Navigator.pop(context);
   }
 
   @override
@@ -51,14 +73,21 @@ class _QrReaderPageState extends State<QrReaderPage> {
               ),
               onQRViewCreated: (controller) {
                 _controller = controller;
-                controller.scannedDataStream.listen(_onData);
+                _dataStream = controller.scannedDataStream.listen(_onData);
               },
             ),
           ),
-          const Expanded(
+          Expanded(
             flex: 1,
             child: Center(
-              child: Text('Scan the code of the peer'),
+              child: _recentError
+                  ? const Text(
+                      'This code does not belong to any peer',
+                      style: TextStyle(
+                        color: Colors.red,
+                      ),
+                    )
+                  : const Text('Scan the code of the peer'),
             ),
           )
         ],

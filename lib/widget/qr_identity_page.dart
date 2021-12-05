@@ -25,7 +25,7 @@ class QrIdentityPage extends StatelessWidget {
                 child: Center(
                   child: QrImage(
                     padding: const EdgeInsets.all(24),
-                    data: '1234',
+                    data: 'application/mpc;1234',
                   ),
                 ),
               ),
