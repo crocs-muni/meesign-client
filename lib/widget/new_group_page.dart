@@ -76,7 +76,8 @@ class _NewGroupPageState extends State<NewGroupPage> {
   }
 
   void _selectQr() async {
-    await Navigator.pushNamed(context, '/new_group/qr_reader');
+    final peer = await Navigator.pushNamed(context, '/new_group/qr_reader');
+    _addMember(peer);
   }
 
   void _finishCreate() {

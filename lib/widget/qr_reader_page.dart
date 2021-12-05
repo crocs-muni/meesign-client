@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:mpc_demo/mpc_model.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class QrReaderPage extends StatefulWidget {
@@ -53,9 +54,10 @@ class _QrReaderPageState extends State<QrReaderPage> {
       return;
     }
 
+    final cosigner = Cosigner('User QR', CosignerType.peer);
     // TODO: is the stream always recreated after a pop?
     _dataStream?.cancel();
-    Navigator.pop(context);
+    Navigator.pop(context, cosigner);
   }
 
   @override
