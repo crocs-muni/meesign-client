@@ -57,13 +57,22 @@ class _NewGroupPageState extends State<NewGroupPage> {
     });
   }
 
-  void _selectSearchedPeer() async {
-    final peer = await Navigator.pushNamed(context, '/new_group/search');
-    if (peer is! Cosigner || _members.contains(peer)) return;
+  void _addMember(Object? member) {
+    if (member is! Cosigner || _members.contains(member)) return;
     setState(() {
-      _members.add(peer);
+      _members.add(member);
       _checkCreatable();
     });
+  }
+
+  void _selectSearchedPeer() async {
+    final peer = await Navigator.pushNamed(context, '/new_group/search');
+    _addMember(peer);
+  }
+
+  void _selectCard() async {
+    final card = await Navigator.pushNamed(context, '/new_group/card_reader');
+    _addMember(card);
   }
 
   void _finishCreate() {
@@ -118,12 +127,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                         leading: const Icon(Icons.contactless_outlined),
                         title: const Text('Add NFC card'),
                         enabled: Platform.isAndroid || Platform.isIOS,
-                        onTap: () {
-                          Navigator.pushNamed(
-                            context,
-                            '/new_group/card_reader',
-                          );
-                        },
+                        onTap: _selectCard,
                       ),
                       ListTile(
                         leading: const Icon(Icons.search),

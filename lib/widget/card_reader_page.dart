@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
+import 'package:mpc_demo/mpc_model.dart';
 
 class CardReaderPage extends StatefulWidget {
   const CardReaderPage({Key? key}) : super(key: key);
@@ -35,7 +36,10 @@ class _CardReaderPageState extends State<CardReaderPage> {
         _working = false;
       });
 
-      Navigator.pop(context);
+      // TODO: this should be done in mpc_model.dart
+      final cosigner = Cosigner('Card', CosignerType.card);
+
+      Navigator.pop(context, cosigner);
     } catch (e) {
       setState(() {
         _working = false;
