@@ -41,6 +41,7 @@ dependencies:
   file_picker: ^4.2.7
   flutter_nfc_kit: ^3.1.0
   qr_code_scanner: ^0.6.1
+  grpc: ^3.0.2
 
 dev_dependencies:
   flutter_test:
