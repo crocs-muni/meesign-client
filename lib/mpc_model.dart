@@ -1,31 +1,15 @@
 import 'package:flutter/foundation.dart';
 
-abstract class Protocol {
-  final int keygenRounds;
-  final int signRounds;
-  const Protocol({
-    required this.keygenRounds,
-    required this.signRounds,
-  });
-}
-
-class Ecdsa extends Protocol {
-  const Ecdsa() : super(keygenRounds: 2, signRounds: 3);
-}
-
 class Group {
   String name;
   List<Cosigner> members;
-  Protocol protocol;
   int threshold;
-  int round = 0;
 
-  bool get isFinished => round == protocol.keygenRounds;
+  bool get isFinished => false;
 
   Group(
     this.name,
     this.members,
-    this.protocol,
     this.threshold,
   );
 }
@@ -45,29 +29,22 @@ class SignedFile {
   String path;
   Group group;
   List<Cosigner> cosigners;
-  int round = 0;
 
-  bool get isFinished => round == group.protocol.signRounds;
+  bool get isFinished => false;
 
   SignedFile(this.path, this.group, this.cosigners);
 }
 
 class MpcModel with ChangeNotifier {
-  final cosigners = [];
-  final groups = [];
-
-  var files = [];
+  final List<Group> groups = [];
+  final List<SignedFile> files = [];
 
   List<Cosigner> searchForPeers(String query) {
-    List<Cosigner> cosigners = [];
-    for (int i = 0; i < 5; i++) {
-      cosigners.add(Cosigner('User $i', CosignerType.peer));
-    }
-    return cosigners;
+    return [];
   }
 
   void addGroup(String name, List<Cosigner> members, int threshold) {
-    groups.add(Group(name, members, const Ecdsa(), threshold));
+    groups.add(Group(name, members, threshold));
     notifyListeners();
   }
 }

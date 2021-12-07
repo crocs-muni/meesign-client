@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 class ProgressCheck extends StatelessWidget {
   const ProgressCheck(this.value, {Key? key}) : super(key: key);
 
-  final double value;
+  final double? value;
 
   @override
   Widget build(BuildContext context) {
@@ -68,12 +68,9 @@ class SigningSubPage extends StatelessWidget {
         itemCount: model.files.length,
         itemBuilder: (context, i) {
           final file = model.files[i];
-          double progress =
-              file.round.toDouble() / file.group.protocol.signRounds;
-
           return ListTile(
             title: Text(file.path),
-            trailing: ProgressCheck(progress),
+            trailing: ProgressCheck(file.isFinished ? 1.0 : null),
             onTap: () {},
           );
         },
@@ -103,14 +100,11 @@ class GroupsSubPage extends StatelessWidget {
       return ListView.builder(
           itemCount: model.groups.length,
           itemBuilder: (context, i) {
-            // final model = context.read<MpcModel>();
             final group = model.groups[i];
-            double progress =
-                group.round.toDouble() / group.protocol.keygenRounds;
 
             return ListTile(
               title: Text(group.name),
-              subtitle: Text('${group.protocol.runtimeType}: '
+              subtitle: Text('Threshold: '
                   '${group.threshold} out of ${group.members.length}'),
               onTap: () {},
               leading: CircleAvatar(
@@ -118,7 +112,7 @@ class GroupsSubPage extends StatelessWidget {
                   _groupInitials(group),
                 ),
               ),
-              trailing: ProgressCheck(progress),
+              trailing: ProgressCheck(group.isFinished ? 1.0 : null),
             );
           });
     });
@@ -161,8 +155,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // final model = context.read<MpcModel>();
-
     const pages = [
       SigningSubPage(),
       GroupsSubPage(),
