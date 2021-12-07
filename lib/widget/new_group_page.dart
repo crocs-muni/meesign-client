@@ -36,7 +36,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
   Iterable<Widget> get _memberChips sync* {
     for (final Cosigner member in _members) {
       final icon =
-          member.type == CosignerType.peer ? Icons.person : Icons.contactless;
+          member.type == CosignerType.app ? Icons.person : Icons.contactless;
       yield InputChip(
         label: Text(member.name),
         avatar: CircleAvatar(

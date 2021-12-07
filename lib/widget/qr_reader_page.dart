@@ -54,7 +54,7 @@ class _QrReaderPageState extends State<QrReaderPage> {
       return;
     }
 
-    final cosigner = Cosigner('User QR', CosignerType.peer);
+    final cosigner = Cosigner('User QR', CosignerType.app);
     // TODO: is the stream always recreated after a pop?
     _dataStream?.cancel();
     Navigator.pop(context, cosigner);

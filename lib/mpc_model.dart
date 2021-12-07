@@ -15,7 +15,7 @@ class Group {
 }
 
 enum CosignerType {
-  peer,
+  app,
   card,
 }
 
