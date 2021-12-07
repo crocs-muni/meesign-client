@@ -86,8 +86,12 @@ class MpcModel with ChangeNotifier {
     if (resp.hasFailure()) throw Exception(resp.failure);
   }
 
-  List<Cosigner> searchForPeers(String query) {
-    return [];
+  Future<Iterable<Cosigner>> searchForPeers(String query) => getRegistered();
+
+  Future<Iterable<Cosigner>> getRegistered() async {
+    final devices = await _client.getDevices(DevicesRequest());
+    return devices.devices
+        .map((device) => Cosigner(device.name, device.id, CosignerType.app));
   }
 
   void addGroup(String name, List<Cosigner> members, int threshold) {

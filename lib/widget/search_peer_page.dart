@@ -14,10 +14,15 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
   final _queryController = TextEditingController();
   List<Cosigner> _queryResults = [];
 
-  void _query(String query) {
+  void _query(String query) async {
+    final model = context.read<MpcModel>();
+    List<Cosigner> results = [];
+    try {
+      results = (await model.searchForPeers(_queryController.text)).toList();
+    } catch (e) {}
+
     setState(() {
-      _queryResults =
-          context.read<MpcModel>().searchForPeers(_queryController.text);
+      _queryResults = results;
     });
   }
 
