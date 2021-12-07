@@ -29,7 +29,8 @@ class QrIdentityPage extends StatelessWidget {
                   child: Consumer<MpcModel>(builder: (context, model, child) {
                     return QrImage(
                       padding: const EdgeInsets.all(24),
-                      data: 'application/mpc;${model.thisDevice.hexId}',
+                      data: 'application/mpc;${model.thisDevice.name},'
+                          '${model.thisDevice.hexId}',
                     );
                   }),
                 ),
