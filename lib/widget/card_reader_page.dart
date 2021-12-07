@@ -37,7 +37,7 @@ class _CardReaderPageState extends State<CardReaderPage> {
       });
 
       // TODO: this should be done in mpc_model.dart
-      final cosigner = Cosigner('Card', CosignerType.card);
+      final cosigner = Cosigner.random('Card', CosignerType.card);
 
       Navigator.pop(context, cosigner);
     } catch (e) {
