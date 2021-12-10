@@ -95,12 +95,11 @@ class MpcModel with ChangeNotifier {
   }
 
   void addGroup(String name, List<Cosigner> members, int threshold) async {
-    final resp = await _client.group(GroupRequest(
+    final task = await _client.group(GroupRequest(
       deviceIds: members.map((m) => m.id),
       name: name,
       threshold: threshold,
     ));
-    if (resp.hasFailure()) throw Exception(resp.failure);
 
     groups.add(Group(name, members, threshold));
     notifyListeners();

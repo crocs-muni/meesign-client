@@ -18,14 +18,14 @@ class MPCClient extends $grpc.Client {
       '/mpcoord.MPC/Register',
       ($0.RegistrationRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.Resp.fromBuffer(value));
-  static final _$sign = $grpc.ClientMethod<$0.SignRequest, $0.Resp>(
+  static final _$sign = $grpc.ClientMethod<$0.SignRequest, $0.Task>(
       '/mpcoord.MPC/Sign',
       ($0.SignRequest value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $0.Resp.fromBuffer(value));
-  static final _$group = $grpc.ClientMethod<$0.GroupRequest, $0.Resp>(
+      ($core.List<$core.int> value) => $0.Task.fromBuffer(value));
+  static final _$group = $grpc.ClientMethod<$0.GroupRequest, $0.Task>(
       '/mpcoord.MPC/Group',
       ($0.GroupRequest value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $0.Resp.fromBuffer(value));
+      ($core.List<$core.int> value) => $0.Task.fromBuffer(value));
   static final _$getTask = $grpc.ClientMethod<$0.TaskRequest, $0.Task>(
       '/mpcoord.MPC/GetTask',
       ($0.TaskRequest value) => value.writeToBuffer(),
@@ -53,12 +53,12 @@ class MPCClient extends $grpc.Client {
     return $createUnaryCall(_$register, request, options: options);
   }
 
-  $grpc.ResponseFuture<$0.Resp> sign($0.SignRequest request,
+  $grpc.ResponseFuture<$0.Task> sign($0.SignRequest request,
       {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$sign, request, options: options);
   }
 
-  $grpc.ResponseFuture<$0.Resp> group($0.GroupRequest request,
+  $grpc.ResponseFuture<$0.Task> group($0.GroupRequest request,
       {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$group, request, options: options);
   }
@@ -96,20 +96,20 @@ abstract class MPCServiceBase extends $grpc.Service {
         ($core.List<$core.int> value) =>
             $0.RegistrationRequest.fromBuffer(value),
         ($0.Resp value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$0.SignRequest, $0.Resp>(
+    $addMethod($grpc.ServiceMethod<$0.SignRequest, $0.Task>(
         'Sign',
         sign_Pre,
         false,
         false,
         ($core.List<$core.int> value) => $0.SignRequest.fromBuffer(value),
-        ($0.Resp value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$0.GroupRequest, $0.Resp>(
+        ($0.Task value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.GroupRequest, $0.Task>(
         'Group',
         group_Pre,
         false,
         false,
         ($core.List<$core.int> value) => $0.GroupRequest.fromBuffer(value),
-        ($0.Resp value) => value.writeToBuffer()));
+        ($0.Task value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.TaskRequest, $0.Task>(
         'GetTask',
         getTask_Pre,
@@ -145,12 +145,12 @@ abstract class MPCServiceBase extends $grpc.Service {
     return register(call, await request);
   }
 
-  $async.Future<$0.Resp> sign_Pre(
+  $async.Future<$0.Task> sign_Pre(
       $grpc.ServiceCall call, $async.Future<$0.SignRequest> request) async {
     return sign(call, await request);
   }
 
-  $async.Future<$0.Resp> group_Pre(
+  $async.Future<$0.Task> group_Pre(
       $grpc.ServiceCall call, $async.Future<$0.GroupRequest> request) async {
     return group(call, await request);
   }
@@ -177,8 +177,8 @@ abstract class MPCServiceBase extends $grpc.Service {
 
   $async.Future<$0.Resp> register(
       $grpc.ServiceCall call, $0.RegistrationRequest request);
-  $async.Future<$0.Resp> sign($grpc.ServiceCall call, $0.SignRequest request);
-  $async.Future<$0.Resp> group($grpc.ServiceCall call, $0.GroupRequest request);
+  $async.Future<$0.Task> sign($grpc.ServiceCall call, $0.SignRequest request);
+  $async.Future<$0.Task> group($grpc.ServiceCall call, $0.GroupRequest request);
   $async.Future<$0.Task> getTask(
       $grpc.ServiceCall call, $0.TaskRequest request);
   $async.Future<$0.Resp> updateTask(
