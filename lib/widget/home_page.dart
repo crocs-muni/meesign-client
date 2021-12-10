@@ -80,17 +80,15 @@ class SigningSubPage extends StatelessWidget {
   }
 }
 
+String _nameInitials(String name) => name
+    .split(' ')
+    .where((w) => w.isNotEmpty)
+    .take(2)
+    .map((w) => w[0].toUpperCase())
+    .join();
+
 class GroupsSubPage extends StatelessWidget {
   const GroupsSubPage({Key? key}) : super(key: key);
-
-  String _groupInitials(Group group) {
-    return group.name
-        .split(' ')
-        .where((w) => w.isNotEmpty)
-        .take(2)
-        .map((w) => w[0].toUpperCase())
-        .join();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +107,7 @@ class GroupsSubPage extends StatelessWidget {
               onTap: () {},
               leading: CircleAvatar(
                 child: Text(
-                  _groupInitials(group),
+                  _nameInitials(group.name),
                 ),
               ),
               trailing: ProgressCheck(group.isFinished ? 1.0 : null),
@@ -210,6 +208,24 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('MPC Demo'),
         actions: [
+          Consumer<MpcModel>(builder: (context, model, child) {
+            final name = model.thisDevice.name;
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  name,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: CircleAvatar(
+                    child: Text(_nameInitials(name)),
+                  ),
+                ),
+              ],
+            );
+          }),
           IconButton(
             icon: const Icon(Icons.qr_code),
             onPressed: () {
