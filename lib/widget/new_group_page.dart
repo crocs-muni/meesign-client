@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mpc_demo/mpc_model.dart';
 import 'package:mpc_demo/rnd_name_generator.dart';
@@ -15,6 +16,7 @@ class NewGroupPage extends StatefulWidget {
 }
 
 class _NewGroupPageState extends State<NewGroupPage> {
+  // TODO: store this in a Group object?
   int _threshold = 1;
   final List<Cosigner> _members = [];
   final _nameController = TextEditingController();
@@ -67,7 +69,10 @@ class _NewGroupPageState extends State<NewGroupPage> {
   }
 
   void _addMember(Object? member) {
-    if (member is! Cosigner || _members.contains(member)) return;
+    if (member is! Cosigner) return;
+    for (final m in _members) {
+      if (listEquals(m.id, member.id)) return;
+    }
     setState(() {
       _members.add(member);
       _checkCreatable();
