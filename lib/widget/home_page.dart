@@ -129,6 +129,38 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _index = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    // TODO: when to cancel it?
+    context.read<MpcModel>().groupRequests.listen(_showGroupRequest);
+  }
+
+  void _showGroupRequest(Group group) {
+    ScaffoldMessenger.of(context).showMaterialBanner(
+      MaterialBanner(
+        content: Text('Do you want to join group ${group.name}?'),
+        leading: const Icon(Icons.group_add),
+        actions: [
+          TextButton(
+            child: const Text('JOIN'),
+            onPressed: () {
+              ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
+              context.read<MpcModel>().joinGroup(group);
+            },
+          ),
+          TextButton(
+            child: const Text('DECLINE'),
+            onPressed: () {
+              ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
+              // TODO: decline request
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showSignRequest(String group, String file) {
     ScaffoldMessenger.of(context).showMaterialBanner(
       MaterialBanner(
