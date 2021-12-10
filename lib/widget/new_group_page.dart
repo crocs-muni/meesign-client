@@ -23,6 +23,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
   @override
   void initState() {
     super.initState();
+    _members.add(context.read<MpcModel>().thisDevice);
     _nameController.addListener(_checkCreatable);
     _nameController.text = RndNameGenerator().next();
   }
@@ -34,7 +35,15 @@ class _NewGroupPageState extends State<NewGroupPage> {
   }
 
   Iterable<Widget> get _memberChips sync* {
-    for (final Cosigner member in _members) {
+    // always present, non-deleteable
+    yield InputChip(
+      label: Text(_members[0].name + ' (You)'),
+      avatar: const CircleAvatar(
+        child: Icon(Icons.person),
+      ),
+    );
+
+    for (final Cosigner member in _members.skip(1)) {
       final icon =
           member.type == CosignerType.app ? Icons.person : Icons.contactless;
       yield InputChip(
