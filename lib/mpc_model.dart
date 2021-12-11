@@ -120,9 +120,11 @@ class MpcModel with ChangeNotifier {
 
   MpcModel() {
     _createTmpDir();
+  }
 
+  Future<void> register(String name, String host) async {
     _channel = ClientChannel(
-      'localhost',
+      host,
       port: 1337,
       options: const ChannelOptions(
         credentials: ChannelCredentials.insecure(),
@@ -131,18 +133,14 @@ class MpcModel with ChangeNotifier {
 
     _client = MPCClient(_channel);
 
-    // TODO: there should be a setup page for this
-    thisDevice = Cosigner.random(RndNameGenerator().next(), CosignerType.app);
-    register(thisDevice);
+    thisDevice = Cosigner.random(name, CosignerType.app);
 
-    _startPoll();
-  }
-
-  Future<void> register(Cosigner cosigner) async {
     final resp = await _client.register(
-      RegistrationRequest(id: cosigner.id, name: cosigner.name),
+      RegistrationRequest(id: thisDevice.id, name: name),
     );
     if (resp.hasFailure()) throw Exception(resp.failure);
+
+    _startPoll();
   }
 
   Future<Iterable<Cosigner>> searchForPeers(String query) => getRegistered();
