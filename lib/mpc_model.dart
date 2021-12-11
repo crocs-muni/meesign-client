@@ -5,6 +5,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:grpc/grpc.dart';
+import 'package:mpc_demo/dylib_manager.dart';
 import 'package:mpc_demo/grpc/mpc.pbgrpc.dart';
 import 'package:mpc_demo/rnd_name_generator.dart';
 import 'package:path/path.dart' as path_pkg;
@@ -91,13 +92,6 @@ class SignedFile {
   SignedFile(this.path, this.group);
 
   String get basename => path_pkg.basename(path);
-
-  static Future<SignedFile> _storeTask(Task task, String dir) async {
-    String path = path_pkg.join(dir, '${Random().nextInt(1 << 32)}.pdf');
-    await File(path).writeAsBytes(task.work, flush: true);
-
-    return SignedFile(path, null)..taskId = task.id;
-  }
 }
 
 class MpcModel with ChangeNotifier {
@@ -117,9 +111,12 @@ class MpcModel with ChangeNotifier {
   Stream<SignedFile> get signRequests => _signReqsController.stream;
 
   late Directory _tmpDir;
+  late Directory _signedDir;
+
+  final DylibManager _dylibManager = DylibManager();
 
   MpcModel() {
-    _createTmpDir();
+    _createDirs();
   }
 
   Future<void> register(String name, String host) async {
@@ -275,7 +272,7 @@ class MpcModel with ChangeNotifier {
             change = true;
 
             task = await _getTask(task.id);
-            final newFile = await SignedFile._storeTask(task, _tmpDir.path);
+            final newFile = await _storeTask(task);
             files.add(newFile);
             _signReqsController.add(newFile);
             break;
@@ -287,6 +284,7 @@ class MpcModel with ChangeNotifier {
     for (final file in files.where((f) => !f.isFinished)) {
       final task = await _getTask(file.taskId!);
       if (task.state == Task_TaskState.FINISHED) {
+        await _insertSignature(file);
         file.isFinished = true;
         change = true;
       }
@@ -315,8 +313,27 @@ class MpcModel with ChangeNotifier {
     if (change) notifyListeners();
   }
 
-  Future<void> _createTmpDir() async {
+  Future<void> _createDirs() async {
     final tmp = await getTemporaryDirectory();
     _tmpDir = await Directory(path_pkg.join(tmp.path, 'mpc_demo')).create();
+    _signedDir =
+        await Directory(path_pkg.join(_tmpDir.path, 'signed')).create();
+  }
+
+  Future<SignedFile> _storeTask(Task task) async {
+    String path = path_pkg.join(
+      _tmpDir.path,
+      '${Random().nextInt(1 << 32)}.pdf',
+    );
+    await File(path).writeAsBytes(task.work, flush: true);
+
+    return SignedFile(path, null)..taskId = task.id;
+  }
+
+  Future<void> _insertSignature(SignedFile file) async {
+    final outPath = path_pkg.join(_signedDir.path, file.basename);
+    // TODO: add cosigners as pdf annotation
+    await _dylibManager.signPdf(file.path, outPath);
+    file.path = outPath;
   }
 }
