@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:grpc/grpc.dart';
 import 'package:mpc_demo/grpc/mpc.pbgrpc.dart';
 import 'package:mpc_demo/rnd_name_generator.dart';
+import 'package:path/path.dart' as path_pkg;
 import 'package:path_provider/path_provider.dart';
 
 class Group {
@@ -89,8 +90,10 @@ class SignedFile {
 
   SignedFile(this.path, this.group);
 
+  String get basename => path_pkg.basename(path);
+
   static Future<SignedFile> _storeTask(Task task, String dir) async {
-    String path = '$dir/${Random().nextInt(1 << 32)}.pdf';
+    String path = path_pkg.join(dir, '${Random().nextInt(1 << 32)}.pdf');
     await File(path).writeAsBytes(task.work, flush: true);
 
     return SignedFile(path, null)..taskId = task.id;
@@ -316,6 +319,6 @@ class MpcModel with ChangeNotifier {
 
   Future<void> _createTmpDir() async {
     final tmp = await getTemporaryDirectory();
-    _tmpDir = await Directory(tmp.path + '/mpc_demo').create();
+    _tmpDir = await Directory(path_pkg.join(tmp.path, 'mpc_demo')).create();
   }
 }
