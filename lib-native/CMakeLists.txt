@@ -26,12 +26,14 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
 
-find_package(OpenSSL REQUIRED)
-find_package(PoDoFo REQUIRED)
-
 set(CARGO_CMD cargo build --target ${RUST_TARGET} ${CARGO_BUILD_TYPE_OPT})
 
-if(ANDROID)
+if(NOT ANDROID)
+  find_package(OpenSSL REQUIRED)
+  find_package(PoDoFo REQUIRED)
+else()
+  find_package(openssl REQUIRED)
+  find_package(podofo REQUIRED)
   add_library(OpenSSL::Crypto ALIAS openssl::crypto)
   add_library(OpenSSL::SSL ALIAS openssl::ssl)
   add_library(PoDoFo ALIAS podofo::podofo)
