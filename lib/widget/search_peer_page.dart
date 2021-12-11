@@ -89,7 +89,10 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
                   ],
                 ),
               ),
-              const Divider(thickness: 1),
+              const Divider(
+                thickness: 1,
+                height: 1,
+              ),
               Expanded(
                 child: ListView(
                   children: _queryResultTiles.toList(),
