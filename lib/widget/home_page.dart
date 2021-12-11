@@ -2,6 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:mpc_demo/mpc_model.dart';
+import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
 
 class ProgressCheck extends StatelessWidget {
@@ -47,18 +48,6 @@ class EmptyList extends StatelessWidget {
 class SigningSubPage extends StatelessWidget {
   const SigningSubPage({Key? key}) : super(key: key);
 
-  Future<FilePickerResult?> _pickPdfFile() async =>
-      FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['pdf'],
-        withData: false,
-        withReadStream: false,
-      );
-
-  void beginSign() async {
-    await _pickPdfFile();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Consumer<MpcModel>(builder: (context, model, child) {
@@ -69,12 +58,16 @@ class SigningSubPage extends StatelessWidget {
         itemBuilder: (context, i) {
           final file = model.files[i];
           return ListTile(
-            title: Text(file.path),
+            title: Text(file.basename),
             trailing: ProgressCheck(file.isFinished ? 1.0 : null),
-            onTap: () {},
+            onTap: () {
+              OpenFile.open(file.path);
+            },
           );
         },
-        separatorBuilder: (context, i) => const Divider(height: 1,),
+        separatorBuilder: (context, i) => const Divider(
+          height: 1,
+        ),
       );
     });
   }
@@ -131,7 +124,9 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     // TODO: when to cancel it?
-    context.read<MpcModel>().groupRequests.listen(_showGroupRequest);
+    MpcModel model = context.read<MpcModel>();
+    model.groupRequests.listen(_showGroupRequest);
+    model.signRequests.listen(_showSignRequest);
   }
 
   void _showGroupRequest(Group group) {
@@ -159,28 +154,77 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _showSignRequest(String group, String file) {
+  void _showSignRequest(SignedFile file) {
     ScaffoldMessenger.of(context).showMaterialBanner(
       MaterialBanner(
-        content: Text('Group $group asks you to sign $file.'),
+        content: Text('Group ??? asks you to sign ${file.basename}.'),
+        leading: const Icon(Icons.lock),
         actions: [
           TextButton(
+            child: const Text('VIEW'),
             onPressed: () {
-              ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
-              // TODO: do sign
+              OpenFile.open(file.path);
             },
-            child: const Text('SIGN'),
           ),
           TextButton(
+            child: const Text('SIGN'),
+            onPressed: () {
+              ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
+              context.read<MpcModel>().cosign(file);
+            },
+          ),
+          TextButton(
+            child: const Text('IGNORE'),
             onPressed: () {
               ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
             },
-            child: const Text('IGNORE'),
           ),
         ],
-        leading: const Icon(Icons.warning),
       ),
     );
+  }
+
+  Future<Group?> _selectGroup() async {
+    return showDialog<Group?>(
+      context: context,
+      builder: (context) {
+        return Consumer<MpcModel>(
+          builder: (context, model, child) {
+            return SimpleDialog(
+              title: const Text('Select group'),
+              children: model.groups
+                  .map((group) => SimpleDialogOption(
+                        child: Text(group.name),
+                        onPressed: () {
+                          Navigator.pop(context, group);
+                        },
+                      ))
+                  .toList(),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  static Future<FilePickerResult?> _pickPdfFile() async =>
+      FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+        withData: false,
+        withReadStream: false,
+      );
+
+  Future<void> _sign() async {
+    final res = await _pickPdfFile();
+    final path = res?.files.first.path;
+    if (path == null) return;
+
+    final group = await _selectGroup();
+    if (group == null) return;
+
+    final model = context.read<MpcModel>();
+    model.sign(path, group);
   }
 
   @override
@@ -192,7 +236,7 @@ class _HomePageState extends State<HomePage> {
 
     final signFab = FloatingActionButton.extended(
       key: const ValueKey('SignFab'),
-      onPressed: (pages[0] as SigningSubPage).beginSign,
+      onPressed: _sign,
       label: const Text('Sign'),
       icon: const Icon(Icons.add),
     );
