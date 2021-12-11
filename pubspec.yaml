@@ -44,6 +44,7 @@ dependencies:
   grpc: ^3.0.2
   path_provider: ^2.0.8
   open_file: ^3.2.1
+  path: ^1.8.0
 
 dev_dependencies:
   flutter_test:
