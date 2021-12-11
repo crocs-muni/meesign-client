@@ -54,7 +54,7 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
 
     for (final cosigner in _queryResults) {
       yield ListTile(
-        leading: const Icon(Icons.network_wifi),
+        leading: const Icon(Icons.person),
         title: Text(cosigner.name),
         onTap: () {
           Navigator.pop(context, cosigner);
