@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -81,13 +82,21 @@ class Cosigner {
 
 class SignedFile {
   String path;
-  Group group;
-  List<Cosigner> cosigners;
+  Group? group;
   int? taskId;
+  bool isFinished = false;
 
-  bool get isFinished => false;
+  SignedFile(this.path, this.group);
 
-  SignedFile(this.path, this.group, this.cosigners);
+  static Future<SignedFile> _storeTask(Task task) async {
+    // TODO: get temp dir properly
+    final dir = await Directory('/tmp/mpc_demo').create();
+
+    String path = '${dir.path}/${Random().nextInt(1 << 32)}.pdf';
+    await File(path).writeAsBytes(task.work, flush: true);
+
+    return SignedFile(path, null)..taskId = task.id;
+  }
 }
 
 class MpcModel with ChangeNotifier {
@@ -102,6 +111,9 @@ class MpcModel with ChangeNotifier {
 
   final StreamController<Group> _groupReqsController = StreamController();
   Stream<Group> get groupRequests => _groupReqsController.stream;
+
+  final StreamController<SignedFile> _signReqsController = StreamController();
+  Stream<SignedFile> get signRequests => _signReqsController.stream;
 
   MpcModel() {
     _channel = ClientChannel(
@@ -150,6 +162,35 @@ class MpcModel with ChangeNotifier {
 
     joinGroup(newGroup);
   }
+
+  Future<void> sign(String path, Group group) async {
+    // TODO: oom for large files
+    final bytes = await File(path).readAsBytes();
+    final task = await _client.sign(SignRequest(
+      groupId: group.id,
+      data: bytes,
+    ));
+
+    final file = SignedFile(path, group)..taskId = task.id;
+    files.add(file);
+    notifyListeners();
+
+    cosign(file);
+  }
+
+  Future<void> cosign(SignedFile file) async {
+    final resp = await _client.updateTask(TaskUpdate(
+      device: thisDevice.id,
+      task: file.taskId,
+      data: [1],
+    ));
+    assert(resp.hasSuccess());
+  }
+
+  Future<Task> _getTask(int id) => _client.getTask(TaskRequest(
+        taskId: id,
+        deviceId: thisDevice.id,
+      ));
 
   // TODO: fix type; change protocol to avoid this stupid find?
   Group _findExistingGroup(groupMsg) {
@@ -211,10 +252,7 @@ class MpcModel with ChangeNotifier {
             change = true;
 
             // new task, we need to fetch it's details
-            task = await _client.getTask(TaskRequest(
-              taskId: task.id,
-              deviceId: thisDevice.id,
-            ));
+            task = await _getTask(task.id);
 
             final newGroup = Group._fromTask(task, devices);
             groups.add(newGroup);
@@ -223,9 +261,28 @@ class MpcModel with ChangeNotifier {
           }
         case Task_TaskType.SIGN:
           {
-            // TODO: Handle this case.
+            SignedFile? file = files.cast<SignedFile?>().firstWhere(
+                  (file) => file!.taskId == task.id,
+                  orElse: () => null,
+                );
+            if (file != null) continue;
+            change = true;
+
+            task = await _getTask(task.id);
+            final newFile = await SignedFile._storeTask(task);
+            files.add(newFile);
+            _signReqsController.add(newFile);
             break;
           }
+      }
+    }
+
+    // FIXME: this should be in the info probably
+    for (final file in files.where((f) => !f.isFinished)) {
+      final task = await _getTask(file.taskId!);
+      if (task.state == Task_TaskState.FINISHED) {
+        file.isFinished = true;
+        change = true;
       }
     }
 
