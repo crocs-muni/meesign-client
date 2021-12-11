@@ -74,7 +74,7 @@ class SigningSubPage extends StatelessWidget {
             onTap: () {},
           );
         },
-        separatorBuilder: (context, i) => const Divider(),
+        separatorBuilder: (context, i) => const Divider(height: 1,),
       );
     });
   }
