@@ -163,6 +163,14 @@ class MpcModel with ChangeNotifier {
     joinGroup(newGroup);
   }
 
+  Future<void> joinGroup(Group group) async {
+    final resp = await _client.updateTask(TaskUpdate(
+      device: thisDevice.id,
+      task: group.taskId,
+      data: [1],
+    ));
+  }
+
   Future<void> sign(String path, Group group) async {
     // TODO: oom for large files
     final bytes = await File(path).readAsBytes();
@@ -211,22 +219,8 @@ class MpcModel with ChangeNotifier {
     throw Exception('Group not found');
   }
 
-  void _startPoll() {
-    if (_pollTimer != null) return;
-    _pollTimer = Timer.periodic(const Duration(seconds: 1), _poll);
-  }
-
-  void _stopPoll() {
-    _pollTimer?.cancel();
-    _pollTimer = null;
-  }
-
-  Future<void> _poll(Timer timer) async {
+  bool _updateGroups(Info info) {
     bool change = false;
-
-    // TODO: cache these?
-    final devices = await _client.getDevices(DevicesRequest());
-    final info = await _client.getInfo(InfoRequest(deviceId: thisDevice.id));
 
     // update details of newly created groups
     for (final group in info.groups) {
@@ -237,6 +231,15 @@ class MpcModel with ChangeNotifier {
       existing.threshold = group.threshold;
       change = true;
     }
+
+    return change;
+  }
+
+  Future<bool> _processTasks(Info info) async {
+    bool change = false;
+
+    // TODO: cache these?
+    final devices = await _client.getDevices(DevicesRequest());
 
     // only contains tasks that require action = waiting for us
     for (var task in info.tasks) {
@@ -286,14 +289,26 @@ class MpcModel with ChangeNotifier {
       }
     }
 
-    if (change) notifyListeners();
+    return change;
   }
 
-  Future<void> joinGroup(Group group) async {
-    final resp = await _client.updateTask(TaskUpdate(
-      device: thisDevice.id,
-      task: group.taskId,
-      data: [1],
-    ));
+  void _startPoll() {
+    if (_pollTimer != null) return;
+    _pollTimer = Timer.periodic(const Duration(seconds: 1), _poll);
+  }
+
+  void _stopPoll() {
+    _pollTimer?.cancel();
+    _pollTimer = null;
+  }
+
+  Future<void> _poll(Timer timer) async {
+    final info = await _client.getInfo(InfoRequest(deviceId: thisDevice.id));
+
+    bool change = false;
+    change |= _updateGroups(info);
+    change |= await _processTasks(info);
+
+    if (change) notifyListeners();
   }
 }
