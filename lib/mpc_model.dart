@@ -181,6 +181,8 @@ class MpcModel with ChangeNotifier {
   }
 
   Future<void> _poll(Timer timer) async {
+    bool change = false;
+
     // TODO: cache these?
     final devices = await _client.getDevices(DevicesRequest());
     final info = await _client.getInfo(InfoRequest(deviceId: thisDevice.id));
@@ -188,8 +190,11 @@ class MpcModel with ChangeNotifier {
     // update details of newly created groups
     for (final group in info.groups) {
       final existing = _findExistingGroup(group);
-      existing.id ??= group.id;
+      if (existing.id != null) continue;
+
+      existing.id = group.id;
       existing.threshold = group.threshold;
+      change = true;
     }
 
     // only contains tasks that require action = waiting for us
@@ -203,6 +208,7 @@ class MpcModel with ChangeNotifier {
                 );
             // already handled
             if (group != null) continue;
+            change = true;
 
             // new task, we need to fetch it's details
             task = await _client.getTask(TaskRequest(
@@ -223,7 +229,7 @@ class MpcModel with ChangeNotifier {
       }
     }
 
-    notifyListeners();
+    if (change) notifyListeners();
   }
 
   Future<void> joinGroup(Group group) async {
