@@ -37,7 +37,7 @@ class _CardReaderPageState extends State<CardReaderPage> {
       });
 
       // TODO: this should be done in mpc_model.dart
-      final cosigner = Cosigner.random('Card', CosignerType.card);
+      final cosigner = Cosigner.random('card', CosignerType.card);
 
       Navigator.pop(context, cosigner);
     } catch (e) {
@@ -87,27 +87,31 @@ class _CardReaderPageState extends State<CardReaderPage> {
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Stack(
-                    alignment: AlignmentDirectional.center,
-                    children: [
-                      SizedBox.square(
-                        dimension: 160,
-                        child: CircularProgressIndicator(
-                          value: _working ? null : 0,
+                  Material(
+                    elevation: 2,
+                    shape: const CircleBorder(),
+                    child: Stack(
+                      alignment: AlignmentDirectional.center,
+                      children: [
+                        SizedBox.square(
+                          dimension: 140,
+                          child: CircularProgressIndicator(
+                            value: _working ? null : 0,
+                          ),
                         ),
-                      ),
-                      const Icon(
-                        Icons.contactless,
-                        size: 100,
-                        color: Colors.amber,
-                      ),
-                    ],
+                        const Icon(
+                          Icons.contactless,
+                          size: 100,
+                          color: Colors.amber,
+                        ),
+                      ],
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(24),
                     child: Text(
-                      'Hold the card near the back of the device',
-                      style: Theme.of(context).textTheme.headline5,
+                      'Hold the card\n near the back of the device',
+                      style: Theme.of(context).textTheme.subtitle1,
                       textAlign: TextAlign.center,
                     ),
                   ),
