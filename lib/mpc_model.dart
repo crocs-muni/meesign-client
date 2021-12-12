@@ -311,7 +311,9 @@ class MpcModel with ChangeNotifier {
 
   Future<void> _createDirs() async {
     final tmp = await getTemporaryDirectory();
-    _tmpDir = await Directory(path_pkg.join(tmp.path, 'mpc_demo')).create();
+    final unique = Random().nextInt(1 << 32);
+    _tmpDir =
+        await Directory(path_pkg.join(tmp.path, 'mpc_demo-$unique')).create();
     _signedDir =
         await Directory(path_pkg.join(_tmpDir.path, 'signed')).create();
   }
