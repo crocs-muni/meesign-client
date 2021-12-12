@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:grpc/grpc.dart';
@@ -85,7 +86,7 @@ class Cosigner {
 
 class SignedFile {
   String path;
-  Group? group;
+  Group group;
   int? taskId;
   bool isFinished = false;
 
@@ -172,14 +173,9 @@ class MpcModel with ChangeNotifier {
   }
 
   Future<void> sign(String path, Group group) async {
-    // TODO: oom for large files
-    final bytes = await File(path).readAsBytes();
-    final task = await _client.sign(SignRequest(
-      groupId: group.id,
-      data: bytes,
-    ));
-
-    final file = SignedFile(path, group)..taskId = task.id;
+    final file = SignedFile(path, group);
+    final task = await _client.sign(await _encodeSignRequest(file));
+    file.taskId = task.id;
     files.add(file);
     notifyListeners();
 
@@ -272,7 +268,7 @@ class MpcModel with ChangeNotifier {
             change = true;
 
             task = await _getTask(task.id);
-            final newFile = await _storeTask(task);
+            final newFile = await _decodeSignRequest(task);
             files.add(newFile);
             _signReqsController.add(newFile);
             break;
@@ -320,14 +316,43 @@ class MpcModel with ChangeNotifier {
         await Directory(path_pkg.join(_tmpDir.path, 'signed')).create();
   }
 
-  Future<SignedFile> _storeTask(Task task) async {
+  Future<SignRequest> _encodeSignRequest(SignedFile file) async {
+    List<int> data = [];
+
+    List<int> id = file.group.id!;
+    data.add(id.length ~/ 256);
+    data.add(id.length % 256);
+    data.addAll(id);
+
+    data.addAll(const AsciiEncoder().convert(file.basename));
+    data.add(0);
+
+    // FIXME: oom for large files
+    final bytes = await File(file.path).readAsBytes();
+    data.addAll(bytes);
+
+    return SignRequest(groupId: id, data: data);
+  }
+
+  Future<SignedFile> _decodeSignRequest(Task task) async {
+    final data = task.work;
+    int idLen = 256 * data[0] + data[1];
+    int iIdEnd = 2 + idLen;
+    List<int> id = data.getRange(2, iIdEnd).toList();
+
+    int iNull = data.indexOf(0, iIdEnd);
+    String baseName = const AsciiDecoder().convert(data, iIdEnd, iNull);
+
     String path = path_pkg.join(
       _tmpDir.path,
-      '${Random().nextInt(1 << 32)}.pdf',
+      baseName,
     );
-    await File(path).writeAsBytes(task.work, flush: true);
+    final fileData = Uint8List.sublistView(data as TypedData, iNull + 1);
+    await File(path).writeAsBytes(fileData, flush: true);
 
-    return SignedFile(path, null)..taskId = task.id;
+    final group = groups.firstWhere((g) => listEquals(g.id, id));
+
+    return SignedFile(path, group)..taskId = task.id;
   }
 
   Future<void> _insertSignature(SignedFile file) async {

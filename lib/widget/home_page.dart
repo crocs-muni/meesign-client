@@ -157,7 +157,8 @@ class _HomePageState extends State<HomePage> {
   void _showSignRequest(SignedFile file) {
     ScaffoldMessenger.of(context).showMaterialBanner(
       MaterialBanner(
-        content: Text('Group ??? asks you to sign ${file.basename}.'),
+        content: Text('Group ${file.group.name} asks you '
+            'to sign ${file.basename}.'),
         leading: const Icon(Icons.lock),
         actions: [
           TextButton(
