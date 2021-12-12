@@ -357,8 +357,11 @@ class MpcModel with ChangeNotifier {
 
   Future<void> _insertSignature(SignedFile file) async {
     final outPath = path_pkg.join(_signedDir.path, file.basename);
-    // TODO: add cosigners as pdf annotation
-    await _dylibManager.signPdf(file.path, outPath);
+
+    final signers = file.group.members.map((m) => '    - ${m.name}').join('\n');
+    final msg = 'Signed using MPC Demo by:\n' + signers;
+
+    await _dylibManager.signPdf(file.path, outPath, message: msg);
     file.path = outPath;
   }
 }
