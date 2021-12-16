@@ -26,12 +26,13 @@ jobs:
       matrix:
         target: [Windows, Linux, Android]
         include:
-        - os: windows-2019
+        - os: windows-2022
           target: Windows
           build_target: windows
           build_path: build\windows\runner\Release
           asset_extension: .zip
           asset_content_type: application/zip
+          toolchain_file: C:\vcpkg\scripts\buildsystems\vcpkg.cmake
         - os: ubuntu-20.04
           target: Linux
           build_target: linux
@@ -58,12 +59,26 @@ jobs:
       if: matrix.target == 'Linux'
       run: |
         sudo apt-get update
-        sudo apt-get install -y libgtk-3-dev libx11-dev pkg-config cmake ninja-build libblkid-dev
+        sudo apt-get install -y libgtk-3-dev libx11-dev pkg-config cmake ninja-build libblkid-dev libpodofo-dev
     - name: Install Android dependencies
       if: matrix.target == 'Android'
       uses: actions/setup-java@v1
       with:
         java-version: '12.x'
+
+    - name: Cache Vcpkg packages
+      uses: actions/cache@v2
+      if: matrix.target == 'Windows'
+      with:
+        path: C:\vcpkg
+        key: vcpkg-root
+
+    - name: Install Windows dependencies
+      if: matrix.target == 'Windows'
+      env:
+        VCPKG_DEFAULT_TRIPLET: x64-windows
+      run: |
+        vcpkg install zlib freetype openssl podofo
 
     - name: Enable desktop support
       if: matrix.target != 'Android'
@@ -89,7 +104,11 @@ jobs:
         cat ~/.cargo/config.toml
 
     # Build the application.
-    - run: flutter build -v ${{ matrix.build_target }} --release
+    - env:
+        CMAKE_TOOLCHAIN_FILE: ${{ matrix.toolchain_file }}
+        VCPKG_ROOT: C:\vcpkg
+        VCPKGRS_DYNAMIC: 1
+      run: flutter build -v ${{ matrix.build_target }} --release
 
     # Package the build.
     - name: Copy VC redistributables to release directory for Windows
