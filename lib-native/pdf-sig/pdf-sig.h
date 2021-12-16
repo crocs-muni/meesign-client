@@ -5,6 +5,9 @@
 #ifdef __cplusplus
 extern "C"
 #endif
+#ifdef _WIN32
+__declspec(dllexport)
+#endif
 void pdf_sign(
     const char *in_file,
     const char *out_file,

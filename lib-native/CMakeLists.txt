@@ -89,3 +89,8 @@ if(ANDROID)
   # this way android build includes it in the created apk
   target_link_libraries(pdf-sig OpenSSL::SSL)
 endif(ANDROID)
+if(WIN32)
+  # FIXME: ditto
+  target_link_libraries(pdf-sig OpenSSL::SSL)
+  target_link_options(pdf-sig PRIVATE "/INCLUDE:OPENSSL_init_ssl")
+endif(WIN32)
