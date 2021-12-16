@@ -49,23 +49,47 @@ jobs:
       fail-fast: false
 
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
     # Set up Flutter.
     - name: Clone Flutter repository with master channel
       uses: subosito/flutter-action@4389e6cbc6cb8a4b18c628ff96ff90be0e926aa8
       with:
         channel: master
 
-    - name: Install Linux dependencies
-      if: matrix.target == 'Linux'
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libgtk-3-dev libx11-dev pkg-config cmake ninja-build libblkid-dev libpodofo-dev
+    # Android-specific setup
     - name: Install Android dependencies
       if: matrix.target == 'Android'
       uses: actions/setup-java@v1
       with:
         java-version: '12.x'
 
+    - name: Set up Rust for Android
+      if: matrix.target == 'Android'
+      env:
+        ANDROID_API: 30
+      run: |
+        rustup target add \
+          aarch64-linux-android \
+          armv7-linux-androideabi \
+          x86_64-linux-android \
+          i686-linux-android
+        bash ./tool/cargo-config-gen-android.sh >> ~/.cargo/config.toml
+        cat ~/.cargo/config.toml
+
+    # Linux-specific setup
+    - name: Install Linux dependencies
+      if: matrix.target == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          libgtk-3-dev libx11-dev libblkid-dev libpodofo-dev \
+          pkg-config cmake ninja-build
+
+    # Windows-specific setup
     - name: Cache Vcpkg packages
       uses: actions/cache@v2
       if: matrix.target == 'Windows'
@@ -85,26 +109,14 @@ jobs:
       run: |
         flutter config --enable-linux-desktop
         flutter config --enable-windows-desktop
-    - run: flutter doctor -v
 
-    # Checkout code, recreate missing files, and get packages.
-    - name: Checkout code
-      uses: actions/checkout@v2
-      with:
-        submodules: recursive
+    # Check setup, fetch dart packages
+    - run: flutter doctor -v
     - run: flutter pub get
 
-    - name: Set up Rust
-      if: matrix.target == 'Android'
-      env:
-        ANDROID_API: 30
-      run: |
-        rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android i686-linux-android
-        bash ./tool/cargo-config-gen-android.sh >> ~/.cargo/config.toml
-        cat ~/.cargo/config.toml
-
     # Build the application.
-    - env:
+    - name: Build app
+      env:
         CMAKE_TOOLCHAIN_FILE: ${{ matrix.toolchain_file }}
         VCPKG_ROOT: C:\vcpkg
         VCPKGRS_DYNAMIC: 1
