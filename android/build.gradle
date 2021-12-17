@@ -16,7 +16,11 @@ allprojects {
         google()
         mavenCentral()
         maven {
-            url "file:///home/jjanku/src/ndkports/build/repository"
+            url = uri("https://maven.pkg.github.com/jjanku/ndkports")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+            }
         }
     }
 }

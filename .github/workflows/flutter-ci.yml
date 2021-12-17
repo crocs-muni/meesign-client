@@ -120,6 +120,8 @@ jobs:
         CMAKE_TOOLCHAIN_FILE: ${{ matrix.toolchain_file }}
         VCPKG_ROOT: C:\vcpkg
         VCPKGRS_DYNAMIC: 1
+        USERNAME: ${{ github.actor }}
+        TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: flutter build -v ${{ matrix.build_target }} --release
 
     # Package the build.
