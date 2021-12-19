@@ -132,9 +132,17 @@ class _NewGroupPageState extends State<NewGroupPage> {
           ElevatedButton.icon(
             onPressed: () {
               showModalBottomSheet(
+                elevation: 4,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(8),
+                    topRight: Radius.circular(8),
+                  ),
+                ),
                 context: context,
                 builder: (context) {
-                  return ListView(
+                  return Column(
+                    // mainAxisSize: MainAxisSize.min,
                     children: [
                       ListTile(
                         leading: const Icon(Icons.qr_code),
