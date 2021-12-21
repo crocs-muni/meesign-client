@@ -1,5 +1,5 @@
 name: 'PdfSigLib'
-output: 'lib/native/pdf_sig_lib.dart'
+output: 'lib/native/generated/pdf_sig_lib.dart'
 headers:
   entry-points:
     - 'lib-native/pdf-sig/pdf-sig.h'

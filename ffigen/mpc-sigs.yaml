@@ -1,6 +1,6 @@
 name: 'MpcSigsLib'
 description: 'Bindings to mpc-sigs C API'
-output: 'lib/native/mpc_sigs_lib.dart'
+output: 'lib/native/generated/mpc_sigs_lib.dart'
 headers:
   entry-points:
     - 'lib-native/mpc-sigs/include/bindings.h'
