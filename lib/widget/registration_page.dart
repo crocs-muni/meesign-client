@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mpc_demo/mpc_model.dart';
-import 'package:mpc_demo/rnd_name_generator.dart';
+import 'package:mpc_demo/util/rnd_name_generator.dart';
 import 'package:provider/provider.dart';
 
 class RegistrationPage extends StatefulWidget {

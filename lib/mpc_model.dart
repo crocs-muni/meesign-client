@@ -7,7 +7,6 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:grpc/grpc.dart';
 import 'package:mpc_demo/grpc/mpc.pbgrpc.dart';
-import 'package:mpc_demo/rnd_name_generator.dart';
 import 'package:path/path.dart' as path_pkg;
 import 'package:path_provider/path_provider.dart';
 
