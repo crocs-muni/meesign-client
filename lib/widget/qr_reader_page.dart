@@ -56,7 +56,8 @@ class _QrReaderPageState extends State<QrReaderPage> {
 
     // application/mpc;name,id
     final qrData = code.split(';')[1].split(',');
-    final cosigner = Cosigner.fromHex(qrData[0], CosignerType.app, qrData[1]);
+    final cosigner =
+        Cosigner.fromBase64(qrData[0], CosignerType.app, qrData[1]);
     // TODO: is the stream always recreated after a pop?
     _dataStream?.cancel();
     Navigator.pop(context, cosigner);

@@ -71,18 +71,15 @@ class Cosigner {
 
   Cosigner(this.name, this.id, this.type);
   Cosigner.random(this.name, this.type) : id = _randomId();
-  Cosigner.fromHex(this.name, this.type, String hex) : id = _decodeHexId(hex);
+  Cosigner.fromBase64(this.name, this.type, String base64)
+      : id = const Base64Decoder().convert(base64);
 
   static List<int> _randomId() {
     final rnd = Random.secure();
     return List.generate(idLen, (i) => rnd.nextInt(256));
   }
 
-  static List<int> _decodeHexId(String hex) => List.generate(hex.length ~/ 2,
-      (i) => int.parse(hex.substring(2 * i, 2 * (i + 1)), radix: 16));
-
-  String get hexId =>
-      id.map((byte) => byte.toRadixString(16).padLeft(2, '0')).join();
+  String get base64Id => const Base64Encoder.urlSafe().convert(id);
 }
 
 class SignedFile {

@@ -30,7 +30,7 @@ class QrIdentityPage extends StatelessWidget {
                     return QrImage(
                       padding: const EdgeInsets.all(24),
                       data: 'application/mpc;${model.thisDevice.name},'
-                          '${model.thisDevice.hexId}',
+                          '${model.thisDevice.base64Id}',
                     );
                   }),
                 ),
