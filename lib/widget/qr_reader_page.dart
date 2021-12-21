@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:mpc_demo/mpc_model.dart';
+import 'package:mpc_demo/util/qr_coder.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class QrReaderPage extends StatefulWidget {
@@ -19,6 +19,8 @@ class _QrReaderPageState extends State<QrReaderPage> {
 
   bool _recentError = false;
   Timer? _errorTimer;
+
+  final QrCoder _coder = QrCoder();
 
   @override
   void reassemble() {
@@ -41,8 +43,11 @@ class _QrReaderPageState extends State<QrReaderPage> {
   void _onData(Barcode data) {
     _errorTimer?.cancel();
 
-    final code = data.code;
-    if (code == null || !code.startsWith('application/mpc;')) {
+    try {
+      final cosigner = _coder.decode(data.code);
+      _dataStream?.cancel();
+      Navigator.pop(context, cosigner);
+    } catch (e) {
       setState(() {
         _recentError = true;
       });
@@ -53,14 +58,6 @@ class _QrReaderPageState extends State<QrReaderPage> {
       });
       return;
     }
-
-    // application/mpc;name,id
-    final qrData = code.split(';')[1].split(',');
-    final cosigner =
-        Cosigner.fromBase64(qrData[0], CosignerType.app, qrData[1]);
-    // TODO: is the stream always recreated after a pop?
-    _dataStream?.cancel();
-    Navigator.pop(context, cosigner);
   }
 
   @override

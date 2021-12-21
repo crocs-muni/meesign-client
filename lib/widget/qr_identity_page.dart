@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mpc_demo/util/qr_coder.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -29,8 +30,7 @@ class QrIdentityPage extends StatelessWidget {
                   child: Consumer<MpcModel>(builder: (context, model, child) {
                     return QrImage(
                       padding: const EdgeInsets.all(24),
-                      data: 'application/mpc;${model.thisDevice.name},'
-                          '${model.thisDevice.base64Id}',
+                      data: QrCoder().encode(model.thisDevice),
                     );
                   }),
                 ),

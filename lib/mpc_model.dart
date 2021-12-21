@@ -70,15 +70,11 @@ class Cosigner {
 
   Cosigner(this.name, this.id, this.type);
   Cosigner.random(this.name, this.type) : id = _randomId();
-  Cosigner.fromBase64(this.name, this.type, String base64)
-      : id = const Base64Decoder().convert(base64);
 
   static List<int> _randomId() {
     final rnd = Random.secure();
     return List.generate(idLen, (i) => rnd.nextInt(256));
   }
-
-  String get base64Id => const Base64Encoder.urlSafe().convert(id);
 }
 
 class SignedFile {
