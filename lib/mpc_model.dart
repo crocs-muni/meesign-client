@@ -38,7 +38,7 @@ class Group {
   static Group _fromTask(Task task, Devices devices) {
     // work format: null-terminated name + list of device ids
     int iNameEnd = task.work.indexOf(0);
-    String name = (const AsciiDecoder()).convert(task.work, 0, iNameEnd);
+    String name = (const Utf8Decoder()).convert(task.work, 0, iNameEnd);
 
     int idsLen = task.work.length - (iNameEnd + 1);
     assert(idsLen % Cosigner.idLen == 0);
@@ -337,7 +337,7 @@ class MpcModel with ChangeNotifier {
     data.add(id.length % 256);
     data.addAll(id);
 
-    data.addAll(const AsciiEncoder().convert(file.basename));
+    data.addAll(const Utf8Encoder().convert(file.basename));
     data.add(0);
 
     // FIXME: oom for large files
@@ -354,7 +354,7 @@ class MpcModel with ChangeNotifier {
     List<int> id = data.getRange(2, iIdEnd).toList();
 
     int iNull = data.indexOf(0, iIdEnd);
-    String baseName = const AsciiDecoder().convert(data, iIdEnd, iNull);
+    String baseName = const Utf8Decoder().convert(data, iIdEnd, iNull);
 
     String path = path_pkg.join(
       _tmpDir.path,
