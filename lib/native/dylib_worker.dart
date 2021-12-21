@@ -6,8 +6,8 @@ import 'dart:isolate';
 
 import 'package:ffi/ffi.dart';
 
-import 'native/mpc_sigs_lib.dart';
-import 'native/pdf_sig_lib.dart';
+import 'mpc_sigs_lib.dart';
+import 'pdf_sig_lib.dart';
 
 String dlPlatformName(String name) {
   if (Platform.isAndroid || Platform.isLinux) return 'lib$name.so';
