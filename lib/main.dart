@@ -28,6 +28,8 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: ThemeMode.system,
       initialRoute: Routes.registration,
       routes: {
         Routes.home: (_) => const HomePage(),
