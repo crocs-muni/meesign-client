@@ -33,27 +33,6 @@ class Group {
     }
     return false;
   }
-
-  static Group _fromTask(Task task, Devices devices) {
-    // work format: null-terminated name + list of device ids
-    int iNameEnd = task.work.indexOf(0);
-    String name = (const Utf8Decoder()).convert(task.work, 0, iNameEnd);
-
-    int idsLen = task.work.length - (iNameEnd + 1);
-    assert(idsLen % Cosigner.idLen == 0);
-    int nCosigners = idsLen ~/ Cosigner.idLen;
-
-    List<Cosigner> members = [];
-    for (int i = 0, start = iNameEnd + 1;
-        i < nCosigners;
-        i++, start += Cosigner.idLen) {
-      List<int> id = task.work.getRange(start, start + Cosigner.idLen).toList();
-      final dev = devices.devices.firstWhere((dev) => listEquals(dev.id, id));
-      members.add(Cosigner(dev.name, id, CosignerType.app));
-    }
-
-    return Group(name, members, -1)..taskId = task.id;
-  }
 }
 
 enum CosignerType {
@@ -256,7 +235,7 @@ class MpcModel with ChangeNotifier {
             // new task, we need to fetch it's details
             task = await _getTask(task.id);
 
-            final newGroup = Group._fromTask(task, devices);
+            final newGroup = _groupFromTask(task, devices);
             groups.add(newGroup);
             _groupReqsController.add(newGroup);
             break;
@@ -319,6 +298,27 @@ class MpcModel with ChangeNotifier {
         await Directory(path_pkg.join(tmp.path, 'mpc_demo-$unique')).create();
     _signedDir =
         await Directory(path_pkg.join(_tmpDir.path, 'signed')).create();
+  }
+
+  static Group _groupFromTask(Task task, Devices devices) {
+    // work format: null-terminated name + list of device ids
+    int iNameEnd = task.work.indexOf(0);
+    String name = (const Utf8Decoder()).convert(task.work, 0, iNameEnd);
+
+    int idsLen = task.work.length - (iNameEnd + 1);
+    assert(idsLen % Cosigner.idLen == 0);
+    int nCosigners = idsLen ~/ Cosigner.idLen;
+
+    List<Cosigner> members = [];
+    for (int i = 0, start = iNameEnd + 1;
+        i < nCosigners;
+        i++, start += Cosigner.idLen) {
+      List<int> id = task.work.getRange(start, start + Cosigner.idLen).toList();
+      final dev = devices.devices.firstWhere((dev) => listEquals(dev.id, id));
+      members.add(Cosigner(dev.name, id, CosignerType.app));
+    }
+
+    return Group(name, members, -1)..taskId = task.id;
   }
 
   Future<SignRequest> _encodeSignRequest(SignedFile file) async {
