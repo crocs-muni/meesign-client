@@ -6,9 +6,9 @@ import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:grpc/grpc.dart';
+import 'package:mpc_demo/file_storage.dart';
 import 'package:mpc_demo/grpc/generated/mpc.pbgrpc.dart';
 import 'package:path/path.dart' as path_pkg;
-import 'package:path_provider/path_provider.dart';
 
 import 'native/dylib_manager.dart';
 
@@ -83,14 +83,8 @@ class MpcModel with ChangeNotifier {
   final StreamController<SignedFile> _signReqsController = StreamController();
   Stream<SignedFile> get signRequests => _signReqsController.stream;
 
-  late Directory _tmpDir;
-  late Directory _signedDir;
-
+  final _fileStorage = FileStorage();
   final DylibManager _dylibManager = DylibManager();
-
-  MpcModel() {
-    _createDirs();
-  }
 
   Future<void> register(String name, String host) async {
     _channel = ClientChannel(
@@ -291,15 +285,6 @@ class MpcModel with ChangeNotifier {
     if (change) notifyListeners();
   }
 
-  Future<void> _createDirs() async {
-    final tmp = await getTemporaryDirectory();
-    final unique = Random().nextInt(1 << 32);
-    _tmpDir =
-        await Directory(path_pkg.join(tmp.path, 'mpc_demo-$unique')).create();
-    _signedDir =
-        await Directory(path_pkg.join(_tmpDir.path, 'signed')).create();
-  }
-
   static Group _groupFromTask(Task task, Devices devices) {
     // work format: null-terminated name + list of device ids
     int iNameEnd = task.work.indexOf(0);
@@ -348,10 +333,7 @@ class MpcModel with ChangeNotifier {
     int iNull = data.indexOf(0, iIdEnd);
     String baseName = const Utf8Decoder().convert(data, iIdEnd, iNull);
 
-    String path = path_pkg.join(
-      _tmpDir.path,
-      baseName,
-    );
+    String path = await _fileStorage.getTmpFilePath(baseName);
     final fileData = Uint8List.sublistView(data as TypedData, iNull + 1);
     await File(path).writeAsBytes(fileData, flush: true);
 
@@ -361,7 +343,7 @@ class MpcModel with ChangeNotifier {
   }
 
   Future<void> _insertSignature(SignedFile file) async {
-    final outPath = path_pkg.join(_signedDir.path, file.basename);
+    final outPath = await _fileStorage.getSignedFilePath(file.basename);
 
     final signers = file.group.members.map((m) => '    - ${m.name}').join('\n');
     final msg = 'Signed using MPC Demo by:\n' + signers;
