@@ -99,10 +99,10 @@ class _CardReaderPageState extends State<CardReaderPage> {
                             value: _working ? null : 0,
                           ),
                         ),
-                        const Icon(
+                        Icon(
                           Icons.contactless,
                           size: 100,
-                          color: Colors.amber,
+                          color: Theme.of(context).colorScheme.secondary,
                         ),
                       ],
                     ),

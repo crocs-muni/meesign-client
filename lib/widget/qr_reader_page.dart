@@ -71,7 +71,7 @@ class _QrReaderPageState extends State<QrReaderPage> {
               key: _qrKey,
               overlay: QrScannerOverlayShape(
                 borderRadius: 16,
-                borderColor: Colors.amber,
+                borderColor: Theme.of(context).colorScheme.secondary,
               ),
               onQRViewCreated: (controller) {
                 _controller = controller;
@@ -83,10 +83,10 @@ class _QrReaderPageState extends State<QrReaderPage> {
             flex: 1,
             child: Center(
               child: _recentError
-                  ? const Text(
+                  ? Text(
                       'This code does not belong to any peer',
                       style: TextStyle(
-                        color: Colors.red,
+                        color: Theme.of(context).errorColor,
                       ),
                     )
                   : const Text('Scan the code of the peer'),

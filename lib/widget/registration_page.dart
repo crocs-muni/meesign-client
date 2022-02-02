@@ -78,10 +78,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 const SizedBox(
                   height: 54,
                 ),
-                const Icon(
+                Icon(
                   Icons.lock,
                   size: 54,
-                  color: Colors.amber,
+                  color: Theme.of(context).colorScheme.secondary,
                 ),
                 const SizedBox(
                   height: 16,
