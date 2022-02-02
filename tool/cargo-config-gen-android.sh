@@ -1,5 +1,14 @@
 #!/bin/bash
 
+if [ ! -d "$ANDROID_NDK_HOME" ]; then
+    echo "Invalit ANDROID_NDK_HOME path!"
+    exit 1
+fi
+if [ -z "$ANDROID_API" ]; then
+    echo "ANDROID_API not set!"
+    exit 2
+fi
+
 TARGETS="
 aarch64-linux-android
 armv7-linux-androideabi
