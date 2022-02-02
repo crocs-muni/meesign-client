@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:mpc_demo/mpc_model.dart';
+import 'package:meesign_client/mpc_model.dart';
 
 class QrCoder {
-  static const String mime = 'application/mpc';
+  static const String mime = 'application/meesign';
 
   late final _base64encoder = const Base64Encoder.urlSafe();
   late final _base64decoder = const Base64Decoder();

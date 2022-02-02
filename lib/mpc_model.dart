@@ -6,8 +6,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:grpc/grpc.dart';
-import 'package:mpc_demo/file_storage.dart';
-import 'package:mpc_demo/grpc/generated/mpc.pbgrpc.dart';
+import 'package:meesign_client/file_storage.dart';
+import 'package:meesign_client/grpc/generated/mpc.pbgrpc.dart';
 import 'package:path/path.dart' as path_pkg;
 
 import 'native/dylib_manager.dart';
@@ -346,7 +346,7 @@ class MpcModel with ChangeNotifier {
     final outPath = await _fileStorage.getSignedFilePath(file.basename);
 
     final signers = file.group.members.map((m) => '    - ${m.name}').join('\n');
-    final msg = 'Signed using MPC Demo by:\n' + signers;
+    final msg = 'Signed using Meesign by:\n' + signers;
 
     await _dylibManager.signPdf(file.path, outPath, message: msg);
     file.path = outPath;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mpc_demo/util/qr_coder.dart';
+import 'package:meesign_client/util/qr_coder.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 

@@ -1,7 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:mpc_demo/mpc_model.dart';
+import 'package:meesign_client/mpc_model.dart';
 import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
 
@@ -253,7 +253,7 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('MPC Demo'),
+        title: const Text('Meesign'),
         actions: [
           Consumer<MpcModel>(builder: (context, model, child) {
             final name = model.thisDevice.name;

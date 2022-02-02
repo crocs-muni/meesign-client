@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 project(runner LANGUAGES CXX)
 
-set(BINARY_NAME "mpc_demo")
-set(APPLICATION_ID "com.example.mpc_demo")
+set(BINARY_NAME "meesign_client")
+set(APPLICATION_ID "com.example.meesign_client")
 
 cmake_policy(SET CMP0063 NEW)
 

@@ -76,7 +76,7 @@ const Devices$json = const {
       '3': 1,
       '4': 3,
       '5': 11,
-      '6': '.mpcoord.Device',
+      '6': '.meesign.Device',
       '10': 'devices'
     },
   ],
@@ -84,7 +84,7 @@ const Devices$json = const {
 
 /// Descriptor for `Devices`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List devicesDescriptor = $convert.base64Decode(
-    'CgdEZXZpY2VzEikKB2RldmljZXMYASADKAsyDy5tcGNvb3JkLkRldmljZVIHZGV2aWNlcw==');
+    'CgdEZXZpY2VzEikKB2RldmljZXMYASADKAsyDy5tZWVzaWduLkRldmljZVIHZGV2aWNlcw==');
 @$core.Deprecated('Use deviceDescriptor instead')
 const Device$json = const {
   '1': 'Device',
@@ -142,7 +142,7 @@ const Task$json = const {
       '3': 2,
       '4': 1,
       '5': 14,
-      '6': '.mpcoord.Task.TaskType',
+      '6': '.meesign.Task.TaskType',
       '10': 'type'
     },
     const {
@@ -150,7 +150,7 @@ const Task$json = const {
       '3': 3,
       '4': 1,
       '5': 14,
-      '6': '.mpcoord.Task.TaskState',
+      '6': '.meesign.Task.TaskState',
       '10': 'state'
     },
     const {'1': 'progress', '3': 4, '4': 1, '5': 5, '10': 'progress'},
@@ -192,7 +192,7 @@ const Task_TaskState$json = const {
 
 /// Descriptor for `Task`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List taskDescriptor = $convert.base64Decode(
-    'CgRUYXNrEg4KAmlkGAEgASgNUgJpZBIqCgR0eXBlGAIgASgOMhYubXBjb29yZC5UYXNrLlRhc2tUeXBlUgR0eXBlEi0KBXN0YXRlGAMgASgOMhcubXBjb29yZC5UYXNrLlRhc2tTdGF0ZVIFc3RhdGUSGgoIcHJvZ3Jlc3MYBCABKAVSCHByb2dyZXNzEhIKBGRhdGEYBSADKAxSBGRhdGESFwoEd29yaxgGIAEoDEgAUgR3b3JriAEBIh8KCFRhc2tUeXBlEgkKBUdST1VQEAASCAoEU0lHThABIjIKCVRhc2tTdGF0ZRILCgdXQUlUSU5HEAASDAoIRklOSVNIRUQQARIKCgZGQUlMRUQQAkIHCgVfd29yaw==');
+    'CgRUYXNrEg4KAmlkGAEgASgNUgJpZBIqCgR0eXBlGAIgASgOMhYubWVlc2lnbi5UYXNrLlRhc2tUeXBlUgR0eXBlEi0KBXN0YXRlGAMgASgOMhcubWVlc2lnbi5UYXNrLlRhc2tTdGF0ZVIFc3RhdGUSGgoIcHJvZ3Jlc3MYBCABKAVSCHByb2dyZXNzEhIKBGRhdGEYBSADKAxSBGRhdGESFwoEd29yaxgGIAEoDEgAUgR3b3JriAEBIh8KCFRhc2tUeXBlEgkKBUdST1VQEAASCAoEU0lHThABIjIKCVRhc2tTdGF0ZRILCgdXQUlUSU5HEAASDAoIRklOSVNIRUQQARIKCgZGQUlMRUQQAkIHCgVfd29yaw==');
 @$core.Deprecated('Use taskUpdateDescriptor instead')
 const TaskUpdate$json = const {
   '1': 'TaskUpdate',
@@ -226,7 +226,7 @@ const Info$json = const {
       '3': 1,
       '4': 3,
       '5': 11,
-      '6': '.mpcoord.Group',
+      '6': '.meesign.Group',
       '10': 'groups'
     },
     const {
@@ -234,7 +234,7 @@ const Info$json = const {
       '3': 2,
       '4': 3,
       '5': 11,
-      '6': '.mpcoord.Task',
+      '6': '.meesign.Task',
       '10': 'tasks'
     },
   ],
@@ -242,7 +242,7 @@ const Info$json = const {
 
 /// Descriptor for `Info`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List infoDescriptor = $convert.base64Decode(
-    'CgRJbmZvEiYKBmdyb3VwcxgBIAMoCzIOLm1wY29vcmQuR3JvdXBSBmdyb3VwcxIjCgV0YXNrcxgCIAMoCzINLm1wY29vcmQuVGFza1IFdGFza3M=');
+    'CgRJbmZvEiYKBmdyb3VwcxgBIAMoCzIOLm1lZXNpZ24uR3JvdXBSBmdyb3VwcxIjCgV0YXNrcxgCIAMoCzINLm1lZXNpZ24uVGFza1IFdGFza3M=');
 @$core.Deprecated('Use respDescriptor instead')
 const Resp$json = const {
   '1': 'Resp',

@@ -48,7 +48,7 @@ class DylibManager {
   Future<void> signPdf(
     String inPath,
     String outPath, {
-    String message = "Signed using MpcDemo",
+    String message = "Signed using Meesign",
   }) {
     return _enqueueRequest(PdfSignRequest(inPath, outPath, message));
   }

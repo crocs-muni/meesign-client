@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
-import 'package:mpc_demo/mpc_model.dart';
+import 'package:meesign_client/mpc_model.dart';
 
 class CardReaderPage extends StatefulWidget {
   const CardReaderPage({Key? key}) : super(key: key);

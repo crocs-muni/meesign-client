@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mpc_demo/mpc_model.dart';
-import 'package:mpc_demo/util/rnd_name_generator.dart';
+import 'package:meesign_client/mpc_model.dart';
+import 'package:meesign_client/util/rnd_name_generator.dart';
 import 'package:provider/provider.dart';
 
 import '../routes.dart';
@@ -87,7 +87,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   height: 16,
                 ),
                 Text(
-                  'MPC Demo',
+                  'Meesign',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headline4,
                 ),

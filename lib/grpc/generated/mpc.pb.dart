@@ -21,7 +21,7 @@ class RegistrationRequest extends $pb.GeneratedMessage {
       package: const $pb.PackageName(
           const $core.bool.fromEnvironment('protobuf.omit_message_names')
               ? ''
-              : 'mpcoord'),
+              : 'meesign'),
       createEmptyInstance: create)
     ..a<$core.List<$core.int>>(
         1,
@@ -110,7 +110,7 @@ class GroupRequest extends $pb.GeneratedMessage {
       package: const $pb.PackageName(
           const $core.bool.fromEnvironment('protobuf.omit_message_names')
               ? ''
-              : 'mpcoord'),
+              : 'meesign'),
       createEmptyInstance: create)
     ..p<$core.List<$core.int>>(
         1,
@@ -212,7 +212,7 @@ class Group extends $pb.GeneratedMessage {
       package: const $pb.PackageName(
           const $core.bool.fromEnvironment('protobuf.omit_message_names')
               ? ''
-              : 'mpcoord'),
+              : 'meesign'),
       createEmptyInstance: create)
     ..a<$core.List<$core.int>>(
         1,
@@ -335,7 +335,7 @@ class DevicesRequest extends $pb.GeneratedMessage {
       package: const $pb.PackageName(
           const $core.bool.fromEnvironment('protobuf.omit_message_names')
               ? ''
-              : 'mpcoord'),
+              : 'meesign'),
       createEmptyInstance: create)
     ..hasRequiredFields = false;
 
@@ -377,7 +377,7 @@ class Devices extends $pb.GeneratedMessage {
       package: const $pb.PackageName(
           const $core.bool.fromEnvironment('protobuf.omit_message_names')
               ? ''
-              : 'mpcoord'),
+              : 'meesign'),
       createEmptyInstance: create)
     ..pc<Device>(
         1,
@@ -436,7 +436,7 @@ class Device extends $pb.GeneratedMessage {
       package: const $pb.PackageName(
           const $core.bool.fromEnvironment('protobuf.omit_message_names')
               ? ''
-              : 'mpcoord'),
+              : 'meesign'),
       createEmptyInstance: create)
     ..a<$core.List<$core.int>>(
         1,
@@ -524,7 +524,7 @@ class SignRequest extends $pb.GeneratedMessage {
       package: const $pb.PackageName(
           const $core.bool.fromEnvironment('protobuf.omit_message_names')
               ? ''
-              : 'mpcoord'),
+              : 'meesign'),
       createEmptyInstance: create)
     ..a<$core.List<$core.int>>(
         1,
@@ -613,7 +613,7 @@ class TaskRequest extends $pb.GeneratedMessage {
       package: const $pb.PackageName(
           const $core.bool.fromEnvironment('protobuf.omit_message_names')
               ? ''
-              : 'mpcoord'),
+              : 'meesign'),
       createEmptyInstance: create)
     ..a<$core.int>(
         1,
@@ -702,7 +702,7 @@ class Task extends $pb.GeneratedMessage {
       package: const $pb.PackageName(
           const $core.bool.fromEnvironment('protobuf.omit_message_names')
               ? ''
-              : 'mpcoord'),
+              : 'meesign'),
       createEmptyInstance: create)
     ..a<$core.int>(
         1,
@@ -876,7 +876,7 @@ class TaskUpdate extends $pb.GeneratedMessage {
       package: const $pb.PackageName(
           const $core.bool.fromEnvironment('protobuf.omit_message_names')
               ? ''
-              : 'mpcoord'),
+              : 'meesign'),
       createEmptyInstance: create)
     ..a<$core.List<$core.int>>(
         1,
@@ -987,7 +987,7 @@ class InfoRequest extends $pb.GeneratedMessage {
       package: const $pb.PackageName(
           const $core.bool.fromEnvironment('protobuf.omit_message_names')
               ? ''
-              : 'mpcoord'),
+              : 'meesign'),
       createEmptyInstance: create)
     ..a<$core.List<$core.int>>(
         1,
@@ -1054,7 +1054,7 @@ class Info extends $pb.GeneratedMessage {
       package: const $pb.PackageName(
           const $core.bool.fromEnvironment('protobuf.omit_message_names')
               ? ''
-              : 'mpcoord'),
+              : 'meesign'),
       createEmptyInstance: create)
     ..pc<Group>(
         1,
@@ -1134,7 +1134,7 @@ class Resp extends $pb.GeneratedMessage {
       package: const $pb.PackageName(
           const $core.bool.fromEnvironment('protobuf.omit_message_names')
               ? ''
-              : 'mpcoord'),
+              : 'meesign'),
       createEmptyInstance: create)
     ..oo(0, [1, 2])
     ..aOS(

@@ -1,4 +1,4 @@
-package com.example.mpc_demo
+package com.example.meesign_client
 
 import io.flutter.embedding.android.FlutterActivity
 

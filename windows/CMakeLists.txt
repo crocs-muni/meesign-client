@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
-project(mpc_demo LANGUAGES CXX)
+project(meesign_client LANGUAGES CXX)
 
-set(BINARY_NAME "mpc_demo")
+set(BINARY_NAME "meesign_client")
 
 cmake_policy(SET CMP0063 NEW)
 

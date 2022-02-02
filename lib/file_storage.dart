@@ -16,7 +16,7 @@ class FileStorage {
   Future<Directory> _createTmpDir() async {
     final tmp = await getTemporaryDirectory();
     final unique = Random().nextInt(1 << 32);
-    final tmpName = path_pkg.join(tmp.path, 'mpc_demo-$unique');
+    final tmpName = path_pkg.join(tmp.path, 'meesign_client-$unique');
     return Directory(tmpName).create();
   }
 

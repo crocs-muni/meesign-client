@@ -15,31 +15,31 @@ export 'mpc.pb.dart';
 
 class MPCClient extends $grpc.Client {
   static final _$register = $grpc.ClientMethod<$0.RegistrationRequest, $0.Resp>(
-      '/mpcoord.MPC/Register',
+      '/meesign.MPC/Register',
       ($0.RegistrationRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.Resp.fromBuffer(value));
   static final _$sign = $grpc.ClientMethod<$0.SignRequest, $0.Task>(
-      '/mpcoord.MPC/Sign',
+      '/meesign.MPC/Sign',
       ($0.SignRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.Task.fromBuffer(value));
   static final _$group = $grpc.ClientMethod<$0.GroupRequest, $0.Task>(
-      '/mpcoord.MPC/Group',
+      '/meesign.MPC/Group',
       ($0.GroupRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.Task.fromBuffer(value));
   static final _$getTask = $grpc.ClientMethod<$0.TaskRequest, $0.Task>(
-      '/mpcoord.MPC/GetTask',
+      '/meesign.MPC/GetTask',
       ($0.TaskRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.Task.fromBuffer(value));
   static final _$updateTask = $grpc.ClientMethod<$0.TaskUpdate, $0.Resp>(
-      '/mpcoord.MPC/UpdateTask',
+      '/meesign.MPC/UpdateTask',
       ($0.TaskUpdate value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.Resp.fromBuffer(value));
   static final _$getInfo = $grpc.ClientMethod<$0.InfoRequest, $0.Info>(
-      '/mpcoord.MPC/GetInfo',
+      '/meesign.MPC/GetInfo',
       ($0.InfoRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.Info.fromBuffer(value));
   static final _$getDevices = $grpc.ClientMethod<$0.DevicesRequest, $0.Devices>(
-      '/mpcoord.MPC/GetDevices',
+      '/meesign.MPC/GetDevices',
       ($0.DevicesRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.Devices.fromBuffer(value));
 
@@ -85,7 +85,7 @@ class MPCClient extends $grpc.Client {
 }
 
 abstract class MPCServiceBase extends $grpc.Service {
-  $core.String get $name => 'mpcoord.MPC';
+  $core.String get $name => 'meesign.MPC';
 
   MPCServiceBase() {
     $addMethod($grpc.ServiceMethod<$0.RegistrationRequest, $0.Resp>(

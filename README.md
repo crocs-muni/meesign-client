@@ -1,4 +1,4 @@
-# mpc_demo
+# meesign client
 
 A new Flutter project.
 
@@ -23,7 +23,7 @@ A new Flutter project.
 3. Clone the repository **with submodules**:
 
    ```bash
-   git clone --recurse-submodules https://github.com/jjanku/mpc_demo.git
+   git clone --recurse-submodules https://github.com/crocs-muni/meesign-client
    ```
 
 4. Build the app:

@@ -2,8 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:mpc_demo/mpc_model.dart';
-import 'package:mpc_demo/util/rnd_name_generator.dart';
+import 'package:meesign_client/mpc_model.dart';
+import 'package:meesign_client/util/rnd_name_generator.dart';
 import 'package:provider/provider.dart';
 
 import 'dart:io';
