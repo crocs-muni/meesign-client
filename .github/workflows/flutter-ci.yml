@@ -54,13 +54,11 @@ jobs:
       with:
         submodules: recursive
 
-    # Set up Flutter.
     - name: Clone Flutter repository with master channel
       uses: subosito/flutter-action@4389e6cbc6cb8a4b18c628ff96ff90be0e926aa8
       with:
         channel: master
 
-    # Android-specific setup
     - name: Install Android dependencies
       if: matrix.target == 'Android'
       uses: actions/setup-java@v1
@@ -71,6 +69,8 @@ jobs:
       if: matrix.target == 'Android'
       env:
         ANDROID_API: 30
+      # add rust android targets,
+      # point cargo to local Android NDK installation
       run: |
         rustup target add \
           aarch64-linux-android \
@@ -80,7 +80,6 @@ jobs:
         bash ./tool/cargo-config-gen-android.sh >> ~/.cargo/config.toml
         cat ~/.cargo/config.toml
 
-    # Linux-specific setup
     - name: Install Linux dependencies
       if: matrix.target == 'Linux'
       run: |
@@ -89,7 +88,6 @@ jobs:
           libgtk-3-dev libx11-dev libblkid-dev libpodofo-dev \
           pkg-config cmake ninja-build
 
-    # Windows-specific setup
     - name: Cache Vcpkg packages
       uses: actions/cache@v2
       if: matrix.target == 'Windows'
@@ -114,12 +112,13 @@ jobs:
     - run: flutter doctor -v
     - run: flutter pub get
 
-    # Build the application.
     - name: Build app
       env:
         CMAKE_TOOLCHAIN_FILE: ${{ matrix.toolchain_file }}
+        # env vars used by rust openssl
         VCPKG_ROOT: C:\vcpkg
         VCPKGRS_DYNAMIC: 1
+        # needed to fetch Android deps (podofo + freetype AARs)
         USERNAME: ${{ github.actor }}
         TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: flutter build -v ${{ matrix.build_target }} --release
