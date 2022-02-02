@@ -3,6 +3,8 @@ import 'package:mpc_demo/mpc_model.dart';
 import 'package:mpc_demo/util/rnd_name_generator.dart';
 import 'package:provider/provider.dart';
 
+import '../routes.dart';
+
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({Key? key}) : super(key: key);
 
@@ -52,7 +54,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         _nameController.text,
         _hostController.text,
       );
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacementNamed(context, Routes.home);
     } catch (e) {
       setState(() {
         _working = false;

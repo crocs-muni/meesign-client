@@ -5,6 +5,8 @@ import 'package:mpc_demo/mpc_model.dart';
 import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
 
+import '../routes.dart';
+
 class ProgressCheck extends StatelessWidget {
   const ProgressCheck(this.value, {Key? key}) : super(key: key);
 
@@ -243,7 +245,7 @@ class _HomePageState extends State<HomePage> {
     );
     final groupFab = FloatingActionButton.extended(
       onPressed: () {
-        Navigator.pushNamed(context, '/new_group');
+        Navigator.pushNamed(context, Routes.newGroup);
       },
       label: const Text('New'),
       icon: const Icon(Icons.add),
@@ -274,7 +276,7 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             icon: const Icon(Icons.qr_code),
             onPressed: () {
-              Navigator.pushNamed(context, '/qr_identity');
+              Navigator.pushNamed(context, Routes.qrIdentity);
             },
           ),
         ],

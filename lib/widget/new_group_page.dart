@@ -8,6 +8,8 @@ import 'package:provider/provider.dart';
 
 import 'dart:io';
 
+import '../routes.dart';
+
 class NewGroupPage extends StatefulWidget {
   const NewGroupPage({Key? key}) : super(key: key);
 
@@ -80,17 +82,17 @@ class _NewGroupPageState extends State<NewGroupPage> {
   }
 
   void _selectSearchedPeer() async {
-    final peer = await Navigator.pushNamed(context, '/new_group/search');
+    final peer = await Navigator.pushNamed(context, Routes.newGroupSearch);
     _addMember(peer);
   }
 
   void _selectCard() async {
-    final card = await Navigator.pushNamed(context, '/new_group/card_reader');
+    final card = await Navigator.pushNamed(context, Routes.newGroupCard);
     _addMember(card);
   }
 
   void _selectQr() async {
-    final peer = await Navigator.pushNamed(context, '/new_group/qr_reader');
+    final peer = await Navigator.pushNamed(context, Routes.newGroupQr);
     _addMember(peer);
   }
 

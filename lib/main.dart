@@ -8,6 +8,7 @@ import 'package:mpc_demo/widget/registration_page.dart';
 import 'package:mpc_demo/widget/search_peer_page.dart';
 import 'package:provider/provider.dart';
 
+import 'routes.dart';
 import 'widget/home_page.dart';
 
 void main() {
@@ -28,15 +29,15 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/registration',
+      initialRoute: Routes.registration,
       routes: {
-        '/home': (context) => const HomePage(),
-        '/new_group': (context) => const NewGroupPage(),
-        '/new_group/search': (context) => const SearchPeerPage(),
-        '/new_group/card_reader': (context) => const CardReaderPage(),
-        '/new_group/qr_reader': (context) => const QrReaderPage(),
-        '/qr_identity': (context) => const QrIdentityPage(),
-        '/registration': (context) => const RegistrationPage(),
+        Routes.home: (_) => const HomePage(),
+        Routes.newGroup: (_) => const NewGroupPage(),
+        Routes.newGroupSearch: (_) => const SearchPeerPage(),
+        Routes.newGroupCard: (_) => const CardReaderPage(),
+        Routes.newGroupQr: (_) => const QrReaderPage(),
+        Routes.qrIdentity: (_) => const QrIdentityPage(),
+        Routes.registration: (_) => const RegistrationPage(),
       },
     );
   }
