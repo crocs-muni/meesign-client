@@ -45,6 +45,7 @@ dependencies:
   path_provider: ^2.0.8
   open_file: ^3.2.1
   path: ^1.8.0
+  async: ^2.8.2
 
 dev_dependencies:
   flutter_test:
