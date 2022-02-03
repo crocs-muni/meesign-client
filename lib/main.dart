@@ -9,6 +9,7 @@ import 'package:meesign_client/widget/search_peer_page.dart';
 import 'package:provider/provider.dart';
 
 import 'routes.dart';
+import 'theme.dart';
 import 'widget/home_page.dart';
 
 void main() {
@@ -26,9 +27,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: AppTheme.light,
       initialRoute: Routes.registration,
       routes: {
         Routes.home: (_) => const HomePage(),
