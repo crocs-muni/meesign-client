@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:meesign_client/mpc_model.dart';
 import 'package:meesign_client/widget/card_reader_page.dart';
 import 'package:meesign_client/widget/new_group_page.dart';
@@ -24,6 +25,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.transparent,
+      ),
+    );
+
     return MaterialApp(
       title: 'Meesign',
       debugShowCheckedModeBanner: false,
