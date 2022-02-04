@@ -1,10 +1,10 @@
 import 'package:animations/animations.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:meesign_client/mpc_model.dart';
 import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
 
+import '../mpc_model.dart';
 import '../routes.dart';
 
 class ProgressCheck extends StatelessWidget {

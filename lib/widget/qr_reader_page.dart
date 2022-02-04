@@ -2,8 +2,9 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:meesign_client/util/qr_coder.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+
+import '../util/qr_coder.dart';
 
 class QrReaderPage extends StatefulWidget {
   const QrReaderPage({Key? key}) : super(key: key);

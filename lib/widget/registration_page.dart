@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:meesign_client/mpc_model.dart';
-import 'package:meesign_client/util/rnd_name_generator.dart';
 import 'package:provider/provider.dart';
 
+import '../mpc_model.dart';
 import '../routes.dart';
+import '../util/rnd_name_generator.dart';
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({Key? key}) : super(key: key);

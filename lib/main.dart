@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:meesign_client/mpc_model.dart';
-import 'package:meesign_client/widget/card_reader_page.dart';
-import 'package:meesign_client/widget/new_group_page.dart';
-import 'package:meesign_client/widget/qr_identity_page.dart';
-import 'package:meesign_client/widget/qr_reader_page.dart';
-import 'package:meesign_client/widget/registration_page.dart';
-import 'package:meesign_client/widget/search_peer_page.dart';
 import 'package:provider/provider.dart';
 
+import 'mpc_model.dart';
 import 'routes.dart';
 import 'theme.dart';
+import 'widget/card_reader_page.dart';
 import 'widget/home_page.dart';
+import 'widget/new_group_page.dart';
+import 'widget/qr_identity_page.dart';
+import 'widget/qr_reader_page.dart';
+import 'widget/registration_page.dart';
+import 'widget/search_peer_page.dart';
 
 void main() {
   runApp(ChangeNotifierProvider(
