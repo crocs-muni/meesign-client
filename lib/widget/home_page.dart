@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../mpc_model.dart';
 import '../routes.dart';
+import 'dismissible.dart';
 
 class ProgressCheck extends StatelessWidget {
   const ProgressCheck(this.value, {Key? key}) : super(key: key);
@@ -59,11 +60,19 @@ class SigningSubPage extends StatelessWidget {
         itemCount: model.files.length,
         itemBuilder: (context, i) {
           final file = model.files[i];
-          return ListTile(
-            title: Text(file.basename),
-            trailing: ProgressCheck(file.isFinished ? 1.0 : null),
-            onTap: () {
-              OpenFile.open(file.path);
+          return Deletable(
+            dismissibleKey: ObjectKey(file),
+            child: ListTile(
+              title: Text(file.basename),
+              trailing: ProgressCheck(file.isFinished ? 1.0 : null),
+              onTap: () {
+                OpenFile.open(file.path);
+              },
+            ),
+            confirmTitle: 'Do you really want to delete ${file.basename}?',
+            onDeleted: (_) {
+              // FIXME: remove the actual file
+              model.files.remove(file);
             },
           );
         },
