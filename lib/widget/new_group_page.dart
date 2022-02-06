@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'dart:io';
 
+import '../card/card.dart';
 import '../routes.dart';
 import '../mpc_model.dart';
 import '../util/rnd_name_generator.dart';
@@ -152,8 +153,8 @@ class _NewGroupPageState extends State<NewGroupPage> {
                       ),
                       ListTile(
                         leading: const Icon(Icons.contactless_outlined),
-                        title: const Text('Add NFC card'),
-                        enabled: Platform.isAndroid || Platform.isIOS,
+                        title: const Text('Add card'),
+                        enabled: CardManager.platformSupported,
                         onTap: _selectCard,
                       ),
                       ListTile(

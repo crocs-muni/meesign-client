@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
         Routes.home: (_) => const HomePage(),
         Routes.newGroup: (_) => const NewGroupPage(),
         Routes.newGroupSearch: (_) => const SearchPeerPage(),
-        Routes.newGroupCard: (_) => const CardReaderPage(),
+        Routes.newGroupCard: (_) => const AddCardPage(),
         Routes.newGroupQr: (_) => const QrReaderPage(),
         Routes.qrIdentity: (_) => const QrIdentityPage(),
         Routes.registration: (_) => const RegistrationPage(),

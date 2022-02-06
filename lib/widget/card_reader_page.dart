@@ -1,70 +1,102 @@
-import 'dart:typed_data';
+import 'package:flutter/material.dart' hide Card;
 
-import 'package:flutter/material.dart';
-import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
+import '../card/card.dart';
+import '../card/jobs.dart';
 
-import '../mpc_model.dart';
+class CardReaderPage<T> extends StatefulWidget {
+  final CardJob<T> job;
 
-class CardReaderPage extends StatefulWidget {
-  const CardReaderPage({Key? key}) : super(key: key);
+  const CardReaderPage({Key? key, required this.job}) : super(key: key);
 
   @override
   _CardReaderPageState createState() => _CardReaderPageState();
 }
 
-class _CardReaderPageState extends State<CardReaderPage> {
-  bool _working = false;
+abstract class ReaderStatus {
+  final String message;
+  const ReaderStatus._(this.message);
+}
 
-  // TODO: check for availability
+class ReaderOkStatus extends ReaderStatus {
+  const ReaderOkStatus._(String message) : super._(message);
+  static const waiting = ReaderOkStatus._('Hold a card near the reader');
+  static const working = ReaderOkStatus._('Do not remove the card');
+}
 
-  void _pollTag() async {
-    try {
-      final tag = await FlutterNfcKit.poll(
-        androidCheckNDEF: false,
-      );
+class ReaderErrStatus extends ReaderStatus {
+  const ReaderErrStatus._(String message) : super._(message);
+  static const noReader = ReaderErrStatus._('No reader available');
+  static const initError = ReaderErrStatus._('Cannot connect to card manager');
+}
 
-      setState(() {
-        _working = true;
+class _CardReaderPageState<T> extends State<CardReaderPage<T>> {
+  final _manager = CardManager();
+  ReaderStatus _status = ReaderOkStatus.waiting;
+
+  bool get _hasError => _status is ReaderErrStatus;
+
+  void setStatus(ReaderStatus status) => setState(() {
+        _status = status;
       });
-
-      Uint8List apdu = Uint8List.fromList([0x00, 0xa4, 0x04, 0x00, 3, 1, 2, 3]);
-      final response = await FlutterNfcKit.transceive(apdu);
-
-      await Future.delayed(const Duration(seconds: 1));
-
-      await FlutterNfcKit.finish();
-      setState(() {
-        _working = false;
-      });
-
-      // TODO: this should be done in mpc_model.dart
-      final cosigner = Cosigner.random('card', CosignerType.card);
-
-      Navigator.pop(context, cosigner);
-    } catch (e) {
-      setState(() {
-        _working = false;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to read card'),
-        ),
-      );
-      _pollTag();
-    }
-  }
 
   @override
   void initState() {
     super.initState();
-    _pollTag();
+    _initManager();
   }
 
   @override
   void dispose() {
-    FlutterNfcKit.finish();
+    _manager.disconnect();
     super.dispose();
+  }
+
+  Future<void> _initManager() async {
+    try {
+      await _manager.connect();
+    } on Exception {
+      setStatus(ReaderErrStatus.initError);
+    }
+
+    _poll();
+  }
+
+  void _poll() async {
+    // TODO: wait for reader instead
+    try {
+      if ((await _manager.readers).isEmpty) throw Exception();
+    } on Exception {
+      setStatus(ReaderErrStatus.noReader);
+      return;
+    }
+
+    try {
+      final cards = await _manager.poll();
+      // TODO: let the user pick one?
+      final card = cards[0];
+      setStatus(ReaderOkStatus.working);
+
+      try {
+        final result = await widget.job.work(card);
+        Navigator.pop(context, result);
+      } finally {
+        await card.disconnect();
+        setStatus(ReaderOkStatus.waiting);
+      }
+    } catch (e) {
+      /* FIXME: make sure not to end up in a busy loop */
+      if (!mounted) return;
+      _showError();
+      _poll();
+    }
+  }
+
+  void _showError({String message = 'Failed to read card'}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
   }
 
   @override
@@ -97,13 +129,15 @@ class _CardReaderPageState extends State<CardReaderPage> {
                         SizedBox.square(
                           dimension: 140,
                           child: CircularProgressIndicator(
-                            value: _working ? null : 0,
+                            value: _status == ReaderOkStatus.working ? null : 0,
                           ),
                         ),
                         Icon(
                           Icons.contactless,
                           size: 100,
-                          color: Theme.of(context).colorScheme.secondary,
+                          color: _hasError
+                              ? Theme.of(context).colorScheme.error
+                              : Theme.of(context).colorScheme.secondary,
                         ),
                       ],
                     ),
@@ -111,7 +145,7 @@ class _CardReaderPageState extends State<CardReaderPage> {
                   Padding(
                     padding: const EdgeInsets.all(24),
                     child: Text(
-                      'Hold the card\n near the back of the device',
+                      _status.message,
                       style: Theme.of(context).textTheme.subtitle1,
                       textAlign: TextAlign.center,
                     ),
@@ -123,5 +157,14 @@ class _CardReaderPageState extends State<CardReaderPage> {
         ),
       ),
     );
+  }
+}
+
+class AddCardPage extends StatelessWidget {
+  const AddCardPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const CardReaderPage(job: AddCardJob());
   }
 }
