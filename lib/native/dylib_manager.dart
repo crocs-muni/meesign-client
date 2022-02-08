@@ -20,7 +20,11 @@ class DylibManager {
 
   Future<void> _initIsolate() async {
     // FIXME: do we also need to shut the isolate down?
-    _isolate = await Isolate.spawn(DylibWorker.main, _receivePort.sendPort);
+    _isolate = await Isolate.spawn(
+      DylibWorker.main,
+      _receivePort.sendPort,
+      debugName: 'dylib worker',
+    );
   }
 
   void _handleMessage(dynamic message) {
