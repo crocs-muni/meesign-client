@@ -1,4 +1,7 @@
+import 'dart:io';
 import 'dart:typed_data';
+
+import 'nfc_card.dart';
 
 class CommandApdu {
   final _builder = BytesBuilder();
@@ -52,9 +55,12 @@ abstract class CardManager {
 
   Future<List<String>> get readers;
 
-  static bool get platformSupported => false;
+  static bool get platformSupported => Platform.isAndroid || Platform.isIOS;
 
   factory CardManager() {
+    if (Platform.isAndroid || Platform.isIOS) {
+      return NfcCardManager();
+    }
     throw UnsupportedError('Platform not supported');
   }
 }
