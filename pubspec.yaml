@@ -46,6 +46,8 @@ dependencies:
   open_file: ^3.2.1
   path: ^1.8.0
   async: ^2.8.2
+  dart_pcsc: 
+    git: https://github.com/jjanku/dart_pcsc.git
 
 dev_dependencies:
   flutter_test:

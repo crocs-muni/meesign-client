@@ -85,6 +85,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.3"
+  dart_pcsc:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "126b21a2639b8992ce74f7a38e092427013a638a"
+      url: "https://github.com/jjanku/dart_pcsc.git"
+    source: git
+    version: "1.0.0"
   fake_async:
     dependency: transitive
     description:
@@ -98,7 +107,7 @@ packages:
       name: ffi
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.2"
+    version: "1.2.0-dev.0"
   ffigen:
     dependency: "direct dev"
     description:
@@ -468,7 +477,7 @@ packages:
       name: win32
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.3.1"
+    version: "2.4.1"
   xdg_directories:
     dependency: transitive
     description:
@@ -484,5 +493,5 @@ packages:
     source: hosted
     version: "3.1.0"
 sdks:
-  dart: ">=2.14.0 <3.0.0"
+  dart: ">=2.16.0 <3.0.0"
   flutter: ">=2.5.0"
