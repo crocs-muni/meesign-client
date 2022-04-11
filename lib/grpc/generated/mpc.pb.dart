@@ -129,6 +129,15 @@ class GroupRequest extends $pb.GeneratedMessage {
             ? ''
             : 'threshold',
         $pb.PbFieldType.OU3)
+    ..e<Protocol>(
+        4,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'protocol',
+        $pb.PbFieldType.OE,
+        defaultOrMaker: Protocol.GG18,
+        valueOf: Protocol.valueOf,
+        enumValues: Protocol.values)
     ..hasRequiredFields = false;
 
   GroupRequest._() : super();
@@ -136,6 +145,7 @@ class GroupRequest extends $pb.GeneratedMessage {
     $core.Iterable<$core.List<$core.int>>? deviceIds,
     $core.String? name,
     $core.int? threshold,
+    Protocol? protocol,
   }) {
     final _result = create();
     if (deviceIds != null) {
@@ -146,6 +156,9 @@ class GroupRequest extends $pb.GeneratedMessage {
     }
     if (threshold != null) {
       _result.threshold = threshold;
+    }
+    if (protocol != null) {
+      _result.protocol = protocol;
     }
     return _result;
   }
@@ -202,6 +215,18 @@ class GroupRequest extends $pb.GeneratedMessage {
   $core.bool hasThreshold() => $_has(2);
   @$pb.TagNumber(3)
   void clearThreshold() => clearField(3);
+
+  @$pb.TagNumber(4)
+  Protocol get protocol => $_getN(3);
+  @$pb.TagNumber(4)
+  set protocol(Protocol v) {
+    setField(4, v);
+  }
+
+  @$pb.TagNumber(4)
+  $core.bool hasProtocol() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearProtocol() => clearField(4);
 }
 
 class Group extends $pb.GeneratedMessage {
@@ -532,8 +557,13 @@ class SignRequest extends $pb.GeneratedMessage {
             ? ''
             : 'groupId',
         $pb.PbFieldType.OY)
-    ..a<$core.List<$core.int>>(
+    ..aOS(
         2,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'name')
+    ..a<$core.List<$core.int>>(
+        3,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
             : 'data',
@@ -543,11 +573,15 @@ class SignRequest extends $pb.GeneratedMessage {
   SignRequest._() : super();
   factory SignRequest({
     $core.List<$core.int>? groupId,
+    $core.String? name,
     $core.List<$core.int>? data,
   }) {
     final _result = create();
     if (groupId != null) {
       _result.groupId = groupId;
+    }
+    if (name != null) {
+      _result.name = name;
     }
     if (data != null) {
       _result.data = data;
@@ -593,16 +627,28 @@ class SignRequest extends $pb.GeneratedMessage {
   void clearGroupId() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.List<$core.int> get data => $_getN(1);
+  $core.String get name => $_getSZ(1);
   @$pb.TagNumber(2)
-  set data($core.List<$core.int> v) {
-    $_setBytes(1, v);
+  set name($core.String v) {
+    $_setString(1, v);
   }
 
   @$pb.TagNumber(2)
-  $core.bool hasData() => $_has(1);
+  $core.bool hasName() => $_has(1);
   @$pb.TagNumber(2)
-  void clearData() => clearField(2);
+  void clearName() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.List<$core.int> get data => $_getN(2);
+  @$pb.TagNumber(3)
+  set data($core.List<$core.int> v) {
+    $_setBytes(2, v);
+  }
+
+  @$pb.TagNumber(3)
+  $core.bool hasData() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearData() => clearField(3);
 }
 
 class TaskRequest extends $pb.GeneratedMessage {
@@ -615,12 +661,12 @@ class TaskRequest extends $pb.GeneratedMessage {
               ? ''
               : 'meesign'),
       createEmptyInstance: create)
-    ..a<$core.int>(
+    ..a<$core.List<$core.int>>(
         1,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
             : 'taskId',
-        $pb.PbFieldType.OU3)
+        $pb.PbFieldType.OY)
     ..a<$core.List<$core.int>>(
         2,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
@@ -631,7 +677,7 @@ class TaskRequest extends $pb.GeneratedMessage {
 
   TaskRequest._() : super();
   factory TaskRequest({
-    $core.int? taskId,
+    $core.List<$core.int>? taskId,
     $core.List<$core.int>? deviceId,
   }) {
     final _result = create();
@@ -670,10 +716,10 @@ class TaskRequest extends $pb.GeneratedMessage {
   static TaskRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.int get taskId => $_getIZ(0);
+  $core.List<$core.int> get taskId => $_getN(0);
   @$pb.TagNumber(1)
-  set taskId($core.int v) {
-    $_setUnsignedInt32(0, v);
+  set taskId($core.List<$core.int> v) {
+    $_setBytes(0, v);
   }
 
   @$pb.TagNumber(1)
@@ -704,12 +750,12 @@ class Task extends $pb.GeneratedMessage {
               ? ''
               : 'meesign'),
       createEmptyInstance: create)
-    ..a<$core.int>(
+    ..a<$core.List<$core.int>>(
         1,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
             : 'id',
-        $pb.PbFieldType.OU3)
+        $pb.PbFieldType.OY)
     ..e<Task_TaskType>(
         2,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
@@ -725,37 +771,30 @@ class Task extends $pb.GeneratedMessage {
             ? ''
             : 'state',
         $pb.PbFieldType.OE,
-        defaultOrMaker: Task_TaskState.WAITING,
+        defaultOrMaker: Task_TaskState.CREATED,
         valueOf: Task_TaskState.valueOf,
         enumValues: Task_TaskState.values)
     ..a<$core.int>(
         4,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
-            : 'progress',
-        $pb.PbFieldType.O3)
-    ..p<$core.List<$core.int>>(
+            : 'round',
+        $pb.PbFieldType.OU3)
+    ..a<$core.List<$core.int>>(
         5,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
             : 'data',
-        $pb.PbFieldType.PY)
-    ..a<$core.List<$core.int>>(
-        6,
-        const $core.bool.fromEnvironment('protobuf.omit_field_names')
-            ? ''
-            : 'work',
         $pb.PbFieldType.OY)
     ..hasRequiredFields = false;
 
   Task._() : super();
   factory Task({
-    $core.int? id,
+    $core.List<$core.int>? id,
     Task_TaskType? type,
     Task_TaskState? state,
-    $core.int? progress,
-    $core.Iterable<$core.List<$core.int>>? data,
-    $core.List<$core.int>? work,
+    $core.int? round,
+    $core.List<$core.int>? data,
   }) {
     final _result = create();
     if (id != null) {
@@ -767,14 +806,11 @@ class Task extends $pb.GeneratedMessage {
     if (state != null) {
       _result.state = state;
     }
-    if (progress != null) {
-      _result.progress = progress;
+    if (round != null) {
+      _result.round = round;
     }
     if (data != null) {
-      _result.data.addAll(data);
-    }
-    if (work != null) {
-      _result.work = work;
+      _result.data = data;
     }
     return _result;
   }
@@ -805,10 +841,10 @@ class Task extends $pb.GeneratedMessage {
   static Task? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.int get id => $_getIZ(0);
+  $core.List<$core.int> get id => $_getN(0);
   @$pb.TagNumber(1)
-  set id($core.int v) {
-    $_setUnsignedInt32(0, v);
+  set id($core.List<$core.int> v) {
+    $_setBytes(0, v);
   }
 
   @$pb.TagNumber(1)
@@ -841,31 +877,28 @@ class Task extends $pb.GeneratedMessage {
   void clearState() => clearField(3);
 
   @$pb.TagNumber(4)
-  $core.int get progress => $_getIZ(3);
+  $core.int get round => $_getIZ(3);
   @$pb.TagNumber(4)
-  set progress($core.int v) {
-    $_setSignedInt32(3, v);
+  set round($core.int v) {
+    $_setUnsignedInt32(3, v);
   }
 
   @$pb.TagNumber(4)
-  $core.bool hasProgress() => $_has(3);
+  $core.bool hasRound() => $_has(3);
   @$pb.TagNumber(4)
-  void clearProgress() => clearField(4);
+  void clearRound() => clearField(4);
 
   @$pb.TagNumber(5)
-  $core.List<$core.List<$core.int>> get data => $_getList(4);
-
-  @$pb.TagNumber(6)
-  $core.List<$core.int> get work => $_getN(5);
-  @$pb.TagNumber(6)
-  set work($core.List<$core.int> v) {
-    $_setBytes(5, v);
+  $core.List<$core.int> get data => $_getN(4);
+  @$pb.TagNumber(5)
+  set data($core.List<$core.int> v) {
+    $_setBytes(4, v);
   }
 
-  @$pb.TagNumber(6)
-  $core.bool hasWork() => $_has(5);
-  @$pb.TagNumber(6)
-  void clearWork() => clearField(6);
+  @$pb.TagNumber(5)
+  $core.bool hasData() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearData() => clearField(5);
 }
 
 class TaskUpdate extends $pb.GeneratedMessage {
@@ -884,12 +917,12 @@ class TaskUpdate extends $pb.GeneratedMessage {
             ? ''
             : 'device',
         $pb.PbFieldType.OY)
-    ..a<$core.int>(
+    ..a<$core.List<$core.int>>(
         2,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
             : 'task',
-        $pb.PbFieldType.OU3)
+        $pb.PbFieldType.OY)
     ..a<$core.List<$core.int>>(
         3,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
@@ -901,7 +934,7 @@ class TaskUpdate extends $pb.GeneratedMessage {
   TaskUpdate._() : super();
   factory TaskUpdate({
     $core.List<$core.int>? device,
-    $core.int? task,
+    $core.List<$core.int>? task,
     $core.List<$core.int>? data,
   }) {
     final _result = create();
@@ -955,10 +988,10 @@ class TaskUpdate extends $pb.GeneratedMessage {
   void clearDevice() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.int get task => $_getIZ(1);
+  $core.List<$core.int> get task => $_getN(1);
   @$pb.TagNumber(2)
-  set task($core.int v) {
-    $_setUnsignedInt32(1, v);
+  set task($core.List<$core.int> v) {
+    $_setBytes(1, v);
   }
 
   @$pb.TagNumber(2)
@@ -979,11 +1012,11 @@ class TaskUpdate extends $pb.GeneratedMessage {
   void clearData() => clearField(3);
 }
 
-class InfoRequest extends $pb.GeneratedMessage {
+class TasksRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       const $core.bool.fromEnvironment('protobuf.omit_message_names')
           ? ''
-          : 'InfoRequest',
+          : 'TasksRequest',
       package: const $pb.PackageName(
           const $core.bool.fromEnvironment('protobuf.omit_message_names')
               ? ''
@@ -997,8 +1030,8 @@ class InfoRequest extends $pb.GeneratedMessage {
         $pb.PbFieldType.OY)
     ..hasRequiredFields = false;
 
-  InfoRequest._() : super();
-  factory InfoRequest({
+  TasksRequest._() : super();
+  factory TasksRequest({
     $core.List<$core.int>? deviceId,
   }) {
     final _result = create();
@@ -1007,31 +1040,32 @@ class InfoRequest extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory InfoRequest.fromBuffer($core.List<$core.int> i,
+  factory TasksRequest.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
-  factory InfoRequest.fromJson($core.String i,
+  factory TasksRequest.fromJson($core.String i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromJson(i, r);
   @$core.Deprecated('Using this can add significant overhead to your binary. '
       'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
       'Will be removed in next major version')
-  InfoRequest clone() => InfoRequest()..mergeFromMessage(this);
+  TasksRequest clone() => TasksRequest()..mergeFromMessage(this);
   @$core.Deprecated('Using this can add significant overhead to your binary. '
       'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
       'Will be removed in next major version')
-  InfoRequest copyWith(void Function(InfoRequest) updates) =>
-      super.copyWith((message) => updates(message as InfoRequest))
-          as InfoRequest; // ignore: deprecated_member_use
+  TasksRequest copyWith(void Function(TasksRequest) updates) =>
+      super.copyWith((message) => updates(message as TasksRequest))
+          as TasksRequest; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
-  static InfoRequest create() => InfoRequest._();
-  InfoRequest createEmptyInstance() => create();
-  static $pb.PbList<InfoRequest> createRepeated() => $pb.PbList<InfoRequest>();
+  static TasksRequest create() => TasksRequest._();
+  TasksRequest createEmptyInstance() => create();
+  static $pb.PbList<TasksRequest> createRepeated() =>
+      $pb.PbList<TasksRequest>();
   @$core.pragma('dart2js:noInline')
-  static InfoRequest getDefault() => _defaultInstance ??=
-      $pb.GeneratedMessage.$_defaultFor<InfoRequest>(create);
-  static InfoRequest? _defaultInstance;
+  static TasksRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<TasksRequest>(create);
+  static TasksRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.List<$core.int> get deviceId => $_getN(0);
@@ -1046,11 +1080,138 @@ class InfoRequest extends $pb.GeneratedMessage {
   void clearDeviceId() => clearField(1);
 }
 
-class Info extends $pb.GeneratedMessage {
+class Tasks extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       const $core.bool.fromEnvironment('protobuf.omit_message_names')
           ? ''
-          : 'Info',
+          : 'Tasks',
+      package: const $pb.PackageName(
+          const $core.bool.fromEnvironment('protobuf.omit_message_names')
+              ? ''
+              : 'meesign'),
+      createEmptyInstance: create)
+    ..pc<Task>(
+        1,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'tasks',
+        $pb.PbFieldType.PM,
+        subBuilder: Task.create)
+    ..hasRequiredFields = false;
+
+  Tasks._() : super();
+  factory Tasks({
+    $core.Iterable<Task>? tasks,
+  }) {
+    final _result = create();
+    if (tasks != null) {
+      _result.tasks.addAll(tasks);
+    }
+    return _result;
+  }
+  factory Tasks.fromBuffer($core.List<$core.int> i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(i, r);
+  factory Tasks.fromJson($core.String i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(i, r);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+      'Will be removed in next major version')
+  Tasks clone() => Tasks()..mergeFromMessage(this);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+      'Will be removed in next major version')
+  Tasks copyWith(void Function(Tasks) updates) =>
+      super.copyWith((message) => updates(message as Tasks))
+          as Tasks; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static Tasks create() => Tasks._();
+  Tasks createEmptyInstance() => create();
+  static $pb.PbList<Tasks> createRepeated() => $pb.PbList<Tasks>();
+  @$core.pragma('dart2js:noInline')
+  static Tasks getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Tasks>(create);
+  static Tasks? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.List<Task> get tasks => $_getList(0);
+}
+
+class GroupsRequest extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      const $core.bool.fromEnvironment('protobuf.omit_message_names')
+          ? ''
+          : 'GroupsRequest',
+      package: const $pb.PackageName(
+          const $core.bool.fromEnvironment('protobuf.omit_message_names')
+              ? ''
+              : 'meesign'),
+      createEmptyInstance: create)
+    ..a<$core.List<$core.int>>(
+        1,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'deviceId',
+        $pb.PbFieldType.OY)
+    ..hasRequiredFields = false;
+
+  GroupsRequest._() : super();
+  factory GroupsRequest({
+    $core.List<$core.int>? deviceId,
+  }) {
+    final _result = create();
+    if (deviceId != null) {
+      _result.deviceId = deviceId;
+    }
+    return _result;
+  }
+  factory GroupsRequest.fromBuffer($core.List<$core.int> i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(i, r);
+  factory GroupsRequest.fromJson($core.String i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(i, r);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+      'Will be removed in next major version')
+  GroupsRequest clone() => GroupsRequest()..mergeFromMessage(this);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+      'Will be removed in next major version')
+  GroupsRequest copyWith(void Function(GroupsRequest) updates) =>
+      super.copyWith((message) => updates(message as GroupsRequest))
+          as GroupsRequest; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static GroupsRequest create() => GroupsRequest._();
+  GroupsRequest createEmptyInstance() => create();
+  static $pb.PbList<GroupsRequest> createRepeated() =>
+      $pb.PbList<GroupsRequest>();
+  @$core.pragma('dart2js:noInline')
+  static GroupsRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<GroupsRequest>(create);
+  static GroupsRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.List<$core.int> get deviceId => $_getN(0);
+  @$pb.TagNumber(1)
+  set deviceId($core.List<$core.int> v) {
+    $_setBytes(0, v);
+  }
+
+  @$pb.TagNumber(1)
+  $core.bool hasDeviceId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearDeviceId() => clearField(1);
+}
+
+class Groups extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      const $core.bool.fromEnvironment('protobuf.omit_message_names')
+          ? ''
+          : 'Groups',
       package: const $pb.PackageName(
           const $core.bool.fromEnvironment('protobuf.omit_message_names')
               ? ''
@@ -1063,60 +1224,46 @@ class Info extends $pb.GeneratedMessage {
             : 'groups',
         $pb.PbFieldType.PM,
         subBuilder: Group.create)
-    ..pc<Task>(
-        2,
-        const $core.bool.fromEnvironment('protobuf.omit_field_names')
-            ? ''
-            : 'tasks',
-        $pb.PbFieldType.PM,
-        subBuilder: Task.create)
     ..hasRequiredFields = false;
 
-  Info._() : super();
-  factory Info({
+  Groups._() : super();
+  factory Groups({
     $core.Iterable<Group>? groups,
-    $core.Iterable<Task>? tasks,
   }) {
     final _result = create();
     if (groups != null) {
       _result.groups.addAll(groups);
     }
-    if (tasks != null) {
-      _result.tasks.addAll(tasks);
-    }
     return _result;
   }
-  factory Info.fromBuffer($core.List<$core.int> i,
+  factory Groups.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
-  factory Info.fromJson($core.String i,
+  factory Groups.fromJson($core.String i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromJson(i, r);
   @$core.Deprecated('Using this can add significant overhead to your binary. '
       'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
       'Will be removed in next major version')
-  Info clone() => Info()..mergeFromMessage(this);
+  Groups clone() => Groups()..mergeFromMessage(this);
   @$core.Deprecated('Using this can add significant overhead to your binary. '
       'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
       'Will be removed in next major version')
-  Info copyWith(void Function(Info) updates) =>
-      super.copyWith((message) => updates(message as Info))
-          as Info; // ignore: deprecated_member_use
+  Groups copyWith(void Function(Groups) updates) =>
+      super.copyWith((message) => updates(message as Groups))
+          as Groups; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
-  static Info create() => Info._();
-  Info createEmptyInstance() => create();
-  static $pb.PbList<Info> createRepeated() => $pb.PbList<Info>();
+  static Groups create() => Groups._();
+  Groups createEmptyInstance() => create();
+  static $pb.PbList<Groups> createRepeated() => $pb.PbList<Groups>();
   @$core.pragma('dart2js:noInline')
-  static Info getDefault() =>
-      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Info>(create);
-  static Info? _defaultInstance;
+  static Groups getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Groups>(create);
+  static Groups? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.List<Group> get groups => $_getList(0);
-
-  @$pb.TagNumber(2)
-  $core.List<Task> get tasks => $_getList(1);
 }
 
 enum Resp_Variant { success, failure, notSet }
@@ -1215,4 +1362,113 @@ class Resp extends $pb.GeneratedMessage {
   $core.bool hasFailure() => $_has(1);
   @$pb.TagNumber(2)
   void clearFailure() => clearField(2);
+}
+
+class TaskAgreement extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      const $core.bool.fromEnvironment('protobuf.omit_message_names')
+          ? ''
+          : 'TaskAgreement',
+      package: const $pb.PackageName(
+          const $core.bool.fromEnvironment('protobuf.omit_message_names')
+              ? ''
+              : 'meesign'),
+      createEmptyInstance: create)
+    ..aOB(
+        1,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'agreement')
+    ..hasRequiredFields = false;
+
+  TaskAgreement._() : super();
+  factory TaskAgreement({
+    $core.bool? agreement,
+  }) {
+    final _result = create();
+    if (agreement != null) {
+      _result.agreement = agreement;
+    }
+    return _result;
+  }
+  factory TaskAgreement.fromBuffer($core.List<$core.int> i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(i, r);
+  factory TaskAgreement.fromJson($core.String i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(i, r);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+      'Will be removed in next major version')
+  TaskAgreement clone() => TaskAgreement()..mergeFromMessage(this);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+      'Will be removed in next major version')
+  TaskAgreement copyWith(void Function(TaskAgreement) updates) =>
+      super.copyWith((message) => updates(message as TaskAgreement))
+          as TaskAgreement; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static TaskAgreement create() => TaskAgreement._();
+  TaskAgreement createEmptyInstance() => create();
+  static $pb.PbList<TaskAgreement> createRepeated() =>
+      $pb.PbList<TaskAgreement>();
+  @$core.pragma('dart2js:noInline')
+  static TaskAgreement getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<TaskAgreement>(create);
+  static TaskAgreement? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.bool get agreement => $_getBF(0);
+  @$pb.TagNumber(1)
+  set agreement($core.bool v) {
+    $_setBool(0, v);
+  }
+
+  @$pb.TagNumber(1)
+  $core.bool hasAgreement() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearAgreement() => clearField(1);
+}
+
+class TaskAcknowledgement extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      const $core.bool.fromEnvironment('protobuf.omit_message_names')
+          ? ''
+          : 'TaskAcknowledgement',
+      package: const $pb.PackageName(
+          const $core.bool.fromEnvironment('protobuf.omit_message_names')
+              ? ''
+              : 'meesign'),
+      createEmptyInstance: create)
+    ..hasRequiredFields = false;
+
+  TaskAcknowledgement._() : super();
+  factory TaskAcknowledgement() => create();
+  factory TaskAcknowledgement.fromBuffer($core.List<$core.int> i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(i, r);
+  factory TaskAcknowledgement.fromJson($core.String i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(i, r);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+      'Will be removed in next major version')
+  TaskAcknowledgement clone() => TaskAcknowledgement()..mergeFromMessage(this);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+      'Will be removed in next major version')
+  TaskAcknowledgement copyWith(void Function(TaskAcknowledgement) updates) =>
+      super.copyWith((message) => updates(message as TaskAcknowledgement))
+          as TaskAcknowledgement; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static TaskAcknowledgement create() => TaskAcknowledgement._();
+  TaskAcknowledgement createEmptyInstance() => create();
+  static $pb.PbList<TaskAcknowledgement> createRepeated() =>
+      $pb.PbList<TaskAcknowledgement>();
+  @$core.pragma('dart2js:noInline')
+  static TaskAcknowledgement getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<TaskAcknowledgement>(create);
+  static TaskAcknowledgement? _defaultInstance;
 }

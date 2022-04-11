@@ -34,10 +34,14 @@ class MPCClient extends $grpc.Client {
       '/meesign.MPC/UpdateTask',
       ($0.TaskUpdate value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.Resp.fromBuffer(value));
-  static final _$getInfo = $grpc.ClientMethod<$0.InfoRequest, $0.Info>(
-      '/meesign.MPC/GetInfo',
-      ($0.InfoRequest value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $0.Info.fromBuffer(value));
+  static final _$getTasks = $grpc.ClientMethod<$0.TasksRequest, $0.Tasks>(
+      '/meesign.MPC/GetTasks',
+      ($0.TasksRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $0.Tasks.fromBuffer(value));
+  static final _$getGroups = $grpc.ClientMethod<$0.GroupsRequest, $0.Groups>(
+      '/meesign.MPC/GetGroups',
+      ($0.GroupsRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $0.Groups.fromBuffer(value));
   static final _$getDevices = $grpc.ClientMethod<$0.DevicesRequest, $0.Devices>(
       '/meesign.MPC/GetDevices',
       ($0.DevicesRequest value) => value.writeToBuffer(),
@@ -73,9 +77,14 @@ class MPCClient extends $grpc.Client {
     return $createUnaryCall(_$updateTask, request, options: options);
   }
 
-  $grpc.ResponseFuture<$0.Info> getInfo($0.InfoRequest request,
+  $grpc.ResponseFuture<$0.Tasks> getTasks($0.TasksRequest request,
       {$grpc.CallOptions? options}) {
-    return $createUnaryCall(_$getInfo, request, options: options);
+    return $createUnaryCall(_$getTasks, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.Groups> getGroups($0.GroupsRequest request,
+      {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$getGroups, request, options: options);
   }
 
   $grpc.ResponseFuture<$0.Devices> getDevices($0.DevicesRequest request,
@@ -124,13 +133,20 @@ abstract class MPCServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.TaskUpdate.fromBuffer(value),
         ($0.Resp value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$0.InfoRequest, $0.Info>(
-        'GetInfo',
-        getInfo_Pre,
+    $addMethod($grpc.ServiceMethod<$0.TasksRequest, $0.Tasks>(
+        'GetTasks',
+        getTasks_Pre,
         false,
         false,
-        ($core.List<$core.int> value) => $0.InfoRequest.fromBuffer(value),
-        ($0.Info value) => value.writeToBuffer()));
+        ($core.List<$core.int> value) => $0.TasksRequest.fromBuffer(value),
+        ($0.Tasks value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.GroupsRequest, $0.Groups>(
+        'GetGroups',
+        getGroups_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.GroupsRequest.fromBuffer(value),
+        ($0.Groups value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.DevicesRequest, $0.Devices>(
         'GetDevices',
         getDevices_Pre,
@@ -165,9 +181,14 @@ abstract class MPCServiceBase extends $grpc.Service {
     return updateTask(call, await request);
   }
 
-  $async.Future<$0.Info> getInfo_Pre(
-      $grpc.ServiceCall call, $async.Future<$0.InfoRequest> request) async {
-    return getInfo(call, await request);
+  $async.Future<$0.Tasks> getTasks_Pre(
+      $grpc.ServiceCall call, $async.Future<$0.TasksRequest> request) async {
+    return getTasks(call, await request);
+  }
+
+  $async.Future<$0.Groups> getGroups_Pre(
+      $grpc.ServiceCall call, $async.Future<$0.GroupsRequest> request) async {
+    return getGroups(call, await request);
   }
 
   $async.Future<$0.Devices> getDevices_Pre(
@@ -183,8 +204,10 @@ abstract class MPCServiceBase extends $grpc.Service {
       $grpc.ServiceCall call, $0.TaskRequest request);
   $async.Future<$0.Resp> updateTask(
       $grpc.ServiceCall call, $0.TaskUpdate request);
-  $async.Future<$0.Info> getInfo(
-      $grpc.ServiceCall call, $0.InfoRequest request);
+  $async.Future<$0.Tasks> getTasks(
+      $grpc.ServiceCall call, $0.TasksRequest request);
+  $async.Future<$0.Groups> getGroups(
+      $grpc.ServiceCall call, $0.GroupsRequest request);
   $async.Future<$0.Devices> getDevices(
       $grpc.ServiceCall call, $0.DevicesRequest request);
 }

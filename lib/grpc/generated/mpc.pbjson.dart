@@ -9,6 +9,17 @@ import 'dart:core' as $core;
 import 'dart:convert' as $convert;
 import 'dart:typed_data' as $typed_data;
 
+@$core.Deprecated('Use protocolDescriptor instead')
+const Protocol$json = const {
+  '1': 'Protocol',
+  '2': const [
+    const {'1': 'GG18', '2': 0},
+  ],
+};
+
+/// Descriptor for `Protocol`. Decode as a `google.protobuf.EnumDescriptorProto`.
+final $typed_data.Uint8List protocolDescriptor =
+    $convert.base64Decode('CghQcm90b2NvbBIICgRHRzE4EAA=');
 @$core.Deprecated('Use registrationRequestDescriptor instead')
 const RegistrationRequest$json = const {
   '1': 'RegistrationRequest',
@@ -36,15 +47,26 @@ const GroupRequest$json = const {
       '10': 'threshold',
       '17': true
     },
+    const {
+      '1': 'protocol',
+      '3': 4,
+      '4': 1,
+      '5': 14,
+      '6': '.meesign.Protocol',
+      '9': 1,
+      '10': 'protocol',
+      '17': true
+    },
   ],
   '8': const [
     const {'1': '_threshold'},
+    const {'1': '_protocol'},
   ],
 };
 
 /// Descriptor for `GroupRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List groupRequestDescriptor = $convert.base64Decode(
-    'CgxHcm91cFJlcXVlc3QSHQoKZGV2aWNlX2lkcxgBIAMoDFIJZGV2aWNlSWRzEhIKBG5hbWUYAiABKAlSBG5hbWUSIQoJdGhyZXNob2xkGAMgASgNSABSCXRocmVzaG9sZIgBAUIMCgpfdGhyZXNob2xk');
+    'CgxHcm91cFJlcXVlc3QSHQoKZGV2aWNlX2lkcxgBIAMoDFIJZGV2aWNlSWRzEhIKBG5hbWUYAiABKAlSBG5hbWUSIQoJdGhyZXNob2xkGAMgASgNSABSCXRocmVzaG9sZIgBARIyCghwcm90b2NvbBgEIAEoDjIRLm1lZXNpZ24uUHJvdG9jb2xIAVIIcHJvdG9jb2yIAQFCDAoKX3RocmVzaG9sZEILCglfcHJvdG9jb2w=');
 @$core.Deprecated('Use groupDescriptor instead')
 const Group$json = const {
   '1': 'Group',
@@ -102,18 +124,19 @@ const SignRequest$json = const {
   '1': 'SignRequest',
   '2': const [
     const {'1': 'group_id', '3': 1, '4': 1, '5': 12, '10': 'groupId'},
-    const {'1': 'data', '3': 2, '4': 1, '5': 12, '10': 'data'},
+    const {'1': 'name', '3': 2, '4': 1, '5': 9, '10': 'name'},
+    const {'1': 'data', '3': 3, '4': 1, '5': 12, '10': 'data'},
   ],
 };
 
 /// Descriptor for `SignRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List signRequestDescriptor = $convert.base64Decode(
-    'CgtTaWduUmVxdWVzdBIZCghncm91cF9pZBgBIAEoDFIHZ3JvdXBJZBISCgRkYXRhGAIgASgMUgRkYXRh');
+    'CgtTaWduUmVxdWVzdBIZCghncm91cF9pZBgBIAEoDFIHZ3JvdXBJZBISCgRuYW1lGAIgASgJUgRuYW1lEhIKBGRhdGEYAyABKAxSBGRhdGE=');
 @$core.Deprecated('Use taskRequestDescriptor instead')
 const TaskRequest$json = const {
   '1': 'TaskRequest',
   '2': const [
-    const {'1': 'task_id', '3': 1, '4': 1, '5': 13, '10': 'taskId'},
+    const {'1': 'task_id', '3': 1, '4': 1, '5': 12, '10': 'taskId'},
     const {
       '1': 'device_id',
       '3': 2,
@@ -131,12 +154,12 @@ const TaskRequest$json = const {
 
 /// Descriptor for `TaskRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List taskRequestDescriptor = $convert.base64Decode(
-    'CgtUYXNrUmVxdWVzdBIXCgd0YXNrX2lkGAEgASgNUgZ0YXNrSWQSIAoJZGV2aWNlX2lkGAIgASgMSABSCGRldmljZUlkiAEBQgwKCl9kZXZpY2VfaWQ=');
+    'CgtUYXNrUmVxdWVzdBIXCgd0YXNrX2lkGAEgASgMUgZ0YXNrSWQSIAoJZGV2aWNlX2lkGAIgASgMSABSCGRldmljZUlkiAEBQgwKCl9kZXZpY2VfaWQ=');
 @$core.Deprecated('Use taskDescriptor instead')
 const Task$json = const {
   '1': 'Task',
   '2': const [
-    const {'1': 'id', '3': 1, '4': 1, '5': 13, '10': 'id'},
+    const {'1': 'id', '3': 1, '4': 1, '5': 12, '10': 'id'},
     const {
       '1': 'type',
       '3': 2,
@@ -153,21 +176,20 @@ const Task$json = const {
       '6': '.meesign.Task.TaskState',
       '10': 'state'
     },
-    const {'1': 'progress', '3': 4, '4': 1, '5': 5, '10': 'progress'},
-    const {'1': 'data', '3': 5, '4': 3, '5': 12, '10': 'data'},
+    const {'1': 'round', '3': 4, '4': 1, '5': 13, '10': 'round'},
     const {
-      '1': 'work',
-      '3': 6,
+      '1': 'data',
+      '3': 5,
       '4': 1,
       '5': 12,
       '9': 0,
-      '10': 'work',
+      '10': 'data',
       '17': true
     },
   ],
   '4': const [Task_TaskType$json, Task_TaskState$json],
   '8': const [
-    const {'1': '_work'},
+    const {'1': '_data'},
   ],
 };
 
@@ -184,42 +206,72 @@ const Task_TaskType$json = const {
 const Task_TaskState$json = const {
   '1': 'TaskState',
   '2': const [
-    const {'1': 'WAITING', '2': 0},
-    const {'1': 'FINISHED', '2': 1},
-    const {'1': 'FAILED', '2': 2},
+    const {'1': 'CREATED', '2': 0},
+    const {'1': 'RUNNING', '2': 1},
+    const {'1': 'FINISHED', '2': 2},
+    const {'1': 'FAILED', '2': 3},
   ],
 };
 
 /// Descriptor for `Task`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List taskDescriptor = $convert.base64Decode(
-    'CgRUYXNrEg4KAmlkGAEgASgNUgJpZBIqCgR0eXBlGAIgASgOMhYubWVlc2lnbi5UYXNrLlRhc2tUeXBlUgR0eXBlEi0KBXN0YXRlGAMgASgOMhcubWVlc2lnbi5UYXNrLlRhc2tTdGF0ZVIFc3RhdGUSGgoIcHJvZ3Jlc3MYBCABKAVSCHByb2dyZXNzEhIKBGRhdGEYBSADKAxSBGRhdGESFwoEd29yaxgGIAEoDEgAUgR3b3JriAEBIh8KCFRhc2tUeXBlEgkKBUdST1VQEAASCAoEU0lHThABIjIKCVRhc2tTdGF0ZRILCgdXQUlUSU5HEAASDAoIRklOSVNIRUQQARIKCgZGQUlMRUQQAkIHCgVfd29yaw==');
+    'CgRUYXNrEg4KAmlkGAEgASgMUgJpZBIqCgR0eXBlGAIgASgOMhYubWVlc2lnbi5UYXNrLlRhc2tUeXBlUgR0eXBlEi0KBXN0YXRlGAMgASgOMhcubWVlc2lnbi5UYXNrLlRhc2tTdGF0ZVIFc3RhdGUSFAoFcm91bmQYBCABKA1SBXJvdW5kEhcKBGRhdGEYBSABKAxIAFIEZGF0YYgBASIfCghUYXNrVHlwZRIJCgVHUk9VUBAAEggKBFNJR04QASI/CglUYXNrU3RhdGUSCwoHQ1JFQVRFRBAAEgsKB1JVTk5JTkcQARIMCghGSU5JU0hFRBACEgoKBkZBSUxFRBADQgcKBV9kYXRh');
 @$core.Deprecated('Use taskUpdateDescriptor instead')
 const TaskUpdate$json = const {
   '1': 'TaskUpdate',
   '2': const [
     const {'1': 'device', '3': 1, '4': 1, '5': 12, '10': 'device'},
-    const {'1': 'task', '3': 2, '4': 1, '5': 13, '10': 'task'},
+    const {'1': 'task', '3': 2, '4': 1, '5': 12, '10': 'task'},
     const {'1': 'data', '3': 3, '4': 1, '5': 12, '10': 'data'},
   ],
 };
 
 /// Descriptor for `TaskUpdate`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List taskUpdateDescriptor = $convert.base64Decode(
-    'CgpUYXNrVXBkYXRlEhYKBmRldmljZRgBIAEoDFIGZGV2aWNlEhIKBHRhc2sYAiABKA1SBHRhc2sSEgoEZGF0YRgDIAEoDFIEZGF0YQ==');
-@$core.Deprecated('Use infoRequestDescriptor instead')
-const InfoRequest$json = const {
-  '1': 'InfoRequest',
+    'CgpUYXNrVXBkYXRlEhYKBmRldmljZRgBIAEoDFIGZGV2aWNlEhIKBHRhc2sYAiABKAxSBHRhc2sSEgoEZGF0YRgDIAEoDFIEZGF0YQ==');
+@$core.Deprecated('Use tasksRequestDescriptor instead')
+const TasksRequest$json = const {
+  '1': 'TasksRequest',
   '2': const [
     const {'1': 'device_id', '3': 1, '4': 1, '5': 12, '10': 'deviceId'},
   ],
 };
 
-/// Descriptor for `InfoRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List infoRequestDescriptor = $convert
-    .base64Decode('CgtJbmZvUmVxdWVzdBIbCglkZXZpY2VfaWQYASABKAxSCGRldmljZUlk');
-@$core.Deprecated('Use infoDescriptor instead')
-const Info$json = const {
-  '1': 'Info',
+/// Descriptor for `TasksRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List tasksRequestDescriptor = $convert.base64Decode(
+    'CgxUYXNrc1JlcXVlc3QSGwoJZGV2aWNlX2lkGAEgASgMUghkZXZpY2VJZA==');
+@$core.Deprecated('Use tasksDescriptor instead')
+const Tasks$json = const {
+  '1': 'Tasks',
+  '2': const [
+    const {
+      '1': 'tasks',
+      '3': 1,
+      '4': 3,
+      '5': 11,
+      '6': '.meesign.Task',
+      '10': 'tasks'
+    },
+  ],
+};
+
+/// Descriptor for `Tasks`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List tasksDescriptor = $convert.base64Decode(
+    'CgVUYXNrcxIjCgV0YXNrcxgBIAMoCzINLm1lZXNpZ24uVGFza1IFdGFza3M=');
+@$core.Deprecated('Use groupsRequestDescriptor instead')
+const GroupsRequest$json = const {
+  '1': 'GroupsRequest',
+  '2': const [
+    const {'1': 'device_id', '3': 1, '4': 1, '5': 12, '10': 'deviceId'},
+  ],
+};
+
+/// Descriptor for `GroupsRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List groupsRequestDescriptor = $convert.base64Decode(
+    'Cg1Hcm91cHNSZXF1ZXN0EhsKCWRldmljZV9pZBgBIAEoDFIIZGV2aWNlSWQ=');
+@$core.Deprecated('Use groupsDescriptor instead')
+const Groups$json = const {
+  '1': 'Groups',
   '2': const [
     const {
       '1': 'groups',
@@ -229,20 +281,12 @@ const Info$json = const {
       '6': '.meesign.Group',
       '10': 'groups'
     },
-    const {
-      '1': 'tasks',
-      '3': 2,
-      '4': 3,
-      '5': 11,
-      '6': '.meesign.Task',
-      '10': 'tasks'
-    },
   ],
 };
 
-/// Descriptor for `Info`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List infoDescriptor = $convert.base64Decode(
-    'CgRJbmZvEiYKBmdyb3VwcxgBIAMoCzIOLm1lZXNpZ24uR3JvdXBSBmdyb3VwcxIjCgV0YXNrcxgCIAMoCzINLm1lZXNpZ24uVGFza1IFdGFza3M=');
+/// Descriptor for `Groups`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List groupsDescriptor = $convert.base64Decode(
+    'CgZHcm91cHMSJgoGZ3JvdXBzGAEgAygLMg4ubWVlc2lnbi5Hcm91cFIGZ3JvdXBz');
 @$core.Deprecated('Use respDescriptor instead')
 const Resp$json = const {
   '1': 'Resp',
@@ -258,3 +302,22 @@ const Resp$json = const {
 /// Descriptor for `Resp`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List respDescriptor = $convert.base64Decode(
     'CgRSZXNwEhoKB3N1Y2Nlc3MYASABKAlIAFIHc3VjY2VzcxIaCgdmYWlsdXJlGAIgASgJSABSB2ZhaWx1cmVCCQoHdmFyaWFudA==');
+@$core.Deprecated('Use taskAgreementDescriptor instead')
+const TaskAgreement$json = const {
+  '1': 'TaskAgreement',
+  '2': const [
+    const {'1': 'agreement', '3': 1, '4': 1, '5': 8, '10': 'agreement'},
+  ],
+};
+
+/// Descriptor for `TaskAgreement`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List taskAgreementDescriptor = $convert.base64Decode(
+    'Cg1UYXNrQWdyZWVtZW50EhwKCWFncmVlbWVudBgBIAEoCFIJYWdyZWVtZW50');
+@$core.Deprecated('Use taskAcknowledgementDescriptor instead')
+const TaskAcknowledgement$json = const {
+  '1': 'TaskAcknowledgement',
+};
+
+/// Descriptor for `TaskAcknowledgement`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List taskAcknowledgementDescriptor =
+    $convert.base64Decode('ChNUYXNrQWNrbm93bGVkZ2VtZW50');

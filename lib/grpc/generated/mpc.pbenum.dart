@@ -9,6 +9,24 @@
 import 'dart:core' as $core;
 import 'package:protobuf/protobuf.dart' as $pb;
 
+class Protocol extends $pb.ProtobufEnum {
+  static const Protocol GG18 = Protocol._(
+      0,
+      const $core.bool.fromEnvironment('protobuf.omit_enum_names')
+          ? ''
+          : 'GG18');
+
+  static const $core.List<Protocol> values = <Protocol>[
+    GG18,
+  ];
+
+  static final $core.Map<$core.int, Protocol> _byValue =
+      $pb.ProtobufEnum.initByValue(values);
+  static Protocol? valueOf($core.int value) => _byValue[value];
+
+  const Protocol._($core.int v, $core.String n) : super(v, n);
+}
+
 class Task_TaskType extends $pb.ProtobufEnum {
   static const Task_TaskType GROUP = Task_TaskType._(
       0,
@@ -34,24 +52,30 @@ class Task_TaskType extends $pb.ProtobufEnum {
 }
 
 class Task_TaskState extends $pb.ProtobufEnum {
-  static const Task_TaskState WAITING = Task_TaskState._(
+  static const Task_TaskState CREATED = Task_TaskState._(
       0,
       const $core.bool.fromEnvironment('protobuf.omit_enum_names')
           ? ''
-          : 'WAITING');
-  static const Task_TaskState FINISHED = Task_TaskState._(
+          : 'CREATED');
+  static const Task_TaskState RUNNING = Task_TaskState._(
       1,
+      const $core.bool.fromEnvironment('protobuf.omit_enum_names')
+          ? ''
+          : 'RUNNING');
+  static const Task_TaskState FINISHED = Task_TaskState._(
+      2,
       const $core.bool.fromEnvironment('protobuf.omit_enum_names')
           ? ''
           : 'FINISHED');
   static const Task_TaskState FAILED = Task_TaskState._(
-      2,
+      3,
       const $core.bool.fromEnvironment('protobuf.omit_enum_names')
           ? ''
           : 'FAILED');
 
   static const $core.List<Task_TaskState> values = <Task_TaskState>[
-    WAITING,
+    CREATED,
+    RUNNING,
     FINISHED,
     FAILED,
   ];
