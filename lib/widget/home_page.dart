@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
 
-import '../mpc_model.dart';
+import '../model/mpc_model.dart';
 import '../routes.dart';
 import 'dismissible.dart';
 

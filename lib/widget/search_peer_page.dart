@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../mpc_model.dart';
+import '../model/mpc_model.dart';
 
 class SearchPeerPage extends StatefulWidget {
   const SearchPeerPage({Key? key}) : super(key: key);

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-import '../mpc_model.dart';
+import '../model/mpc_model.dart';
 import '../util/qr_coder.dart';
 
 class QrIdentityPage extends StatelessWidget {

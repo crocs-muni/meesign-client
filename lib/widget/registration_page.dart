@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../mpc_model.dart';
+import '../model/mpc_model.dart';
 import '../routes.dart';
 import '../util/rnd_name_generator.dart';
 

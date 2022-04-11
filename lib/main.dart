@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-import 'mpc_model.dart';
+import 'model/mpc_model.dart';
 import 'routes.dart';
 import 'theme.dart';
 import 'widget/card_reader_page.dart';

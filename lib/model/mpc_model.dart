@@ -6,8 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:grpc/grpc.dart';
 import 'package:path/path.dart' as path_pkg;
 
-import 'file_storage.dart';
-import 'grpc/generated/mpc.pbgrpc.dart';
+import '../file_storage.dart';
+import '../grpc/generated/mpc.pbgrpc.dart';
 
 class Group {
   List<int>? id;

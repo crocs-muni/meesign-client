@@ -1,4 +1,4 @@
-import '../mpc_model.dart';
+import '../model/mpc_model.dart';
 import 'card.dart';
 import 'iso7816.dart';
 

@@ -6,7 +6,7 @@ import 'dart:io';
 
 import '../card/card.dart';
 import '../routes.dart';
-import '../mpc_model.dart';
+import '../model/mpc_model.dart';
 import '../util/rnd_name_generator.dart';
 
 class NewGroupPage extends StatefulWidget {
