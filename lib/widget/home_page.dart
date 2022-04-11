@@ -150,7 +150,7 @@ class _HomePageState extends State<HomePage> {
             child: const Text('JOIN'),
             onPressed: () {
               ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
-              context.read<MpcModel>().joinGroup(group);
+              // TODO: join group
             },
           ),
           TextButton(
@@ -182,7 +182,7 @@ class _HomePageState extends State<HomePage> {
             child: const Text('SIGN'),
             onPressed: () {
               ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
-              context.read<MpcModel>().cosign(file);
+              // TODO: cosign
             },
           ),
           TextButton(
