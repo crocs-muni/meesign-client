@@ -1,4 +1,4 @@
-import '../model/mpc_model.dart';
+import '../model/cosigner.dart';
 import 'card.dart';
 import 'iso7816.dart';
 

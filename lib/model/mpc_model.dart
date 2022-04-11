@@ -1,66 +1,18 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:grpc/grpc.dart';
-import 'package:path/path.dart' as path_pkg;
 
 import '../file_storage.dart';
 import '../grpc/generated/mpc.pbgrpc.dart' as rpc;
+import 'cosigner.dart';
+import 'group.dart';
+import 'signed_file.dart';
 
-class Group {
-  List<int>? id;
-  String name;
-  List<Cosigner> members;
-  int threshold;
-
-  bool get isFinished => id != null;
-
-  Group(
-    this.name,
-    this.members,
-    this.threshold,
-  );
-
-  hasMember(List<int> id) {
-    for (final member in members) {
-      if (listEquals(member.id, id)) return true;
-    }
-    return false;
-  }
-}
-
-enum CosignerType {
-  app,
-  card,
-}
-
-class Cosigner {
-  String name;
-  List<int> id;
-  CosignerType type;
-
-  static const int idLen = 16;
-
-  Cosigner(this.name, this.id, this.type);
-  Cosigner.random(this.name, this.type) : id = _randomId();
-
-  static List<int> _randomId() {
-    final rnd = Random.secure();
-    return List.generate(idLen, (i) => rnd.nextInt(256));
-  }
-}
-
-class SignedFile {
-  String path;
-  Group group;
-  bool isFinished = false;
-
-  SignedFile(this.path, this.group);
-
-  String get basename => path_pkg.basename(path);
-}
+export 'cosigner.dart';
+export 'group.dart';
+export 'signed_file.dart';
 
 class MpcModel with ChangeNotifier {
   final List<Group> groups = [];
