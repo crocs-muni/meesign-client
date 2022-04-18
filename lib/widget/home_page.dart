@@ -5,6 +5,7 @@ import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
 
 import '../model/mpc_model.dart';
+import '../model/tasks.dart';
 import '../routes.dart';
 import 'dismissible.dart';
 
@@ -140,24 +141,24 @@ class _HomePageState extends State<HomePage> {
     model.signRequests.listen(_showSignRequest);
   }
 
-  void _showGroupRequest(Group group) {
+  void _showGroupRequest(GroupTask task) {
     ScaffoldMessenger.of(context).showMaterialBanner(
       MaterialBanner(
-        content: Text('Do you want to join group ${group.name}?'),
+        content: Text('Do you want to join group ${task.group.name}?'),
         leading: const Icon(Icons.group_add),
         actions: [
           TextButton(
             child: const Text('JOIN'),
             onPressed: () {
               ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
-              // TODO: join group
+              context.read<MpcModel>().approveTask(task, agree: true);
             },
           ),
           TextButton(
             child: const Text('DECLINE'),
             onPressed: () {
               ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
-              // TODO: decline request
+              context.read<MpcModel>().approveTask(task, agree: false);
             },
           ),
         ],
@@ -165,7 +166,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _showSignRequest(SignedFile file) {
+  void _showSignRequest(SignTask task) {
+    SignedFile file = task.file;
     ScaffoldMessenger.of(context).showMaterialBanner(
       MaterialBanner(
         content: Text('Group ${file.group.name} asks you '
@@ -182,13 +184,14 @@ class _HomePageState extends State<HomePage> {
             child: const Text('SIGN'),
             onPressed: () {
               ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
-              // TODO: cosign
+              context.read<MpcModel>().approveTask(task, agree: true);
             },
           ),
           TextButton(
             child: const Text('IGNORE'),
             onPressed: () {
               ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
+              // FIXME: decline?
             },
           ),
         ],
@@ -204,6 +207,7 @@ class _HomePageState extends State<HomePage> {
           builder: (context, model, child) {
             return SimpleDialog(
               title: const Text('Select group'),
+              // FIXME: only finished groups!
               children: model.groups
                   .map((group) => SimpleDialogOption(
                         child: Text(group.name),
