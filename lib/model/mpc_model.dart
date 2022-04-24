@@ -18,6 +18,7 @@ export 'group.dart';
 export 'signed_file.dart';
 
 class MpcModel with ChangeNotifier {
+  // FIXME: make these private
   final List<Group> groups = [];
   final List<SignedFile> files = [];
 
@@ -84,17 +85,122 @@ class MpcModel with ChangeNotifier {
       threshold: threshold,
     ));
 
+    // FIXME: maybe the group should be added right when the user requests it?
+    // FIXME: repeptition
+    final uuid = Uuid(rpcTask.id);
+    final group = Group(name, members, threshold);
+    final task = GroupTask(uuid, group);
+    groups.add(group);
+    _tasks[uuid] = task;
+
+    approveTask(task, agree: true);
     notifyListeners();
   }
 
   Future<void> sign(String path, Group group) async {
-    final file = SignedFile(path, group);
+    // final rpcTask = await _client.sign(await _encodeSignRequest(file));
+    final rpcTask = await _client.sign(rpc.SignRequest(
+      groupId: group.id,
+      data: [1, 2, 3, 4],
+    ));
+
+    // FIXME: so much repetition
+    final uuid = Uuid(rpcTask.id);
+    final file = SignedFile('FIXME', group);
+    final task = SignTask(uuid, file);
+    files.add(file);
+    _tasks[uuid] = task;
+
+    approveTask(task, agree: true);
     notifyListeners();
   }
 
-  Future<void> approveTask(MpcTask task, {required bool agree}) async {}
+  Future<void> approveTask(MpcTask task, {required bool agree}) async {
+    final update = rpc.TaskAgreement(agreement: agree);
+    await _sendUpdate(task, update.writeToBuffer());
+  }
 
-  Future<void> _processTasks(rpc.Tasks rpcTasks) async {}
+  MpcTask _handleNewTask(rpc.Task rpcTask) {
+    assert(rpcTask.state == rpc.Task_TaskState.CREATED);
+    assert(rpcTask.round == 0);
+
+    final uuid = Uuid(rpcTask.id);
+    late MpcTask task;
+
+    switch (rpcTask.type) {
+      case rpc.Task_TaskType.GROUP:
+        {
+          final req = rpc.GroupRequest.fromBuffer(rpcTask.data);
+          final members = req.deviceIds
+              .map(
+                // TODO: fetch names from server
+                (id) => Cosigner('unknown', id, CosignerType.app),
+              )
+              .toList();
+          final group = Group(req.name, members, req.threshold);
+          task = GroupTask(uuid, group);
+          groups.add(group);
+          break;
+        }
+      case rpc.Task_TaskType.SIGN:
+        {
+          final req = rpc.SignRequest.fromBuffer(rpcTask.data);
+          // FIXME: groups should probably be hashed by their id
+          final group = groups.firstWhere((g) => listEquals(g.id, req.groupId));
+          final file = SignedFile('FIXME', group);
+          task = SignTask(uuid, file);
+          files.add(file);
+        }
+    }
+
+    _tasks[uuid] = task;
+    if (task is GroupTask) _groupReqsController.add(task);
+    if (task is SignTask) _signReqsController.add(task);
+    notifyListeners();
+    return task;
+  }
+
+  Future<void> _updateTask(MpcTask task, rpc.Task rpcTask) async {
+    // TODO: check status for errors
+    final update = await task.update(rpcTask.round, rpcTask.data);
+    if (update == null) return;
+    await _sendUpdate(task, update);
+  }
+
+  Future<void> _finishTask(MpcTask task, rpc.Task rpcTask) async {
+    await task.finish(rpcTask.data);
+
+    final update = rpc.TaskAcknowledgement();
+    await _sendUpdate(task, update.writeToBuffer());
+
+    notifyListeners();
+  }
+
+  Future<rpc.Resp> _sendUpdate(MpcTask task, List<int> data) async =>
+      _client.updateTask(rpc.TaskUpdate(
+        device: thisDevice.id,
+        task: task.id.bytes,
+        data: data,
+      ));
+
+  Future<void> _processTasks(rpc.Tasks rpcTasks) async {
+    for (final rpcTask in rpcTasks.tasks) {
+      final uuid = Uuid(rpcTask.id);
+      final task = _tasks[uuid];
+
+      // FIXME: also consider the state
+      // TODO: maybe add some kind of task pool to move the code out of model?
+      if (task == null) {
+        _handleNewTask(rpcTask);
+      } else {
+        if (rpcTask.state == rpc.Task_TaskState.FINISHED) {
+          _finishTask(task, rpcTask);
+        } else {
+          _updateTask(task, rpcTask);
+        }
+      }
+    }
+  }
 
   void _startPoll() {
     if (_pollTimer != null) return;
@@ -106,5 +212,10 @@ class MpcModel with ChangeNotifier {
     _pollTimer = null;
   }
 
-  Future<void> _poll(Timer timer) async {}
+  Future<void> _poll(Timer timer) async {
+    final rpcTasks = await _client.getTasks(
+      rpc.TasksRequest(deviceId: thisDevice.id),
+    );
+    await _processTasks(rpcTasks);
+  }
 }
