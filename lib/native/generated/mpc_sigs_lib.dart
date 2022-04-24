@@ -21,59 +21,114 @@ class MpcSigsLib {
           lookup)
       : _lookup = lookup;
 
-  ffi.Pointer<CertKey> cert_key_new() {
-    return _cert_key_new();
-  }
-
-  late final _cert_key_newPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<CertKey> Function()>>(
-          'cert_key_new');
-  late final _cert_key_new =
-      _cert_key_newPtr.asFunction<ffi.Pointer<CertKey> Function()>();
-
-  void cert_key_free(
-    ffi.Pointer<CertKey> p,
+  ffi.Pointer<ProtoWrapper> protocol_new(
+    int alg,
   ) {
-    return _cert_key_free(
-      p,
+    return _protocol_new(
+      alg,
     );
   }
 
-  late final _cert_key_freePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<CertKey>)>>(
-          'cert_key_free');
-  late final _cert_key_free =
-      _cert_key_freePtr.asFunction<void Function(ffi.Pointer<CertKey>)>();
+  late final _protocol_newPtr = _lookup<
+          ffi.NativeFunction<ffi.Pointer<ProtoWrapper> Function(ffi.Int32)>>(
+      'protocol_new');
+  late final _protocol_new =
+      _protocol_newPtr.asFunction<ffi.Pointer<ProtoWrapper> Function(int)>();
 
-  ffi.Pointer<ffi.Void> cert_key_get_key(
-    ffi.Pointer<CertKey> p,
+  Buffer protocol_update(
+    ffi.Pointer<ProtoWrapper> proto,
+    ffi.Pointer<ffi.Uint8> data,
+    int len,
   ) {
-    return _cert_key_get_key(
-      p,
+    return _protocol_update(
+      proto,
+      data,
+      len,
     );
   }
 
-  late final _cert_key_get_keyPtr = _lookup<
+  late final _protocol_updatePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Pointer<ffi.Void> Function(
-              ffi.Pointer<CertKey>)>>('cert_key_get_key');
-  late final _cert_key_get_key = _cert_key_get_keyPtr
-      .asFunction<ffi.Pointer<ffi.Void> Function(ffi.Pointer<CertKey>)>();
+          Buffer Function(ffi.Pointer<ProtoWrapper>, ffi.Pointer<ffi.Uint8>,
+              uintptr_t)>>('protocol_update');
+  late final _protocol_update = _protocol_updatePtr.asFunction<
+      Buffer Function(
+          ffi.Pointer<ProtoWrapper>, ffi.Pointer<ffi.Uint8>, int)>();
 
-  ffi.Pointer<ffi.Void> cert_key_get_cert(
-    ffi.Pointer<CertKey> p,
+  Buffer protocol_result(
+    ffi.Pointer<ProtoWrapper> proto,
   ) {
-    return _cert_key_get_cert(
-      p,
+    return _protocol_result(
+      proto,
     );
   }
 
-  late final _cert_key_get_certPtr = _lookup<
+  late final _protocol_resultPtr =
+      _lookup<ffi.NativeFunction<Buffer Function(ffi.Pointer<ProtoWrapper>)>>(
+          'protocol_result');
+  late final _protocol_result = _protocol_resultPtr
+      .asFunction<Buffer Function(ffi.Pointer<ProtoWrapper>)>();
+
+  ffi.Pointer<ffi.Int8> protocol_error(
+    ffi.Pointer<ProtoWrapper> proto,
+  ) {
+    return _protocol_error(
+      proto,
+    );
+  }
+
+  late final _protocol_errorPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Pointer<ffi.Void> Function(
-              ffi.Pointer<CertKey>)>>('cert_key_get_cert');
-  late final _cert_key_get_cert = _cert_key_get_certPtr
-      .asFunction<ffi.Pointer<ffi.Void> Function(ffi.Pointer<CertKey>)>();
+          ffi.Pointer<ffi.Int8> Function(
+              ffi.Pointer<ProtoWrapper>)>>('protocol_error');
+  late final _protocol_error = _protocol_errorPtr
+      .asFunction<ffi.Pointer<ffi.Int8> Function(ffi.Pointer<ProtoWrapper>)>();
+
+  void protocol_free(
+    ffi.Pointer<ProtoWrapper> proto,
+  ) {
+    return _protocol_free(
+      proto,
+    );
+  }
+
+  late final _protocol_freePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ProtoWrapper>)>>(
+          'protocol_free');
+  late final _protocol_free =
+      _protocol_freePtr.asFunction<void Function(ffi.Pointer<ProtoWrapper>)>();
+
+  ffi.Pointer<ProtoWrapper> group_sign(
+    int alg,
+    ffi.Pointer<ffi.Uint8> group_data,
+    int len,
+  ) {
+    return _group_sign(
+      alg,
+      group_data,
+      len,
+    );
+  }
+
+  late final _group_signPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ProtoWrapper> Function(
+              ffi.Int32, ffi.Pointer<ffi.Uint8>, uintptr_t)>>('group_sign');
+  late final _group_sign = _group_signPtr.asFunction<
+      ffi.Pointer<ProtoWrapper> Function(int, ffi.Pointer<ffi.Uint8>, int)>();
 }
 
-class CertKey extends ffi.Opaque {}
+abstract class Algorithm {
+  static const int Gg18 = 0;
+}
+
+class ProtoWrapper extends ffi.Opaque {}
+
+class Buffer extends ffi.Struct {
+  external ffi.Pointer<ffi.Uint8> ptr;
+
+  @uintptr_t()
+  external int len;
+}
+
+typedef uintptr_t = ffi.Uint64;
