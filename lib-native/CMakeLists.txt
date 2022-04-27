@@ -60,7 +60,10 @@ else()
     OPENSSL_LIBS=crypto
     RUSTFLAGS="${RUSTFLAGS}"
     OPENSSL_LIB_DIR=${CRYPTO_LIB_DIR} OPENSSL_INCLUDE_DIR=${CRYPTO_INCLUDE_DIR}
+    # CC and AR are necessary for Rust cc crate (used e.g. by secp256k1-sys),
+    # see https://crates.io/crates/cc
     CC=${CMAKE_C_COMPILER}
+    AR=${CMAKE_AR}
     ${CARGO_CMD}
   )
 endif()
