@@ -6,12 +6,18 @@ import 'package:path/path.dart' as path_pkg;
 import 'package:path_provider/path_provider.dart';
 
 class FileStorage {
+  static final FileStorage _instance = FileStorage._internal();
+
   final _tmpDirMemo = AsyncMemoizer<Directory>();
   Future<Directory> get _tmpDir async =>
       _tmpDirMemo.runOnce(() => _createTmpDir());
   final _signedDirMemo = AsyncMemoizer<Directory>();
   Future<Directory> get _signedDir async =>
       _signedDirMemo.runOnce(() => _createSignedDir());
+
+  FileStorage._internal();
+
+  factory FileStorage() => _instance;
 
   Future<Directory> _createTmpDir() async {
     final tmp = await getTemporaryDirectory();
