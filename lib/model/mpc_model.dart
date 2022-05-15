@@ -98,15 +98,27 @@ class MpcModel with ChangeNotifier {
   }
 
   Future<void> sign(String path, Group group) async {
-    // final rpcTask = await _client.sign(await _encodeSignRequest(file));
-    final rpcTask = await _client.sign(rpc.SignRequest(
-      groupId: group.id,
-      data: [1, 2, 3, 4],
-    ));
+    final file = SignedFile(path, group);
+
+    if (Platform.isWindows || Platform.isLinux) {
+      String newPath = await _fileStorage.getTmpFilePath(file.basename);
+      await File(path).copy(newPath);
+      file.path = newPath;
+    }
+
+    // FIXME: oom for large files
+    final bytes = await File(file.path).readAsBytes();
+
+    final rpcTask = await _client.sign(
+      rpc.SignRequest(
+        groupId: group.id,
+        name: file.basename,
+        data: bytes,
+      ),
+    );
 
     // FIXME: so much repetition
     final uuid = Uuid(rpcTask.id);
-    final file = SignedFile('FIXME', group);
     final task = SignTask(uuid, file);
     files.add(file);
     _tasks[uuid] = task;
@@ -120,7 +132,7 @@ class MpcModel with ChangeNotifier {
     await _sendUpdate(task, update.writeToBuffer());
   }
 
-  MpcTask _handleNewTask(rpc.Task rpcTask) {
+  Future<MpcTask> _handleNewTask(rpc.Task rpcTask) async {
     assert(rpcTask.state == rpc.Task_TaskState.CREATED);
     assert(rpcTask.round == 0);
 
@@ -145,9 +157,14 @@ class MpcModel with ChangeNotifier {
       case rpc.Task_TaskType.SIGN:
         {
           final req = rpc.SignRequest.fromBuffer(rpcTask.data);
+
+          // TODO: who should be responsible for saving files?
+          String path = await _fileStorage.getTmpFilePath(req.name);
+          await File(path).writeAsBytes(rpcTask.data, flush: true);
+
           // FIXME: groups should probably be hashed by their id
           final group = groups.firstWhere((g) => listEquals(g.id, req.groupId));
-          final file = SignedFile('FIXME', group);
+          final file = SignedFile(path, group);
           task = SignTask(uuid, file);
           files.add(file);
         }
@@ -169,6 +186,10 @@ class MpcModel with ChangeNotifier {
 
   Future<void> _finishTask(MpcTask task, rpc.Task rpcTask) async {
     await task.finish(rpcTask.data);
+
+    if (task is SignTask) {
+      await File(task.file.path).writeAsBytes(rpcTask.data, flush: true);
+    }
 
     final update = rpc.TaskAcknowledgement();
     await _sendUpdate(task, update.writeToBuffer());
