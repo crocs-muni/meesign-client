@@ -18,7 +18,6 @@ class NewGroupPage extends StatefulWidget {
 
 class _NewGroupPageState extends State<NewGroupPage> {
   // TODO: store this in a Group object?
-  int _threshold = 1;
   final List<Cosigner> _members = [];
   final _nameController = TextEditingController();
   bool _creatable = false;
@@ -97,7 +96,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
   void _finishCreate() {
     final model = context.read<MpcModel>();
-    model.addGroup(_nameController.text, _members, _threshold);
+    model.addGroup(_nameController.text, _members, _members.length);
     Navigator.pop(context);
   }
 
@@ -176,37 +175,6 @@ class _NewGroupPageState extends State<NewGroupPage> {
             runSpacing: 4.0,
             children: _memberChips.toList(),
           ),
-          const Padding(
-            padding: EdgeInsets.only(top: 8, bottom: 8),
-            child: Divider(),
-          ),
-          Row(
-            children: [
-              const Icon(Icons.info),
-              const SizedBox(width: 16),
-              Flexible(
-                child: _members.length > 1
-                    ? Text(
-                        'Threshold: $_threshold out of ${_members.length} members '
-                        'will be required to sign a document')
-                    : const Text('Add more members to set threshold'),
-              ),
-            ],
-          ),
-          _members.length > 1
-              ? Slider(
-                  value: _threshold.toDouble(),
-                  min: 1,
-                  max: _members.length.toDouble(),
-                  divisions: _members.length - 1,
-                  label: _threshold.toString(),
-                  onChanged: (double value) {
-                    setState(() {
-                      _threshold = value.toInt();
-                    });
-                  },
-                )
-              : const Slider(value: 0, onChanged: null),
         ],
       ),
     );
