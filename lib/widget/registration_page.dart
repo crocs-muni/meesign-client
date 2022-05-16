@@ -100,6 +100,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     labelText: 'Name',
                     border: OutlineInputBorder(),
                   ),
+                  textInputAction: TextInputAction.next,
                 ),
                 const SizedBox(
                   height: 16,
@@ -111,6 +112,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     border: const OutlineInputBorder(),
                     errorText: _error == null ? null : 'Failed to register',
                   ),
+                  onSubmitted: (_) => _register(),
                 )
               ],
             )),

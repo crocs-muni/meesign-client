@@ -84,6 +84,7 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
                         decoration: const InputDecoration.collapsed(
                           hintText: 'Search for peer',
                         ),
+                        autofocus: true,
                       ),
                     ),
                   ],
