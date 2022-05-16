@@ -87,10 +87,6 @@ endif()
 
 install(FILES "${MPC_SIGS_LIB}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
   COMPONENT Runtime)
-# copy all dlls, vcpkg copies pdf-sig dependencies next to the built dll
-install(DIRECTORY $<TARGET_FILE_DIR:pdf-sig>/
-  DESTINATION "${INSTALL_BUNDLE_LIB_DIR}" COMPONENT Runtime
-  FILES_MATCHING PATTERN "*.dll")
 
 # Fully re-copy the assets directory on each build to avoid having stale files
 # from a previous install.
