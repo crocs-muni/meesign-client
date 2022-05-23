@@ -17,7 +17,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     text: RndNameGenerator().next(),
   );
   final _hostController = TextEditingController(
-    text: 'localhost',
+    text: 'meesign.local',
   );
 
   bool _working = false;
