@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../util/qr_coder.dart';
 
@@ -14,9 +14,7 @@ class QrReaderPage extends StatefulWidget {
 }
 
 class _QrReaderPageState extends State<QrReaderPage> {
-  final GlobalKey _qrKey = GlobalKey(debugLabel: 'QR');
-  QRViewController? _controller;
-  StreamSubscription? _dataStream;
+  final MobileScannerController controller = MobileScannerController();
 
   bool _recentError = false;
   Timer? _errorTimer;
@@ -24,29 +22,17 @@ class _QrReaderPageState extends State<QrReaderPage> {
   final QrCoder _coder = QrCoder();
 
   @override
-  void reassemble() {
-    super.reassemble();
-
-    // necessary for hot reload
-    if (Platform.isAndroid) {
-      _controller!.pauseCamera();
-    } else if (Platform.isIOS) {
-      _controller!.resumeCamera();
-    }
-  }
-
-  @override
   void dispose() {
-    _controller?.dispose();
+    controller.dispose();
     super.dispose();
   }
 
-  void _onData(Barcode data) {
+  void _onDetect(Barcode data, MobileScannerArguments? _) {
     _errorTimer?.cancel();
 
     try {
-      final cosigner = _coder.decode(data.code);
-      _dataStream?.cancel();
+      final cosigner = _coder.decode(data.rawValue);
+      controller.dispose();
       Navigator.pop(context, cosigner);
     } catch (e) {
       setState(() {
@@ -57,7 +43,6 @@ class _QrReaderPageState extends State<QrReaderPage> {
           _recentError = false;
         });
       });
-      return;
     }
   }
 
@@ -68,16 +53,9 @@ class _QrReaderPageState extends State<QrReaderPage> {
         children: <Widget>[
           Expanded(
             flex: 5,
-            child: QRView(
-              key: _qrKey,
-              overlay: QrScannerOverlayShape(
-                borderRadius: 16,
-                borderColor: Theme.of(context).colorScheme.secondary,
-              ),
-              onQRViewCreated: (controller) {
-                _controller = controller;
-                _dataStream = controller.scannedDataStream.listen(_onData);
-              },
+            child: MobileScanner(
+              allowDuplicates: false,
+              onDetect: _onDetect,
             ),
           ),
           Expanded(
