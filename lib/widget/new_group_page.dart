@@ -20,14 +20,20 @@ class _NewGroupPageState extends State<NewGroupPage> {
   // TODO: store this in a Group object?
   final List<Cosigner> _members = [];
   final _nameController = TextEditingController();
-  bool _creatable = false;
+  String? _nameErr, _memberErr;
 
   @override
   void initState() {
     super.initState();
     _members.add(context.read<MpcModel>().thisDevice);
-    _nameController.addListener(_checkCreatable);
     _nameController.text = RndNameGenerator().next();
+    _nameController.addListener(() {
+      if (_nameErr != null) {
+        setState(() {
+          _nameErr = null;
+        });
+      }
+    });
   }
 
   @override
@@ -62,12 +68,6 @@ class _NewGroupPageState extends State<NewGroupPage> {
     }
   }
 
-  void _checkCreatable() {
-    setState(() {
-      _creatable = _members.length >= 2 && _nameController.text.isNotEmpty;
-    });
-  }
-
   void _addMember(Object? member) {
     if (member is! Cosigner) return;
     for (final m in _members) {
@@ -75,7 +75,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
     }
     setState(() {
       _members.add(member);
-      _checkCreatable();
+      _memberErr = null;
     });
   }
 
@@ -84,7 +84,19 @@ class _NewGroupPageState extends State<NewGroupPage> {
     _addMember(peer);
   }
 
-  void _finishCreate() {
+  void _tryCreate() {
+    if (_nameController.text.isEmpty) {
+      setState(() {
+        _nameErr = "Enter group name";
+      });
+    }
+    if (_members.length < 2) {
+      setState(() {
+        _memberErr = "Add member";
+      });
+    }
+    if (_nameErr != null || _memberErr != null) return;
+
     final model = context.read<MpcModel>();
     model.addGroup(_nameController.text, _members, _members.length);
     Navigator.pop(context);
@@ -97,7 +109,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
         title: const Text('New Group'),
         actions: [
           TextButton(
-            onPressed: _creatable ? _finishCreate : null,
+            onPressed: _tryCreate,
             style: TextButton.styleFrom(
                 primary: Theme.of(context).colorScheme.onPrimary),
             child: const Text('CREATE'),
@@ -110,9 +122,10 @@ class _NewGroupPageState extends State<NewGroupPage> {
           const SizedBox(height: 16),
           TextField(
             controller: _nameController,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               hintText: 'Group name',
-              border: OutlineInputBorder(),
+              border: const OutlineInputBorder(),
+              errorText: _nameErr,
             ),
           ),
           const Padding(
@@ -158,6 +171,9 @@ class _NewGroupPageState extends State<NewGroupPage> {
             },
             label: const Text('New member'),
             icon: const Icon(Icons.add),
+            style: ElevatedButton.styleFrom(
+              primary: _memberErr != null ? Theme.of(context).errorColor : null,
+            ),
           ),
           const SizedBox(height: 16),
           Wrap(
