@@ -10,7 +10,7 @@ class QrCoder {
 
   String encode(Cosigner cosigner) {
     final base64Id = _base64encoder.convert(cosigner.id);
-    return '$mime;${cosigner.name},$base64Id';
+    return '$mime;$base64Id,${cosigner.name}';
   }
 
   Cosigner decode(String? data) {
@@ -18,9 +18,13 @@ class QrCoder {
       throw const FormatException('Incorrect QR data format');
     }
 
-    final args = data.split(';')[1].split(',');
-    final id = _base64decoder.convert(args[1]);
+    final args = data.split(';')[1];
+    int i = args.indexOf(',');
+    if (i == -1) throw const FormatException('Malformed QR data');
 
-    return Cosigner(args[0], id, CosignerType.app);
+    final id = _base64decoder.convert(args.substring(0, i));
+    final name = args.substring(i + 1);
+
+    return Cosigner(name, id, CosignerType.app);
   }
 }
