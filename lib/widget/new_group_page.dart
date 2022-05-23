@@ -79,18 +79,8 @@ class _NewGroupPageState extends State<NewGroupPage> {
     });
   }
 
-  void _selectSearchedPeer() async {
-    final peer = await Navigator.pushNamed(context, Routes.newGroupSearch);
-    _addMember(peer);
-  }
-
-  void _selectCard() async {
-    final card = await Navigator.pushNamed(context, Routes.newGroupCard);
-    _addMember(card);
-  }
-
-  void _selectQr() async {
-    final peer = await Navigator.pushNamed(context, Routes.newGroupQr);
+  void _selectPeer(String route) async {
+    final peer = await Navigator.pushNamed(context, route);
     _addMember(peer);
   }
 
@@ -148,18 +138,18 @@ class _NewGroupPageState extends State<NewGroupPage> {
                         leading: const Icon(Icons.qr_code),
                         title: const Text('Scan QR code'),
                         enabled: Platform.isAndroid || Platform.isIOS,
-                        onTap: _selectQr,
+                        onTap: () => _selectPeer(Routes.newGroupQr),
                       ),
                       ListTile(
                         leading: const Icon(Icons.contactless_outlined),
                         title: const Text('Add card'),
                         enabled: CardManager.platformSupported,
-                        onTap: _selectCard,
+                        onTap: () => _selectPeer(Routes.newGroupCard),
                       ),
                       ListTile(
                         leading: const Icon(Icons.search),
                         title: const Text('Search peer'),
-                        onTap: _selectSearchedPeer,
+                        onTap: () => _selectPeer(Routes.newGroupSearch),
                       ),
                     ],
                   );
