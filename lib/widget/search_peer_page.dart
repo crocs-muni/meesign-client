@@ -11,8 +11,13 @@ class SearchPeerPage extends StatefulWidget {
 }
 
 class _SearchPeerPageState extends State<SearchPeerPage> {
+  static const activeThreshold = Duration(seconds: 10);
+
   final _queryController = TextEditingController();
   List<Cosigner> _queryResults = [];
+  DateTime _pivot = DateTime.now();
+
+  bool _isActive(Cosigner cosigner) => cosigner.lastActive.isAfter(_pivot);
 
   void _query(String query) async {
     final model = context.read<MpcModel>();
@@ -20,6 +25,16 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
     try {
       results = await model.searchForPeers(_queryController.text);
     } catch (e) {}
+
+    _pivot = DateTime.now().subtract(activeThreshold);
+    final active = results.where(_isActive).toList();
+    final inactive = results.where((cos) => !_isActive(cos)).toList();
+
+    cmp(Cosigner a, Cosigner b) => a.name.compareTo(b.name);
+    active.sort(cmp);
+    inactive.sort(cmp);
+
+    results = active + inactive;
 
     setState(() {
       _queryResults = results;
@@ -80,6 +95,15 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
                     final cosigner = _queryResults[index];
                     return ListTile(
                       leading: const Icon(Icons.person),
+                      trailing: Container(
+                        width: 8,
+                        decoration: ShapeDecoration(
+                          color: _isActive(cosigner)
+                              ? Colors.green
+                              : Colors.orange,
+                          shape: const CircleBorder(),
+                        ),
+                      ),
                       title: Text(cosigner.name),
                       onTap: () {
                         Navigator.pop(context, cosigner);

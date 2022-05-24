@@ -61,15 +61,13 @@ class MpcModel with ChangeNotifier {
   }
 
   Future<List<Cosigner>> searchForPeers(String query) async {
-    final res = (await getRegistered())
+    return (await getRegistered())
         .where((cosigner) =>
             cosigner.name.startsWith(query) ||
             cosigner.name.split(' ').any(
                   (word) => word.startsWith(query),
                 ))
         .toList();
-    res.sort((a, b) => a.name.compareTo(b.name));
-    return res;
   }
 
   Future<Iterable<Cosigner>> getRegistered() async {
