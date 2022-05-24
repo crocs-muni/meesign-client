@@ -10,6 +10,7 @@ service MPC {
     rpc GetTasks(TasksRequest) returns (Tasks);
     rpc GetGroups(GroupsRequest) returns (Groups);
     rpc GetDevices(DevicesRequest) returns (Devices);
+    rpc Log(LogRequest) returns (Resp);
 }
 
 enum Protocol {
@@ -17,19 +18,19 @@ enum Protocol {
 }
 
 message RegistrationRequest {
-    bytes id = 1;
+    bytes identifier = 1;
     string name = 2;
 }
 
 message GroupRequest {
-    repeated bytes device_ids = 1;
-    string name = 2;
+    string name = 1;
+    repeated bytes device_ids = 2;
     optional uint32 threshold = 3;
     optional Protocol protocol = 4;
 }
 
 message Group {
-    bytes id = 1;
+    bytes identifier = 1;
     string name = 2;
     uint32 threshold = 3;
     repeated bytes device_ids = 4;
@@ -44,13 +45,14 @@ message Devices {
 }
 
 message Device {
-    bytes id = 1;
+    bytes identifier = 1;
     string name = 2;
+    uint64 last_active = 3;
 }
 
 message SignRequest {
-    bytes group_id = 1;
-    string name = 2;
+    string name = 1;
+    bytes group_id = 2;
     bytes data = 3;
 }
 
@@ -78,13 +80,13 @@ message Task {
 }
 
 message TaskUpdate {
-    bytes device = 1;
+    bytes device_id = 1;
     bytes task = 2;
     bytes data = 3;
 }
 
 message TasksRequest {
-    bytes device_id = 1;
+    optional bytes device_id = 1;
 }
 
 message Tasks {
@@ -92,7 +94,7 @@ message Tasks {
 }
 
 message GroupsRequest {
-    bytes device_id = 1;
+    optional bytes device_id = 1;
 }
 
 message Groups {
@@ -108,6 +110,11 @@ message Resp {
 
 message TaskAgreement {
     bool agreement = 1;
+};
+
+message LogRequest {
+    string message = 1;
+    optional bytes device_id = 2;
 };
 
 message TaskAcknowledgement {};
