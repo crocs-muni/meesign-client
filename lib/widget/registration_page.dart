@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../model/mpc_model.dart';
 import '../routes.dart';
+import '../util/chars.dart';
 import '../util/rnd_name_generator.dart';
 
 class RegistrationPage extends StatefulWidget {
@@ -103,6 +105,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   textInputAction: TextInputAction.next,
                   enabled: !_working,
                   maxLength: 32,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.deny(
+                      RegExp('[${RegExp.escape(asciiPunctuationChars)}]'),
+                    )
+                  ],
                 ),
                 const SizedBox(
                   height: 16,

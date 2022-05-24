@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'dart:io';
@@ -7,6 +8,7 @@ import 'dart:io';
 import '../card/card.dart';
 import '../routes.dart';
 import '../model/mpc_model.dart';
+import '../util/chars.dart';
 import '../util/rnd_name_generator.dart';
 
 class NewGroupPage extends StatefulWidget {
@@ -128,6 +130,11 @@ class _NewGroupPageState extends State<NewGroupPage> {
               errorText: _nameErr,
             ),
             maxLength: 32,
+            inputFormatters: [
+              FilteringTextInputFormatter.deny(
+                RegExp('[${RegExp.escape(asciiPunctuationChars)}]'),
+              )
+            ],
           ),
           const Padding(
             padding: EdgeInsets.only(top: 8, bottom: 8),
