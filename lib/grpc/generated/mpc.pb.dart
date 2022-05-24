@@ -1290,14 +1290,7 @@ class Groups extends $pb.GeneratedMessage {
   $core.List<Group> get groups => $_getList(0);
 }
 
-enum Resp_Variant { success, failure, notSet }
-
 class Resp extends $pb.GeneratedMessage {
-  static const $core.Map<$core.int, Resp_Variant> _Resp_VariantByTag = {
-    1: Resp_Variant.success,
-    2: Resp_Variant.failure,
-    0: Resp_Variant.notSet
-  };
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(
       const $core.bool.fromEnvironment('protobuf.omit_message_names')
           ? ''
@@ -1307,30 +1300,20 @@ class Resp extends $pb.GeneratedMessage {
               ? ''
               : 'meesign'),
       createEmptyInstance: create)
-    ..oo(0, [1, 2])
     ..aOS(
         1,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
-            : 'success')
-    ..aOS(
-        2,
-        const $core.bool.fromEnvironment('protobuf.omit_field_names')
-            ? ''
-            : 'failure')
+            : 'message')
     ..hasRequiredFields = false;
 
   Resp._() : super();
   factory Resp({
-    $core.String? success,
-    $core.String? failure,
+    $core.String? message,
   }) {
     final _result = create();
-    if (success != null) {
-      _result.success = success;
-    }
-    if (failure != null) {
-      _result.failure = failure;
+    if (message != null) {
+      _result.message = message;
     }
     return _result;
   }
@@ -1360,32 +1343,17 @@ class Resp extends $pb.GeneratedMessage {
       _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Resp>(create);
   static Resp? _defaultInstance;
 
-  Resp_Variant whichVariant() => _Resp_VariantByTag[$_whichOneof(0)]!;
-  void clearVariant() => clearField($_whichOneof(0));
-
   @$pb.TagNumber(1)
-  $core.String get success => $_getSZ(0);
+  $core.String get message => $_getSZ(0);
   @$pb.TagNumber(1)
-  set success($core.String v) {
+  set message($core.String v) {
     $_setString(0, v);
   }
 
   @$pb.TagNumber(1)
-  $core.bool hasSuccess() => $_has(0);
+  $core.bool hasMessage() => $_has(0);
   @$pb.TagNumber(1)
-  void clearSuccess() => clearField(1);
-
-  @$pb.TagNumber(2)
-  $core.String get failure => $_getSZ(1);
-  @$pb.TagNumber(2)
-  set failure($core.String v) {
-    $_setString(1, v);
-  }
-
-  @$pb.TagNumber(2)
-  $core.bool hasFailure() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearFailure() => clearField(2);
+  void clearMessage() => clearField(1);
 }
 
 class TaskAgreement extends $pb.GeneratedMessage {
