@@ -52,7 +52,7 @@ class MpcModel with ChangeNotifier {
     thisDevice = Cosigner.random(name, CosignerType.app);
 
     final resp = await _client.register(
-      rpc.RegistrationRequest(id: thisDevice.id, name: name),
+      rpc.RegistrationRequest(identifier: thisDevice.id, name: name),
     );
     if (resp.hasFailure()) throw Exception(resp.failure);
 
@@ -73,8 +73,8 @@ class MpcModel with ChangeNotifier {
 
   Future<Iterable<Cosigner>> getRegistered() async {
     final devices = await _client.getDevices(rpc.DevicesRequest());
-    return devices.devices
-        .map((device) => Cosigner(device.name, device.id, CosignerType.app));
+    return devices.devices.map(
+        (device) => Cosigner(device.name, device.identifier, CosignerType.app));
   }
 
   Future<void> addGroup(
@@ -199,7 +199,7 @@ class MpcModel with ChangeNotifier {
 
   Future<rpc.Resp> _sendUpdate(MpcTask task, List<int> data) async =>
       _client.updateTask(rpc.TaskUpdate(
-        device: thisDevice.id,
+        deviceId: thisDevice.id,
         task: task.id.bytes,
         data: data,
       ));

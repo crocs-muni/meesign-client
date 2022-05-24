@@ -24,20 +24,20 @@ final $typed_data.Uint8List protocolDescriptor =
 const RegistrationRequest$json = const {
   '1': 'RegistrationRequest',
   '2': const [
-    const {'1': 'id', '3': 1, '4': 1, '5': 12, '10': 'id'},
+    const {'1': 'identifier', '3': 1, '4': 1, '5': 12, '10': 'identifier'},
     const {'1': 'name', '3': 2, '4': 1, '5': 9, '10': 'name'},
   ],
 };
 
 /// Descriptor for `RegistrationRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List registrationRequestDescriptor = $convert.base64Decode(
-    'ChNSZWdpc3RyYXRpb25SZXF1ZXN0Eg4KAmlkGAEgASgMUgJpZBISCgRuYW1lGAIgASgJUgRuYW1l');
+    'ChNSZWdpc3RyYXRpb25SZXF1ZXN0Eh4KCmlkZW50aWZpZXIYASABKAxSCmlkZW50aWZpZXISEgoEbmFtZRgCIAEoCVIEbmFtZQ==');
 @$core.Deprecated('Use groupRequestDescriptor instead')
 const GroupRequest$json = const {
   '1': 'GroupRequest',
   '2': const [
-    const {'1': 'device_ids', '3': 1, '4': 3, '5': 12, '10': 'deviceIds'},
-    const {'1': 'name', '3': 2, '4': 1, '5': 9, '10': 'name'},
+    const {'1': 'name', '3': 1, '4': 1, '5': 9, '10': 'name'},
+    const {'1': 'device_ids', '3': 2, '4': 3, '5': 12, '10': 'deviceIds'},
     const {
       '1': 'threshold',
       '3': 3,
@@ -66,12 +66,12 @@ const GroupRequest$json = const {
 
 /// Descriptor for `GroupRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List groupRequestDescriptor = $convert.base64Decode(
-    'CgxHcm91cFJlcXVlc3QSHQoKZGV2aWNlX2lkcxgBIAMoDFIJZGV2aWNlSWRzEhIKBG5hbWUYAiABKAlSBG5hbWUSIQoJdGhyZXNob2xkGAMgASgNSABSCXRocmVzaG9sZIgBARIyCghwcm90b2NvbBgEIAEoDjIRLm1lZXNpZ24uUHJvdG9jb2xIAVIIcHJvdG9jb2yIAQFCDAoKX3RocmVzaG9sZEILCglfcHJvdG9jb2w=');
+    'CgxHcm91cFJlcXVlc3QSEgoEbmFtZRgBIAEoCVIEbmFtZRIdCgpkZXZpY2VfaWRzGAIgAygMUglkZXZpY2VJZHMSIQoJdGhyZXNob2xkGAMgASgNSABSCXRocmVzaG9sZIgBARIyCghwcm90b2NvbBgEIAEoDjIRLm1lZXNpZ24uUHJvdG9jb2xIAVIIcHJvdG9jb2yIAQFCDAoKX3RocmVzaG9sZEILCglfcHJvdG9jb2w=');
 @$core.Deprecated('Use groupDescriptor instead')
 const Group$json = const {
   '1': 'Group',
   '2': const [
-    const {'1': 'id', '3': 1, '4': 1, '5': 12, '10': 'id'},
+    const {'1': 'identifier', '3': 1, '4': 1, '5': 12, '10': 'identifier'},
     const {'1': 'name', '3': 2, '4': 1, '5': 9, '10': 'name'},
     const {'1': 'threshold', '3': 3, '4': 1, '5': 13, '10': 'threshold'},
     const {'1': 'device_ids', '3': 4, '4': 3, '5': 12, '10': 'deviceIds'},
@@ -80,7 +80,7 @@ const Group$json = const {
 
 /// Descriptor for `Group`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List groupDescriptor = $convert.base64Decode(
-    'CgVHcm91cBIOCgJpZBgBIAEoDFICaWQSEgoEbmFtZRgCIAEoCVIEbmFtZRIcCgl0aHJlc2hvbGQYAyABKA1SCXRocmVzaG9sZBIdCgpkZXZpY2VfaWRzGAQgAygMUglkZXZpY2VJZHM=');
+    'CgVHcm91cBIeCgppZGVudGlmaWVyGAEgASgMUgppZGVudGlmaWVyEhIKBG5hbWUYAiABKAlSBG5hbWUSHAoJdGhyZXNob2xkGAMgASgNUgl0aHJlc2hvbGQSHQoKZGV2aWNlX2lkcxgEIAMoDFIJZGV2aWNlSWRz');
 @$core.Deprecated('Use devicesRequestDescriptor instead')
 const DevicesRequest$json = const {
   '1': 'DevicesRequest',
@@ -111,27 +111,28 @@ final $typed_data.Uint8List devicesDescriptor = $convert.base64Decode(
 const Device$json = const {
   '1': 'Device',
   '2': const [
-    const {'1': 'id', '3': 1, '4': 1, '5': 12, '10': 'id'},
+    const {'1': 'identifier', '3': 1, '4': 1, '5': 12, '10': 'identifier'},
     const {'1': 'name', '3': 2, '4': 1, '5': 9, '10': 'name'},
+    const {'1': 'last_active', '3': 3, '4': 1, '5': 4, '10': 'lastActive'},
   ],
 };
 
 /// Descriptor for `Device`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List deviceDescriptor = $convert.base64Decode(
-    'CgZEZXZpY2USDgoCaWQYASABKAxSAmlkEhIKBG5hbWUYAiABKAlSBG5hbWU=');
+    'CgZEZXZpY2USHgoKaWRlbnRpZmllchgBIAEoDFIKaWRlbnRpZmllchISCgRuYW1lGAIgASgJUgRuYW1lEh8KC2xhc3RfYWN0aXZlGAMgASgEUgpsYXN0QWN0aXZl');
 @$core.Deprecated('Use signRequestDescriptor instead')
 const SignRequest$json = const {
   '1': 'SignRequest',
   '2': const [
-    const {'1': 'group_id', '3': 1, '4': 1, '5': 12, '10': 'groupId'},
-    const {'1': 'name', '3': 2, '4': 1, '5': 9, '10': 'name'},
+    const {'1': 'name', '3': 1, '4': 1, '5': 9, '10': 'name'},
+    const {'1': 'group_id', '3': 2, '4': 1, '5': 12, '10': 'groupId'},
     const {'1': 'data', '3': 3, '4': 1, '5': 12, '10': 'data'},
   ],
 };
 
 /// Descriptor for `SignRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List signRequestDescriptor = $convert.base64Decode(
-    'CgtTaWduUmVxdWVzdBIZCghncm91cF9pZBgBIAEoDFIHZ3JvdXBJZBISCgRuYW1lGAIgASgJUgRuYW1lEhIKBGRhdGEYAyABKAxSBGRhdGE=');
+    'CgtTaWduUmVxdWVzdBISCgRuYW1lGAEgASgJUgRuYW1lEhkKCGdyb3VwX2lkGAIgASgMUgdncm91cElkEhIKBGRhdGEYAyABKAxSBGRhdGE=');
 @$core.Deprecated('Use taskRequestDescriptor instead')
 const TaskRequest$json = const {
   '1': 'TaskRequest',
@@ -220,7 +221,7 @@ final $typed_data.Uint8List taskDescriptor = $convert.base64Decode(
 const TaskUpdate$json = const {
   '1': 'TaskUpdate',
   '2': const [
-    const {'1': 'device', '3': 1, '4': 1, '5': 12, '10': 'device'},
+    const {'1': 'device_id', '3': 1, '4': 1, '5': 12, '10': 'deviceId'},
     const {'1': 'task', '3': 2, '4': 1, '5': 12, '10': 'task'},
     const {'1': 'data', '3': 3, '4': 1, '5': 12, '10': 'data'},
   ],
@@ -228,18 +229,29 @@ const TaskUpdate$json = const {
 
 /// Descriptor for `TaskUpdate`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List taskUpdateDescriptor = $convert.base64Decode(
-    'CgpUYXNrVXBkYXRlEhYKBmRldmljZRgBIAEoDFIGZGV2aWNlEhIKBHRhc2sYAiABKAxSBHRhc2sSEgoEZGF0YRgDIAEoDFIEZGF0YQ==');
+    'CgpUYXNrVXBkYXRlEhsKCWRldmljZV9pZBgBIAEoDFIIZGV2aWNlSWQSEgoEdGFzaxgCIAEoDFIEdGFzaxISCgRkYXRhGAMgASgMUgRkYXRh');
 @$core.Deprecated('Use tasksRequestDescriptor instead')
 const TasksRequest$json = const {
   '1': 'TasksRequest',
   '2': const [
-    const {'1': 'device_id', '3': 1, '4': 1, '5': 12, '10': 'deviceId'},
+    const {
+      '1': 'device_id',
+      '3': 1,
+      '4': 1,
+      '5': 12,
+      '9': 0,
+      '10': 'deviceId',
+      '17': true
+    },
+  ],
+  '8': const [
+    const {'1': '_device_id'},
   ],
 };
 
 /// Descriptor for `TasksRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List tasksRequestDescriptor = $convert.base64Decode(
-    'CgxUYXNrc1JlcXVlc3QSGwoJZGV2aWNlX2lkGAEgASgMUghkZXZpY2VJZA==');
+    'CgxUYXNrc1JlcXVlc3QSIAoJZGV2aWNlX2lkGAEgASgMSABSCGRldmljZUlkiAEBQgwKCl9kZXZpY2VfaWQ=');
 @$core.Deprecated('Use tasksDescriptor instead')
 const Tasks$json = const {
   '1': 'Tasks',
@@ -262,13 +274,24 @@ final $typed_data.Uint8List tasksDescriptor = $convert.base64Decode(
 const GroupsRequest$json = const {
   '1': 'GroupsRequest',
   '2': const [
-    const {'1': 'device_id', '3': 1, '4': 1, '5': 12, '10': 'deviceId'},
+    const {
+      '1': 'device_id',
+      '3': 1,
+      '4': 1,
+      '5': 12,
+      '9': 0,
+      '10': 'deviceId',
+      '17': true
+    },
+  ],
+  '8': const [
+    const {'1': '_device_id'},
   ],
 };
 
 /// Descriptor for `GroupsRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List groupsRequestDescriptor = $convert.base64Decode(
-    'Cg1Hcm91cHNSZXF1ZXN0EhsKCWRldmljZV9pZBgBIAEoDFIIZGV2aWNlSWQ=');
+    'Cg1Hcm91cHNSZXF1ZXN0EiAKCWRldmljZV9pZBgBIAEoDEgAUghkZXZpY2VJZIgBAUIMCgpfZGV2aWNlX2lk');
 @$core.Deprecated('Use groupsDescriptor instead')
 const Groups$json = const {
   '1': 'Groups',
@@ -313,6 +336,29 @@ const TaskAgreement$json = const {
 /// Descriptor for `TaskAgreement`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List taskAgreementDescriptor = $convert.base64Decode(
     'Cg1UYXNrQWdyZWVtZW50EhwKCWFncmVlbWVudBgBIAEoCFIJYWdyZWVtZW50');
+@$core.Deprecated('Use logRequestDescriptor instead')
+const LogRequest$json = const {
+  '1': 'LogRequest',
+  '2': const [
+    const {'1': 'message', '3': 1, '4': 1, '5': 9, '10': 'message'},
+    const {
+      '1': 'device_id',
+      '3': 2,
+      '4': 1,
+      '5': 12,
+      '9': 0,
+      '10': 'deviceId',
+      '17': true
+    },
+  ],
+  '8': const [
+    const {'1': '_device_id'},
+  ],
+};
+
+/// Descriptor for `LogRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List logRequestDescriptor = $convert.base64Decode(
+    'CgpMb2dSZXF1ZXN0EhgKB21lc3NhZ2UYASABKAlSB21lc3NhZ2USIAoJZGV2aWNlX2lkGAIgASgMSABSCGRldmljZUlkiAEBQgwKCl9kZXZpY2VfaWQ=');
 @$core.Deprecated('Use taskAcknowledgementDescriptor instead')
 const TaskAcknowledgement$json = const {
   '1': 'TaskAcknowledgement',
