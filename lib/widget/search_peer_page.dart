@@ -18,7 +18,7 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
     final model = context.read<MpcModel>();
     List<Cosigner> results = [];
     try {
-      results = (await model.searchForPeers(_queryController.text)).toList();
+      results = await model.searchForPeers(_queryController.text);
     } catch (e) {}
 
     setState(() {
@@ -40,27 +40,6 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
   void dispose() {
     _queryController.dispose();
     super.dispose();
-  }
-
-  // TODO: this should probably be replaced with
-  // ListView.builder() once the results get big
-  Iterable<Widget> get _queryResultTiles sync* {
-    yield ListTile(
-      title: Text(
-        'LOCAL NETWORK',
-        style: Theme.of(context).textTheme.button,
-      ),
-    );
-
-    for (final cosigner in _queryResults) {
-      yield ListTile(
-        leading: const Icon(Icons.person),
-        title: Text(cosigner.name),
-        onTap: () {
-          Navigator.pop(context, cosigner);
-        },
-      );
-    }
   }
 
   @override
@@ -95,8 +74,18 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
                 height: 1,
               ),
               Expanded(
-                child: ListView(
-                  children: _queryResultTiles.toList(),
+                child: ListView.builder(
+                  itemCount: _queryResults.length,
+                  itemBuilder: (context, index) {
+                    final cosigner = _queryResults[index];
+                    return ListTile(
+                      leading: const Icon(Icons.person),
+                      title: Text(cosigner.name),
+                      onTap: () {
+                        Navigator.pop(context, cosigner);
+                      },
+                    );
+                  },
                 ),
               ),
             ],
