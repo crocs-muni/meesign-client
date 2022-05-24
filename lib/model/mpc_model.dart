@@ -18,6 +18,8 @@ export 'group.dart';
 export 'signed_file.dart';
 
 class MpcModel with ChangeNotifier {
+  static const maxFileSize = 8 * 1024 * 1024;
+
   // FIXME: make these private
   final List<Group> groups = [];
   final List<SignedFile> files = [];

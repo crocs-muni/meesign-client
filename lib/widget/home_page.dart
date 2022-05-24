@@ -256,10 +256,38 @@ class _HomePageState extends State<HomePage> {
         withReadStream: false,
       );
 
+  void showErrorDialog({required String title, required String desc}) =>
+      showDialog<void>(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(title),
+            content: Text(desc),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+
   Future<void> _sign() async {
     final res = await _pickPdfFile();
-    final path = res?.files.first.path;
+    if (res == null || res.files.isEmpty) return;
+
+    final file = res.files.first;
+    final path = file.path;
     if (path == null) return;
+
+    if (file.size > MpcModel.maxFileSize) {
+      showErrorDialog(
+        title: 'File too large',
+        desc: 'Please select a smaller one.',
+      );
+      return;
+    }
 
     final group = await _selectGroup();
     if (group == null) return;
