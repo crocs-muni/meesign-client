@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
     );
 
     return MaterialApp(
-      title: 'Meesign',
+      title: 'MeeSign',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
