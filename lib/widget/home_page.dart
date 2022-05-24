@@ -1,4 +1,5 @@
 import 'package:animations/animations.dart';
+import 'package:badges/badges.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
@@ -131,6 +132,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _index = 0;
+  int _nSignReqs = 0, _nGroupReqs = 0;
 
   @override
   void initState() {
@@ -142,6 +144,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _showGroupRequest(GroupTask task) {
+    // FIXME: rebuilds whole tree?
+    setState(() {
+      ++_nGroupReqs;
+    });
     ScaffoldMessenger.of(context).showMaterialBanner(
       MaterialBanner(
         content: Text('Do you want to join group ${task.group.name}?'),
@@ -150,6 +156,9 @@ class _HomePageState extends State<HomePage> {
           TextButton(
             child: const Text('JOIN'),
             onPressed: () {
+              setState(() {
+                --_nGroupReqs;
+              });
               ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
               context.read<MpcModel>().approveTask(task, agree: true);
             },
@@ -167,6 +176,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _showSignRequest(SignTask task) {
+    setState(() {
+      ++_nSignReqs;
+    });
     SignedFile file = task.file;
     ScaffoldMessenger.of(context).showMaterialBanner(
       MaterialBanner(
@@ -183,6 +195,10 @@ class _HomePageState extends State<HomePage> {
           TextButton(
             child: const Text('SIGN'),
             onPressed: () {
+              setState(() {
+                --_nSignReqs;
+              });
+              // FIXME: add one handler for both approve, reject
               ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
               context.read<MpcModel>().approveTask(task, agree: true);
             },
@@ -307,13 +323,21 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: _index == 0 ? signFab : groupFab,
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.lock),
+            icon: Badge(
+              badgeContent: Text('$_nSignReqs'),
+              child: Icon(Icons.lock),
+              showBadge: _nSignReqs != 0,
+            ),
             label: 'Signing',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.people),
+            icon: Badge(
+              badgeContent: Text('$_nGroupReqs'),
+              child: Icon(Icons.people),
+              showBadge: _nGroupReqs != 0,
+            ),
             label: 'Groups',
           ),
         ],
