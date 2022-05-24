@@ -25,6 +25,6 @@ class QrCoder {
     final id = _base64decoder.convert(args.substring(0, i));
     final name = args.substring(i + 1);
 
-    return Cosigner(name, id, CosignerType.app);
+    return Cosigner(name, id, CosignerType.app, DateTime.now());
   }
 }
