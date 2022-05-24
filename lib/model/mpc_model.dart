@@ -75,7 +75,13 @@ class MpcModel with ChangeNotifier {
   Future<Iterable<Cosigner>> getRegistered() async {
     final devices = await _client.getDevices(rpc.DevicesRequest());
     return devices.devices.map(
-        (device) => Cosigner(device.name, device.identifier, CosignerType.app));
+      (device) => Cosigner(
+        device.name,
+        device.identifier,
+        CosignerType.app,
+        DateTime.fromMillisecondsSinceEpoch(device.lastActive.toInt() * 1000),
+      ),
+    );
   }
 
   Future<void> addGroup(
@@ -147,7 +153,12 @@ class MpcModel with ChangeNotifier {
           final members = req.deviceIds
               .map(
                 // TODO: fetch names from server
-                (id) => Cosigner('unknown', id, CosignerType.app),
+                (id) => Cosigner(
+                  'unknown',
+                  id,
+                  CosignerType.app,
+                  DateTime.now(),
+                ),
               )
               .toList();
           final group = Group(req.name, members, req.threshold);
