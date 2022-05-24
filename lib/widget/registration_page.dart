@@ -87,7 +87,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   height: 16,
                 ),
                 Text(
-                  'Meesign',
+                  'MeeSign',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headline4,
                 ),

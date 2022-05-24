@@ -7,7 +7,7 @@
 
 #include "flutter/generated_plugin_registrant.h"
 
-static const gchar* app_title = "Meesign";
+static const gchar* app_title = "MeeSign";
 
 struct _MyApplication {
   GtkApplication parent_instance;

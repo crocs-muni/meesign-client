@@ -282,7 +282,7 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Meesign'),
+        title: const Text('MeeSign'),
         actions: [
           Consumer<MpcModel>(builder: (context, model, child) {
             final name = model.thisDevice.name;
