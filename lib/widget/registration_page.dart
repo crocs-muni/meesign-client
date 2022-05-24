@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import '../model/mpc_model.dart';
@@ -80,10 +81,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 const SizedBox(
                   height: 54,
                 ),
-                Icon(
-                  Icons.lock,
-                  size: 54,
+                SvgPicture.asset(
+                  'assets/icon_logo.svg',
                   color: Theme.of(context).colorScheme.secondary,
+                  width: 72,
                 ),
                 const SizedBox(
                   height: 16,
