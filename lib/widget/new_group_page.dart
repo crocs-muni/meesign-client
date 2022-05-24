@@ -127,6 +127,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
               border: const OutlineInputBorder(),
               errorText: _nameErr,
             ),
+            maxLength: 32,
           ),
           const Padding(
             padding: EdgeInsets.only(top: 8, bottom: 8),

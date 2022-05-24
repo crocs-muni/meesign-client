@@ -102,6 +102,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   ),
                   textInputAction: TextInputAction.next,
                   enabled: !_working,
+                  maxLength: 32,
                 ),
                 const SizedBox(
                   height: 16,
