@@ -314,17 +314,13 @@ final $typed_data.Uint8List groupsDescriptor = $convert.base64Decode(
 const Resp$json = const {
   '1': 'Resp',
   '2': const [
-    const {'1': 'success', '3': 1, '4': 1, '5': 9, '9': 0, '10': 'success'},
-    const {'1': 'failure', '3': 2, '4': 1, '5': 9, '9': 0, '10': 'failure'},
-  ],
-  '8': const [
-    const {'1': 'variant'},
+    const {'1': 'message', '3': 1, '4': 1, '5': 9, '10': 'message'},
   ],
 };
 
 /// Descriptor for `Resp`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List respDescriptor = $convert.base64Decode(
-    'CgRSZXNwEhoKB3N1Y2Nlc3MYASABKAlIAFIHc3VjY2VzcxIaCgdmYWlsdXJlGAIgASgJSABSB2ZhaWx1cmVCCQoHdmFyaWFudA==');
+final $typed_data.Uint8List respDescriptor =
+    $convert.base64Decode('CgRSZXNwEhgKB21lc3NhZ2UYASABKAlSB21lc3NhZ2U=');
 @$core.Deprecated('Use taskAgreementDescriptor instead')
 const TaskAgreement$json = const {
   '1': 'TaskAgreement',

@@ -54,7 +54,6 @@ class MpcModel with ChangeNotifier {
     final resp = await _client.register(
       rpc.RegistrationRequest(identifier: thisDevice.id, name: name),
     );
-    if (resp.hasFailure()) throw Exception(resp.failure);
 
     _startPoll();
   }
