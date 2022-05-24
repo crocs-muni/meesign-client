@@ -90,7 +90,7 @@ String _nameInitials(String name) => name
     .split(' ')
     .where((w) => w.isNotEmpty)
     .take(2)
-    .map((w) => w[0].toUpperCase())
+    .map((w) => w.characters.first.toUpperCase())
     .join();
 
 class GroupsSubPage extends StatelessWidget {
