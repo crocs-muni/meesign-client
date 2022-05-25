@@ -10,7 +10,7 @@ import '../util/uuid.dart';
 import 'group.dart';
 import 'signed_file.dart';
 
-enum TaskStatus { unapproved, waiting, finished }
+enum TaskStatus { unapproved, waiting, working, finished, error }
 
 abstract class MpcTask {
   Uuid id;
@@ -25,7 +25,10 @@ abstract class MpcTask {
     _round = round;
     // FIXME: this is safe as long as the round we receive is correct
 
-    if (_round == 1) await _initWorker();
+    if (_round == 1) {
+      _status = TaskStatus.working;
+      await _initWorker();
+    }
 
     final ProtocolUpdate resp = await _worker.enqueueRequest(
       // FIXME: change types
