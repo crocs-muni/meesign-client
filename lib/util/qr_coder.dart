@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../model/cosigner.dart';
+import 'uuid.dart';
 
 class QrCoder {
   static const String mime = 'application/meesign';
@@ -9,7 +10,7 @@ class QrCoder {
   late final _base64decoder = const Base64Decoder();
 
   String encode(Cosigner cosigner) {
-    final base64Id = _base64encoder.convert(cosigner.id);
+    final base64Id = _base64encoder.convert(cosigner.id.bytes);
     return '$mime;$base64Id,${cosigner.name}';
   }
 
@@ -25,6 +26,6 @@ class QrCoder {
     final id = _base64decoder.convert(args.substring(0, i));
     final name = args.substring(i + 1);
 
-    return Cosigner(name, id, CosignerType.app, DateTime.now());
+    return Cosigner(name, Uuid(id), CosignerType.app, DateTime.now());
   }
 }

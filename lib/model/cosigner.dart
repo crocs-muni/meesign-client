@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import '../util/uuid.dart';
+
 enum CosignerType {
   app,
   card,
@@ -7,7 +9,7 @@ enum CosignerType {
 
 class Cosigner {
   String name;
-  List<int> id;
+  Uuid id;
   CosignerType type;
   DateTime lastActive;
 
@@ -18,8 +20,9 @@ class Cosigner {
       : id = _randomId(),
         lastActive = DateTime.now();
 
-  static List<int> _randomId() {
+  static Uuid _randomId() {
     final rnd = Random.secure();
-    return List.generate(idLen, (i) => rnd.nextInt(256));
+    final bytes = List.generate(idLen, (i) => rnd.nextInt(256));
+    return Uuid(bytes);
   }
 }
