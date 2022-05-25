@@ -54,7 +54,7 @@ class MpcModel with ChangeNotifier {
     thisDevice = Cosigner.random(name, CosignerType.app);
 
     final resp = await _client.register(
-      rpc.RegistrationRequest(identifier: thisDevice.id, name: name),
+      rpc.RegistrationRequest(identifier: thisDevice.id.bytes, name: name),
     );
 
     _startPoll();
@@ -75,7 +75,7 @@ class MpcModel with ChangeNotifier {
     return devices.devices.map(
       (device) => Cosigner(
         device.name,
-        device.identifier,
+        Uuid(device.identifier),
         CosignerType.app,
         DateTime.fromMillisecondsSinceEpoch(device.lastActive.toInt() * 1000),
       ),
@@ -85,7 +85,7 @@ class MpcModel with ChangeNotifier {
   Future<void> addGroup(
       String name, List<Cosigner> members, int threshold) async {
     final rpcTask = await _client.group(rpc.GroupRequest(
-      deviceIds: members.map((m) => m.id),
+      deviceIds: members.map((m) => m.id.bytes),
       name: name,
       threshold: threshold,
     ));
@@ -153,7 +153,7 @@ class MpcModel with ChangeNotifier {
                 // TODO: fetch names from server
                 (id) => Cosigner(
                   'unknown',
-                  id,
+                  Uuid(id),
                   CosignerType.app,
                   DateTime.now(),
                 ),
@@ -209,7 +209,7 @@ class MpcModel with ChangeNotifier {
 
   Future<rpc.Resp> _sendUpdate(MpcTask task, List<int> data) async =>
       _client.updateTask(rpc.TaskUpdate(
-        deviceId: thisDevice.id,
+        deviceId: thisDevice.id.bytes,
         task: task.id.bytes,
         data: data,
       ));
@@ -245,7 +245,7 @@ class MpcModel with ChangeNotifier {
 
   Future<void> _poll(Timer timer) async {
     final rpcTasks = await _client.getTasks(
-      rpc.TasksRequest(deviceId: thisDevice.id),
+      rpc.TasksRequest(deviceId: thisDevice.id.bytes),
     );
     await _processTasks(rpcTasks);
   }

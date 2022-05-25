@@ -73,7 +73,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
   void _addMember(Object? member) {
     if (member is! Cosigner) return;
     for (final m in _members) {
-      if (listEquals(m.id, member.id)) return;
+      if (m.id == member.id) return;
     }
     setState(() {
       _members.add(member);

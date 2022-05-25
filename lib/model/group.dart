@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 
 import '../native/generated/mpc_sigs_lib.dart';
+import '../util/uuid.dart';
 import 'cosigner.dart';
 
 class Group {
@@ -22,9 +23,9 @@ class Group {
     this.threshold,
   );
 
-  hasMember(List<int> id) {
+  hasMember(Uuid id) {
     for (final member in members) {
-      if (listEquals(member.id, id)) return true;
+      if (member.id == id) return true;
     }
     return false;
   }
