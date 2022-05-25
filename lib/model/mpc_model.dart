@@ -133,6 +133,7 @@ class MpcModel with ChangeNotifier {
   }
 
   Future<void> approveTask(MpcTask task, {required bool agree}) async {
+    task.approve();
     final update = rpc.TaskAgreement(agreement: agree);
     await _sendUpdate(task, update.writeToBuffer());
   }
