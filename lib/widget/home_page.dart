@@ -346,7 +346,19 @@ class _HomePageState extends State<HomePage> {
                 Padding(
                   padding: const EdgeInsets.all(8),
                   child: CircleAvatar(
-                    child: Text(_nameInitials(name)),
+                    child: AnimatedBuilder(
+                      animation: model.lastUpdate,
+                      builder: (context, child) {
+                        return Badge(
+                          badgeColor: model.lastUpdate.value > -5
+                              ? Colors.green
+                              : Colors.orange,
+                          child: Text(
+                            _nameInitials(name),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
               ],

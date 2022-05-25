@@ -40,6 +40,8 @@ class MpcModel with ChangeNotifier {
 
   final Map<Uuid, MpcTask> _tasks = HashMap();
 
+  final ValueNotifier<int> lastUpdate = ValueNotifier(0);
+
   Future<void> register(String name, String host) async {
     _channel = ClientChannel(
       host,
@@ -242,9 +244,15 @@ class MpcModel with ChangeNotifier {
   }
 
   Future<void> _poll(Timer timer) async {
-    final rpcTasks = await _client.getTasks(
-      rpc.TasksRequest(deviceId: thisDevice.id.bytes),
-    );
-    await _processTasks(rpcTasks);
+    try {
+      final rpcTasks = await _client.getTasks(
+        rpc.TasksRequest(deviceId: thisDevice.id.bytes),
+      );
+      lastUpdate.value = 0;
+      await _processTasks(rpcTasks);
+    } catch (e) {
+      --lastUpdate.value;
+      rethrow;
+    }
   }
 }
