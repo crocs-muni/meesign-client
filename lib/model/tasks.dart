@@ -18,6 +18,8 @@ abstract class MpcTask {
   int _round = 0;
   late final Worker _worker;
 
+  double get progress;
+
   MpcTask(this.id);
 
   Future<List<int>?> update(int round, List<int> data) async {
@@ -48,6 +50,9 @@ abstract class MpcTask {
 
 class GroupTask extends MpcTask {
   final Group group;
+
+  @override
+  double get progress => _round / 6;
 
   GroupTask(Uuid uuid, this.group) : super(uuid);
 
@@ -80,6 +85,9 @@ class GroupTask extends MpcTask {
 
 class SignTask extends MpcTask {
   final SignedFile file;
+
+  @override
+  double get progress => _round / 10;
 
   SignTask(Uuid uuid, this.file) : super(uuid);
 
