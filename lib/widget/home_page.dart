@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:animations/animations.dart';
 import 'package:badges/badges.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../model/mpc_model.dart';
 import '../model/tasks.dart';
@@ -55,6 +58,16 @@ class EmptyList extends StatelessWidget {
   }
 }
 
+void _openFile(String path) {
+  if (Platform.isLinux) {
+    launchUrl(Uri.file(path));
+  } else {
+    // FIXME: try to avoid open_file package,
+    // it seems to be of low quality
+    OpenFile.open(path);
+  }
+}
+
 class SigningSubPage extends StatelessWidget {
   const SigningSubPage({Key? key}) : super(key: key);
 
@@ -75,7 +88,7 @@ class SigningSubPage extends StatelessWidget {
               title: Text(file.basename),
               trailing: ProgressCheck(file.isFinished ? 1.0 : null),
               onTap: () {
-                OpenFile.open(file.path);
+                _openFile(file.path);
               },
             ),
             confirmTitle: 'Do you really want to delete ${file.basename}?',
@@ -198,7 +211,7 @@ class _HomePageState extends State<HomePage> {
           TextButton(
             child: const Text('VIEW'),
             onPressed: () {
-              OpenFile.open(file.path);
+              _openFile(file.path);
             },
           ),
           TextButton(
