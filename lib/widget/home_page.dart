@@ -130,8 +130,6 @@ class GroupsSubPage extends StatelessWidget {
 
             return ExpansionTile(
               title: Text(group.name),
-              subtitle: Text('Threshold: '
-                  '${group.threshold} out of ${group.members.length}'),
               leading: CircleAvatar(
                 child: Text(
                   _nameInitials(group.name),
