@@ -106,10 +106,10 @@ class SigningSubPage extends StatelessWidget {
   }
 }
 
-String _nameInitials(String name) => name
+String _nameInitials(String name, {int count = 2}) => name
     .split(' ')
     .where((w) => w.isNotEmpty)
-    .take(2)
+    .take(count)
     .map((w) => w.characters.first.toUpperCase())
     .join();
 
@@ -128,17 +128,39 @@ class GroupsSubPage extends StatelessWidget {
           itemBuilder: (context, i) {
             final group = model.groups[i];
 
-            return ListTile(
+            return ExpansionTile(
               title: Text(group.name),
               subtitle: Text('Threshold: '
                   '${group.threshold} out of ${group.members.length}'),
-              onTap: () {},
               leading: CircleAvatar(
                 child: Text(
                   _nameInitials(group.name),
                 ),
               ),
               trailing: ProgressCheck(group.isFinished ? 1.0 : null),
+              childrenPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
+              ),
+              children: [
+                Container(
+                  alignment: Alignment.topLeft,
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 4,
+                    children: group.members
+                        .map((m) => Chip(
+                              avatar: CircleAvatar(
+                                child: Text(
+                                  _nameInitials(m.name, count: 1),
+                                ),
+                              ),
+                              label: Text(m.name),
+                            ))
+                        .toList(),
+                  ),
+                ),
+              ],
             );
           });
     });
