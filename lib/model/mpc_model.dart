@@ -40,6 +40,10 @@ class MpcModel with ChangeNotifier {
 
   final Map<Uuid, MpcTask> _tasks = HashMap();
 
+  // TODO: store the tasks separately to avoid filtering?
+  Iterable<GroupTask> get groupTasks => _tasks.values.whereType<GroupTask>();
+  Iterable<SignTask> get signTasks => _tasks.values.whereType<SignTask>();
+
   final ValueNotifier<int> lastUpdate = ValueNotifier(0);
 
   Future<void> register(String name, String host) async {
@@ -95,9 +99,8 @@ class MpcModel with ChangeNotifier {
     // FIXME: maybe the group should be added right when the user requests it?
     // FIXME: repeptition
     final uuid = Uuid(rpcTask.id);
-    final group = Group(name, members, threshold);
+    final group = GroupBase(name, members, threshold);
     final task = GroupTask(uuid, group);
-    groups.add(group);
     _tasks[uuid] = task;
 
     approveTask(task, agree: true);
@@ -127,7 +130,6 @@ class MpcModel with ChangeNotifier {
     // FIXME: so much repetition
     final uuid = Uuid(rpcTask.id);
     final task = SignTask(uuid, file);
-    files.add(file);
     _tasks[uuid] = task;
 
     approveTask(task, agree: true);
@@ -159,9 +161,8 @@ class MpcModel with ChangeNotifier {
           final members =
               req.deviceIds.map((id) => registered[Uuid(id)]!).toList();
 
-          final group = Group(req.name, members, req.threshold);
+          final group = GroupBase(req.name, members, req.threshold);
           task = GroupTask(uuid, group);
-          groups.add(group);
           break;
         }
       case rpc.Task_TaskType.SIGN:
@@ -176,7 +177,6 @@ class MpcModel with ChangeNotifier {
           final group = groups.firstWhere((g) => listEquals(g.id, req.groupId));
           final file = SignedFile(path, group);
           task = SignTask(uuid, file);
-          files.add(file);
         }
     }
 
@@ -195,10 +195,13 @@ class MpcModel with ChangeNotifier {
   }
 
   Future<void> _finishTask(MpcTask task, rpc.Task rpcTask) async {
-    await task.finish(rpcTask.data);
-
-    if (task is SignTask) {
-      await File(task.file.path).writeAsBytes(rpcTask.data, flush: true);
+    if (task is GroupTask) {
+      Group group = await task.finish(rpcTask.data);
+      groups.add(group);
+    } else if (task is SignTask) {
+      SignedFile file = await task.finish(rpcTask.data);
+      await File(file.path).writeAsBytes(rpcTask.data, flush: true);
+      files.add(file);
     }
 
     final update = rpc.TaskAcknowledgement();
