@@ -3,6 +3,7 @@ import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:ffi/ffi.dart';
+import 'package:flutter/foundation.dart';
 
 import '../native/generated/mpc_sigs_lib.dart';
 import '../native/worker.dart';
@@ -12,7 +13,7 @@ import 'signed_file.dart';
 
 enum TaskStatus { unapproved, waiting, working, finished, error }
 
-abstract class MpcTask {
+abstract class MpcTask with ChangeNotifier {
   Uuid id;
   TaskStatus _status = TaskStatus.unapproved;
   int _round = 0;
@@ -22,15 +23,18 @@ abstract class MpcTask {
 
   MpcTask(this.id);
 
-  Future<List<int>?> update(int round, List<int> data) async {
-    if (round <= _round) return null;
-    _round = round;
-    // FIXME: this is safe as long as the round we receive is correct
-
-    if (_round == 1) {
-      _status = TaskStatus.working;
-      await _initWorker();
+  Future<T> _tryChange<T>(Future<T> Function() op) async {
+    try {
+      return await op();
+    } catch (e) {
+      _status = TaskStatus.error;
+      notifyListeners();
+      rethrow;
     }
+  }
+
+  Future<List<int>?> _update(int round, List<int> data) async {
+    if (_round == 1) await _initWorker();
 
     final ProtocolUpdate resp = await _worker.enqueueRequest(
       // FIXME: change types
@@ -40,11 +44,34 @@ abstract class MpcTask {
     return resp.deliver();
   }
 
+  Future<List<int>?> update(int round, List<int> data) async {
+    if (round <= _round) return null;
+    _round = round;
+    _status = TaskStatus.working;
+    notifyListeners();
+
+    return _tryChange(() => _update(round, data));
+  }
+
   Future<void> _initWorker();
 
-  Future<void> finish(List<int> data);
+  Future<void> _finish(List<int> data);
 
-  void approve() => _status = TaskStatus.waiting;
+  Future<void> finish(List<int> data) async {
+    if (_status == TaskStatus.finished) return;
+    _status = TaskStatus.finished;
+
+    await _tryChange(() => _finish(data));
+
+    _worker.stop();
+    notifyListeners();
+  }
+
+  void approve() {
+    _status = TaskStatus.waiting;
+    notifyListeners();
+  }
+
   TaskStatus get status => _status;
 }
 
@@ -67,10 +94,7 @@ class GroupTask extends MpcTask {
   }
 
   @override
-  Future<void> finish(List<int> data) async {
-    if (_status == TaskStatus.finished) return;
-    _status = TaskStatus.finished;
-
+  Future<void> _finish(List<int> data) async {
     final TransferableTypedData trans =
         await _worker.enqueueRequest(TaskFinishMsg());
 
@@ -78,8 +102,6 @@ class GroupTask extends MpcTask {
     // group.context = mpcLib.protocol_result_group(_proto);
     group.id = data;
     group.context = trans.materialize().asUint8List();
-
-    _worker.stop();
   }
 }
 
@@ -104,16 +126,9 @@ class SignTask extends MpcTask {
   }
 
   @override
-  Future<void> finish(List<int> data) async {
-    // TODO: implement finish
-    if (_status == TaskStatus.finished) return;
-    _status = TaskStatus.finished;
-
+  Future<void> _finish(List<int> data) async {
     await _worker.enqueueRequest(TaskFinishMsg());
-
     file.isFinished = true;
-
-    _worker.stop();
   }
 }
 
