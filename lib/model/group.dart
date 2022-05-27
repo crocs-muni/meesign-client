@@ -1,27 +1,26 @@
-import 'dart:ffi';
 import 'dart:typed_data';
 
-import 'package:flutter/foundation.dart';
-
-import '../native/generated/mpc_sigs_lib.dart';
 import '../util/uuid.dart';
 import 'cosigner.dart';
 
-class Group {
-  List<int>? id;
+class GroupBase {
   String name;
   List<Cosigner> members;
   int threshold;
 
-  Uint8List? context;
-
-  bool get isFinished => id != null;
-
-  Group(
+  GroupBase(
     this.name,
     this.members,
     this.threshold,
   );
+}
+
+class Group extends GroupBase {
+  List<int> id;
+  Uint8List context;
+
+  Group(this.id, this.context, GroupBase base)
+      : super(base.name, base.members, base.threshold);
 
   hasMember(Uuid id) {
     for (final member in members) {

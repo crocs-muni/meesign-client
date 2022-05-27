@@ -55,16 +55,19 @@ abstract class MpcTask with ChangeNotifier {
 
   Future<void> _initWorker();
 
-  Future<void> _finish(List<int> data);
+  // FIXME: avoid dynamic
+  Future<dynamic> _finish(List<int> data);
 
-  Future<void> finish(List<int> data) async {
+  Future<dynamic> finish(List<int> data) async {
     if (_status == TaskStatus.finished) return;
     _status = TaskStatus.finished;
 
-    await _tryChange(() => _finish(data));
+    final res = await _tryChange(() => _finish(data));
 
     _worker.stop();
     notifyListeners();
+
+    return res;
   }
 
   void approve() {
@@ -76,12 +79,12 @@ abstract class MpcTask with ChangeNotifier {
 }
 
 class GroupTask extends MpcTask {
-  final Group group;
+  final GroupBase groupBase;
 
   @override
   double get progress => _round / 6;
 
-  GroupTask(Uuid uuid, this.group) : super(uuid);
+  GroupTask(Uuid uuid, this.groupBase) : super(uuid);
 
   @override
   Future<void> _initWorker() async {
@@ -94,14 +97,15 @@ class GroupTask extends MpcTask {
   }
 
   @override
-  Future<void> _finish(List<int> data) async {
+  Future<Group> _finish(List<int> data) async {
     final TransferableTypedData trans =
         await _worker.enqueueRequest(TaskFinishMsg());
 
     // FIXME: when to do copy when receiving data using grpc?
     // group.context = mpcLib.protocol_result_group(_proto);
-    group.id = data;
-    group.context = trans.materialize().asUint8List();
+    final id = data;
+    final context = trans.materialize().asUint8List();
+    return Group(id, context, groupBase);
   }
 }
 
@@ -121,14 +125,14 @@ class SignTask extends MpcTask {
     );
     await _worker.start();
     await _worker.enqueueRequest(
-      SignInitMsg(Algorithm.Gg18, file.group.context!, file.path),
+      SignInitMsg(Algorithm.Gg18, file.group.context, file.path),
     );
   }
 
   @override
-  Future<void> _finish(List<int> data) async {
+  Future<SignedFile> _finish(List<int> data) async {
     await _worker.enqueueRequest(TaskFinishMsg());
-    file.isFinished = true;
+    return file;
   }
 }
 

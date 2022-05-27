@@ -5,7 +5,6 @@ import 'group.dart';
 class SignedFile {
   String path;
   Group group;
-  bool isFinished = false;
 
   SignedFile(this.path, this.group);
 
