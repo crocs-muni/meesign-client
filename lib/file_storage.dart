@@ -1,9 +1,12 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
 import 'package:async/async.dart';
 import 'package:path/path.dart' as path_pkg;
 import 'package:path_provider/path_provider.dart';
+
+import 'util/uuid.dart';
 
 class FileStorage {
   static final FileStorage _instance = FileStorage._internal();
@@ -31,11 +34,14 @@ class FileStorage {
     return Directory(signedName).create();
   }
 
-  Future<String> getTmpFilePath(String basename) async {
+  Future<String> getTaskFilePath(String basename, Uuid taskId) async {
     final tmpDir = await _tmpDir;
-    // TODO: this should be the place to handle name conflicts etc.
+    final taskDir = Directory(
+      path_pkg.join(tmpDir.path, base64Url.encode(taskId.bytes)),
+    );
+    await taskDir.create();
     return path_pkg.join(
-      tmpDir.path,
+      taskDir.path,
       basename,
     );
   }
