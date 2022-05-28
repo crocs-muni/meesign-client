@@ -31,7 +31,7 @@ class QrIdentityPage extends StatelessWidget {
                     return QrImage(
                       padding: const EdgeInsets.all(24),
                       foregroundColor: Theme.of(context).colorScheme.onSurface,
-                      data: QrCoder().encode(model.thisDevice),
+                      data: QrCoder().encode(MpcModel.thisDevice),
                     );
                   }),
                 ),

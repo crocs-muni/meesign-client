@@ -543,6 +543,7 @@ class _HomePageState extends State<HomePage> {
         title: 'Sign request failed',
         desc: 'Please try again.',
       );
+      rethrow;
     }
   }
 
@@ -560,6 +561,7 @@ class _HomePageState extends State<HomePage> {
         title: 'Group request failed',
         desc: 'Please try again',
       );
+      rethrow;
     }
   }
 
@@ -587,7 +589,7 @@ class _HomePageState extends State<HomePage> {
         title: const Text('MeeSign'),
         actions: [
           Consumer<MpcModel>(builder: (context, model, child) {
-            final name = model.thisDevice.name;
+            final name = MpcModel.thisDevice.name;
             return Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [

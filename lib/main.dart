@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +16,19 @@ import 'widget/registration_page.dart';
 import 'widget/search_peer_page.dart';
 
 void main() {
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    MpcModel.log(details.toString(minLevel: DiagnosticLevel.debug));
+  };
+  runZonedGuarded(() {
+    runApp(ChangeNotifierProvider(
+      create: (context) => MpcModel(),
+      child: const MyApp(),
+    ));
+  }, ((error, stack) {
+    MpcModel.log(error.toString() + '**stacktrace**\n' + stack.toString());
+  }));
+
   runApp(ChangeNotifierProvider(
     create: (context) => MpcModel(),
     child: const MyApp(),
