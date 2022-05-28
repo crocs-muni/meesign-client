@@ -134,6 +134,19 @@ class MpcModel with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<rpc.Resp> _sendUpdate(MpcTask task, List<int> data) async {
+    try {
+      return _client.updateTask(rpc.TaskUpdate(
+        deviceId: thisDevice.id.bytes,
+        task: task.id.bytes,
+        data: data,
+      ));
+    } catch (e) {
+      task.error();
+      rethrow;
+    }
+  }
+
   Future<void> approveTask(MpcTask task, {required bool agree}) async {
     task.approve();
     final update = rpc.TaskAgreement(agreement: agree);
@@ -188,7 +201,9 @@ class MpcModel with ChangeNotifier {
   Future<void> _updateTask(MpcTask task, rpc.Task rpcTask) async {
     // old data
     if (rpcTask.round <= task.round) return;
-    // TODO: check status for errors
+
+    if (rpcTask.state == rpc.Task_TaskState.FAILED) task.error();
+
     final update = await task.update(rpcTask.round, rpcTask.data);
     if (update == null) return;
     await _sendUpdate(task, update);
@@ -210,13 +225,6 @@ class MpcModel with ChangeNotifier {
 
     notifyListeners();
   }
-
-  Future<rpc.Resp> _sendUpdate(MpcTask task, List<int> data) async =>
-      _client.updateTask(rpc.TaskUpdate(
-        deviceId: thisDevice.id.bytes,
-        task: task.id.bytes,
-        data: data,
-      ));
 
   Future<void> _processTasks(rpc.Tasks rpcTasks) async {
     for (final rpcTask in rpcTasks.tasks) {
