@@ -56,6 +56,7 @@ class _QrReaderPageState extends State<QrReaderPage> {
             child: MobileScanner(
               allowDuplicates: false,
               onDetect: _onDetect,
+              controller: controller,
             ),
           ),
           Expanded(
