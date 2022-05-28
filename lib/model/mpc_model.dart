@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:grpc/grpc.dart';
+import 'package:path/path.dart' as path_pkg;
 
 import '../file_storage.dart';
 import '../grpc/generated/mpc.pbgrpc.dart' as rpc;
@@ -108,27 +109,25 @@ class MpcModel with ChangeNotifier {
   }
 
   Future<void> sign(String path, Group group) async {
-    final file = SignedFile(path, group);
-
-    if (Platform.isWindows || Platform.isLinux) {
-      String newPath = await _fileStorage.getTmpFilePath(file.basename);
-      await File(path).copy(newPath);
-      file.path = newPath;
-    }
-
     // FIXME: oom for large files
-    final bytes = await File(file.path).readAsBytes();
+    final bytes = await File(path).readAsBytes();
+    String basename = path_pkg.basename(path);
 
     final rpcTask = await _client.sign(
       rpc.SignRequest(
         groupId: group.id,
-        name: file.basename,
+        name: basename,
         data: bytes,
       ),
     );
 
     // FIXME: so much repetition
     final uuid = Uuid(rpcTask.id);
+
+    String taskPath = await _fileStorage.getTaskFilePath(basename, uuid);
+    await File(taskPath).writeAsBytes(bytes, flush: true);
+    final file = SignedFile(taskPath, group);
+
     final task = SignTask(uuid, file);
     _tasks[uuid] = task;
 
@@ -183,7 +182,7 @@ class MpcModel with ChangeNotifier {
           final req = rpc.SignRequest.fromBuffer(rpcTask.data);
 
           // TODO: who should be responsible for saving files?
-          String path = await _fileStorage.getTmpFilePath(req.name);
+          String path = await _fileStorage.getTaskFilePath(req.name, uuid);
           await File(path).writeAsBytes(rpcTask.data, flush: true);
 
           // FIXME: groups should probably be hashed by their id
