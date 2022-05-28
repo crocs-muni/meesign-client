@@ -188,6 +188,8 @@ class MpcModel with ChangeNotifier {
   }
 
   Future<void> _updateTask(MpcTask task, rpc.Task rpcTask) async {
+    // old data
+    if (rpcTask.round <= task.round) return;
     // TODO: check status for errors
     final update = await task.update(rpcTask.round, rpcTask.data);
     if (update == null) return;
@@ -195,6 +197,8 @@ class MpcModel with ChangeNotifier {
   }
 
   Future<void> _finishTask(MpcTask task, rpc.Task rpcTask) async {
+    if (task.status != TaskStatus.working) return;
+
     if (task is GroupTask) {
       Group group = await task.finish(rpcTask.data);
       groups.add(group);
