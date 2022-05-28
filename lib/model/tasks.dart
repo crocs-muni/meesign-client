@@ -19,6 +19,7 @@ abstract class MpcTask with ChangeNotifier {
   TaskStatus _status = TaskStatus.unapproved;
   int _round = 0;
   late final Worker _worker;
+  DateTime timeCreated = DateTime.now();
 
   double get progress;
   TaskStatus get status => _status;
