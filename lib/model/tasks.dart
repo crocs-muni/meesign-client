@@ -20,17 +20,15 @@ abstract class MpcTask with ChangeNotifier {
   late final Worker _worker;
 
   double get progress;
+  TaskStatus get status => _status;
+  int get round => _round;
 
   MpcTask(this.id);
 
-  Future<T> _tryChange<T>(Future<T> Function() op) async {
-    try {
-      return await op();
-    } catch (e) {
-      _status = TaskStatus.error;
-      notifyListeners();
-      rethrow;
-    }
+  Never _throw(Object e) {
+    _status = TaskStatus.error;
+    notifyListeners();
+    throw e;
   }
 
   Future<List<int>?> _update(int round, List<int> data) async {
@@ -45,12 +43,22 @@ abstract class MpcTask with ChangeNotifier {
   }
 
   Future<List<int>?> update(int round, List<int> data) async {
-    if (round <= _round) return null;
-    _round = round;
+    if (status != TaskStatus.working && status != TaskStatus.waiting) {
+      _throw(StateError('Invalid task state for update'));
+    }
+    if (round != _round + 1) {
+      _throw(StateError('Invalid round'));
+    }
+
+    ++_round;
     _status = TaskStatus.working;
     notifyListeners();
 
-    return _tryChange(() => _update(round, data));
+    try {
+      return await _update(round, data);
+    } catch (e) {
+      _throw(e);
+    }
   }
 
   Future<void> _initWorker();
@@ -59,23 +67,26 @@ abstract class MpcTask with ChangeNotifier {
   Future<dynamic> _finish(List<int> data);
 
   Future<dynamic> finish(List<int> data) async {
-    if (_status == TaskStatus.finished) return;
+    if (_status != TaskStatus.working) {
+      _throw(StateError('Invalid task state for finish'));
+    }
     _status = TaskStatus.finished;
 
-    final res = await _tryChange(() => _finish(data));
-
-    _worker.stop();
-    notifyListeners();
-
-    return res;
+    try {
+      return await _finish(data);
+    } catch (e) {
+      _throw(e);
+    } finally {
+      _worker.stop();
+      notifyListeners();
+    }
   }
 
   void approve() {
+    if (_status != TaskStatus.unapproved) return;
     _status = TaskStatus.waiting;
     notifyListeners();
   }
-
-  TaskStatus get status => _status;
 }
 
 class GroupTask extends MpcTask {
@@ -217,6 +228,7 @@ class GroupWorkerThread extends TaskWorkerThread {
 
   // TODO: add wrapper class?
   TransferableTypedData _finish() {
+    assert(_proto != nullptr);
     final buf = mpcLib.protocol_result(_proto);
     if (buf.ptr == nullptr) _throw();
 
@@ -257,6 +269,7 @@ class SignWorkerThread extends TaskWorkerThread {
 
   void _finish() {
     // TODO: insert signature
+    assert(_proto != nullptr);
     mpcLib.protocol_free(_proto);
   }
 
