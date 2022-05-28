@@ -110,11 +110,9 @@ class _NewGroupPageState extends State<NewGroupPage> {
       appBar: AppBar(
         title: const Text('New Group'),
         actions: [
-          TextButton(
+          IconButton(
             onPressed: _tryCreate,
-            style: TextButton.styleFrom(
-                primary: Theme.of(context).colorScheme.onPrimary),
-            child: const Text('CREATE'),
+            icon: const Icon(Icons.send),
           ),
         ],
       ),
