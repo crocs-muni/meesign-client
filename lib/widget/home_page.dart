@@ -127,6 +127,7 @@ Widget buildTaskListView<T extends MpcTask, U>(
 }) {
   final unfinished =
       tasks.where((task) => task.status != TaskStatus.finished).toList();
+  unfinished.sort((a, b) => b.timeCreated.compareTo(a.timeCreated));
 
   int length = finished.length + unfinished.length;
 
