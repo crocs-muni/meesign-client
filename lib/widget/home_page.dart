@@ -537,7 +537,7 @@ class _HomePageState extends State<HomePage> {
     if (group == null) return;
 
     try {
-      context.read<MpcModel>().sign(path, group);
+      await context.read<MpcModel>().sign(path, group);
     } catch (e) {
       showErrorDialog(
         title: 'Sign request failed',
