@@ -535,8 +535,31 @@ class _HomePageState extends State<HomePage> {
     final group = await _selectGroup();
     if (group == null) return;
 
-    final model = context.read<MpcModel>();
-    model.sign(path, group);
+    try {
+      context.read<MpcModel>().sign(path, group);
+    } catch (e) {
+      showErrorDialog(
+        title: 'Sign request failed',
+        desc: 'Please try again.',
+      );
+    }
+  }
+
+  Future<void> _group() async {
+    final res = await Navigator.pushNamed(context, Routes.newGroup)
+        as Map<String, Object>?;
+    if (res == null) return;
+
+    try {
+      final name = res['name'] as String;
+      final members = res['members'] as List<Cosigner>;
+      await context.read<MpcModel>().addGroup(name, members, members.length);
+    } catch (e) {
+      showErrorDialog(
+        title: 'Group request failed',
+        desc: 'Please try again',
+      );
+    }
   }
 
   @override
@@ -553,9 +576,7 @@ class _HomePageState extends State<HomePage> {
       icon: const Icon(Icons.add),
     );
     final groupFab = FloatingActionButton.extended(
-      onPressed: () {
-        Navigator.pushNamed(context, Routes.newGroup);
-      },
+      onPressed: _group,
       label: const Text('New'),
       icon: const Icon(Icons.add),
     );
