@@ -99,9 +99,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
     }
     if (_nameErr != null || _memberErr != null) return;
 
-    final model = context.read<MpcModel>();
-    model.addGroup(_nameController.text, _members, _members.length);
-    Navigator.pop(context);
+    Navigator.pop(context, {'name': _nameController.text, 'members': _members});
   }
 
   @override
