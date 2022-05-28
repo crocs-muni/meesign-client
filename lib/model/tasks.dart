@@ -29,6 +29,8 @@ abstract class MpcTask with ChangeNotifier {
   Never _throw(Object e) {
     _status = TaskStatus.error;
     notifyListeners();
+    // FIXME: this can leak protocol in the worker
+    _worker.stop();
     throw e;
   }
 
@@ -74,12 +76,12 @@ abstract class MpcTask with ChangeNotifier {
     _status = TaskStatus.finished;
 
     try {
-      return await _finish(data);
-    } catch (e) {
-      _throw(e);
-    } finally {
+      final res = await _finish(data);
       _worker.stop();
       notifyListeners();
+      return res;
+    } catch (e) {
+      _throw(e);
     }
   }
 
