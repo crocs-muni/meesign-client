@@ -4,9 +4,9 @@ class AppTheme {
   static final light = ThemeData.from(
     colorScheme: const ColorScheme.light().copyWith(
       primary: Colors.indigo,
-      primaryVariant: Colors.indigo[700],
+      primaryContainer: Colors.indigo[700],
       secondary: Colors.amberAccent[200],
-      secondaryVariant: Colors.amberAccent[700],
+      secondaryContainer: Colors.amberAccent[700],
     ),
   ).copyWith(
     // necessary for avatar color, seems like a bug
@@ -16,9 +16,9 @@ class AppTheme {
   static final dark = ThemeData.from(
     colorScheme: const ColorScheme.dark().copyWith(
       primary: Colors.indigo[200],
-      primaryVariant: Colors.indigo[700],
+      primaryContainer: Colors.indigo[700],
       secondary: Colors.amberAccent[200],
-      secondaryVariant: Colors.amberAccent[200],
+      secondaryContainer: Colors.amberAccent[200],
     ),
   );
 }
