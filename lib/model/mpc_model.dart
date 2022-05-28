@@ -137,7 +137,7 @@ class MpcModel with ChangeNotifier {
 
   Future<rpc.Resp> _sendUpdate(MpcTask task, List<int> data) async {
     try {
-      return _client.updateTask(rpc.TaskUpdate(
+      return await _client.updateTask(rpc.TaskUpdate(
         deviceId: thisDevice.id.bytes,
         task: task.id.bytes,
         data: data,
