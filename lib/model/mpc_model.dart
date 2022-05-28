@@ -229,9 +229,13 @@ class MpcModel with ChangeNotifier {
       // FIXME: also consider the state
       // TODO: maybe add some kind of task pool to move the code out of model?
       if (task == null) {
-        // need to await here to avoid interpreting
-        // the same task as new multiple times
-        await _handleNewTask(rpcTask);
+        try {
+          // need to await here to avoid interpreting
+          // the same task as new multiple times
+          await _handleNewTask(rpcTask);
+        } catch (e) {
+          print(e);
+        }
       } else {
         if (rpcTask.state == rpc.Task_TaskState.FINISHED) {
           _finishTask(task, rpcTask);
