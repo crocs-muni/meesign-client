@@ -63,7 +63,7 @@ class MpcModel with ChangeNotifier {
       rpc.RegistrationRequest(identifier: thisDevice.id.bytes, name: name),
     );
 
-    _startPoll();
+    _schedulePoll();
   }
 
   Future<List<Cosigner>> searchForPeers(String query) async {
@@ -229,7 +229,9 @@ class MpcModel with ChangeNotifier {
       // FIXME: also consider the state
       // TODO: maybe add some kind of task pool to move the code out of model?
       if (task == null) {
-        _handleNewTask(rpcTask);
+        // need to await here to avoid interpreting
+        // the same task as new multiple times
+        await _handleNewTask(rpcTask);
       } else {
         if (rpcTask.state == rpc.Task_TaskState.FINISHED) {
           _finishTask(task, rpcTask);
@@ -240,17 +242,11 @@ class MpcModel with ChangeNotifier {
     }
   }
 
-  void _startPoll() {
-    if (_pollTimer != null) return;
-    _pollTimer = Timer.periodic(const Duration(seconds: 1), _poll);
+  void _schedulePoll() {
+    _pollTimer = Timer(const Duration(seconds: 1), _poll);
   }
 
-  void _stopPoll() {
-    _pollTimer?.cancel();
-    _pollTimer = null;
-  }
-
-  Future<void> _poll(Timer timer) async {
+  Future<void> _poll() async {
     try {
       final rpcTasks = await _client.getTasks(
         rpc.TasksRequest(deviceId: thisDevice.id.bytes),
@@ -260,6 +256,8 @@ class MpcModel with ChangeNotifier {
     } catch (e) {
       --lastUpdate.value;
       rethrow;
+    } finally {
+      _schedulePoll();
     }
   }
 }
