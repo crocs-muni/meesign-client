@@ -27,7 +27,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
   @override
   void initState() {
     super.initState();
-    _members.add(context.read<MpcModel>().thisDevice);
+    _members.add(MpcModel.thisDevice);
     _nameController.text = RndNameGenerator().next();
     _nameController.addListener(() {
       if (_nameErr != null) {

@@ -211,7 +211,6 @@ abstract class TaskWorkerThread extends WorkerThread {
       final buf = alloc<Uint8>(data.length);
       buf.asTypedList(data.length).setAll(0, data);
 
-      print('update protocol');
       final outBuf = mpcLib.protocol_update(_proto, buf, data.length);
       if (outBuf.ptr == nullptr) _throw();
 

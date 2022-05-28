@@ -25,9 +25,9 @@ class MpcModel with ChangeNotifier {
   final List<Group> groups = [];
   final List<SignedFile> files = [];
 
-  late ClientChannel _channel;
-  late rpc.MPCClient _client;
-  late Cosigner thisDevice;
+  static late ClientChannel _channel;
+  static late rpc.MPCClient _client;
+  static late Cosigner thisDevice;
 
   final StreamController<GroupTask> _groupReqsController = StreamController();
   Stream<GroupTask> get groupRequests => _groupReqsController.stream;
@@ -238,7 +238,7 @@ class MpcModel with ChangeNotifier {
           // the same task as new multiple times
           await _handleNewTask(rpcTask);
         } catch (e) {
-          print(e);
+          log(e.toString());
         }
       } else {
         if (rpcTask.state == rpc.Task_TaskState.FINISHED) {
@@ -265,5 +265,14 @@ class MpcModel with ChangeNotifier {
     } finally {
       _schedulePoll();
     }
+  }
+
+  static void log(String message) async {
+    try {
+      await _client.log(rpc.LogRequest(
+        message: message,
+        deviceId: thisDevice.id.bytes,
+      ));
+    } catch (_) {}
   }
 }
