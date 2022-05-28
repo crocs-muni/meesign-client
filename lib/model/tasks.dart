@@ -1,4 +1,5 @@
 import 'dart:ffi';
+import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
 
@@ -143,6 +144,7 @@ class SignTask extends MpcTask {
   @override
   Future<SignedFile> _finish(List<int> data) async {
     await _worker.enqueueRequest(TaskFinishMsg());
+    await File(file.path).writeAsBytes(data, flush: true);
     return file;
   }
 }
