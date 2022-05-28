@@ -204,7 +204,6 @@ class MpcModel with ChangeNotifier {
       groups.add(group);
     } else if (task is SignTask) {
       SignedFile file = await task.finish(rpcTask.data);
-      await File(file.path).writeAsBytes(rpcTask.data, flush: true);
       files.add(file);
     }
 
