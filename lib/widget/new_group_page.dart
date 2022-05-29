@@ -9,7 +9,6 @@ import '../card/card.dart';
 import '../routes.dart';
 import '../model/mpc_model.dart';
 import '../util/chars.dart';
-import '../util/rnd_name_generator.dart';
 
 class NewGroupPage extends StatefulWidget {
   const NewGroupPage({Key? key}) : super(key: key);
@@ -28,7 +27,6 @@ class _NewGroupPageState extends State<NewGroupPage> {
   void initState() {
     super.initState();
     _members.add(MpcModel.thisDevice);
-    _nameController.text = RndNameGenerator().next();
     _nameController.addListener(() {
       if (_nameErr != null) {
         setState(() {

@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import '../model/mpc_model.dart';
 import '../routes.dart';
 import '../util/chars.dart';
-import '../util/rnd_name_generator.dart';
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({Key? key}) : super(key: key);
@@ -16,26 +15,29 @@ class RegistrationPage extends StatefulWidget {
 }
 
 class _RegistrationPageState extends State<RegistrationPage> {
-  final _nameController = TextEditingController(
-    text: RndNameGenerator().next(),
-  );
+  final _nameController = TextEditingController();
   final _hostController = TextEditingController(
     text: 'meesign.local',
   );
 
   bool _working = false;
-  Exception? _error;
+  // FIXME: use form?
+  TextEditingController? _errorField;
 
   @override
   void initState() {
     super.initState();
-    _hostController.addListener(() {
-      if (_error != null) {
-        setState(() {
-          _error = null;
-        });
-      }
-    });
+
+    void Function() makeListener(TextEditingController controller) => () {
+          if (_errorField == controller) {
+            setState(() {
+              _errorField = null;
+            });
+          }
+        };
+
+    _nameController.addListener(makeListener(_nameController));
+    _hostController.addListener(makeListener(_hostController));
   }
 
   @override
@@ -46,9 +48,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
   }
 
   Future<void> _register() async {
+    if (_nameController.text.isEmpty) {
+      setState(() {
+        _errorField = _nameController;
+      });
+      return;
+    }
+
     setState(() {
       _working = true;
-      _error = null;
+      _errorField = null;
     });
 
     MpcModel model = context.read<MpcModel>();
@@ -61,7 +70,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     } catch (e) {
       setState(() {
         _working = false;
-        _error = e as Exception?;
+        _errorField = _hostController;
       });
     }
   }
@@ -99,9 +108,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 ),
                 TextField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Name',
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
+                    errorText:
+                        _errorField == _nameController ? 'Invalid name' : null,
                   ),
                   textInputAction: TextInputAction.next,
                   enabled: !_working,
@@ -120,7 +131,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   decoration: InputDecoration(
                     labelText: 'Coordinator address',
                     border: const OutlineInputBorder(),
-                    errorText: _error == null ? null : 'Failed to register',
+                    errorText: _errorField == _hostController
+                        ? 'Failed to register'
+                        : null,
                   ),
                   enabled: !_working,
                   onSubmitted: (_) => _register(),
