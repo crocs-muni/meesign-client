@@ -45,13 +45,14 @@ dependencies:
   open_file: ^3.2.1
   path: ^1.8.0
   async: ^2.8.2
-  dart_pcsc: 
+  dart_pcsc:
     git: https://github.com/jjanku/dart_pcsc.git
   mobile_scanner: ^2.0.0
   badges: ^2.0.2
   characters: ^1.2.0
   flutter_svg: ^1.0.3
   url_launcher: ^6.1.2
+  collection: ^1.16.0
 
 dev_dependencies:
   flutter_test:

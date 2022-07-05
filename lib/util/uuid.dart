@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/rendering.dart';
+import 'package:collection/collection.dart';
 
 // TODO: use uuid package?
 class Uuid {
@@ -11,10 +10,10 @@ class Uuid {
   @override
   bool operator ==(other) {
     if (other is! Uuid) return false;
-    return listEquals(bytes, other.bytes);
+    return (const ListEquality()).equals(bytes, other.bytes);
   }
 
   // FIXME: is this useable in a hashmap?
   @override
-  int get hashCode => hashList(bytes);
+  int get hashCode => (const ListEquality()).hash(bytes);
 }
