@@ -570,7 +570,7 @@ class _HomePageState extends State<HomePage> {
         title: const Text('MeeSign'),
         actions: [
           Consumer<MpcModel>(builder: (context, model, child) {
-            final name = MpcModel.thisDevice.name;
+            final name = model.thisDevice.name;
             return Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
