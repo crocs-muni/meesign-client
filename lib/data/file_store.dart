@@ -14,9 +14,6 @@ class FileStore {
   final _tmpDirMemo = AsyncMemoizer<Directory>();
   Future<Directory> get _tmpDir async =>
       _tmpDirMemo.runOnce(() => _createTmpDir());
-  final _signedDirMemo = AsyncMemoizer<Directory>();
-  Future<Directory> get _signedDir async =>
-      _signedDirMemo.runOnce(() => _createSignedDir());
 
   FileStore._internal();
 
@@ -29,11 +26,6 @@ class FileStore {
     return Directory(tmpName).create();
   }
 
-  Future<Directory> _createSignedDir() async {
-    final signedName = path_pkg.join((await _tmpDir).path, 'signed');
-    return Directory(signedName).create();
-  }
-
   Future<String> getTaskFilePath(String basename, Uuid taskId) async {
     final tmpDir = await _tmpDir;
     final taskDir = Directory(
@@ -42,14 +34,6 @@ class FileStore {
     await taskDir.create();
     return path_pkg.join(
       taskDir.path,
-      basename,
-    );
-  }
-
-  Future<String> getSignedFilePath(String basename) async {
-    final signedDir = await _signedDir;
-    return path_pkg.join(
-      signedDir.path,
       basename,
     );
   }
