@@ -1,34 +1,28 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 
-import 'package:async/async.dart';
 import 'package:path/path.dart' as path_pkg;
-import 'package:path_provider/path_provider.dart';
 
 import '../util/uuid.dart';
+import 'tmp_dir_provider.dart';
+
+abstract class DirProvider {
+  Future<Directory> getStoreDirectory();
+}
 
 class FileStore {
   static final FileStore _instance = FileStore._internal();
 
-  final _tmpDirMemo = AsyncMemoizer<Directory>();
-  Future<Directory> get _tmpDir async =>
-      _tmpDirMemo.runOnce(() => _getTmpDir());
+  // FIXME: set it in constructor, use DI instead of singleton
+  final DirProvider _dirProvider = TmpDirProvider();
 
   FileStore._internal();
 
   factory FileStore() => _instance;
 
-  Future<Directory> _getTmpDir() async {
-    final tmp = await getTemporaryDirectory();
-    final unique = Random().nextInt(1 << 32);
-    final tmpName = path_pkg.join(tmp.path, 'meesign_client-$unique');
-    return Directory(tmpName);
-  }
-
   Future<String> getFilePath(Uuid id, String name) async {
     return path_pkg.join(
-      (await _tmpDir).path,
+      (await _dirProvider.getStoreDirectory()).path,
       base64Url.encode(id.bytes),
       name,
     );
