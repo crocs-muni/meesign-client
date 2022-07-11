@@ -121,10 +121,8 @@ class MpcModel with ChangeNotifier {
 
     // FIXME: so much repetition
     final uuid = Uuid(rpcTask.id);
-
-    String taskPath = await _fileStore.getTaskFilePath(basename, uuid);
-    await File(taskPath).writeAsBytes(bytes, flush: true);
-    final file = SignedFile(taskPath, group);
+    path = await _fileStore.storeFile(uuid, basename, bytes);
+    final file = SignedFile(path, group);
 
     final task = SignTask(uuid, file);
     _tasks[uuid] = task;
@@ -179,13 +177,11 @@ class MpcModel with ChangeNotifier {
         {
           final req = rpc.SignRequest.fromBuffer(rpcTask.data);
 
-          // TODO: who should be responsible for saving files?
-          String path = await _fileStore.getTaskFilePath(req.name, uuid);
-          await File(path).writeAsBytes(rpcTask.data, flush: true);
-
           // FIXME: groups should probably be hashed by their id
           final group = groups.firstWhere((g) => listEquals(g.id, req.groupId));
+          final path = await _fileStore.storeFile(uuid, req.name, rpcTask.data);
           final file = SignedFile(path, group);
+
           task = SignTask(uuid, file);
         }
     }

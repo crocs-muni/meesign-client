@@ -13,28 +13,31 @@ class FileStore {
 
   final _tmpDirMemo = AsyncMemoizer<Directory>();
   Future<Directory> get _tmpDir async =>
-      _tmpDirMemo.runOnce(() => _createTmpDir());
+      _tmpDirMemo.runOnce(() => _getTmpDir());
 
   FileStore._internal();
 
   factory FileStore() => _instance;
 
-  Future<Directory> _createTmpDir() async {
+  Future<Directory> _getTmpDir() async {
     final tmp = await getTemporaryDirectory();
     final unique = Random().nextInt(1 << 32);
     final tmpName = path_pkg.join(tmp.path, 'meesign_client-$unique');
-    return Directory(tmpName).create();
+    return Directory(tmpName);
   }
 
-  Future<String> getTaskFilePath(String basename, Uuid taskId) async {
-    final tmpDir = await _tmpDir;
-    final taskDir = Directory(
-      path_pkg.join(tmpDir.path, base64Url.encode(taskId.bytes)),
-    );
-    await taskDir.create();
+  Future<String> getFilePath(Uuid id, String name) async {
     return path_pkg.join(
-      taskDir.path,
-      basename,
+      (await _tmpDir).path,
+      base64Url.encode(id.bytes),
+      name,
     );
+  }
+
+  Future<String> storeFile(Uuid id, String name, List<int> data) async {
+    final path = await getFilePath(id, name);
+    await Directory(path_pkg.dirname(path)).create(recursive: true);
+    await File(path).writeAsBytes(data, flush: true);
+    return path;
   }
 }

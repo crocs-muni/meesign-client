@@ -1,11 +1,11 @@
 import 'dart:ffi';
-import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:ffi/ffi.dart';
 import 'package:flutter/foundation.dart';
 
+import '../data/file_store.dart';
 import '../native/generated/mpc_sigs_lib.dart';
 import '../native/worker.dart';
 import '../util/uuid.dart';
@@ -153,7 +153,7 @@ class SignTask extends MpcTask {
   @override
   Future<SignedFile> _finish(List<int> data) async {
     await _worker.enqueueRequest(TaskFinishMsg());
-    await File(file.path).writeAsBytes(data, flush: true);
+    await FileStore().storeFile(id, file.basename, data);
     return file;
   }
 }
