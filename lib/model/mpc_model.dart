@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:grpc/grpc.dart';
 import 'package:path/path.dart' as path_pkg;
 
-import '../file_storage.dart';
+import '../data/file_store.dart';
 import '../grpc/generated/mpc.pbgrpc.dart' as rpc;
 import '../util/uuid.dart';
 import 'cosigner.dart';
@@ -35,7 +35,7 @@ class MpcModel with ChangeNotifier {
   final StreamController<SignTask> _signReqsController = StreamController();
   Stream<SignTask> get signRequests => _signReqsController.stream;
 
-  final _fileStorage = FileStorage();
+  final _fileStore = FileStore();
 
   final Map<Uuid, MpcTask> _tasks = HashMap();
 
@@ -122,7 +122,7 @@ class MpcModel with ChangeNotifier {
     // FIXME: so much repetition
     final uuid = Uuid(rpcTask.id);
 
-    String taskPath = await _fileStorage.getTaskFilePath(basename, uuid);
+    String taskPath = await _fileStore.getTaskFilePath(basename, uuid);
     await File(taskPath).writeAsBytes(bytes, flush: true);
     final file = SignedFile(taskPath, group);
 
@@ -180,7 +180,7 @@ class MpcModel with ChangeNotifier {
           final req = rpc.SignRequest.fromBuffer(rpcTask.data);
 
           // TODO: who should be responsible for saving files?
-          String path = await _fileStorage.getTaskFilePath(req.name, uuid);
+          String path = await _fileStore.getTaskFilePath(req.name, uuid);
           await File(path).writeAsBytes(rpcTask.data, flush: true);
 
           // FIXME: groups should probably be hashed by their id
