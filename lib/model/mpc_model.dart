@@ -7,6 +7,7 @@ import 'package:grpc/grpc.dart';
 import 'package:path/path.dart' as path_pkg;
 
 import '../data/file_store.dart';
+import '../data/device_repository.dart';
 import '../grpc/generated/mpc.pbgrpc.dart' as rpc;
 import '../util/uuid.dart';
 import 'device.dart';
@@ -28,6 +29,8 @@ class MpcModel with ChangeNotifier {
   late ClientChannel _channel;
   late rpc.MPCClient _client;
   late Device thisDevice;
+
+  late DeviceRepository _deviceRepository;
 
   final StreamController<GroupTask> _groupReqsController = StreamController();
   Stream<GroupTask> get groupRequests => _groupReqsController.stream;
@@ -55,37 +58,15 @@ class MpcModel with ChangeNotifier {
     );
 
     _client = rpc.MPCClient(_channel);
+    _deviceRepository = DeviceRepository(_client);
 
-    thisDevice = Device.random(name, DeviceType.app);
-
-    final resp = await _client.register(
-      rpc.RegistrationRequest(identifier: thisDevice.id.bytes, name: name),
-    );
+    thisDevice = await _deviceRepository.register(name);
 
     _schedulePoll();
   }
 
-  Future<List<Device>> searchForPeers(String query) async {
-    return (await getRegistered())
-        .where((device) =>
-            device.name.startsWith(query) ||
-            device.name.split(' ').any(
-                  (word) => word.startsWith(query),
-                ))
-        .toList();
-  }
-
-  Future<Iterable<Device>> getRegistered() async {
-    final devices = await _client.getDevices(rpc.DevicesRequest());
-    return devices.devices.map(
-      (device) => Device(
-        device.name,
-        Uuid(device.identifier),
-        DeviceType.app,
-        DateTime.fromMillisecondsSinceEpoch(device.lastActive.toInt() * 1000),
-      ),
-    );
-  }
+  Future<Iterable<Device>> findDeviceByName(String query) =>
+      _deviceRepository.findDeviceByName(query);
 
   Future<void> addGroup(
       String name, List<Device> members, int threshold) async {
@@ -163,7 +144,7 @@ class MpcModel with ChangeNotifier {
           final req = rpc.GroupRequest.fromBuffer(rpcTask.data);
 
           final registered = Map<Uuid, Device>.fromIterable(
-            await getRegistered(),
+            await _deviceRepository.getDevices(),
             key: (dev) => dev.id,
           );
           final members =

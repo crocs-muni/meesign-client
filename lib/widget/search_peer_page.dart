@@ -21,9 +21,9 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
 
   void _query(String query) async {
     final model = context.read<MpcModel>();
-    List<Device> results = [];
+    Iterable<Device> results = [];
     try {
-      results = await model.searchForPeers(_queryController.text);
+      results = await model.findDeviceByName(_queryController.text);
     } catch (_) {}
 
     _pivot = DateTime.now().subtract(activeThreshold);
@@ -34,10 +34,8 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
     active.sort(cmp);
     inactive.sort(cmp);
 
-    results = active + inactive;
-
     setState(() {
-      _queryResults = results;
+      _queryResults = active + inactive;
     });
   }
 
