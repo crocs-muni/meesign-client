@@ -1,13 +1,10 @@
-import 'dart:ffi';
-import 'dart:isolate';
 import 'dart:typed_data';
 
-import 'package:ffi/ffi.dart';
 import 'package:flutter/foundation.dart';
 
 import '../data/file_store.dart';
 import '../native/generated/mpc_sigs_lib.dart';
-import '../native/worker.dart';
+import '../native/mpc_sigs_wrapper.dart';
 import '../util/uuid.dart';
 import 'group.dart';
 import 'signed_file.dart';
@@ -18,22 +15,18 @@ abstract class MpcTask with ChangeNotifier {
   Uuid id;
   TaskStatus _status = TaskStatus.unapproved;
   int _round = 0;
-  late final Worker _worker;
   DateTime timeCreated = DateTime.now();
+  Uint8List context;
 
   double get progress;
   TaskStatus get status => _status;
   int get round => _round;
 
-  MpcTask(this.id);
+  MpcTask(this.id, this.context);
 
   void error() {
     _status = TaskStatus.error;
     notifyListeners();
-    // FIXME: this can leak protocol in the worker
-    try {
-      _worker.stop();
-    } catch (_) {}
   }
 
   Never _throw(Object e) {
@@ -42,14 +35,9 @@ abstract class MpcTask with ChangeNotifier {
   }
 
   Future<List<int>?> _update(int round, List<int> data) async {
-    if (_round == 1) await _initWorker();
-
-    final ProtocolUpdate resp = await _worker.enqueueRequest(
-      // FIXME: change types
-      ProtocolUpdate(data as Uint8List),
-    );
-
-    return resp.deliver();
+    final res = await ProtocolWrapper.advance(context, data as Uint8List);
+    context = res.context;
+    return res.data;
   }
 
   Future<List<int>?> update(int round, List<int> data) async {
@@ -71,8 +59,6 @@ abstract class MpcTask with ChangeNotifier {
     }
   }
 
-  Future<void> _initWorker();
-
   // FIXME: avoid dynamic
   Future<dynamic> _finish(List<int> data);
 
@@ -84,7 +70,6 @@ abstract class MpcTask with ChangeNotifier {
 
     try {
       final res = await _finish(data);
-      _worker.stop();
       notifyListeners();
       return res;
     } catch (e) {
@@ -105,27 +90,14 @@ class GroupTask extends MpcTask {
   @override
   double get progress => _round / 6;
 
-  GroupTask(Uuid uuid, this.groupBase) : super(uuid);
-
-  @override
-  Future<void> _initWorker() async {
-    _worker = Worker(
-      GroupWorkerThread.entryPoint,
-      debugName: 'group worker',
-    );
-    await _worker.start();
-    await _worker.enqueueRequest(GroupInitMsg(Algorithm.Gg18));
-  }
+  GroupTask(Uuid uuid, this.groupBase)
+      : super(uuid, ProtocolWrapper.keygen(ProtocolId.Gg18));
 
   @override
   Future<Group> _finish(List<int> data) async {
-    final TransferableTypedData trans =
-        await _worker.enqueueRequest(TaskFinishMsg());
-
     // FIXME: when to do copy when receiving data using grpc?
-    // group.context = mpcLib.protocol_result_group(_proto);
     final id = data;
-    final context = trans.materialize().asUint8List();
+    final context = ProtocolWrapper.finish(this.context);
     return Group(id, context, groupBase);
   }
 }
@@ -136,154 +108,13 @@ class SignTask extends MpcTask {
   @override
   double get progress => _round / 10;
 
-  SignTask(Uuid uuid, this.file) : super(uuid);
-
-  @override
-  Future<void> _initWorker() async {
-    _worker = Worker(
-      SignWorkerThread.entryPoint,
-      debugName: 'sign worker',
-    );
-    await _worker.start();
-    await _worker.enqueueRequest(
-      SignInitMsg(Algorithm.Gg18, file.group.context, file.path),
-    );
-  }
+  SignTask(Uuid uuid, this.file)
+      : super(uuid, ProtocolWrapper.sign(ProtocolId.Gg18, file.group.context));
 
   @override
   Future<SignedFile> _finish(List<int> data) async {
-    await _worker.enqueueRequest(TaskFinishMsg());
+    ProtocolWrapper.finish(context);
     await FileStore().storeFile(id, file.basename, data);
     return file;
-  }
-}
-
-class GroupInitMsg {
-  int algorithm;
-  GroupInitMsg(this.algorithm);
-}
-
-class PayloadMsg {
-  TransferableTypedData data;
-
-  PayloadMsg(Uint8List data) : data = TransferableTypedData.fromList([data]);
-
-  Uint8List deliver() => data.materialize().asUint8List();
-}
-
-class SignInitMsg extends PayloadMsg {
-  int algorithm;
-  String path;
-
-  SignInitMsg(this.algorithm, Uint8List groupData, this.path)
-      : super(groupData);
-}
-
-class ProtocolUpdate extends PayloadMsg {
-  ProtocolUpdate(Uint8List data) : super(data);
-}
-
-class TaskFinishMsg {}
-
-class NativeException implements Exception {
-  final String message;
-  NativeException(this.message);
-}
-
-final MpcSigsLib mpcLib = MpcSigsLib(dlOpen('mpc_sigs'));
-
-abstract class TaskWorkerThread extends WorkerThread {
-  Pointer<ProtoWrapper> _proto = nullptr;
-
-  TaskWorkerThread(SendPort sendPort) : super(sendPort);
-
-  void _throw() {
-    final errMsg = mpcLib.protocol_error(_proto).cast<Utf8>().toDartString();
-    throw NativeException(errMsg);
-  }
-
-  ProtocolUpdate _updateProtocol(ProtocolUpdate update) {
-    assert(_proto != nullptr);
-    final data = update.deliver();
-
-    // TODO: can we avoid some of these copies?
-    return using((Arena alloc) {
-      final buf = alloc<Uint8>(data.length);
-      buf.asTypedList(data.length).setAll(0, data);
-
-      final outBuf = mpcLib.protocol_update(_proto, buf, data.length);
-      if (outBuf.ptr == nullptr) _throw();
-
-      return ProtocolUpdate(
-        outBuf.ptr.asTypedList(outBuf.len),
-      );
-    });
-  }
-}
-
-class GroupWorkerThread extends TaskWorkerThread {
-  GroupWorkerThread(SendPort sendPort) : super(sendPort);
-
-  @override
-  handleMessage(message) {
-    if (message is GroupInitMsg) return _init(message);
-    if (message is ProtocolUpdate) return _updateProtocol(message);
-    if (message is TaskFinishMsg) return _finish();
-    assert(false);
-  }
-
-  void _init(GroupInitMsg message) {
-    _proto = mpcLib.protocol_new(message.algorithm);
-  }
-
-  // TODO: add wrapper class?
-  TransferableTypedData _finish() {
-    assert(_proto != nullptr);
-    final buf = mpcLib.protocol_result(_proto);
-    if (buf.ptr == nullptr) _throw();
-
-    final trans = TransferableTypedData.fromList(
-      [buf.ptr.asTypedList(buf.len)],
-    );
-
-    mpcLib.protocol_free(_proto);
-    _proto = nullptr;
-
-    return trans;
-  }
-
-  static void entryPoint(SendPort sendPort) {
-    GroupWorkerThread(sendPort);
-  }
-}
-
-class SignWorkerThread extends TaskWorkerThread {
-  SignWorkerThread(SendPort sendPort) : super(sendPort);
-
-  @override
-  handleMessage(message) {
-    if (message is SignInitMsg) return _init(message);
-    if (message is ProtocolUpdate) return _updateProtocol(message);
-    if (message is TaskFinishMsg) return _finish();
-  }
-
-  void _init(SignInitMsg message) {
-    // TODO: same as above, how to avoid copies?
-    final data = message.deliver();
-    using((Arena alloc) {
-      final buf = alloc<Uint8>(data.length);
-      buf.asTypedList(data.length).setAll(0, data);
-      _proto = mpcLib.group_sign(message.algorithm, buf, data.length);
-    });
-  }
-
-  void _finish() {
-    // TODO: insert signature
-    assert(_proto != nullptr);
-    mpcLib.protocol_free(_proto);
-  }
-
-  static void entryPoint(SendPort sendPort) {
-    SignWorkerThread(sendPort);
   }
 }
