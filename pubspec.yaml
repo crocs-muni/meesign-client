@@ -53,6 +53,7 @@ dependencies:
   flutter_svg: ^1.0.3
   url_launcher: ^6.1.2
   collection: ^1.16.0
+  meta: ^1.7.0
 
 dev_dependencies:
   flutter_test:
