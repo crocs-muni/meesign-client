@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:io';
+import 'dart:io' as io;
 
 import 'package:flutter/foundation.dart';
 import 'package:grpc/grpc.dart';
@@ -12,19 +12,19 @@ import '../grpc/generated/mpc.pbgrpc.dart' as rpc;
 import '../util/uuid.dart';
 import 'device.dart';
 import 'group.dart';
-import 'signed_file.dart';
+import 'file.dart';
 import 'tasks.dart';
 
 export 'device.dart';
 export 'group.dart';
-export 'signed_file.dart';
+export 'file.dart';
 
 class MpcModel with ChangeNotifier {
   static const maxFileSize = 8 * 1024 * 1024;
 
   // FIXME: make these private
   final List<Group> groups = [];
-  final List<SignedFile> files = [];
+  final List<File> files = [];
 
   late ClientChannel _channel;
   late rpc.MPCClient _client;
@@ -89,7 +89,7 @@ class MpcModel with ChangeNotifier {
 
   Future<void> sign(String path, Group group) async {
     // FIXME: oom for large files
-    final bytes = await File(path).readAsBytes();
+    final bytes = await io.File(path).readAsBytes();
     String basename = path_pkg.basename(path);
 
     final rpcTask = await _client.sign(
@@ -103,7 +103,7 @@ class MpcModel with ChangeNotifier {
     // FIXME: so much repetition
     final uuid = Uuid(rpcTask.id);
     path = await _fileStore.storeFile(uuid, basename, bytes);
-    final file = SignedFile(path, group);
+    final file = File(path, group);
 
     final task = SignTask(uuid, file);
     _tasks[uuid] = task;
@@ -161,7 +161,7 @@ class MpcModel with ChangeNotifier {
           // FIXME: groups should probably be hashed by their id
           final group = groups.firstWhere((g) => listEquals(g.id, req.groupId));
           final path = await _fileStore.storeFile(uuid, req.name, rpcTask.data);
-          final file = SignedFile(path, group);
+          final file = File(path, group);
 
           task = SignTask(uuid, file);
         }
@@ -192,7 +192,7 @@ class MpcModel with ChangeNotifier {
       Group group = await task.finish(rpcTask.data);
       groups.add(group);
     } else if (task is SignTask) {
-      SignedFile file = await task.finish(rpcTask.data);
+      File file = await task.finish(rpcTask.data);
       files.add(file);
     }
 

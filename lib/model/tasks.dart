@@ -7,7 +7,7 @@ import '../native/generated/mpc_sigs_lib.dart';
 import '../native/mpc_sigs_wrapper.dart';
 import '../util/uuid.dart';
 import 'group.dart';
-import 'signed_file.dart';
+import 'file.dart';
 
 enum TaskStatus { unapproved, waiting, working, finished, error }
 
@@ -103,7 +103,7 @@ class GroupTask extends MpcTask {
 }
 
 class SignTask extends MpcTask {
-  final SignedFile file;
+  final File file;
 
   @override
   double get progress => _round / 10;
@@ -112,7 +112,7 @@ class SignTask extends MpcTask {
       : super(uuid, ProtocolWrapper.sign(ProtocolId.Gg18, file.group.context));
 
   @override
-  Future<SignedFile> _finish(List<int> data) async {
+  Future<File> _finish(List<int> data) async {
     ProtocolWrapper.finish(context);
     await FileStore().storeFile(id, file.basename, data);
     return file;

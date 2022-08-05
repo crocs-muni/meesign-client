@@ -224,7 +224,7 @@ class SigningSubPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<MpcModel>(builder: (context, model, child) {
-      return buildTaskListView<SignTask, SignedFile>(
+      return buildTaskListView<SignTask, File>(
         model.signTasks.toList(),
         model.files,
         finishedTitle: 'Signed files',

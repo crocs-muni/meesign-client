@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:io';
+import 'dart:io' as io;
 
 import 'package:path/path.dart' as path_pkg;
 
@@ -7,7 +7,7 @@ import '../util/uuid.dart';
 import 'tmp_dir_provider.dart';
 
 abstract class DirProvider {
-  Future<Directory> getStoreDirectory();
+  Future<io.Directory> getStoreDirectory();
 }
 
 class FileStore {
@@ -30,8 +30,8 @@ class FileStore {
 
   Future<String> storeFile(Uuid id, String name, List<int> data) async {
     final path = await getFilePath(id, name);
-    await Directory(path_pkg.dirname(path)).create(recursive: true);
-    await File(path).writeAsBytes(data, flush: true);
+    await io.Directory(path_pkg.dirname(path)).create(recursive: true);
+    await io.File(path).writeAsBytes(data, flush: true);
     return path;
   }
 }
