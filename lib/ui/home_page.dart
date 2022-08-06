@@ -9,25 +9,24 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../model/mpc_model.dart';
-import '../model/tasks.dart';
 import '../routes.dart';
 import '../widget/dismissible.dart';
 
-class TaskStatusIndicator extends StatelessWidget {
-  final TaskStatus status;
+class TaskStateIndicator extends StatelessWidget {
+  final TaskState state;
   final double progress;
 
-  const TaskStatusIndicator(this.status, this.progress, {Key? key})
+  const TaskStateIndicator(this.state, this.progress, {Key? key})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    switch (status) {
-      case TaskStatus.unapproved:
+    switch (state) {
+      case TaskState.created:
         return const Icon(Icons.arrow_drop_down);
-      case TaskStatus.waiting:
+      case TaskState.approved:
         return const Icon(Icons.timer_outlined);
-      case TaskStatus.working:
+      case TaskState.running:
         return SizedBox(
           height: 24,
           width: 24,
@@ -37,9 +36,9 @@ class TaskStatusIndicator extends StatelessWidget {
             strokeWidth: 2.0,
           ),
         );
-      case TaskStatus.finished:
+      case TaskState.finished:
         return const Icon(Icons.check, color: Colors.green);
-      case TaskStatus.error:
+      case TaskState.failed:
         return Icon(Icons.error_outline, color: Theme.of(context).errorColor);
     }
   }
@@ -83,32 +82,32 @@ extension Intersperse<T> on List<T> {
   }
 }
 
-String? statusMessage(TaskStatus status) {
-  switch (status) {
-    case TaskStatus.unapproved:
+String? statusMessage(TaskState state) {
+  switch (state) {
+    case TaskState.created:
       return 'Waiting for confirmation';
-    case TaskStatus.waiting:
+    case TaskState.approved:
       return 'Waiting for approval by others';
-    case TaskStatus.working:
+    case TaskState.running:
       return 'Working on task';
-    case TaskStatus.finished:
+    case TaskState.finished:
       return null;
-    case TaskStatus.error:
+    case TaskState.failed:
       return 'Task failed';
   }
 }
 
-Widget buildTaskListView<T extends MpcTask, U>(
-  List<T> tasks,
+Widget buildTaskListView<T, U>(
+  List<Task<T>> tasks,
   List<U> finished, {
   required String finishedTitle,
   required Widget emptyView,
-  required Widget Function(BuildContext, T, Widget?) unfinishedBuilder,
+  required Widget Function(BuildContext, Task<T>) unfinishedBuilder,
   required Widget Function(BuildContext, U) finishedBuilder,
 }) {
   final unfinished =
-      tasks.where((task) => task.status != TaskStatus.finished).toList();
-  unfinished.sort((a, b) => b.timeCreated.compareTo(a.timeCreated));
+      tasks.where((task) => task.state != TaskState.finished).toList();
+  // TODO: unfinished.sort((a, b) => b.timeCreated.compareTo(a.timeCreated));
 
   int length = finished.length + unfinished.length;
 
@@ -136,12 +135,7 @@ Widget buildTaskListView<T extends MpcTask, U>(
         );
       }
       if (i <= unfinished.length) {
-        return ChangeNotifierProvider.value(
-          value: unfinished[i - 1],
-          child: Consumer<T>(
-            builder: unfinishedBuilder,
-          ),
-        );
+        return unfinishedBuilder(context, unfinished[i - 1]);
       } else {
         return finishedBuilder(context, finished[i - unfinished.length - 2]);
       }
@@ -224,16 +218,16 @@ class SigningSubPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<MpcModel>(builder: (context, model, child) {
-      return buildTaskListView<SignTask, File>(
-        model.signTasks.toList(),
+      return buildTaskListView<File, File>(
+        model.signTasks,
         model.files,
         finishedTitle: 'Signed files',
         emptyView: const EmptyList(hint: 'Add new group first.'),
-        unfinishedBuilder: (context, task, _) {
+        unfinishedBuilder: (context, task) {
           final approveActions = <Widget>[
             OutlinedButton(
               child: const Text('SIGN'),
-              onPressed: () => model.approveTask(task, agree: true),
+              onPressed: () => model.joinSign(task, agree: true),
             ),
             OutlinedButton(
               child: const Text('DECLINE'),
@@ -242,18 +236,18 @@ class SigningSubPage extends StatelessWidget {
           ];
 
           return FileTile(
-            name: task.file.basename,
-            group: task.file.group.name,
-            desc: statusMessage(task.status),
-            trailing: TaskStatusIndicator(task.status, task.progress),
+            name: task.info.basename,
+            group: task.info.group.name,
+            desc: statusMessage(task.state),
+            trailing: TaskStateIndicator(task.state, task.round / task.nRounds),
             initiallyExpanded: true,
             actions: <Widget>[
                   OutlinedButton(
                     child: const Text('VIEW'),
-                    onPressed: () => _openFile(task.file.path),
+                    onPressed: () => _openFile(task.info.path),
                   ),
                 ] +
-                (task.status == TaskStatus.unapproved ? approveActions : []),
+                (task.state == TaskState.created ? approveActions : []),
           );
         },
         finishedBuilder: (context, file) {
@@ -262,7 +256,7 @@ class SigningSubPage extends StatelessWidget {
             child: FileTile(
               name: file.basename,
               group: file.group.name,
-              trailing: const TaskStatusIndicator(TaskStatus.finished, 1),
+              trailing: const TaskStateIndicator(TaskState.finished, 1),
               actions: <Widget>[
                 OutlinedButton(
                   child: const Text('VIEW'),
@@ -371,27 +365,27 @@ class GroupsSubPage extends StatelessWidget {
     return Consumer<MpcModel>(builder: (context, model, child) {
       // FIXME: finished tasks should be removed at some time
 
-      return buildTaskListView<GroupTask, Group>(
-        model.groupTasks.toList(),
+      return buildTaskListView<GroupBase, Group>(
+        model.groupTasks,
         model.groups,
         finishedTitle: 'Groups',
         emptyView: const EmptyList(
           hint: 'Try creating a new group',
         ),
-        unfinishedBuilder: (context, task, _) {
-          final group = task.groupBase;
+        unfinishedBuilder: (context, task) {
+          final group = task.info;
 
           return GroupTile(
             name: group.name,
-            desc: statusMessage(task.status),
+            desc: statusMessage(task.state),
             members: group.members.map((m) => m.name).toList(),
-            trailing: TaskStatusIndicator(task.status, task.progress),
+            trailing: TaskStateIndicator(task.state, task.round / task.nRounds),
             initiallyExpanded: true,
-            showActions: task.status == TaskStatus.unapproved,
+            showActions: task.state == TaskState.created,
             actions: [
               OutlinedButton(
                 child: const Text('JOIN'),
-                onPressed: () => model.approveTask(task, agree: true),
+                onPressed: () => model.joinGroup(task, agree: true),
               ),
               OutlinedButton(
                 child: const Text('DECLINE'),
@@ -419,35 +413,8 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-ValueNotifier<int> _unapprovedCounter(Stream<MpcTask> stream) {
-  final ValueNotifier<int> counter = ValueNotifier(0);
-  stream.listen((task) {
-    ++counter.value;
-    void listener() {
-      if (task.status != TaskStatus.unapproved) {
-        --counter.value;
-        task.removeListener(listener);
-      }
-    }
-
-    task.addListener(listener);
-  });
-  return counter;
-}
-
 class _HomePageState extends State<HomePage> {
   int _index = 0;
-  late final ValueNotifier<int> _nGroupReqs;
-  late final ValueNotifier<int> _nSignReqs;
-
-  @override
-  void initState() {
-    super.initState();
-    // TODO: when to cancel it?
-    MpcModel model = context.read<MpcModel>();
-    _nGroupReqs = _unapprovedCounter(model.groupRequests);
-    _nSignReqs = _unapprovedCounter(model.signRequests);
-  }
 
   Future<Group?> _selectGroup() async {
     return showDialog<Group?>(
@@ -622,23 +589,25 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: AnimatedBuilder(
-              animation: _nSignReqs,
-              builder: (context, _) => Badge(
-                badgeContent: Text('${_nSignReqs.value}'),
+            icon: StreamBuilder<int>(
+              stream: context.watch<MpcModel>().nSignReqs,
+              initialData: 0,
+              builder: (context, snapshot) => Badge(
+                badgeContent: Text('${snapshot.data ?? 0}'),
                 child: const Icon(Icons.lock),
-                showBadge: _nSignReqs.value != 0,
+                showBadge: (snapshot.data ?? 0) != 0,
               ),
             ),
             label: 'Signing',
           ),
           BottomNavigationBarItem(
-            icon: AnimatedBuilder(
-              animation: _nGroupReqs,
-              builder: (context, _) => Badge(
-                badgeContent: Text('${_nGroupReqs.value}'),
+            icon: StreamBuilder<int>(
+              stream: context.watch<MpcModel>().nGroupReqs,
+              initialData: 0,
+              builder: (context, snapshot) => Badge(
+                badgeContent: Text('${snapshot.data ?? 0}'),
                 child: const Icon(Icons.people),
-                showBadge: _nGroupReqs.value != 0,
+                showBadge: (snapshot.data ?? 0) != 0,
               ),
             ),
             label: 'Groups',
