@@ -102,7 +102,7 @@ class MpcModel with ChangeNotifier {
 
     // FIXME: so much repetition
     final uuid = Uuid(rpcTask.id);
-    path = await _fileStore.storeFile(uuid, basename, bytes);
+    path = await _fileStore.storeFile(Uuid([]), uuid, basename, bytes);
     final file = File(path, group);
 
     final task = SignTask(uuid, file);
@@ -160,7 +160,8 @@ class MpcModel with ChangeNotifier {
 
           // FIXME: groups should probably be hashed by their id
           final group = groups.firstWhere((g) => listEquals(g.id, req.groupId));
-          final path = await _fileStore.storeFile(uuid, req.name, rpcTask.data);
+          final path = await _fileStore.storeFile(
+              Uuid([]), uuid, req.name, rpcTask.data);
           final file = File(path, group);
 
           task = SignTask(uuid, file);

@@ -114,7 +114,7 @@ class SignTask extends MpcTask {
   @override
   Future<File> _finish(List<int> data) async {
     ProtocolWrapper.finish(context);
-    await FileStore().storeFile(id, file.basename, data);
+    await FileStore().storeFile(Uuid([]), id, file.basename, data);
     return file;
   }
 }
