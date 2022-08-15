@@ -15,8 +15,8 @@ jobs:
       - uses: actions/checkout@v2
       - run: flutter pub get
 
-      - run: dart analyze
-      - run: dart format --output none --set-exit-if-changed .
+      - run: flutter analyze
+      - run: flutter format --output none --set-exit-if-changed .
 
 
   create-build:
