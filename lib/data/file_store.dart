@@ -4,21 +4,15 @@ import 'dart:io' as io;
 import 'package:path/path.dart' as path_pkg;
 
 import '../util/uuid.dart';
-import 'tmp_dir_provider.dart';
 
 abstract class DirProvider {
   Future<io.Directory> getStoreDirectory();
 }
 
 class FileStore {
-  static final FileStore _instance = FileStore._internal();
+  final DirProvider _dirProvider;
 
-  // FIXME: set it in constructor, use DI instead of singleton
-  final DirProvider _dirProvider = TmpDirProvider();
-
-  FileStore._internal();
-
-  factory FileStore() => _instance;
+  FileStore(this._dirProvider);
 
   Future<String> getFilePath(Uuid did, Uuid id, String name) async {
     return path_pkg.join(

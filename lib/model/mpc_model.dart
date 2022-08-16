@@ -6,6 +6,7 @@ import 'package:grpc/grpc.dart';
 import '../data/file_repository.dart';
 import '../data/file_store.dart';
 import '../data/group_repository.dart';
+import '../data/tmp_dir_provider.dart';
 import '../data/device_repository.dart';
 import '../grpc/generated/mpc.pbgrpc.dart' as rpc;
 import 'device.dart';
@@ -54,7 +55,8 @@ class MpcModel with ChangeNotifier {
     _client = rpc.MPCClient(_channel);
     _deviceRepository = DeviceRepository(_client);
     _groupRepository = GroupRepository(_client, _deviceRepository);
-    _fileRepository = FileRepository(_client, FileStore(), _groupRepository);
+    final fileStore = FileStore(TmpDirProvider());
+    _fileRepository = FileRepository(_client, fileStore, _groupRepository);
   }
 
   Future<void> register(String name, String host) async {
