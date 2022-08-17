@@ -8,8 +8,10 @@ import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../app_container.dart';
 import '../model/mpc_model.dart';
 import '../routes.dart';
+import '../sync.dart';
 import '../widget/dismissible.dart';
 
 class TaskStateIndicator extends StatelessWidget {
@@ -406,35 +408,49 @@ class GroupsSubPage extends StatelessWidget {
   }
 }
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  Widget build(BuildContext context) {
+    final di = context.read<AppContainer>();
+    return ChangeNotifierProvider(
+      create: (context) => MpcModel(
+        di.prefRepository,
+        di.groupRepository,
+        di.fileRepository,
+      ),
+      child: const HomePageView(),
+    );
+  }
 }
 
-class _HomePageState extends State<HomePage> {
+class HomePageView extends StatefulWidget {
+  const HomePageView({Key? key}) : super(key: key);
+
+  @override
+  State<HomePageView> createState() => _HomePageViewState();
+}
+
+class _HomePageViewState extends State<HomePageView> {
   int _index = 0;
 
   Future<Group?> _selectGroup() async {
+    final groups = context.read<MpcModel>().groups;
     return showDialog<Group?>(
       context: context,
       builder: (context) {
-        return Consumer<MpcModel>(
-          builder: (context, model, child) {
-            return SimpleDialog(
-              title: const Text('Select group'),
-              // FIXME: only finished groups!
-              children: model.groups
-                  .map((group) => SimpleDialogOption(
-                        child: Text(group.name),
-                        onPressed: () {
-                          Navigator.pop(context, group);
-                        },
-                      ))
-                  .toList(),
-            );
-          },
+        return SimpleDialog(
+          title: const Text('Select group'),
+          // FIXME: only finished groups!
+          children: groups
+              .map((group) => SimpleDialogOption(
+                    child: Text(group.name),
+                    onPressed: () {
+                      Navigator.pop(context, group);
+                    },
+                  ))
+              .toList(),
         );
       },
     );
@@ -537,7 +553,7 @@ class _HomePageState extends State<HomePage> {
         title: const Text('MeeSign'),
         actions: [
           Consumer<MpcModel>(builder: (context, model, child) {
-            final name = model.thisDevice.name;
+            final name = model.device?.name ?? '';
             return Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -549,10 +565,10 @@ class _HomePageState extends State<HomePage> {
                   padding: const EdgeInsets.all(8),
                   child: CircleAvatar(
                     child: AnimatedBuilder(
-                      animation: model.lastUpdate,
+                      animation: context.read<Sync>().lastUpdate,
                       builder: (context, child) {
                         return Badge(
-                          badgeColor: model.lastUpdate.value > -5
+                          badgeColor: context.read<Sync>().lastUpdate.value > -5
                               ? Colors.green
                               : Colors.orange,
                           child: Text(

@@ -1,14 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:grpc/grpc.dart';
 
 import '../data/file_repository.dart';
-import '../data/file_store.dart';
 import '../data/group_repository.dart';
-import '../data/tmp_dir_provider.dart';
-import '../data/device_repository.dart';
-import '../grpc/generated/mpc.pbgrpc.dart' as rpc;
+import '../data/pref_repository.dart';
 import 'device.dart';
 import 'group.dart';
 import 'file.dart';
@@ -27,47 +23,31 @@ class MpcModel with ChangeNotifier {
   List<Group> groups = [];
   List<File> files = [];
 
-  late ClientChannel _channel;
-  late rpc.MPCClient _client;
-  late Device thisDevice;
+  Device? device;
 
-  late DeviceRepository _deviceRepository;
-  late GroupRepository _groupRepository;
-  late FileRepository _fileRepository;
+  final GroupRepository _groupRepository;
+  final FileRepository _fileRepository;
 
-  late final Stream<int> nGroupReqs;
-  late final Stream<int> nSignReqs;
+  Stream<int> nGroupReqs = const Stream.empty();
+  Stream<int> nSignReqs = const Stream.empty();
 
   List<Task<GroupBase>> groupTasks = [];
   List<Task<File>> signTasks = [];
 
-  final ValueNotifier<int> lastUpdate = ValueNotifier(0);
-
-  void _init(String host) {
-    _channel = ClientChannel(
-      host,
-      port: 1337,
-      options: const ChannelOptions(
-        credentials: ChannelCredentials.insecure(),
-      ),
-    );
-
-    _client = rpc.MPCClient(_channel);
-    _deviceRepository = DeviceRepository(_client);
-    _groupRepository = GroupRepository(_client, _deviceRepository);
-    final fileStore = FileStore(TmpDirProvider());
-    _fileRepository = FileRepository(_client, fileStore, _groupRepository);
+  MpcModel(
+    PrefRepository prefRepository,
+    this._groupRepository,
+    this._fileRepository,
+  ) {
+    prefRepository.getDevice().then((value) {
+      device = value;
+      if (value != null) _listen(value);
+    });
   }
 
-  Future<void> register(String name, String host) async {
-    _init(host);
-    thisDevice = await _deviceRepository.register(name);
-    _listen();
-  }
-
-  void _listen() {
-    final groupTasksStream = _groupRepository.observeTasks(thisDevice.id);
-    final signTasksStream = _fileRepository.observeTasks(thisDevice.id);
+  void _listen(Device device) {
+    final groupTasksStream = _groupRepository.observeTasks(device.id);
+    final signTasksStream = _fileRepository.observeTasks(device.id);
 
     int unapproved(List<Task<dynamic>> tasks) =>
         tasks.where((task) => task.state == TaskState.created).length;
@@ -87,20 +67,15 @@ class MpcModel with ChangeNotifier {
     // this can lead to inconsistencies in the ui when one stream gets updated
     // and the other one does not
 
-    _groupRepository.observeGroups(thisDevice.id).listen((groups) {
+    _groupRepository.observeGroups(device.id).listen((groups) {
       this.groups = groups;
       notifyListeners();
     });
-    _fileRepository.observeFiles(thisDevice.id).listen((files) {
+    _fileRepository.observeFiles(device.id).listen((files) {
       this.files = files;
       notifyListeners();
     });
-
-    _scheduleSync();
   }
-
-  Future<Iterable<Device>> findDeviceByName(String query) =>
-      _deviceRepository.findDeviceByName(query);
 
   Future<void> addGroup(String name, List<Device> members, int threshold) =>
       _groupRepository.group(name, members, threshold);
@@ -109,22 +84,7 @@ class MpcModel with ChangeNotifier {
       _fileRepository.sign(path, group);
 
   Future<void> joinGroup(Task<GroupBase> task, {required bool agree}) =>
-      _groupRepository.approveTask(thisDevice.id, task.id, agree: agree);
+      _groupRepository.approveTask(device!.id, task.id, agree: agree);
   Future<void> joinSign(Task<File> task, {required bool agree}) =>
-      _fileRepository.approveTask(thisDevice.id, task.id, agree: agree);
-
-  Timer _scheduleSync() => Timer(const Duration(seconds: 1), _sync);
-
-  Future<void> _sync() async {
-    try {
-      await _groupRepository.sync(thisDevice.id);
-      await _fileRepository.sync(thisDevice.id);
-      lastUpdate.value = 0;
-    } catch (e) {
-      --lastUpdate.value;
-      rethrow;
-    } finally {
-      _scheduleSync();
-    }
-  }
+      _fileRepository.approveTask(device!.id, task.id, agree: agree);
 }

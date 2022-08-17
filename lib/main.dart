@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-import 'model/mpc_model.dart';
+import 'app_container.dart';
 import 'routes.dart';
+import 'sync.dart';
 import 'theme.dart';
 import 'ui/card_reader_page.dart';
 import 'ui/home_page.dart';
@@ -14,10 +15,15 @@ import 'ui/registration_page.dart';
 import 'ui/search_peer_page.dart';
 
 void main() {
-  runApp(ChangeNotifierProvider(
-    create: (context) => MpcModel(),
-    child: const MyApp(),
-  ));
+  runApp(
+    Provider(
+      create: (_) => AppContainer(),
+      child: Provider(
+        create: (_) => Sync(),
+        child: const MyApp(),
+      ),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

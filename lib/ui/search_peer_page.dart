@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../model/mpc_model.dart';
+import '../app_container.dart';
+import '../model/device.dart';
 
 class SearchPeerPage extends StatefulWidget {
   const SearchPeerPage({Key? key}) : super(key: key);
@@ -20,10 +21,10 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
   bool _isActive(Device device) => device.lastActive.isAfter(_pivot);
 
   void _query(String query) async {
-    final model = context.read<MpcModel>();
     Iterable<Device> results = [];
     try {
-      results = await model.findDeviceByName(_queryController.text);
+      final deviceRepository = context.read<AppContainer>().deviceRepository;
+      results = await deviceRepository.findDeviceByName(_queryController.text);
     } catch (_) {}
 
     _pivot = DateTime.now().subtract(activeThreshold);

@@ -3,9 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
-import '../model/mpc_model.dart';
+import '../app_container.dart';
+import '../data/device_repository.dart';
 import '../routes.dart';
+import '../sync.dart';
 import '../util/chars.dart';
+import '../util/client_factory.dart';
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({Key? key}) : super(key: key);
@@ -60,12 +63,29 @@ class _RegistrationPageState extends State<RegistrationPage> {
       _errorField = null;
     });
 
-    MpcModel model = context.read<MpcModel>();
+    final di = context.read<AppContainer>();
+    final sync = context.read<Sync>();
+
+    final host = _hostController.text;
+
     try {
-      await model.register(
-        _nameController.text,
-        _hostController.text,
+      final deviceRepository = DeviceRepository(
+        ClientFactory.create(host),
       );
+      final device = await deviceRepository.register(
+        _nameController.text,
+      );
+
+      di.init(host);
+      di.prefRepository.setHost(host);
+      di.prefRepository.setDevice(device);
+
+      sync.init(
+        di.prefRepository,
+        di.groupRepository,
+        di.fileRepository,
+      );
+
       Navigator.pushReplacementNamed(context, Routes.home);
     } catch (e) {
       setState(() {
