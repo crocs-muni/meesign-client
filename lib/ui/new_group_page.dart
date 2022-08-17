@@ -4,8 +4,8 @@ import 'package:flutter/services.dart';
 import 'dart:io';
 
 import '../card/card.dart';
+import '../model/device.dart';
 import '../routes.dart';
-import '../model/mpc_model.dart';
 import '../util/chars.dart';
 
 class NewGroupPage extends StatefulWidget {
@@ -24,7 +24,6 @@ class _NewGroupPageState extends State<NewGroupPage> {
   @override
   void initState() {
     super.initState();
-    _members.add(context.read<MpcModel>().thisDevice);
     _nameController.addListener(() {
       if (_nameErr != null) {
         setState(() {
@@ -41,15 +40,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
   }
 
   Iterable<Widget> get _memberChips sync* {
-    // always present, non-deleteable
-    yield InputChip(
-      label: Text(_members[0].name + ' (You)'),
-      avatar: const CircleAvatar(
-        child: Icon(Icons.person),
-      ),
-    );
-
-    for (final Device member in _members.skip(1)) {
+    for (final Device member in _members) {
       final icon =
           member.type == DeviceType.app ? Icons.person : Icons.contactless;
       yield InputChip(
