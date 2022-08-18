@@ -9,10 +9,10 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../app_container.dart';
-import '../model/mpc_model.dart';
 import '../routes.dart';
 import '../sync.dart';
 import '../widget/dismissible.dart';
+import 'home_state.dart';
 
 class TaskStateIndicator extends StatelessWidget {
   final TaskState state;
@@ -219,7 +219,7 @@ class SigningSubPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<MpcModel>(builder: (context, model, child) {
+    return Consumer<HomeState>(builder: (context, model, child) {
       return buildTaskListView<File, File>(
         model.signTasks,
         model.files,
@@ -364,7 +364,7 @@ class GroupsSubPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<MpcModel>(builder: (context, model, child) {
+    return Consumer<HomeState>(builder: (context, model, child) {
       // FIXME: finished tasks should be removed at some time
 
       return buildTaskListView<GroupBase, Group>(
@@ -415,7 +415,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final di = context.read<AppContainer>();
     return ChangeNotifierProvider(
-      create: (context) => MpcModel(
+      create: (context) => HomeState(
         di.prefRepository,
         di.groupRepository,
         di.fileRepository,
@@ -436,7 +436,7 @@ class _HomePageViewState extends State<HomePageView> {
   int _index = 0;
 
   Future<Group?> _selectGroup() async {
-    final groups = context.read<MpcModel>().groups;
+    final groups = context.read<HomeState>().groups;
     return showDialog<Group?>(
       context: context,
       builder: (context) {
@@ -489,7 +489,7 @@ class _HomePageViewState extends State<HomePageView> {
     final path = file.path;
     if (path == null) return;
 
-    if (file.size > MpcModel.maxFileSize) {
+    if (file.size > HomeState.maxFileSize) {
       showErrorDialog(
         title: 'File too large',
         desc: 'Please select a smaller one.',
@@ -501,7 +501,7 @@ class _HomePageViewState extends State<HomePageView> {
     if (group == null) return;
 
     try {
-      await context.read<MpcModel>().sign(path, group);
+      await context.read<HomeState>().sign(path, group);
     } catch (e) {
       showErrorDialog(
         title: 'Sign request failed',
@@ -519,7 +519,7 @@ class _HomePageViewState extends State<HomePageView> {
     try {
       final name = res['name'] as String;
       final members = res['members'] as List<Device>;
-      await context.read<MpcModel>().addGroup(name, members, members.length);
+      await context.read<HomeState>().addGroup(name, members, members.length);
     } catch (e) {
       showErrorDialog(
         title: 'Group request failed',
@@ -552,7 +552,7 @@ class _HomePageViewState extends State<HomePageView> {
       appBar: AppBar(
         title: const Text('MeeSign'),
         actions: [
-          Consumer<MpcModel>(builder: (context, model, child) {
+          Consumer<HomeState>(builder: (context, model, child) {
             final name = model.device?.name ?? '';
             return Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -606,7 +606,7 @@ class _HomePageViewState extends State<HomePageView> {
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: StreamBuilder<int>(
-              stream: context.watch<MpcModel>().nSignReqs,
+              stream: context.watch<HomeState>().nSignReqs,
               initialData: 0,
               builder: (context, snapshot) => Badge(
                 badgeContent: Text('${snapshot.data ?? 0}'),
@@ -618,7 +618,7 @@ class _HomePageViewState extends State<HomePageView> {
           ),
           BottomNavigationBarItem(
             icon: StreamBuilder<int>(
-              stream: context.watch<MpcModel>().nGroupReqs,
+              stream: context.watch<HomeState>().nGroupReqs,
               initialData: 0,
               builder: (context, snapshot) => Badge(
                 badgeContent: Text('${snapshot.data ?? 0}'),

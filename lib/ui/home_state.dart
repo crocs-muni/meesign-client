@@ -5,17 +5,17 @@ import 'package:flutter/foundation.dart';
 import '../data/file_repository.dart';
 import '../data/group_repository.dart';
 import '../data/pref_repository.dart';
-import 'device.dart';
-import 'group.dart';
-import 'file.dart';
-import 'task.dart';
+import '../model/device.dart';
+import '../model/group.dart';
+import '../model/file.dart';
+import '../model/task.dart';
 
-export 'device.dart';
-export 'group.dart';
-export 'file.dart';
-export 'task.dart';
+export '../model/device.dart';
+export '../model/group.dart';
+export '../model/file.dart';
+export '../model/task.dart';
 
-class MpcModel with ChangeNotifier {
+class HomeState with ChangeNotifier {
   static const maxFileSize = FileRepository.maxFileSize;
 
   // TODO: migrate from ChangeNotifier to streams
@@ -34,7 +34,7 @@ class MpcModel with ChangeNotifier {
   List<Task<GroupBase>> groupTasks = [];
   List<Task<File>> signTasks = [];
 
-  MpcModel(
+  HomeState(
     PrefRepository prefRepository,
     this._groupRepository,
     this._fileRepository,
