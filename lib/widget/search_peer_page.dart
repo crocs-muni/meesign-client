@@ -14,23 +14,23 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
   static const activeThreshold = Duration(seconds: 10);
 
   final _queryController = TextEditingController();
-  List<Cosigner> _queryResults = [];
+  List<Device> _queryResults = [];
   DateTime _pivot = DateTime.now();
 
-  bool _isActive(Cosigner cosigner) => cosigner.lastActive.isAfter(_pivot);
+  bool _isActive(Device device) => device.lastActive.isAfter(_pivot);
 
   void _query(String query) async {
     final model = context.read<MpcModel>();
-    List<Cosigner> results = [];
+    List<Device> results = [];
     try {
       results = await model.searchForPeers(_queryController.text);
     } catch (_) {}
 
     _pivot = DateTime.now().subtract(activeThreshold);
     final active = results.where(_isActive).toList();
-    final inactive = results.where((cos) => !_isActive(cos)).toList();
+    final inactive = results.where((dev) => !_isActive(dev)).toList();
 
-    cmp(Cosigner a, Cosigner b) => a.name.compareTo(b.name);
+    cmp(Device a, Device b) => a.name.compareTo(b.name);
     active.sort(cmp);
     inactive.sort(cmp);
 
@@ -92,21 +92,20 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
                 child: ListView.builder(
                   itemCount: _queryResults.length,
                   itemBuilder: (context, index) {
-                    final cosigner = _queryResults[index];
+                    final device = _queryResults[index];
                     return ListTile(
                       leading: const Icon(Icons.person),
                       trailing: Container(
                         width: 8,
                         decoration: ShapeDecoration(
-                          color: _isActive(cosigner)
-                              ? Colors.green
-                              : Colors.orange,
+                          color:
+                              _isActive(device) ? Colors.green : Colors.orange,
                           shape: const CircleBorder(),
                         ),
                       ),
-                      title: Text(cosigner.name),
+                      title: Text(device.name),
                       onTap: () {
-                        Navigator.pop(context, cosigner);
+                        Navigator.pop(context, device);
                       },
                     );
                   },

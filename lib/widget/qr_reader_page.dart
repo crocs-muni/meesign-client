@@ -30,9 +30,9 @@ class _QrReaderPageState extends State<QrReaderPage> {
     _errorTimer?.cancel();
 
     try {
-      final cosigner = _coder.decode(data.rawValue);
+      final device = _coder.decode(data.rawValue);
       controller.dispose();
-      Navigator.pop(context, cosigner);
+      Navigator.pop(context, device);
     } catch (e) {
       setState(() {
         _recentError = true;

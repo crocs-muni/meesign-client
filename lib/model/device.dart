@@ -2,21 +2,21 @@ import 'dart:math';
 
 import '../util/uuid.dart';
 
-enum CosignerType {
+enum DeviceType {
   app,
   card,
 }
 
-class Cosigner {
+class Device {
   String name;
   Uuid id;
-  CosignerType type;
+  DeviceType type;
   DateTime lastActive;
 
   static const int idLen = 16;
 
-  Cosigner(this.name, this.id, this.type, this.lastActive);
-  Cosigner.random(this.name, this.type)
+  Device(this.name, this.id, this.type, this.lastActive);
+  Device.random(this.name, this.type)
       : id = _randomId(),
         lastActive = DateTime.now();
 

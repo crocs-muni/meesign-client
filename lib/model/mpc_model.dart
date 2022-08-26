@@ -9,12 +9,12 @@ import 'package:path/path.dart' as path_pkg;
 import '../data/file_store.dart';
 import '../grpc/generated/mpc.pbgrpc.dart' as rpc;
 import '../util/uuid.dart';
-import 'cosigner.dart';
+import 'device.dart';
 import 'group.dart';
 import 'signed_file.dart';
 import 'tasks.dart';
 
-export 'cosigner.dart';
+export 'device.dart';
 export 'group.dart';
 export 'signed_file.dart';
 
@@ -27,7 +27,7 @@ class MpcModel with ChangeNotifier {
 
   late ClientChannel _channel;
   late rpc.MPCClient _client;
-  late Cosigner thisDevice;
+  late Device thisDevice;
 
   final StreamController<GroupTask> _groupReqsController = StreamController();
   Stream<GroupTask> get groupRequests => _groupReqsController.stream;
@@ -56,7 +56,7 @@ class MpcModel with ChangeNotifier {
 
     _client = rpc.MPCClient(_channel);
 
-    thisDevice = Cosigner.random(name, CosignerType.app);
+    thisDevice = Device.random(name, DeviceType.app);
 
     final resp = await _client.register(
       rpc.RegistrationRequest(identifier: thisDevice.id.bytes, name: name),
@@ -65,30 +65,30 @@ class MpcModel with ChangeNotifier {
     _schedulePoll();
   }
 
-  Future<List<Cosigner>> searchForPeers(String query) async {
+  Future<List<Device>> searchForPeers(String query) async {
     return (await getRegistered())
-        .where((cosigner) =>
-            cosigner.name.startsWith(query) ||
-            cosigner.name.split(' ').any(
+        .where((device) =>
+            device.name.startsWith(query) ||
+            device.name.split(' ').any(
                   (word) => word.startsWith(query),
                 ))
         .toList();
   }
 
-  Future<Iterable<Cosigner>> getRegistered() async {
+  Future<Iterable<Device>> getRegistered() async {
     final devices = await _client.getDevices(rpc.DevicesRequest());
     return devices.devices.map(
-      (device) => Cosigner(
+      (device) => Device(
         device.name,
         Uuid(device.identifier),
-        CosignerType.app,
+        DeviceType.app,
         DateTime.fromMillisecondsSinceEpoch(device.lastActive.toInt() * 1000),
       ),
     );
   }
 
   Future<void> addGroup(
-      String name, List<Cosigner> members, int threshold) async {
+      String name, List<Device> members, int threshold) async {
     final rpcTask = await _client.group(rpc.GroupRequest(
       deviceIds: members.map((m) => m.id.bytes),
       name: name,
@@ -162,9 +162,9 @@ class MpcModel with ChangeNotifier {
         {
           final req = rpc.GroupRequest.fromBuffer(rpcTask.data);
 
-          final registered = Map<Uuid, Cosigner>.fromIterable(
+          final registered = Map<Uuid, Device>.fromIterable(
             await getRegistered(),
-            key: (cos) => cos.id,
+            key: (dev) => dev.id,
           );
           final members =
               req.deviceIds.map((id) => registered[Uuid(id)]!).toList();

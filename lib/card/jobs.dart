@@ -1,12 +1,12 @@
-import '../model/cosigner.dart';
+import '../model/device.dart';
 import 'card.dart';
 import 'iso7816.dart';
 
-class AddCardJob implements CardJob<Cosigner> {
+class AddCardJob implements CardJob<Device> {
   const AddCardJob();
 
   @override
-  Future<Cosigner> work(Card card) async {
+  Future<Device> work(Card card) async {
     // TODO: add real impl
     final command = CommandApdu(
         Iso7816.claIso7816, Iso7816.insSelect, 0x04, 0x00, [1, 2, 3, 4]);
@@ -15,6 +15,6 @@ class AddCardJob implements CardJob<Cosigner> {
     await Future.delayed(const Duration(seconds: 1));
 
     // TODO: this should be done in mpc_model.dart
-    return Cosigner.random('card', CosignerType.card);
+    return Device.random('card', DeviceType.card);
   }
 }

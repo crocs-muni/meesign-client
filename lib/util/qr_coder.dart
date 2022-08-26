@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import '../model/cosigner.dart';
+import '../model/device.dart';
 import 'uuid.dart';
 
 class QrCoder {
@@ -9,12 +9,12 @@ class QrCoder {
   late final _base64encoder = const Base64Encoder.urlSafe();
   late final _base64decoder = const Base64Decoder();
 
-  String encode(Cosigner cosigner) {
-    final base64Id = _base64encoder.convert(cosigner.id.bytes);
-    return '$mime;$base64Id,${cosigner.name}';
+  String encode(Device device) {
+    final base64Id = _base64encoder.convert(device.id.bytes);
+    return '$mime;$base64Id,${device.name}';
   }
 
-  Cosigner decode(String? data) {
+  Device decode(String? data) {
     if (data == null || !data.startsWith(mime)) {
       throw const FormatException('Incorrect QR data format');
     }
@@ -26,6 +26,6 @@ class QrCoder {
     final id = _base64decoder.convert(args.substring(0, i));
     final name = args.substring(i + 1);
 
-    return Cosigner(name, Uuid(id), CosignerType.app, DateTime.now());
+    return Device(name, Uuid(id), DeviceType.app, DateTime.now());
   }
 }

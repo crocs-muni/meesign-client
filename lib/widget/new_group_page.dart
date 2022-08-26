@@ -17,7 +17,7 @@ class NewGroupPage extends StatefulWidget {
 
 class _NewGroupPageState extends State<NewGroupPage> {
   // TODO: store this in a Group object?
-  final List<Cosigner> _members = [];
+  final List<Device> _members = [];
   final _nameController = TextEditingController();
   String? _nameErr, _memberErr;
 
@@ -49,9 +49,9 @@ class _NewGroupPageState extends State<NewGroupPage> {
       ),
     );
 
-    for (final Cosigner member in _members.skip(1)) {
+    for (final Device member in _members.skip(1)) {
       final icon =
-          member.type == CosignerType.app ? Icons.person : Icons.contactless;
+          member.type == DeviceType.app ? Icons.person : Icons.contactless;
       yield InputChip(
         label: Text(member.name),
         avatar: CircleAvatar(
@@ -67,7 +67,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
   }
 
   void _addMember(Object? member) {
-    if (member is! Cosigner) return;
+    if (member is! Device) return;
     for (final m in _members) {
       if (m.id == member.id) return;
     }

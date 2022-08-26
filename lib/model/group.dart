@@ -1,11 +1,11 @@
 import 'dart:typed_data';
 
 import '../util/uuid.dart';
-import 'cosigner.dart';
+import 'device.dart';
 
 class GroupBase {
   String name;
-  List<Cosigner> members;
+  List<Device> members;
   int threshold;
 
   GroupBase(

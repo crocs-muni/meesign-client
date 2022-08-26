@@ -535,7 +535,7 @@ class _HomePageState extends State<HomePage> {
 
     try {
       final name = res['name'] as String;
-      final members = res['members'] as List<Cosigner>;
+      final members = res['members'] as List<Device>;
       await context.read<MpcModel>().addGroup(name, members, members.length);
     } catch (e) {
       showErrorDialog(
