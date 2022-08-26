@@ -10,7 +10,7 @@ class QrReaderPage extends StatefulWidget {
   const QrReaderPage({Key? key}) : super(key: key);
 
   @override
-  _QrReaderPageState createState() => _QrReaderPageState();
+  State<QrReaderPage> createState() => _QrReaderPageState();
 }
 
 class _QrReaderPageState extends State<QrReaderPage> {

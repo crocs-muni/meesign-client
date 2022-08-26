@@ -11,7 +11,7 @@ class RegistrationPage extends StatefulWidget {
   const RegistrationPage({Key? key}) : super(key: key);
 
   @override
-  _RegistrationPageState createState() => _RegistrationPageState();
+  State<RegistrationPage> createState() => _RegistrationPageState();
 }
 
 class _RegistrationPageState extends State<RegistrationPage> {

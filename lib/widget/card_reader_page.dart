@@ -9,7 +9,7 @@ class CardReaderPage<T> extends StatefulWidget {
   const CardReaderPage({Key? key, required this.job}) : super(key: key);
 
   @override
-  _CardReaderPageState createState() => _CardReaderPageState();
+  State<CardReaderPage> createState() => _CardReaderPageState();
 }
 
 abstract class ReaderStatus {
