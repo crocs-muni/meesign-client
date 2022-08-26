@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:meta/meta.dart';
+
 import '../util/uuid.dart';
 
 enum DeviceType {
@@ -7,15 +9,16 @@ enum DeviceType {
   card,
 }
 
+@immutable
 class Device {
-  String name;
-  Uuid id;
-  DeviceType type;
-  DateTime lastActive;
+  final String name;
+  final Uuid id;
+  final DeviceType type;
+  final DateTime lastActive;
 
   static const int idLen = 16;
 
-  Device(this.name, this.id, this.type, this.lastActive);
+  const Device(this.name, this.id, this.type, this.lastActive);
   Device.random(this.name, this.type)
       : id = _randomId(),
         lastActive = DateTime.now();
