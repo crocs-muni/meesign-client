@@ -24,7 +24,7 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
     List<Cosigner> results = [];
     try {
       results = await model.searchForPeers(_queryController.text);
-    } catch (e) {}
+    } catch (_) {}
 
     _pivot = DateTime.now().subtract(activeThreshold);
     final active = results.where(_isActive).toList();
