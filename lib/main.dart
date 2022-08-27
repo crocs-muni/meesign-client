@@ -5,13 +5,13 @@ import 'package:provider/provider.dart';
 import 'model/mpc_model.dart';
 import 'routes.dart';
 import 'theme.dart';
-import 'widget/card_reader_page.dart';
-import 'widget/home_page.dart';
-import 'widget/new_group_page.dart';
-import 'widget/qr_identity_page.dart';
-import 'widget/qr_reader_page.dart';
-import 'widget/registration_page.dart';
-import 'widget/search_peer_page.dart';
+import 'ui/card_reader_page.dart';
+import 'ui/home_page.dart';
+import 'ui/new_group_page.dart';
+import 'ui/qr_identity_page.dart';
+import 'ui/qr_reader_page.dart';
+import 'ui/registration_page.dart';
+import 'ui/search_peer_page.dart';
 
 void main() {
   runApp(ChangeNotifierProvider(

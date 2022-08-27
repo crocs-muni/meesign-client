@@ -11,7 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../model/mpc_model.dart';
 import '../model/tasks.dart';
 import '../routes.dart';
-import 'dismissible.dart';
+import '../widget/dismissible.dart';
 
 class TaskStatusIndicator extends StatelessWidget {
   final TaskStatus status;
