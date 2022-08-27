@@ -16,6 +16,8 @@ class GroupBase {
     this.members,
     this.threshold,
   );
+
+  hasMember(Uuid id) => members.any((member) => member.id == id);
 }
 
 @immutable
@@ -25,11 +27,4 @@ class Group extends GroupBase {
 
   Group(this.id, this.context, GroupBase base)
       : super(base.name, base.members, base.threshold);
-
-  hasMember(Uuid id) {
-    for (final member in members) {
-      if (member.id == id) return true;
-    }
-    return false;
-  }
 }
