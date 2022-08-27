@@ -1,12 +1,14 @@
+import 'package:meta/meta.dart';
 import 'package:path/path.dart' as path_pkg;
 
 import 'group.dart';
 
+@immutable
 class File {
-  String path;
-  Group group;
+  final String path;
+  final Group group;
 
-  File(this.path, this.group);
+  const File(this.path, this.group);
 
   String get basename => path_pkg.basename(path);
 }
