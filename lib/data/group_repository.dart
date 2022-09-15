@@ -2,9 +2,9 @@ import 'dart:collection';
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
+import 'package:meesign_network/grpc.dart' as rpc;
 import 'package:rxdart/subjects.dart';
 
-import '../grpc/generated/mpc.pbgrpc.dart' as rpc;
 import '../model/device.dart';
 import '../model/group.dart';
 import '../model/task.dart';

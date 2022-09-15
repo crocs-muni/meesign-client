@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:meesign_network/meesign_network.dart' show ClientFactory;
 import 'package:provider/provider.dart';
 
 import '../app_container.dart';
@@ -8,7 +9,6 @@ import '../data/device_repository.dart';
 import '../routes.dart';
 import '../sync.dart';
 import '../util/chars.dart';
-import '../util/client_factory.dart';
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({Key? key}) : super(key: key);

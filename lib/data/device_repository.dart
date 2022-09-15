@@ -1,4 +1,5 @@
-import '../grpc/generated/mpc.pbgrpc.dart' as rpc;
+import 'package:meesign_network/grpc.dart' as rpc;
+
 import '../model/device.dart';
 import '../util/uuid.dart';
 

@@ -1,9 +1,9 @@
 import 'dart:collection';
 import 'dart:io' as io;
 
+import 'package:meesign_network/grpc.dart' as rpc;
 import 'package:rxdart/subjects.dart';
 
-import '../grpc/generated/mpc.pbgrpc.dart' as rpc;
 import '../model/group.dart';
 import '../model/file.dart';
 import '../model/task.dart';

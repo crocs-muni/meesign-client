@@ -1,4 +1,4 @@
-import 'grpc/generated/mpc.pbgrpc.dart' as rpc;
+import 'package:meesign_network/meesign_network.dart';
 
 import 'data/file_repository.dart';
 import 'data/file_store.dart';
@@ -6,10 +6,9 @@ import 'data/device_repository.dart';
 import 'data/group_repository.dart';
 import 'data/pref_repository.dart';
 import 'data/tmp_dir_provider.dart';
-import 'util/client_factory.dart';
 
 class AppContainer {
-  late final rpc.MPCClient client;
+  late final MPCClient client;
 
   late final FileStore fileStore = FileStore(TmpDirProvider());
 

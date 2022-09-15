@@ -40,7 +40,6 @@ dependencies:
   animations: ^2.0.2
   file_picker: ^4.2.7
   flutter_nfc_kit: ^3.1.0
-  grpc: ^3.0.2
   path_provider: ^2.0.8
   open_file: ^3.2.1
   path: ^1.8.0
@@ -55,6 +54,8 @@ dependencies:
   collection: ^1.16.0
   meta: ^1.7.0
   rxdart: ^0.27.5
+  meesign_network:
+    path: meesign_network
 
 dev_dependencies:
   flutter_test:

@@ -1,12 +1,12 @@
 import 'package:grpc/grpc.dart';
 
-import '../grpc/generated/mpc.pbgrpc.dart' as rpc;
+import 'generated/mpc.pbgrpc.dart';
 
 class ClientFactory {
-  static rpc.MPCClient create(String host) => rpc.MPCClient(
+  static MPCClient create(String host, {int port = 1337}) => MPCClient(
         ClientChannel(
           host,
-          port: 1337,
+          port: port,
           options: const ChannelOptions(
             credentials: ChannelCredentials.insecure(),
           ),
