@@ -1,8 +1,10 @@
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
+import 'package:meta/meta.dart';
 
 // TODO: use uuid package?
+@immutable
 class Uuid {
   final Uint8List bytes;
   Uuid(List<int> bytes) : bytes = Uint8List.fromList(bytes);
