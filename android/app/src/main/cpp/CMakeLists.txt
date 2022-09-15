@@ -14,7 +14,7 @@ elseif(CMAKE_ANDROID_ARCH_ABI STREQUAL "x86")
   set(RUST_TARGET "i686-linux-android")
 endif()
 
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../../../../../lib-native" lib-native)
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../../../../../meesign_native/native" native)
 
 add_library(mpc_sigs_lib SHARED IMPORTED)
 set_property(TARGET mpc_sigs_lib PROPERTY IMPORTED_LOCATION ${MPC_SIGS_LIB})

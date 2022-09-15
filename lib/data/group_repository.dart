@@ -2,14 +2,13 @@ import 'dart:collection';
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
+import 'package:meesign_native/meesign_native.dart';
 import 'package:meesign_network/grpc.dart' as rpc;
 import 'package:rxdart/subjects.dart';
 
 import '../model/device.dart';
 import '../model/group.dart';
 import '../model/task.dart';
-import '../native/generated/mpc_sigs_lib.dart';
-import '../native/mpc_sigs_wrapper.dart';
 import '../util/default_map.dart';
 import '../util/uuid.dart';
 import 'device_repository.dart';

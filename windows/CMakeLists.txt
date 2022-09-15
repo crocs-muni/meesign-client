@@ -52,7 +52,7 @@ include(flutter/generated_plugins.cmake)
 
 # Build native libs
 set(RUST_TARGET "x86_64-pc-windows-msvc")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../lib-native" lib-native)
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../meesign_native/native" native)
 
 target_link_libraries(${BINARY_NAME} PRIVATE mpc_sigs)
 

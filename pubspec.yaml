@@ -29,7 +29,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  ffi: ^1.1.2
   provider: ^6.0.1
 
 
@@ -54,13 +53,14 @@ dependencies:
   collection: ^1.16.0
   meta: ^1.7.0
   rxdart: ^0.27.5
+  meesign_native:
+    path: meesign_native
   meesign_network:
     path: meesign_network
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  ffigen: ^6.0.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

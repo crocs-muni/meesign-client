@@ -1,9 +1,9 @@
 name: 'MpcSigsLib'
 description: 'Bindings to mpc-sigs C API'
-output: 'lib/native/generated/mpc_sigs_lib.dart'
+output: 'lib/src/generated/mpc_sigs_lib.dart'
 headers:
   entry-points:
-    - 'lib-native/mpc-sigs/include/bindings.h'
+    - 'native/mpc-sigs/include/bindings.h'
   # by default, code is generated recursively for all included headers,
   # so specify only the headers we need (most notably avoid system headers)
   include-directives:
