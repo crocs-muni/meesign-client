@@ -1,6 +1,8 @@
-# meesign client
+# MeeSign Client
 
-A new Flutter project.
+An open-source tool for multi-party document signing, client for [MeeSign Server](https://github.com/crocs-muni/meesign-server).
+
+To learn more about MeeSign, visit [our website](https://meesign.crocs.fi.muni.cz/).
 
 ## Build
 
