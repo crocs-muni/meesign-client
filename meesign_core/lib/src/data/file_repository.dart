@@ -16,6 +16,8 @@ import 'task_repository.dart';
 
 import 'package:path/path.dart' as path_pkg;
 
+export 'file_store.dart';
+
 class FileRepository extends TaskRepository<File> {
   static const maxFileSize = 8 * 1024 * 1024;
 

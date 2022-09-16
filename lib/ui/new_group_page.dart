@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:meesign_core/meesign_model.dart';
 
 import 'dart:io';
 
 import '../card/card.dart';
-import '../model/device.dart';
 import '../routes.dart';
 import '../util/chars.dart';
 

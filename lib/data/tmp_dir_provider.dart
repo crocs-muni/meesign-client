@@ -2,10 +2,9 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:async/async.dart';
+import 'package:meesign_core/meesign_data.dart';
 import 'package:path/path.dart' as path_pkg;
 import 'package:path_provider/path_provider.dart';
-
-import 'file_store.dart';
 
 class TmpDirProvider implements DirProvider {
   final _tmpDirMemo = AsyncMemoizer<Directory>();

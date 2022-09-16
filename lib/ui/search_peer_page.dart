@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:meesign_core/meesign_model.dart';
 import 'package:provider/provider.dart';
 
 import '../app_container.dart';
-import '../model/device.dart';
 
 class SearchPeerPage extends StatefulWidget {
   const SearchPeerPage({Key? key}) : super(key: key);

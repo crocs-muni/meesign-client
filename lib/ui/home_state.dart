@@ -1,19 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-
-import '../data/file_repository.dart';
-import '../data/group_repository.dart';
-import '../data/pref_repository.dart';
-import '../model/device.dart';
-import '../model/group.dart';
-import '../model/file.dart';
-import '../model/task.dart';
-
-export '../model/device.dart';
-export '../model/group.dart';
-export '../model/file.dart';
-export '../model/task.dart';
+import 'package:meesign_core/meesign_data.dart';
 
 class HomeState with ChangeNotifier {
   static const maxFileSize = FileRepository.maxFileSize;

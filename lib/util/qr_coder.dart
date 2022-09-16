@@ -1,7 +1,6 @@
-import 'dart:convert';
+import 'package:meesign_core/meesign_data.dart';
 
-import '../model/device.dart';
-import 'uuid.dart';
+import 'dart:convert';
 
 class QrCoder {
   static const String mime = 'application/meesign';

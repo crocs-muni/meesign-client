@@ -1,4 +1,5 @@
-import '../model/device.dart';
+import 'package:meesign_core/meesign_model.dart';
+
 import 'card.dart';
 import 'iso7816.dart';
 

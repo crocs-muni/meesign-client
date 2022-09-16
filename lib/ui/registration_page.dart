@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:meesign_network/meesign_network.dart' show ClientFactory;
+import 'package:meesign_core/meesign_data.dart';
 import 'package:provider/provider.dart';
 
 import '../app_container.dart';
-import '../data/device_repository.dart';
 import '../routes.dart';
 import '../sync.dart';
 import '../util/chars.dart';

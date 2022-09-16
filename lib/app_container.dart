@@ -1,10 +1,5 @@
-import 'package:meesign_network/meesign_network.dart';
+import 'package:meesign_core/meesign_data.dart';
 
-import 'data/file_repository.dart';
-import 'data/file_store.dart';
-import 'data/device_repository.dart';
-import 'data/group_repository.dart';
-import 'data/pref_repository.dart';
 import 'data/tmp_dir_provider.dart';
 
 class AppContainer {

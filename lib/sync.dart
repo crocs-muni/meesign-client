@@ -1,11 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-
-import '../data/file_repository.dart';
-import '../data/group_repository.dart';
-import '../data/pref_repository.dart';
-import '../model/device.dart';
+import 'package:meesign_core/meesign_data.dart';
 
 class Sync {
   late final GroupRepository _groupRepository;
