@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ ! -d "$ANDROID_NDK_HOME" ]; then
-    echo "Invalit ANDROID_NDK_HOME path!"
+if [ -z "$ANDROID_NDK_HOME" ]; then
+    echo "Invalid ANDROID_NDK_HOME path!"
     exit 1
 fi
 if [ -z "$ANDROID_API" ]; then
