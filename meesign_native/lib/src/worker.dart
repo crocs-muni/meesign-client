@@ -1,19 +1,5 @@
 import 'dart:async';
-import 'dart:ffi';
-import 'dart:io';
 import 'dart:isolate';
-
-String dlPlatformName(String name) {
-  if (Platform.isAndroid || Platform.isLinux) return 'lib$name.so';
-  if (Platform.isWindows) return '$name.dll';
-  if (Platform.isMacOS) return '$name.dylib';
-  throw Exception('Platform unsupported');
-}
-
-DynamicLibrary dlOpen(String name) {
-  if (Platform.isLinux) return DynamicLibrary.process();
-  return DynamicLibrary.open(dlPlatformName(name));
-}
 
 typedef WorkerFunc<Q, R> = FutureOr<R> Function(Q);
 

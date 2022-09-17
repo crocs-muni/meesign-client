@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:ffi/ffi.dart';
 
+import 'dl_util.dart';
 import 'generated/mpc_sigs_lib.dart';
 import 'worker.dart';
 
