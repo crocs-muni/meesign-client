@@ -1,3 +1,0 @@
-[submodule "mpc-sigs"]
-	path = meesign_native/native/mpc-sigs
-	url = https://github.com/jjanku/mpc-sigs.git

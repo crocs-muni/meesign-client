@@ -1,0 +1,18 @@
+syntax = "proto3";
+package meesign;
+
+message GG18KeyGenInit {
+  uint32 index = 1;
+  uint32 parties = 2;
+  uint32 threshold = 3;
+}
+
+message GG18SignInit {
+  repeated uint32 indices = 1;
+  uint32 index = 2;
+  bytes hash = 3;
+}
+
+message GG18Message {
+  repeated bytes message = 1;
+}

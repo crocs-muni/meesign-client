@@ -22,10 +22,10 @@ To learn more about MeeSign, visit [our website](https://meesign.crocs.fi.muni.c
          ANDROID_NDK_HOME="path/to/ndk/version" ANDROID_API="30" bash ./tool/cargo-config-gen-android.sh >> ~/.cargo/config.toml
          ```
 
-3. Clone the repository **with submodules**:
+3. Clone the repository:
 
    ```bash
-   git clone --recurse-submodules https://github.com/crocs-muni/meesign-client
+   git clone https://github.com/crocs-muni/meesign-client
    ```
 
 4. Build the app:
