@@ -34,6 +34,15 @@ class MPCClient extends $grpc.Client {
       '/meesign.MPC/UpdateTask',
       ($0.TaskUpdate value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.Resp.fromBuffer(value));
+  static final _$decideTask = $grpc.ClientMethod<$0.TaskDecision, $0.Resp>(
+      '/meesign.MPC/DecideTask',
+      ($0.TaskDecision value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $0.Resp.fromBuffer(value));
+  static final _$acknowledgeTask =
+      $grpc.ClientMethod<$0.TaskAcknowledgement, $0.Resp>(
+          '/meesign.MPC/AcknowledgeTask',
+          ($0.TaskAcknowledgement value) => value.writeToBuffer(),
+          ($core.List<$core.int> value) => $0.Resp.fromBuffer(value));
   static final _$getTasks = $grpc.ClientMethod<$0.TasksRequest, $0.Tasks>(
       '/meesign.MPC/GetTasks',
       ($0.TasksRequest value) => value.writeToBuffer(),
@@ -79,6 +88,16 @@ class MPCClient extends $grpc.Client {
   $grpc.ResponseFuture<$0.Resp> updateTask($0.TaskUpdate request,
       {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$updateTask, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.Resp> decideTask($0.TaskDecision request,
+      {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$decideTask, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.Resp> acknowledgeTask($0.TaskAcknowledgement request,
+      {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$acknowledgeTask, request, options: options);
   }
 
   $grpc.ResponseFuture<$0.Tasks> getTasks($0.TasksRequest request,
@@ -142,6 +161,21 @@ abstract class MPCServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.TaskUpdate.fromBuffer(value),
         ($0.Resp value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.TaskDecision, $0.Resp>(
+        'DecideTask',
+        decideTask_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.TaskDecision.fromBuffer(value),
+        ($0.Resp value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.TaskAcknowledgement, $0.Resp>(
+        'AcknowledgeTask',
+        acknowledgeTask_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) =>
+            $0.TaskAcknowledgement.fromBuffer(value),
+        ($0.Resp value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.TasksRequest, $0.Tasks>(
         'GetTasks',
         getTasks_Pre,
@@ -197,6 +231,16 @@ abstract class MPCServiceBase extends $grpc.Service {
     return updateTask(call, await request);
   }
 
+  $async.Future<$0.Resp> decideTask_Pre(
+      $grpc.ServiceCall call, $async.Future<$0.TaskDecision> request) async {
+    return decideTask(call, await request);
+  }
+
+  $async.Future<$0.Resp> acknowledgeTask_Pre($grpc.ServiceCall call,
+      $async.Future<$0.TaskAcknowledgement> request) async {
+    return acknowledgeTask(call, await request);
+  }
+
   $async.Future<$0.Tasks> getTasks_Pre(
       $grpc.ServiceCall call, $async.Future<$0.TasksRequest> request) async {
     return getTasks(call, await request);
@@ -225,6 +269,10 @@ abstract class MPCServiceBase extends $grpc.Service {
       $grpc.ServiceCall call, $0.TaskRequest request);
   $async.Future<$0.Resp> updateTask(
       $grpc.ServiceCall call, $0.TaskUpdate request);
+  $async.Future<$0.Resp> decideTask(
+      $grpc.ServiceCall call, $0.TaskDecision request);
+  $async.Future<$0.Resp> acknowledgeTask(
+      $grpc.ServiceCall call, $0.TaskAcknowledgement request);
   $async.Future<$0.Tasks> getTasks(
       $grpc.ServiceCall call, $0.TasksRequest request);
   $async.Future<$0.Groups> getGroups(

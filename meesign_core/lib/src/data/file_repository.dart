@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:io' as io;
+import 'dart:typed_data';
 
 import 'package:meesign_native/meesign_native.dart';
 import 'package:meesign_network/grpc.dart' as rpc;
@@ -52,14 +53,14 @@ class FileRepository extends TaskRepository<File> {
 
   @override
   Future<Task<File>> createTask(Uuid did, rpc.Task rpcTask) async {
-    final req = rpc.SignRequest.fromBuffer(rpcTask.data);
+    final req = rpc.SignRequest.fromBuffer(rpcTask.request);
 
     final group = await _groupRepository.findGroupById(did, req.groupId);
     if (group == null) throw StateException();
 
     final tid = Uuid(rpcTask.id);
     // FIXME: create random id for file?
-    final path = await _fileStore.storeFile(did, tid, req.name, rpcTask.data);
+    final path = await _fileStore.storeFile(did, tid, req.name, req.data);
     final file = File(path, group);
 
     // TODO: support more protocols
@@ -70,14 +71,19 @@ class FileRepository extends TaskRepository<File> {
       approved: false,
       round: 0,
       nRounds: 10,
-      context: ProtocolWrapper.sign(ProtocolId.Gg18, file.group.context),
+      context: Uint8List(0),
       info: file,
     );
   }
 
   @override
+  Task<File> initTask(Task<File> task) => task.copyWith(
+        context: ProtocolWrapper.sign(ProtocolId.Gg18, task.info.group.context),
+      );
+
+  @override
   Future<void> finishTask(Uuid did, Task<File> task, rpc.Task rpcTask) async {
-    ProtocolWrapper.finish(task.context);
+    if (task.context.isNotEmpty) ProtocolWrapper.finish(task.context);
     final File file = task.info;
     await _fileStore.storeFile(did, task.id, file.basename, rpcTask.data);
 

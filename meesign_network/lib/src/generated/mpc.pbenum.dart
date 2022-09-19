@@ -9,22 +9,46 @@
 import 'dart:core' as $core;
 import 'package:protobuf/protobuf.dart' as $pb;
 
-class Protocol extends $pb.ProtobufEnum {
-  static const Protocol GG18 = Protocol._(
+class ProtocolType extends $pb.ProtobufEnum {
+  static const ProtocolType GG18 = ProtocolType._(
       0,
       const $core.bool.fromEnvironment('protobuf.omit_enum_names')
           ? ''
           : 'GG18');
 
-  static const $core.List<Protocol> values = <Protocol>[
+  static const $core.List<ProtocolType> values = <ProtocolType>[
     GG18,
   ];
 
-  static final $core.Map<$core.int, Protocol> _byValue =
+  static final $core.Map<$core.int, ProtocolType> _byValue =
       $pb.ProtobufEnum.initByValue(values);
-  static Protocol? valueOf($core.int value) => _byValue[value];
+  static ProtocolType? valueOf($core.int value) => _byValue[value];
 
-  const Protocol._($core.int v, $core.String n) : super(v, n);
+  const ProtocolType._($core.int v, $core.String n) : super(v, n);
+}
+
+class KeyType extends $pb.ProtobufEnum {
+  static const KeyType SignPDF = KeyType._(
+      0,
+      const $core.bool.fromEnvironment('protobuf.omit_enum_names')
+          ? ''
+          : 'SignPDF');
+  static const KeyType SignDigest = KeyType._(
+      1,
+      const $core.bool.fromEnvironment('protobuf.omit_enum_names')
+          ? ''
+          : 'SignDigest');
+
+  static const $core.List<KeyType> values = <KeyType>[
+    SignPDF,
+    SignDigest,
+  ];
+
+  static final $core.Map<$core.int, KeyType> _byValue =
+      $pb.ProtobufEnum.initByValue(values);
+  static KeyType? valueOf($core.int value) => _byValue[value];
+
+  const KeyType._($core.int v, $core.String n) : super(v, n);
 }
 
 class Task_TaskType extends $pb.ProtobufEnum {

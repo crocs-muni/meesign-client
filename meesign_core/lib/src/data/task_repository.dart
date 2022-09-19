@@ -36,14 +36,29 @@ abstract class TaskRepository<T> {
       );
 
   Future<void> _approve(Uuid did, Uuid tid, {required bool agree}) =>
-      _sendUpdate(
-          did, tid, rpc.TaskAgreement(agreement: agree).writeToBuffer());
+      _rpcClient.decideTask(rpc.TaskDecision(
+        task: tid.bytes,
+        device: did.bytes,
+        accept: agree,
+      ));
 
   Future<void> _acknowledge(Uuid did, Uuid tid) =>
-      _sendUpdate(did, tid, rpc.TaskAcknowledgement().writeToBuffer());
+      _rpcClient.acknowledgeTask(rpc.TaskAcknowledgement(
+        taskId: tid.bytes,
+        deviceId: did.bytes,
+      ));
+
+  /// retrieve the task including all its details
+  Future<rpc.Task> _fetchTask(Uuid did, Uuid tid) =>
+      _rpcClient.getTask(rpc.TaskRequest(
+        deviceId: did.bytes,
+        taskId: tid.bytes,
+      ));
 
   @visibleForOverriding
   Future<Task<T>> createTask(Uuid did, rpc.Task rpcTask);
+  @visibleForOverriding
+  Task<T> initTask(Task<T> task);
   @visibleForOverriding
   Future<void> finishTask(Uuid did, Task<T> task, rpc.Task rpcTask);
 
@@ -55,21 +70,19 @@ abstract class TaskRepository<T> {
 
   // TODO: better way to compare states?
 
-  Future<Task<T>?> _syncCreated(
-      Uuid did, Task<T>? task, rpc.Task rpcTask) async {
-    assert(rpcTask.round == 0);
-    if (task != null) return null; // nothing to do
-    return await createTask(did, rpcTask);
+  Future<Task<T>> _syncCreated(Uuid did, Task<T> task, rpc.Task rpcTask) async {
+    if (task.state != TaskState.created) throw StateException();
+    return task;
   }
 
-  Future<Task<T>?> _syncFailed(Task<T>? task, rpc.Task rpcTask) async {
-    return task?.copyWith(context: Uint8List(0), state: TaskState.failed);
+  Future<Task<T>> _syncFailed(Task<T> task, rpc.Task rpcTask) async {
+    return task.copyWith(context: Uint8List(0), state: TaskState.failed);
   }
 
-  Future<Task<T>?> _syncFinished(
-      Uuid did, Task<T>? task, rpc.Task rpcTask) async {
-    if (task == null) throw StateException();
-    if (task.state != TaskState.running) throw StateException();
+  Future<Task<T>> _syncFinished(
+      Uuid did, Task<T> task, rpc.Task rpcTask) async {
+    if (task.state == TaskState.failed) throw StateException();
+    if (task.state == TaskState.finished) return task;
 
     // FIXME: how to rollback if one of these fails?
     await finishTask(did, task, rpcTask);
@@ -78,16 +91,24 @@ abstract class TaskRepository<T> {
     return task.copyWith(context: Uint8List(0), state: TaskState.finished);
   }
 
-  Future<Task<T>?> _syncRunning(
-      Uuid did, Task<T>? task, rpc.Task rpcTask) async {
-    if (task == null) throw StateException();
+  Future<Task<T>> _syncRunning(Uuid did, Task<T> task, rpc.Task rpcTask) async {
     if (task.state != TaskState.created && task.state != TaskState.running) {
       throw StateException();
     }
-    if (!task.approved) return null;
-    if (task.round >= rpcTask.round) return null; // nothing to do
+
+    bool activeParticipant = task.context.isNotEmpty || rpcTask.hasData();
+    if (!activeParticipant) {
+      return task.copyWith(
+        state: TaskState.running,
+        round: rpcTask.round,
+      );
+    }
+
+    if (!task.approved) return task;
+    if (!rpcTask.hasData()) return task; // nothing to do
     if (task.round != rpcTask.round - 1) throw StateException();
 
+    if (task.round == 0) task = initTask(task);
     final res = await ProtocolWrapper.advance(
       task.context,
       rpcTask.data as Uint8List,
@@ -104,11 +125,16 @@ abstract class TaskRepository<T> {
 
   Future<void> _syncTask(Uuid did, rpc.Task rpcTask) async {
     final tid = Uuid(rpcTask.id);
-    final task = _tasks[did][tid];
+    var task = _tasks[did][tid];
 
     late final Task<T>? newTask;
 
     try {
+      if (task == null) {
+        rpcTask = await _fetchTask(did, tid);
+        task = await createTask(did, rpcTask);
+      }
+
       switch (rpcTask.state) {
         case rpc.Task_TaskState.CREATED:
           newTask = await _syncCreated(did, task, rpcTask);
@@ -126,7 +152,6 @@ abstract class TaskRepository<T> {
     } on Exception {
       // TODO: some errors need to be reported to the server,
       // sometimes we can rollback (e.g. in case of network errors)
-      // FIXME: create new failed task when task = null?
       newTask = task?.copyWith(context: Uint8List(0), state: TaskState.failed);
       rethrow;
     } finally {

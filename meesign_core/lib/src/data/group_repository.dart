@@ -44,6 +44,8 @@ class GroupRepository extends TaskRepository<GroupBase> {
         deviceIds: members.map((m) => m.id.bytes),
         name: name,
         threshold: threshold,
+        protocol: rpc.ProtocolType.GG18,
+        keyType: rpc.KeyType.SignPDF,
       ),
     );
 
@@ -52,7 +54,7 @@ class GroupRepository extends TaskRepository<GroupBase> {
 
   @override
   Future<Task<GroupBase>> createTask(Uuid did, rpc.Task rpcTask) async {
-    final req = rpc.GroupRequest.fromBuffer(rpcTask.data);
+    final req = rpc.GroupRequest.fromBuffer(rpcTask.request);
 
     final ids = req.deviceIds.map((id) => Uuid(id)).toList();
     final members = (await _deviceRepository.findDevicesByIds(ids)).toList();
@@ -65,7 +67,7 @@ class GroupRepository extends TaskRepository<GroupBase> {
       approved: false,
       round: 0,
       nRounds: 6,
-      context: ProtocolWrapper.keygen(ProtocolId.Gg18),
+      context: Uint8List(0),
       info: GroupBase(req.name, members, req.threshold),
     );
   }
@@ -73,6 +75,11 @@ class GroupRepository extends TaskRepository<GroupBase> {
   void _emit(Uuid did) {
     _groupsSubjects[did].add(_groups[did].values.toList(growable: false));
   }
+
+  @override
+  Task<GroupBase> initTask(Task<GroupBase> task) => task.copyWith(
+        context: ProtocolWrapper.keygen(ProtocolId.Gg18),
+      );
 
   @override
   Future<void> finishTask(Uuid did, Task task, rpc.Task rpcTask) async {
