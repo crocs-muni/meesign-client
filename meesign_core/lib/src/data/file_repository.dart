@@ -34,14 +34,14 @@ class FileRepository extends TaskRepository<File> {
     this._groupRepository,
   ) : super(_rpcClient);
 
-  Future<void> sign(String path, Group group) async {
+  Future<void> sign(String path, List<int> gid) async {
     // FIXME: delegate to FileStore?
     final bytes = await io.File(path).readAsBytes();
     String basename = path_pkg.basename(path);
 
     await _rpcClient.sign(
       rpc.SignRequest(
-        groupId: group.id,
+        groupId: gid,
         name: basename,
         data: bytes,
       ),

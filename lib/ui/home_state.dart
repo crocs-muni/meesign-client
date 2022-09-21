@@ -69,7 +69,7 @@ class HomeState with ChangeNotifier {
       _groupRepository.group(name, members, threshold);
 
   Future<void> sign(String path, Group group) =>
-      _fileRepository.sign(path, group);
+      _fileRepository.sign(path, group.id);
 
   Future<void> joinGroup(Task<GroupBase> task, {required bool agree}) =>
       _groupRepository.approveTask(device!.id, task.id, agree: agree);
