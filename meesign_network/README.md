@@ -19,3 +19,9 @@ If you modify a file in [proto](proto), regenerate the Dart gRPC code:
    ```bash
    protoc --experimental_allow_proto3_optional --plugin=/path/to/bin/protoc-gen-dart --dart_out=grpc:lib/src/generated/ -I proto proto/mpc.proto
    ```
+
+4. Format the generated code:
+
+   ```bash
+   dart format ./lib/src/generated/
+   ```

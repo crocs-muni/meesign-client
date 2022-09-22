@@ -9,3 +9,9 @@ dart run ffigen --config ffigen/changed-lib.yaml
 ```
 
 This regenerates the files as specified by the provided ffigen configuration. (Note that [ffigen requires LLVM](https://pub.dev/packages/ffigen).)
+
+Also make sure that the generated files are formatted properly:
+
+```bash
+dart format ./lib/src/generated/
+```
