@@ -517,7 +517,8 @@ class _HomePageViewState extends State<HomePageView> {
     try {
       final name = res['name'] as String;
       final members = res['members'] as List<Device>;
-      await context.read<HomeState>().addGroup(name, members, members.length);
+      final threshold = res['threshold'] as int;
+      await context.read<HomeState>().addGroup(name, members, threshold);
     } catch (e) {
       showErrorDialog(
         title: 'Group request failed',

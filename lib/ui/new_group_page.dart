@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:meesign_core/meesign_model.dart';
@@ -15,8 +17,11 @@ class NewGroupPage extends StatefulWidget {
   State<NewGroupPage> createState() => _NewGroupPageState();
 }
 
+const int _minThreshold = 2;
+
 class _NewGroupPageState extends State<NewGroupPage> {
   // TODO: store this in a Group object?
+  int _threshold = _minThreshold;
   final List<Device> _members = [];
   final _nameController = TextEditingController();
   String? _nameErr, _memberErr;
@@ -39,6 +44,9 @@ class _NewGroupPageState extends State<NewGroupPage> {
     super.dispose();
   }
 
+  void _setThreshold(int value) =>
+      _threshold = max(_minThreshold, min(value, _members.length));
+
   Iterable<Widget> get _memberChips sync* {
     for (final Device member in _members) {
       final icon =
@@ -51,6 +59,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
         onDeleted: () {
           setState(() {
             _members.remove(member);
+            _setThreshold(_threshold);
           });
         },
       );
@@ -86,7 +95,14 @@ class _NewGroupPageState extends State<NewGroupPage> {
     }
     if (_nameErr != null || _memberErr != null) return;
 
-    Navigator.pop(context, {'name': _nameController.text, 'members': _members});
+    Navigator.pop(
+      context,
+      {
+        'name': _nameController.text,
+        'members': _members,
+        'threshold': _threshold,
+      },
+    );
   }
 
   @override
@@ -171,6 +187,33 @@ class _NewGroupPageState extends State<NewGroupPage> {
             spacing: 8.0,
             runSpacing: 4.0,
             children: _memberChips.toList(),
+          ),
+          const Padding(
+            padding: EdgeInsets.only(top: 8, bottom: 8),
+            child: Divider(),
+          ),
+          const Text(
+            'Threshold',
+          ),
+          Row(
+            children: [
+              const Icon(Icons.person),
+              Expanded(
+                child: Slider(
+                  value: min(_threshold, _members.length).toDouble(),
+                  min: 0,
+                  max: _members.length.toDouble(),
+                  divisions: max(1, _members.length),
+                  label: '$_threshold',
+                  onChanged: _members.length > _minThreshold
+                      ? (value) => setState(() {
+                            _setThreshold(value.round());
+                          })
+                      : null,
+                ),
+              ),
+              const Icon(Icons.people),
+            ],
           ),
         ],
       ),
