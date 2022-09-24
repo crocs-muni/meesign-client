@@ -231,7 +231,7 @@ class SigningSubPage extends StatelessWidget {
             ),
             OutlinedButton(
               child: const Text('DECLINE'),
-              onPressed: null,
+              onPressed: () => model.joinSign(task, agree: false),
             ),
           ];
 
@@ -389,7 +389,7 @@ class GroupsSubPage extends StatelessWidget {
               ),
               OutlinedButton(
                 child: const Text('DECLINE'),
-                onPressed: null,
+                onPressed: () => model.joinGroup(task, agree: false),
               )
             ],
           );
