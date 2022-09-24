@@ -62,6 +62,7 @@ class GroupRepository extends TaskRepository<GroupBase> {
     return Task<GroupBase>(
       id: Uuid(rpcTask.id),
       state: TaskState.created,
+      approved: false,
       round: 0,
       nRounds: 6,
       context: ProtocolWrapper.keygen(ProtocolId.Gg18),

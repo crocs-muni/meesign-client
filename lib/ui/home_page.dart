@@ -27,8 +27,6 @@ class TaskStateIndicator extends StatelessWidget {
     switch (state) {
       case TaskState.created:
         return const Icon(Icons.arrow_drop_down);
-      case TaskState.approved:
-        return const Icon(Icons.timer_outlined);
       case TaskState.running:
         return SizedBox(
           height: 24,
@@ -85,12 +83,11 @@ extension Intersperse<T> on List<T> {
   }
 }
 
-String? statusMessage(TaskState state) {
-  switch (state) {
+String? statusMessage(Task task) {
+  switch (task.state) {
     case TaskState.created:
-      return 'Waiting for confirmation';
-    case TaskState.approved:
-      return 'Waiting for approval by others';
+      return 'Waiting for confirmation '
+          '${task.approved ? 'by others' : ''}';
     case TaskState.running:
       return 'Working on task';
     case TaskState.finished:
@@ -241,7 +238,7 @@ class SigningSubPage extends StatelessWidget {
           return FileTile(
             name: task.info.basename,
             group: task.info.group.name,
-            desc: statusMessage(task.state),
+            desc: statusMessage(task),
             trailing: TaskStateIndicator(task.state, task.round / task.nRounds),
             initiallyExpanded: true,
             actions: <Widget>[
@@ -250,7 +247,7 @@ class SigningSubPage extends StatelessWidget {
                     onPressed: () => _openFile(task.info.path),
                   ),
                 ] +
-                (task.state == TaskState.created ? approveActions : []),
+                (!task.approved ? approveActions : []),
           );
         },
         finishedBuilder: (context, file) {
@@ -380,11 +377,11 @@ class GroupsSubPage extends StatelessWidget {
 
           return GroupTile(
             name: group.name,
-            desc: statusMessage(task.state),
+            desc: statusMessage(task),
             members: group.members.map((m) => m.name).toList(),
             trailing: TaskStateIndicator(task.state, task.round / task.nRounds),
             initiallyExpanded: true,
-            showActions: task.state == TaskState.created,
+            showActions: !task.approved,
             actions: [
               OutlinedButton(
                 child: const Text('JOIN'),

@@ -38,7 +38,7 @@ class HomeState with ChangeNotifier {
     final signTasksStream = _fileRepository.observeTasks(device.id);
 
     int unapproved(List<Task<dynamic>> tasks) =>
-        tasks.where((task) => task.state == TaskState.created).length;
+        tasks.where((task) => !task.approved).length;
     nGroupReqs = groupTasksStream.map(unapproved);
     nSignReqs = signTasksStream.map(unapproved);
 

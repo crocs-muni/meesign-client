@@ -67,6 +67,7 @@ class FileRepository extends TaskRepository<File> {
     return Task<File>(
       id: tid,
       state: TaskState.created,
+      approved: false,
       round: 0,
       nRounds: 10,
       context: ProtocolWrapper.sign(ProtocolId.Gg18, file.group.context),

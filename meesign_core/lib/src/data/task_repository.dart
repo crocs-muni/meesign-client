@@ -81,9 +81,10 @@ abstract class TaskRepository<T> {
   Future<Task<T>?> _syncRunning(
       Uuid did, Task<T>? task, rpc.Task rpcTask) async {
     if (task == null) throw StateException();
-    if (task.state != TaskState.approved && task.state != TaskState.running) {
+    if (task.state != TaskState.created && task.state != TaskState.running) {
       throw StateException();
     }
+    if (!task.approved) return null;
     if (task.round >= rpcTask.round) return null; // nothing to do
     if (task.round != rpcTask.round - 1) throw StateException();
 
@@ -158,11 +159,11 @@ abstract class TaskRepository<T> {
 
   Future<void> approveTask(Uuid did, Uuid tid, {required bool agree}) async {
     final task = _tasks[did][tid];
-    // FIXME: gracefully return when already approved?
-    if (task == null || task.state != TaskState.created) throw StateException();
+    if (task == null) throw StateException();
+    if (task.approved) return;
 
     await _approve(did, tid, agree: agree);
-    _tasks[did][tid] = task.copyWith(state: TaskState.approved);
+    _tasks[did][tid] = task.copyWith(approved: true);
     _emit(did);
   }
 
