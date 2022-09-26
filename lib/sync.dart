@@ -29,15 +29,21 @@ class Sync {
   Timer _scheduleSync() => Timer(const Duration(seconds: 1), _sync);
 
   Future<void> _sync() async {
-    try {
-      await _groupRepository.sync(_device.id);
-      await _fileRepository.sync(_device.id);
+    Object? err;
+    for (TaskRepository repository in [_groupRepository, _fileRepository]) {
+      try {
+        await repository.sync(_device.id);
+      } catch (e) {
+        err = e;
+      }
+    }
+
+    _scheduleSync();
+    if (err == null) {
       lastUpdate.value = 0;
-    } catch (e) {
+    } else {
       --lastUpdate.value;
-      rethrow;
-    } finally {
-      _scheduleSync();
+      throw err;
     }
   }
 }
