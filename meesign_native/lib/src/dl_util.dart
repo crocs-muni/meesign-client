@@ -9,6 +9,5 @@ String dlPlatformName(String name) {
 }
 
 DynamicLibrary dlOpen(String name) {
-  if (Platform.isLinux) return DynamicLibrary.process();
   return DynamicLibrary.open(dlPlatformName(name));
 }
