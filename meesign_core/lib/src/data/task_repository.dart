@@ -176,10 +176,13 @@ abstract class TaskRepository<T> {
 
     // TODO: lock the repository while sync in progress?
 
-    await Future.wait(
-      rpcTasks.tasks.where(isSyncable).map((t) => _syncTask(did, t)),
-    );
-    _emit(did);
+    try {
+      await Future.wait(
+        rpcTasks.tasks.where(isSyncable).map((t) => _syncTask(did, t)),
+      );
+    } finally {
+      _emit(did);
+    }
   }
 
   Future<void> approveTask(Uuid did, Uuid tid, {required bool agree}) async {
