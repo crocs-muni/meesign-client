@@ -59,6 +59,11 @@ class MPCClient extends $grpc.Client {
       '/meesign.MPC/Log',
       ($0.LogRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.Resp.fromBuffer(value));
+  static final _$subscribeUpdates =
+      $grpc.ClientMethod<$0.SubscribeRequest, $0.Task>(
+          '/meesign.MPC/SubscribeUpdates',
+          ($0.SubscribeRequest value) => value.writeToBuffer(),
+          ($core.List<$core.int> value) => $0.Task.fromBuffer(value));
 
   MPCClient($grpc.ClientChannel channel,
       {$grpc.CallOptions? options,
@@ -118,6 +123,13 @@ class MPCClient extends $grpc.Client {
   $grpc.ResponseFuture<$0.Resp> log($0.LogRequest request,
       {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$log, request, options: options);
+  }
+
+  $grpc.ResponseStream<$0.Task> subscribeUpdates($0.SubscribeRequest request,
+      {$grpc.CallOptions? options}) {
+    return $createStreamingCall(
+        _$subscribeUpdates, $async.Stream.fromIterable([request]),
+        options: options);
   }
 }
 
@@ -204,6 +216,13 @@ abstract class MPCServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.LogRequest.fromBuffer(value),
         ($0.Resp value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.SubscribeRequest, $0.Task>(
+        'SubscribeUpdates',
+        subscribeUpdates_Pre,
+        false,
+        true,
+        ($core.List<$core.int> value) => $0.SubscribeRequest.fromBuffer(value),
+        ($0.Task value) => value.writeToBuffer()));
   }
 
   $async.Future<$0.Resp> register_Pre($grpc.ServiceCall call,
@@ -261,6 +280,11 @@ abstract class MPCServiceBase extends $grpc.Service {
     return log(call, await request);
   }
 
+  $async.Stream<$0.Task> subscribeUpdates_Pre($grpc.ServiceCall call,
+      $async.Future<$0.SubscribeRequest> request) async* {
+    yield* subscribeUpdates(call, await request);
+  }
+
   $async.Future<$0.Resp> register(
       $grpc.ServiceCall call, $0.RegistrationRequest request);
   $async.Future<$0.Task> sign($grpc.ServiceCall call, $0.SignRequest request);
@@ -280,4 +304,6 @@ abstract class MPCServiceBase extends $grpc.Service {
   $async.Future<$0.Devices> getDevices(
       $grpc.ServiceCall call, $0.DevicesRequest request);
   $async.Future<$0.Resp> log($grpc.ServiceCall call, $0.LogRequest request);
+  $async.Stream<$0.Task> subscribeUpdates(
+      $grpc.ServiceCall call, $0.SubscribeRequest request);
 }

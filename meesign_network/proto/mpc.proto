@@ -13,6 +13,7 @@ service MPC {
   rpc GetGroups(GroupsRequest) returns (Groups);
   rpc GetDevices(DevicesRequest) returns (Devices);
   rpc Log(LogRequest) returns (Resp);
+  rpc SubscribeUpdates(SubscribeRequest) returns (stream Task);
 }
 
 enum ProtocolType {
@@ -136,4 +137,8 @@ message TaskAcknowledgement {
 message LogRequest {
   string message = 1;
   optional bytes device_id = 2;
+};
+
+message SubscribeRequest {
+  bytes device_id = 1;
 };

@@ -403,3 +403,14 @@ const LogRequest$json = const {
 /// Descriptor for `LogRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List logRequestDescriptor = $convert.base64Decode(
     'CgpMb2dSZXF1ZXN0EhgKB21lc3NhZ2UYASABKAlSB21lc3NhZ2USIAoJZGV2aWNlX2lkGAIgASgMSABSCGRldmljZUlkiAEBQgwKCl9kZXZpY2VfaWQ=');
+@$core.Deprecated('Use subscribeRequestDescriptor instead')
+const SubscribeRequest$json = const {
+  '1': 'SubscribeRequest',
+  '2': const [
+    const {'1': 'device_id', '3': 1, '4': 1, '5': 12, '10': 'deviceId'},
+  ],
+};
+
+/// Descriptor for `SubscribeRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List subscribeRequestDescriptor = $convert.base64Decode(
+    'ChBTdWJzY3JpYmVSZXF1ZXN0EhsKCWRldmljZV9pZBgBIAEoDFIIZGV2aWNlSWQ=');

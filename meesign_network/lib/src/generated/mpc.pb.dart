@@ -1785,3 +1785,71 @@ class LogRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   void clearDeviceId() => clearField(2);
 }
+
+class SubscribeRequest extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      const $core.bool.fromEnvironment('protobuf.omit_message_names')
+          ? ''
+          : 'SubscribeRequest',
+      package: const $pb.PackageName(
+          const $core.bool.fromEnvironment('protobuf.omit_message_names')
+              ? ''
+              : 'meesign'),
+      createEmptyInstance: create)
+    ..a<$core.List<$core.int>>(
+        1,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'deviceId',
+        $pb.PbFieldType.OY)
+    ..hasRequiredFields = false;
+
+  SubscribeRequest._() : super();
+  factory SubscribeRequest({
+    $core.List<$core.int>? deviceId,
+  }) {
+    final _result = create();
+    if (deviceId != null) {
+      _result.deviceId = deviceId;
+    }
+    return _result;
+  }
+  factory SubscribeRequest.fromBuffer($core.List<$core.int> i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(i, r);
+  factory SubscribeRequest.fromJson($core.String i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(i, r);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+      'Will be removed in next major version')
+  SubscribeRequest clone() => SubscribeRequest()..mergeFromMessage(this);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+      'Will be removed in next major version')
+  SubscribeRequest copyWith(void Function(SubscribeRequest) updates) =>
+      super.copyWith((message) => updates(message as SubscribeRequest))
+          as SubscribeRequest; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static SubscribeRequest create() => SubscribeRequest._();
+  SubscribeRequest createEmptyInstance() => create();
+  static $pb.PbList<SubscribeRequest> createRepeated() =>
+      $pb.PbList<SubscribeRequest>();
+  @$core.pragma('dart2js:noInline')
+  static SubscribeRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<SubscribeRequest>(create);
+  static SubscribeRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.List<$core.int> get deviceId => $_getN(0);
+  @$pb.TagNumber(1)
+  set deviceId($core.List<$core.int> v) {
+    $_setBytes(0, v);
+  }
+
+  @$pb.TagNumber(1)
+  $core.bool hasDeviceId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearDeviceId() => clearField(1);
+}
