@@ -5,6 +5,7 @@ import 'package:meesign_native/meesign_native.dart';
 import 'package:meta/meta.dart';
 import 'package:meesign_network/grpc.dart' as rpc;
 import 'package:rxdart/subjects.dart';
+import 'package:synchronized/synchronized.dart';
 
 import '../model/task.dart';
 import '../util/default_map.dart';
@@ -20,6 +21,8 @@ abstract class TaskRepository<T> {
       DefaultMap(HashMap(), () => HashMap());
   final DefaultMap<Uuid, BehaviorSubject<List<Task<T>>>> _tasksSubjects =
       DefaultMap(HashMap(), () => BehaviorSubject.seeded([]));
+  final DefaultMap<Uuid, DefaultMap<Uuid, Lock>> _taskLocks =
+      DefaultMap(HashMap(), () => DefaultMap(HashMap(), () => Lock()));
 
   TaskRepository(this._rpcClient);
 
@@ -98,7 +101,7 @@ abstract class TaskRepository<T> {
       );
     }
 
-    if (!task.approved) return task;
+    if (!task.approved) throw StateException();
     if (!rpcTask.hasData()) return task; // nothing to do
     if (task.round != rpcTask.round - 1) throw StateException();
 
@@ -117,8 +120,7 @@ abstract class TaskRepository<T> {
     );
   }
 
-  Future<void> _syncTask(Uuid did, rpc.Task rpcTask) async {
-    final tid = Uuid(rpcTask.id);
+  Future<void> _syncTaskUnsafe(Uuid did, Uuid tid, rpc.Task rpcTask) async {
     var task = _tasks[did][tid];
 
     late final Task<T>? newTask;
@@ -155,6 +157,14 @@ abstract class TaskRepository<T> {
     }
   }
 
+  Future<void> _syncTask(Uuid did, rpc.Task rpcTask) async {
+    final tid = Uuid(rpcTask.id);
+    await _taskLocks[did][tid].synchronized(
+      () => _syncTaskUnsafe(did, tid, rpcTask),
+    );
+    // FIXME: when to remove task lock?
+  }
+
   void _emit(Uuid did) {
     // TODO: transform tasks to public model
     _tasksSubjects[did].add(_tasks[did].values.toList(growable: false));
@@ -168,8 +178,6 @@ abstract class TaskRepository<T> {
       rpc.TasksRequest(deviceId: did.bytes),
     );
 
-    // TODO: lock the repository while sync in progress?
-
     try {
       await Future.wait(
         rpcTasks.tasks.where(isSyncable).map((t) => _syncTask(did, t)),
@@ -179,7 +187,7 @@ abstract class TaskRepository<T> {
     }
   }
 
-  Future<void> approveTask(Uuid did, Uuid tid, {required bool agree}) async {
+  Future<void> _approveTaskUnsafe(Uuid did, Uuid tid, bool agree) async {
     final task = _tasks[did][tid];
     if (task == null) throw StateException();
     if (task.approved) return;
@@ -188,6 +196,11 @@ abstract class TaskRepository<T> {
     _tasks[did][tid] = task.copyWith(approved: true);
     _emit(did);
   }
+
+  Future<void> approveTask(Uuid did, Uuid tid, {required bool agree}) =>
+      _taskLocks[did][tid].synchronized(
+        () => _approveTaskUnsafe(did, tid, agree),
+      );
 
   Stream<List<Task<T>>> observeTasks(Uuid did) => _tasksSubjects[did].stream;
 
