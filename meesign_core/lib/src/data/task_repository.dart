@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'dart:collection';
 import 'dart:typed_data';
 
 import 'package:meesign_native/meesign_native.dart';
-import 'package:meta/meta.dart';
+import 'package:meesign_network/meesign_network.dart'
+    show BcastRespStream, BcastRespStreamExt;
 import 'package:meesign_network/grpc.dart' as rpc;
+import 'package:meta/meta.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:synchronized/synchronized.dart';
 
@@ -15,6 +18,8 @@ class StateException implements Exception {}
 
 class TaskSource {
   final rpc.MPCClient _rpcClient;
+
+  final Map<Uuid, BcastRespStream<rpc.Task>> _streams = HashMap();
 
   TaskSource(this._rpcClient);
 
@@ -51,6 +56,21 @@ class TaskSource {
     );
     return rpcTasks.tasks;
   }
+
+  BcastRespStream<rpc.Task> subscribe(Uuid did) {
+    return _streams.putIfAbsent(did, () {
+      return _rpcClient
+          .subscribeUpdates(
+        rpc.SubscribeRequest(deviceId: did.bytes),
+      )
+          .asBcastRespStream(
+        onCancel: (subscription) {
+          _streams.remove(did);
+          subscription.cancel();
+        },
+      );
+    });
+  }
 }
 
 // TODO: create DeviceTaskRepository to simplify did handling?
@@ -63,6 +83,8 @@ abstract class TaskRepository<T> {
       DefaultMap(HashMap(), () => BehaviorSubject.seeded([]));
   final DefaultMap<Uuid, DefaultMap<Uuid, Lock>> _taskLocks =
       DefaultMap(HashMap(), () => DefaultMap(HashMap(), () => Lock()));
+
+  final Map<Uuid, StreamSubscription<rpc.Task>> _subscriptions = HashMap();
 
   TaskRepository(this._taskSource);
 
@@ -192,6 +214,37 @@ abstract class TaskRepository<T> {
       _emit(did);
     }
   }
+
+  Future<void> subscribe(
+    Uuid did, {
+    void Function(Object, StackTrace)? onError,
+    void Function()? onDone,
+  }) async {
+    if (_subscriptions.containsKey(did)) return;
+
+    final stream = _taskSource.subscribe(did);
+
+    _subscriptions[did] = stream.listen(
+      (rpcTask) async {
+        if (!isSyncable(rpcTask)) return;
+        try {
+          await _syncTask(did, rpcTask);
+        } finally {
+          _emit(did);
+        }
+      },
+      onDone: () {
+        _subscriptions.remove(did);
+        if (onDone != null) onDone();
+      },
+      onError: onError,
+    );
+
+    await stream.headers;
+  }
+
+  Future<void> unsubscribe(Uuid did) async =>
+      _subscriptions.remove(did)?.cancel();
 
   Future<void> _approveTaskUnsafe(Uuid did, Uuid tid, bool agree) async {
     final task = _tasks[did][tid];
