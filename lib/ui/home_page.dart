@@ -608,7 +608,10 @@ class _HomePageViewState extends State<HomePageView> {
               stream: context.watch<HomeState>().nSignReqs,
               initialData: 0,
               builder: (context, snapshot) => Badge(
-                badgeContent: Text('${snapshot.data ?? 0}'),
+                badgeContent: Text(
+                  '${snapshot.data ?? 0}',
+                  style: const TextStyle(color: Colors.white),
+                ),
                 child: const Icon(Icons.lock),
                 showBadge: (snapshot.data ?? 0) != 0,
               ),
@@ -620,7 +623,10 @@ class _HomePageViewState extends State<HomePageView> {
               stream: context.watch<HomeState>().nGroupReqs,
               initialData: 0,
               builder: (context, snapshot) => Badge(
-                badgeContent: Text('${snapshot.data ?? 0}'),
+                badgeContent: Text(
+                  '${snapshot.data ?? 0}',
+                  style: const TextStyle(color: Colors.white),
+                ),
                 child: const Icon(Icons.people),
                 showBadge: (snapshot.data ?? 0) != 0,
               ),
