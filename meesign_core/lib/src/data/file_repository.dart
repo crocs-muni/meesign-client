@@ -31,9 +31,10 @@ class FileRepository extends TaskRepository<File> {
 
   FileRepository(
     this._rpcClient,
+    TaskSource taskSource,
     this._fileStore,
     this._groupRepository,
-  ) : super(_rpcClient);
+  ) : super(taskSource);
 
   Future<void> sign(String path, List<int> gid) async {
     // FIXME: delegate to FileStore?

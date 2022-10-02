@@ -32,7 +32,11 @@ class GroupRepository extends TaskRepository<GroupBase> {
   final DefaultMap<Uuid, BehaviorSubject<List<Group>>> _groupsSubjects =
       DefaultMap(HashMap(), () => BehaviorSubject.seeded([]));
 
-  GroupRepository(this._rpcClient, this._deviceRepository) : super(_rpcClient);
+  GroupRepository(
+    this._rpcClient,
+    TaskSource taskSource,
+    this._deviceRepository,
+  ) : super(taskSource);
 
   Future<void> group(
     String name,

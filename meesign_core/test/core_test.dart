@@ -106,9 +106,11 @@ void main() {
   setUp(() {
     client = ClientFactory.create('localhost');
     deviceRepository = DeviceRepository(client);
-    groupRepository = GroupRepository(client, deviceRepository);
+    final taskSource = TaskSource(client);
+    groupRepository = GroupRepository(client, taskSource, deviceRepository);
     final fileStore = FileStore(SimpleDirProvider(outputPath));
-    fileRepository = FileRepository(client, fileStore, groupRepository);
+    fileRepository =
+        FileRepository(client, taskSource, fileStore, groupRepository);
   });
 
   Future<void> testSign({required int n, required int t}) =>

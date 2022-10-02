@@ -15,7 +15,9 @@ class AppContainer {
   void init(String host) {
     client = ClientFactory.create(host);
     deviceRepository = DeviceRepository(client);
-    groupRepository = GroupRepository(client, deviceRepository);
-    fileRepository = FileRepository(client, fileStore, groupRepository);
+    final taskSource = TaskSource(client);
+    groupRepository = GroupRepository(client, taskSource, deviceRepository);
+    fileRepository =
+        FileRepository(client, taskSource, fileStore, groupRepository);
   }
 }

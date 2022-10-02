@@ -13,9 +13,49 @@ import '../util/uuid.dart';
 
 class StateException implements Exception {}
 
+class TaskSource {
+  final rpc.MPCClient _rpcClient;
+
+  TaskSource(this._rpcClient);
+
+  Future<rpc.Resp> update(Uuid did, Uuid tid, List<int> data) =>
+      _rpcClient.updateTask(rpc.TaskUpdate(
+        deviceId: did.bytes,
+        task: tid.bytes,
+        data: data,
+      ));
+
+  Future<void> approve(Uuid did, Uuid tid, {required bool agree}) =>
+      _rpcClient.decideTask(rpc.TaskDecision(
+        task: tid.bytes,
+        device: did.bytes,
+        accept: agree,
+      ));
+
+  Future<void> acknowledge(Uuid did, Uuid tid) =>
+      _rpcClient.acknowledgeTask(rpc.TaskAcknowledgement(
+        taskId: tid.bytes,
+        deviceId: did.bytes,
+      ));
+
+  /// retrieve the task including all its details
+  Future<rpc.Task> fetch(Uuid did, Uuid tid) =>
+      _rpcClient.getTask(rpc.TaskRequest(
+        deviceId: did.bytes,
+        taskId: tid.bytes,
+      ));
+
+  Future<List<rpc.Task>> fetchAll(Uuid did) async {
+    final rpcTasks = await _rpcClient.getTasks(
+      rpc.TasksRequest(deviceId: did.bytes),
+    );
+    return rpcTasks.tasks;
+  }
+}
+
 // TODO: create DeviceTaskRepository to simplify did handling?
 abstract class TaskRepository<T> {
-  final rpc.MPCClient _rpcClient;
+  final TaskSource _taskSource;
 
   final DefaultMap<Uuid, Map<Uuid, Task<T>>> _tasks =
       DefaultMap(HashMap(), () => HashMap());
@@ -24,39 +64,7 @@ abstract class TaskRepository<T> {
   final DefaultMap<Uuid, DefaultMap<Uuid, Lock>> _taskLocks =
       DefaultMap(HashMap(), () => DefaultMap(HashMap(), () => Lock()));
 
-  TaskRepository(this._rpcClient);
-
-  // TODO: move this, approve, ack to TaskRemoteSource?
-  // TODO: TaskRemoteSource could also be used to cache tasks,
-  // as the server does not atm support fetching just a specific type of tasks
-  Future<rpc.Resp> _sendUpdate(Uuid did, Uuid tid, List<int> data) =>
-      _rpcClient.updateTask(
-        rpc.TaskUpdate(
-          deviceId: did.bytes,
-          task: tid.bytes,
-          data: data,
-        ),
-      );
-
-  Future<void> _approve(Uuid did, Uuid tid, {required bool agree}) =>
-      _rpcClient.decideTask(rpc.TaskDecision(
-        task: tid.bytes,
-        device: did.bytes,
-        accept: agree,
-      ));
-
-  Future<void> _acknowledge(Uuid did, Uuid tid) =>
-      _rpcClient.acknowledgeTask(rpc.TaskAcknowledgement(
-        taskId: tid.bytes,
-        deviceId: did.bytes,
-      ));
-
-  /// retrieve the task including all its details
-  Future<rpc.Task> _fetchTask(Uuid did, Uuid tid) =>
-      _rpcClient.getTask(rpc.TaskRequest(
-        deviceId: did.bytes,
-        taskId: tid.bytes,
-      ));
+  TaskRepository(this._taskSource);
 
   @visibleForOverriding
   Future<Task<T>> createTask(Uuid did, rpc.Task rpcTask);
@@ -83,7 +91,7 @@ abstract class TaskRepository<T> {
 
     // FIXME: how to rollback if one of these fails?
     await finishTask(did, task, rpcTask);
-    await _acknowledge(did, task.id);
+    await _taskSource.acknowledge(did, task.id);
 
     return task.copyWith(context: Uint8List(0), state: TaskState.finished);
   }
@@ -111,7 +119,7 @@ abstract class TaskRepository<T> {
       rpcTask.data as Uint8List,
     );
     // TODO: rollback if we fail to deliver the update
-    await _sendUpdate(did, task.id, res.data);
+    await _taskSource.update(did, task.id, res.data);
 
     return task.copyWith(
       state: TaskState.running,
@@ -127,7 +135,7 @@ abstract class TaskRepository<T> {
 
     try {
       if (task == null) {
-        rpcTask = await _fetchTask(did, tid);
+        rpcTask = await _taskSource.fetch(did, tid);
         task = await createTask(did, rpcTask);
       }
 
@@ -174,13 +182,10 @@ abstract class TaskRepository<T> {
   bool isSyncable(rpc.Task rpcTask);
 
   Future<void> sync(Uuid did) async {
-    final rpcTasks = await _rpcClient.getTasks(
-      rpc.TasksRequest(deviceId: did.bytes),
-    );
-
+    final rpcTasks = await _taskSource.fetchAll(did);
     try {
       await Future.wait(
-        rpcTasks.tasks.where(isSyncable).map((t) => _syncTask(did, t)),
+        rpcTasks.where(isSyncable).map((t) => _syncTask(did, t)),
       );
     } finally {
       _emit(did);
@@ -192,7 +197,7 @@ abstract class TaskRepository<T> {
     if (task == null) throw StateException();
     if (task.approved) return;
 
-    await _approve(did, tid, agree: agree);
+    await _taskSource.approve(did, tid, agree: agree);
     _tasks[did][tid] = task.copyWith(approved: true);
     _emit(did);
   }
