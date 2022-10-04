@@ -73,7 +73,7 @@ Future<void> sign(
     [for (var i = 0; i < n; i++) deviceRepository.register('d$i')],
   );
 
-  sync(groupRepository, fileRepository, ds);
+  await Future.wait(ds.map((d) => groupRepository.subscribe(d.id)));
 
   await groupRepository.group('$t out of $n', ds, t);
   approveAllFirst(groupRepository, ds);
@@ -81,6 +81,8 @@ Future<void> sign(
     ds.map((d) => groupRepository.observeGroups(d.id).firstElement()),
   );
   expect(gs.map((g) => g.id), allEqual);
+
+  await Future.wait(ds.map((d) => fileRepository.subscribe(d.id)));
 
   await fileRepository.sign('test/file.pdf', gs[0].id);
   approveAllFirst(fileRepository, ds.take(t));
