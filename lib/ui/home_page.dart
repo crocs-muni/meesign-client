@@ -564,10 +564,10 @@ class _HomePageViewState extends State<HomePageView> {
                   padding: const EdgeInsets.all(8),
                   child: CircleAvatar(
                     child: AnimatedBuilder(
-                      animation: context.read<Sync>().lastUpdate,
+                      animation: context.read<Sync>().subscribed,
                       builder: (context, child) {
                         return Badge(
-                          badgeColor: context.read<Sync>().lastUpdate.value > -5
+                          badgeColor: context.read<Sync>().subscribed.value
                               ? Colors.green
                               : Colors.orange,
                           child: Text(

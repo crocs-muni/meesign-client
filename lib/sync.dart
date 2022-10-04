@@ -9,7 +9,9 @@ class Sync {
 
   late final Device _device;
 
-  final ValueNotifier<int> lastUpdate = ValueNotifier(0);
+  final ValueNotifier<bool> subscribed = ValueNotifier(false);
+
+  Timer? _retryTimer;
 
   Future<void> init(
     PrefRepository prefRepository,
@@ -23,27 +25,20 @@ class Sync {
     _groupRepository = groupRepository;
     _fileRepository = fileRepository;
 
-    _sync();
+    _subscribe();
   }
 
-  Timer _scheduleSync() => Timer(const Duration(seconds: 1), _sync);
+  Future<void> _subscribe() async {
+    _retryTimer = null;
+    await Future.wait([
+      for (TaskRepository r in [_groupRepository, _fileRepository])
+        r.subscribe(_device.id, onDone: _subscriptionDone)
+    ]);
+    subscribed.value = true;
+  }
 
-  Future<void> _sync() async {
-    Object? err;
-    for (TaskRepository repository in [_groupRepository, _fileRepository]) {
-      try {
-        await repository.sync(_device.id);
-      } catch (e) {
-        err = e;
-      }
-    }
-
-    _scheduleSync();
-    if (err == null) {
-      lastUpdate.value = 0;
-    } else {
-      --lastUpdate.value;
-      throw err;
-    }
+  void _subscriptionDone() {
+    subscribed.value = false;
+    _retryTimer ??= Timer(const Duration(seconds: 2), _subscribe);
   }
 }
