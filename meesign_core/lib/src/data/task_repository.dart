@@ -62,12 +62,6 @@ abstract class TaskRepository<T> {
   @visibleForOverriding
   Future<void> finishTask(Uuid did, Task<T> task, rpc.Task rpcTask);
 
-  @protected
-  void registerTask(Uuid did, Task<T> task) {
-    _tasks[did][task.id] = task;
-    _emit(did);
-  }
-
   // TODO: better way to compare states?
 
   Future<Task<T>> _syncCreated(Uuid did, Task<T> task, rpc.Task rpcTask) async {
