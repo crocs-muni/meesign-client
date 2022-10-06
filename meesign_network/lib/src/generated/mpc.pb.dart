@@ -883,22 +883,28 @@ class Task extends $pb.GeneratedMessage {
         5,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
-            : 'accept',
+            : 'attempt',
         $pb.PbFieldType.OU3)
     ..a<$core.int>(
         6,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
+            : 'accept',
+        $pb.PbFieldType.OU3)
+    ..a<$core.int>(
+        7,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
             : 'reject',
         $pb.PbFieldType.OU3)
     ..a<$core.List<$core.int>>(
-        7,
+        8,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
             : 'data',
         $pb.PbFieldType.OY)
     ..a<$core.List<$core.int>>(
-        8,
+        9,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
             : 'request',
@@ -911,6 +917,7 @@ class Task extends $pb.GeneratedMessage {
     Task_TaskType? type,
     Task_TaskState? state,
     $core.int? round,
+    $core.int? attempt,
     $core.int? accept,
     $core.int? reject,
     $core.List<$core.int>? data,
@@ -928,6 +935,9 @@ class Task extends $pb.GeneratedMessage {
     }
     if (round != null) {
       _result.round = round;
+    }
+    if (attempt != null) {
+      _result.attempt = attempt;
     }
     if (accept != null) {
       _result.accept = accept;
@@ -1018,52 +1028,64 @@ class Task extends $pb.GeneratedMessage {
   void clearRound() => clearField(4);
 
   @$pb.TagNumber(5)
-  $core.int get accept => $_getIZ(4);
+  $core.int get attempt => $_getIZ(4);
   @$pb.TagNumber(5)
-  set accept($core.int v) {
+  set attempt($core.int v) {
     $_setUnsignedInt32(4, v);
   }
 
   @$pb.TagNumber(5)
-  $core.bool hasAccept() => $_has(4);
+  $core.bool hasAttempt() => $_has(4);
   @$pb.TagNumber(5)
-  void clearAccept() => clearField(5);
+  void clearAttempt() => clearField(5);
 
   @$pb.TagNumber(6)
-  $core.int get reject => $_getIZ(5);
+  $core.int get accept => $_getIZ(5);
   @$pb.TagNumber(6)
-  set reject($core.int v) {
+  set accept($core.int v) {
     $_setUnsignedInt32(5, v);
   }
 
   @$pb.TagNumber(6)
-  $core.bool hasReject() => $_has(5);
+  $core.bool hasAccept() => $_has(5);
   @$pb.TagNumber(6)
-  void clearReject() => clearField(6);
+  void clearAccept() => clearField(6);
 
   @$pb.TagNumber(7)
-  $core.List<$core.int> get data => $_getN(6);
+  $core.int get reject => $_getIZ(6);
   @$pb.TagNumber(7)
-  set data($core.List<$core.int> v) {
-    $_setBytes(6, v);
+  set reject($core.int v) {
+    $_setUnsignedInt32(6, v);
   }
 
   @$pb.TagNumber(7)
-  $core.bool hasData() => $_has(6);
+  $core.bool hasReject() => $_has(6);
   @$pb.TagNumber(7)
-  void clearData() => clearField(7);
+  void clearReject() => clearField(7);
 
   @$pb.TagNumber(8)
-  $core.List<$core.int> get request => $_getN(7);
+  $core.List<$core.int> get data => $_getN(7);
   @$pb.TagNumber(8)
-  set request($core.List<$core.int> v) {
+  set data($core.List<$core.int> v) {
     $_setBytes(7, v);
   }
 
   @$pb.TagNumber(8)
-  $core.bool hasRequest() => $_has(7);
+  $core.bool hasData() => $_has(7);
   @$pb.TagNumber(8)
-  void clearRequest() => clearField(8);
+  void clearData() => clearField(8);
+
+  @$pb.TagNumber(9)
+  $core.List<$core.int> get request => $_getN(8);
+  @$pb.TagNumber(9)
+  set request($core.List<$core.int> v) {
+    $_setBytes(8, v);
+  }
+
+  @$pb.TagNumber(9)
+  $core.bool hasRequest() => $_has(8);
+  @$pb.TagNumber(9)
+  void clearRequest() => clearField(9);
 }
 
 class TaskUpdate extends $pb.GeneratedMessage {
@@ -1094,6 +1116,12 @@ class TaskUpdate extends $pb.GeneratedMessage {
             ? ''
             : 'data',
         $pb.PbFieldType.OY)
+    ..a<$core.int>(
+        4,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'attempt',
+        $pb.PbFieldType.OU3)
     ..hasRequiredFields = false;
 
   TaskUpdate._() : super();
@@ -1101,6 +1129,7 @@ class TaskUpdate extends $pb.GeneratedMessage {
     $core.List<$core.int>? deviceId,
     $core.List<$core.int>? task,
     $core.List<$core.int>? data,
+    $core.int? attempt,
   }) {
     final _result = create();
     if (deviceId != null) {
@@ -1111,6 +1140,9 @@ class TaskUpdate extends $pb.GeneratedMessage {
     }
     if (data != null) {
       _result.data = data;
+    }
+    if (attempt != null) {
+      _result.attempt = attempt;
     }
     return _result;
   }
@@ -1175,6 +1207,18 @@ class TaskUpdate extends $pb.GeneratedMessage {
   $core.bool hasData() => $_has(2);
   @$pb.TagNumber(3)
   void clearData() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.int get attempt => $_getIZ(3);
+  @$pb.TagNumber(4)
+  set attempt($core.int v) {
+    $_setUnsignedInt32(3, v);
+  }
+
+  @$pb.TagNumber(4)
+  $core.bool hasAttempt() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearAttempt() => clearField(4);
 }
 
 class TasksRequest extends $pb.GeneratedMessage {

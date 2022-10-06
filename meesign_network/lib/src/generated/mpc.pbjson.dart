@@ -200,11 +200,12 @@ const Task$json = const {
       '10': 'state'
     },
     const {'1': 'round', '3': 4, '4': 1, '5': 13, '10': 'round'},
-    const {'1': 'accept', '3': 5, '4': 1, '5': 13, '10': 'accept'},
-    const {'1': 'reject', '3': 6, '4': 1, '5': 13, '10': 'reject'},
+    const {'1': 'attempt', '3': 5, '4': 1, '5': 13, '10': 'attempt'},
+    const {'1': 'accept', '3': 6, '4': 1, '5': 13, '10': 'accept'},
+    const {'1': 'reject', '3': 7, '4': 1, '5': 13, '10': 'reject'},
     const {
       '1': 'data',
-      '3': 7,
+      '3': 8,
       '4': 1,
       '5': 12,
       '9': 0,
@@ -213,7 +214,7 @@ const Task$json = const {
     },
     const {
       '1': 'request',
-      '3': 8,
+      '3': 9,
       '4': 1,
       '5': 12,
       '9': 1,
@@ -250,7 +251,7 @@ const Task_TaskState$json = const {
 
 /// Descriptor for `Task`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List taskDescriptor = $convert.base64Decode(
-    'CgRUYXNrEg4KAmlkGAEgASgMUgJpZBIqCgR0eXBlGAIgASgOMhYubWVlc2lnbi5UYXNrLlRhc2tUeXBlUgR0eXBlEi0KBXN0YXRlGAMgASgOMhcubWVlc2lnbi5UYXNrLlRhc2tTdGF0ZVIFc3RhdGUSFAoFcm91bmQYBCABKA1SBXJvdW5kEhYKBmFjY2VwdBgFIAEoDVIGYWNjZXB0EhYKBnJlamVjdBgGIAEoDVIGcmVqZWN0EhcKBGRhdGEYByABKAxIAFIEZGF0YYgBARIdCgdyZXF1ZXN0GAggASgMSAFSB3JlcXVlc3SIAQEiHwoIVGFza1R5cGUSCQoFR1JPVVAQABIICgRTSUdOEAEiPwoJVGFza1N0YXRlEgsKB0NSRUFURUQQABILCgdSVU5OSU5HEAESDAoIRklOSVNIRUQQAhIKCgZGQUlMRUQQA0IHCgVfZGF0YUIKCghfcmVxdWVzdA==');
+    'CgRUYXNrEg4KAmlkGAEgASgMUgJpZBIqCgR0eXBlGAIgASgOMhYubWVlc2lnbi5UYXNrLlRhc2tUeXBlUgR0eXBlEi0KBXN0YXRlGAMgASgOMhcubWVlc2lnbi5UYXNrLlRhc2tTdGF0ZVIFc3RhdGUSFAoFcm91bmQYBCABKA1SBXJvdW5kEhgKB2F0dGVtcHQYBSABKA1SB2F0dGVtcHQSFgoGYWNjZXB0GAYgASgNUgZhY2NlcHQSFgoGcmVqZWN0GAcgASgNUgZyZWplY3QSFwoEZGF0YRgIIAEoDEgAUgRkYXRhiAEBEh0KB3JlcXVlc3QYCSABKAxIAVIHcmVxdWVzdIgBASIfCghUYXNrVHlwZRIJCgVHUk9VUBAAEggKBFNJR04QASI/CglUYXNrU3RhdGUSCwoHQ1JFQVRFRBAAEgsKB1JVTk5JTkcQARIMCghGSU5JU0hFRBACEgoKBkZBSUxFRBADQgcKBV9kYXRhQgoKCF9yZXF1ZXN0');
 @$core.Deprecated('Use taskUpdateDescriptor instead')
 const TaskUpdate$json = const {
   '1': 'TaskUpdate',
@@ -258,12 +259,13 @@ const TaskUpdate$json = const {
     const {'1': 'device_id', '3': 1, '4': 1, '5': 12, '10': 'deviceId'},
     const {'1': 'task', '3': 2, '4': 1, '5': 12, '10': 'task'},
     const {'1': 'data', '3': 3, '4': 1, '5': 12, '10': 'data'},
+    const {'1': 'attempt', '3': 4, '4': 1, '5': 13, '10': 'attempt'},
   ],
 };
 
 /// Descriptor for `TaskUpdate`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List taskUpdateDescriptor = $convert.base64Decode(
-    'CgpUYXNrVXBkYXRlEhsKCWRldmljZV9pZBgBIAEoDFIIZGV2aWNlSWQSEgoEdGFzaxgCIAEoDFIEdGFzaxISCgRkYXRhGAMgASgMUgRkYXRh');
+    'CgpUYXNrVXBkYXRlEhsKCWRldmljZV9pZBgBIAEoDFIIZGV2aWNlSWQSEgoEdGFzaxgCIAEoDFIEdGFzaxISCgRkYXRhGAMgASgMUgRkYXRhEhgKB2F0dGVtcHQYBCABKA1SB2F0dGVtcHQ=');
 @$core.Deprecated('Use tasksRequestDescriptor instead')
 const TasksRequest$json = const {
   '1': 'TasksRequest',
