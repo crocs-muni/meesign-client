@@ -71,6 +71,7 @@ class GroupRepository extends TaskRepository<GroupBase> {
       approved: false,
       round: 0,
       nRounds: 6,
+      attempt: 0,
       context: Uint8List(0),
       info: GroupBase(req.name, members, req.threshold),
     );

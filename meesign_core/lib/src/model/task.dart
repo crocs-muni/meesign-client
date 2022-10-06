@@ -14,6 +14,7 @@ class Task<T> {
   final bool approved;
   final int round;
   final int nRounds;
+  final int attempt;
   final T info;
   // FIXME: create separate class hiding context
   final Uint8List context;
@@ -24,6 +25,7 @@ class Task<T> {
     required this.approved,
     required this.round,
     required this.nRounds,
+    required this.attempt,
     required this.context,
     required this.info,
   });
@@ -34,6 +36,7 @@ class Task<T> {
     bool? approved,
     int? round,
     int? nRounds,
+    int? attempt,
     T? info,
     Uint8List? context,
   }) {
@@ -43,6 +46,7 @@ class Task<T> {
       approved: approved ?? this.approved,
       round: round ?? this.round,
       nRounds: nRounds ?? this.nRounds,
+      attempt: attempt ?? this.attempt,
       info: info ?? this.info,
       context: context ?? this.context,
     );

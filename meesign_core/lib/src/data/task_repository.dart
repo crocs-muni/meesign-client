@@ -4,7 +4,7 @@ import 'dart:typed_data';
 
 import 'package:meesign_native/meesign_native.dart';
 import 'package:meesign_network/meesign_network.dart'
-    show BcastRespStream, BcastRespStreamExt;
+    show BcastRespStream, BcastRespStreamExt, GrpcError;
 import 'package:meesign_network/grpc.dart' as rpc;
 import 'package:meta/meta.dart';
 import 'package:rxdart/subjects.dart';
@@ -23,11 +23,12 @@ class TaskSource {
 
   TaskSource(this._rpcClient);
 
-  Future<rpc.Resp> update(Uuid did, Uuid tid, List<int> data) =>
+  Future<rpc.Resp> update(Uuid did, Uuid tid, List<int> data, int attempt) =>
       _rpcClient.updateTask(rpc.TaskUpdate(
         deviceId: did.bytes,
         task: tid.bytes,
         data: data,
+        attempt: attempt,
       ));
 
   Future<void> approve(Uuid did, Uuid tid, {required bool agree}) =>
@@ -142,12 +143,27 @@ abstract class TaskRepository<T> {
       rpcTask.data as Uint8List,
     );
     // TODO: rollback if we fail to deliver the update
-    await _taskSource.update(did, task.id, res.data);
+    try {
+      await _taskSource.update(did, task.id, res.data, task.attempt);
+    } on GrpcError catch (e) {
+      // FIXME: avoid matching error strings
+      if (e.message == 'Stale update') return task;
+      rethrow;
+    }
 
     return task.copyWith(
       state: TaskState.running,
       round: task.round + 1,
       context: res.context,
+    );
+  }
+
+  Task<T> _restart(Task<T> task, rpc.Task rpcTask) {
+    return task.copyWith(
+      state: TaskState.created,
+      round: 0,
+      attempt: rpcTask.attempt,
+      context: Uint8List(0),
     );
   }
 
@@ -160,6 +176,13 @@ abstract class TaskRepository<T> {
       if (task == null) {
         rpcTask = await _taskSource.fetch(did, tid);
         task = await createTask(did, rpcTask);
+      }
+
+      if (task.attempt < rpcTask.attempt) {
+        task = _restart(task, rpcTask);
+      } else if (task.attempt > rpcTask.attempt) {
+        newTask = null;
+        return;
       }
 
       switch (rpcTask.state) {
