@@ -76,7 +76,6 @@ abstract class TaskRepository<T> {
   // TODO: better way to compare states?
 
   Future<Task<T>> _syncCreated(Uuid did, Task<T> task, rpc.Task rpcTask) async {
-    if (task.state != TaskState.created) throw StateException();
     return task;
   }
 
@@ -86,8 +85,9 @@ abstract class TaskRepository<T> {
 
   Future<Task<T>> _syncFinished(
       Uuid did, Task<T> task, rpc.Task rpcTask) async {
-    if (task.state == TaskState.failed) throw StateException();
-    if (task.state == TaskState.finished) return task;
+    if (task.state == TaskState.finished || task.state == TaskState.failed) {
+      return task;
+    }
 
     // FIXME: how to rollback if one of these fails?
     await finishTask(did, task, rpcTask);
@@ -97,8 +97,8 @@ abstract class TaskRepository<T> {
   }
 
   Future<Task<T>> _syncRunning(Uuid did, Task<T> task, rpc.Task rpcTask) async {
-    if (task.state != TaskState.created && task.state != TaskState.running) {
-      throw StateException();
+    if (task.state == TaskState.finished || task.state == TaskState.failed) {
+      return task;
     }
 
     bool activeParticipant = task.context.isNotEmpty || rpcTask.hasData();
@@ -111,7 +111,8 @@ abstract class TaskRepository<T> {
 
     if (!task.approved) throw StateException();
     if (!rpcTask.hasData()) return task; // nothing to do
-    if (task.round != rpcTask.round - 1) throw StateException();
+    if (rpcTask.round <= task.round) return task;
+    if (rpcTask.round != task.round + 1) throw StateException();
 
     if (task.round == 0) task = initTask(task);
     final res = await ProtocolWrapper.advance(
