@@ -52,6 +52,7 @@ dependencies:
   url_launcher: ^6.1.2
   meesign_core:
     path: meesign_core
+  args: ^2.3.1
 
 dev_dependencies:
   flutter_test:
