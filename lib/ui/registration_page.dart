@@ -10,7 +10,14 @@ import '../sync.dart';
 import '../util/chars.dart';
 
 class RegistrationPage extends StatefulWidget {
-  const RegistrationPage({Key? key}) : super(key: key);
+  final String prefillName;
+  final String prefillHost;
+
+  const RegistrationPage({
+    Key? key,
+    this.prefillHost = '',
+    this.prefillName = '',
+  }) : super(key: key);
 
   @override
   State<RegistrationPage> createState() => _RegistrationPageState();
@@ -18,9 +25,7 @@ class RegistrationPage extends StatefulWidget {
 
 class _RegistrationPageState extends State<RegistrationPage> {
   final _nameController = TextEditingController();
-  final _hostController = TextEditingController(
-    text: 'meesign.local',
-  );
+  final _hostController = TextEditingController();
 
   bool _working = false;
   // FIXME: use form?
@@ -37,6 +42,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
             });
           }
         };
+
+    _nameController.text = widget.prefillName;
+    _hostController.text = widget.prefillHost;
 
     _nameController.addListener(makeListener(_nameController));
     _hostController.addListener(makeListener(_hostController));
