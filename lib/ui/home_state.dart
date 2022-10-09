@@ -3,6 +3,11 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:meesign_core/meesign_data.dart';
 
+extension TaskDetails on Task {
+  bool get approvable =>
+      !approved && (state == TaskState.created || state == TaskState.running);
+}
+
 class HomeState with ChangeNotifier {
   static const maxFileSize = FileRepository.maxFileSize;
 
@@ -37,10 +42,10 @@ class HomeState with ChangeNotifier {
     final groupTasksStream = _groupRepository.observeTasks(device.id);
     final signTasksStream = _fileRepository.observeTasks(device.id);
 
-    int unapproved(List<Task<dynamic>> tasks) =>
-        tasks.where((task) => !task.approved).length;
-    nGroupReqs = groupTasksStream.map(unapproved);
-    nSignReqs = signTasksStream.map(unapproved);
+    int pending(List<Task<dynamic>> tasks) =>
+        tasks.where((task) => task.approvable).length;
+    nGroupReqs = groupTasksStream.map(pending);
+    nSignReqs = signTasksStream.map(pending);
 
     groupTasksStream.listen((tasks) {
       groupTasks = tasks;

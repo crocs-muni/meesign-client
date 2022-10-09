@@ -247,7 +247,7 @@ class SigningSubPage extends StatelessWidget {
                     onPressed: () => _openFile(task.info.path),
                   ),
                 ] +
-                (!task.approved ? approveActions : []),
+                (task.approvable ? approveActions : []),
           );
         },
         finishedBuilder: (context, file) {
@@ -381,7 +381,7 @@ class GroupsSubPage extends StatelessWidget {
             members: group.members.map((m) => m.name).toList(),
             trailing: TaskStateIndicator(task.state, task.round / task.nRounds),
             initiallyExpanded: true,
-            showActions: !task.approved,
+            showActions: task.approvable,
             actions: [
               OutlinedButton(
                 child: const Text('JOIN'),
