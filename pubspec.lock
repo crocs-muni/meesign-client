@@ -255,21 +255,21 @@ packages:
       path: meesign_core
       relative: true
     source: path
-    version: "1.0.0"
+    version: "0.1.1"
   meesign_native:
     dependency: transitive
     description:
       path: meesign_native
       relative: true
     source: path
-    version: "1.0.0"
+    version: "0.1.1"
   meesign_network:
     dependency: transitive
     description:
       path: meesign_network
       relative: true
     source: path
-    version: "1.0.0"
+    version: "0.1.1"
   meta:
     dependency: transitive
     description:
