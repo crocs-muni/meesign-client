@@ -48,8 +48,6 @@ class FileRepository extends TaskRepository<File> {
         data: bytes,
       ),
     );
-
-    // TODO: add task immediately instead of waiting for the next sync
   }
 
   @override

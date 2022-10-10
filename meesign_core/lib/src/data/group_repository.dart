@@ -52,8 +52,6 @@ class GroupRepository extends TaskRepository<GroupBase> {
         keyType: rpc.KeyType.SignPDF,
       ),
     );
-
-    // TODO: add task immediately instead of waiting for the next sync
   }
 
   @override
