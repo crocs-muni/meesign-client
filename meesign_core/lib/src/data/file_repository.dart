@@ -66,11 +66,7 @@ class FileRepository extends TaskRepository<File> {
 
     return Task<File>(
       id: tid,
-      state: TaskState.created,
-      approved: false,
-      round: 0,
       nRounds: 10,
-      attempt: 0,
       context: Uint8List(0),
       info: file,
     );

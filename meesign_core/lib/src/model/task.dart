@@ -21,11 +21,11 @@ class Task<T> {
 
   const Task({
     required this.id,
-    required this.state,
-    required this.approved,
-    required this.round,
+    this.state = TaskState.created,
+    this.approved = false,
+    this.round = 0,
     required this.nRounds,
-    required this.attempt,
+    this.attempt = 0,
     required this.context,
     required this.info,
   });

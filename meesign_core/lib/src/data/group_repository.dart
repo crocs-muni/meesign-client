@@ -65,11 +65,7 @@ class GroupRepository extends TaskRepository<GroupBase> {
 
     return Task<GroupBase>(
       id: Uuid(rpcTask.id),
-      state: TaskState.created,
-      approved: false,
-      round: 0,
       nRounds: 6,
-      attempt: 0,
       context: Uint8List(0),
       info: GroupBase(req.name, members, req.threshold),
     );
