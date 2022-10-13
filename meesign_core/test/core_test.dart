@@ -75,7 +75,7 @@ Future<void> sign(
 
   await Future.wait(ds.map((d) => groupRepository.subscribe(d.id)));
 
-  await groupRepository.group('$t out of $n', ds, t);
+  await groupRepository.group('$t out of $n', ds, t, Protocol.gg18);
   approveAllFirst(groupRepository, ds);
   final gs = await Future.wait(
     ds.map((d) => groupRepository.observeGroups(d.id).firstElement()),

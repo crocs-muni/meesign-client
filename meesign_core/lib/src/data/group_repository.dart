@@ -8,6 +8,7 @@ import 'package:rxdart/subjects.dart';
 
 import '../model/device.dart';
 import '../model/group.dart';
+import '../model/protocol.dart';
 import '../model/task.dart';
 import '../util/default_map.dart';
 import '../util/uuid.dart';
@@ -42,13 +43,14 @@ class GroupRepository extends TaskRepository<GroupBase> {
     String name,
     List<Device> members,
     int threshold,
+    Protocol protocol,
   ) async {
     await _rpcClient.group(
       rpc.GroupRequest(
         deviceIds: members.map((m) => m.id.bytes),
         name: name,
         threshold: threshold,
-        protocol: rpc.ProtocolType.GG18,
+        protocol: protocol.toNetwork(),
         keyType: rpc.KeyType.SignPDF,
       ),
     );
@@ -60,14 +62,13 @@ class GroupRepository extends TaskRepository<GroupBase> {
 
     final ids = req.deviceIds.map((id) => Uuid(id)).toList();
     final members = (await _deviceRepository.findDevicesByIds(ids)).toList();
-
-    // TODO: support more protocols
+    final protocol = ProtocolConversion.fromNetwork(req.protocol);
 
     return Task<GroupBase>(
       id: Uuid(rpcTask.id),
-      nRounds: 6,
+      nRounds: protocol.keygenRounds,
       context: Uint8List(0),
-      info: GroupBase(req.name, members, req.threshold),
+      info: GroupBase(req.name, members, req.threshold, protocol),
     );
   }
 
@@ -77,7 +78,7 @@ class GroupRepository extends TaskRepository<GroupBase> {
 
   @override
   Task<GroupBase> initTask(Task<GroupBase> task) => task.copyWith(
-        context: ProtocolWrapper.keygen(ProtocolId.Gg18),
+        context: ProtocolWrapper.keygen(task.info.protocol.toNative()),
       );
 
   @override

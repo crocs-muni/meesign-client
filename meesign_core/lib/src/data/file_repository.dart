@@ -6,8 +6,8 @@ import 'package:meesign_native/meesign_native.dart';
 import 'package:meesign_network/grpc.dart' as rpc;
 import 'package:rxdart/subjects.dart';
 
-import '../model/group.dart';
 import '../model/file.dart';
+import '../model/protocol.dart';
 import '../model/task.dart';
 import '../util/default_map.dart';
 import '../util/uuid.dart';
@@ -62,11 +62,9 @@ class FileRepository extends TaskRepository<File> {
     final path = await _fileStore.storeFile(did, tid, req.name, req.data);
     final file = File(path, group);
 
-    // TODO: support more protocols
-
     return Task<File>(
       id: tid,
-      nRounds: 10,
+      nRounds: group.protocol.signRounds,
       context: Uint8List(0),
       info: file,
     );
@@ -74,7 +72,10 @@ class FileRepository extends TaskRepository<File> {
 
   @override
   Task<File> initTask(Task<File> task) => task.copyWith(
-        context: ProtocolWrapper.sign(ProtocolId.Gg18, task.info.group.context),
+        context: ProtocolWrapper.sign(
+          task.info.group.protocol.toNative(),
+          task.info.group.context,
+        ),
       );
 
   @override

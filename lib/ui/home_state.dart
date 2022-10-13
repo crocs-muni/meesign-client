@@ -71,7 +71,7 @@ class HomeState with ChangeNotifier {
   }
 
   Future<void> addGroup(String name, List<Device> members, int threshold) =>
-      _groupRepository.group(name, members, threshold);
+      _groupRepository.group(name, members, threshold, Protocol.gg18);
 
   Future<void> sign(String path, Group group) =>
       _fileRepository.sign(path, group.id);
