@@ -106,7 +106,7 @@ void main() {
   late FileRepository fileRepository;
 
   setUp(() {
-    client = ClientFactory.create('localhost');
+    client = ClientFactory.create('localhost', allowBadCerts: true);
     deviceRepository = DeviceRepository(client);
     final taskSource = TaskSource(client);
     groupRepository = GroupRepository(client, taskSource, deviceRepository);
