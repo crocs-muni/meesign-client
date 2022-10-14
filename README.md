@@ -43,3 +43,9 @@ To learn more about MeeSign, visit [our website](https://meesign.crocs.fi.muni.c
    ```bash
    flutter run
    ```
+
+### Options
+
+The build can be customized by passing `--dart-define=OPTION=VALUE` to `flutter run` or `flutter build`, see `flutter run --help` for more details. The following definitions are considered:
+
+* `ALLOW_BAD_CERTS`: If `true`, certificate checks are skipped and any server certificate is accepted.
