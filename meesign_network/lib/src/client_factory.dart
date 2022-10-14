@@ -3,12 +3,21 @@ import 'package:grpc/grpc.dart';
 import 'generated/mpc.pbgrpc.dart';
 
 class ClientFactory {
-  static MPCClient create(String host, {int port = 1337}) => MPCClient(
+  static MPCClient create(
+    String host, {
+    List<int>? certs,
+    bool allowBadCerts = false,
+    int port = 1337,
+  }) =>
+      MPCClient(
         ClientChannel(
           host,
           port: port,
-          options: const ChannelOptions(
-            credentials: ChannelCredentials.insecure(),
+          options: ChannelOptions(
+            credentials: ChannelCredentials.secure(
+              certificates: certs,
+              onBadCertificate: allowBadCerts ? allowBadCertificates : null,
+            ),
           ),
         ),
       );
