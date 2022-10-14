@@ -77,13 +77,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
     try {
       final deviceRepository = DeviceRepository(
-        ClientFactory.create(host),
+        ClientFactory.create(host, certs: await di.certs),
       );
       final device = await deviceRepository.register(
         _nameController.text,
       );
 
-      di.init(host);
+      await di.init(host);
       di.prefRepository.setHost(host);
       di.prefRepository.setDevice(device);
 

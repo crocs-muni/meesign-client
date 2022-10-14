@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:meesign_core/meesign_data.dart';
 
 import 'data/tmp_dir_provider.dart';
@@ -12,8 +13,13 @@ class AppContainer {
   late final GroupRepository groupRepository;
   late final FileRepository fileRepository;
 
-  void init(String host) {
-    client = ClientFactory.create(host);
+  Future<List<int>?> get certs async {
+    final data = await rootBundle.load('assets/ca-cert.pem');
+    return data.lengthInBytes == 0 ? null : data.buffer.asUint8List();
+  }
+
+  Future<void> init(String host) async {
+    client = ClientFactory.create(host, certs: await certs);
     deviceRepository = DeviceRepository(client);
     final taskSource = TaskSource(client);
     groupRepository = GroupRepository(client, taskSource, deviceRepository);

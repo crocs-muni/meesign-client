@@ -28,7 +28,11 @@ To learn more about MeeSign, visit [our website](https://meesign.crocs.fi.muni.c
    git clone https://github.com/crocs-muni/meesign-client
    ```
 
-4. Build the app:
+4. Copy MeeSign CA certificate to `assets/ca-cert.pem`
+
+   If you have a local build of MeeSign server, the corresponding file is placed in `keys/meesign-ca-cert.pem`.
+
+5. Build the app:
 
    ```bash
    flutter build
