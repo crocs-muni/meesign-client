@@ -120,7 +120,10 @@ jobs:
         # needed to fetch Android deps (podofo + freetype AARs)
         USERNAME: ${{ github.actor }}
         TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: flutter build -v ${{ matrix.build_target }} --release
+      run: >
+        flutter build -v ${{ matrix.build_target }}
+        --release
+        --dart-define=ALLOW_BAD_CERTS=true
 
     # Package the build.
     - name: Copy VC redistributables to release directory for Windows
