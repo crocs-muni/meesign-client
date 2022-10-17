@@ -88,11 +88,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
       di.prefRepository.setHost(host);
       di.prefRepository.setDevice(device);
 
-      sync.init(
-        di.prefRepository,
+      sync.init(device, [
         di.groupRepository,
         di.fileRepository,
-      );
+      ]);
 
       Navigator.pushReplacementNamed(context, Routes.home);
     } catch (e) {
