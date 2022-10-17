@@ -589,14 +589,14 @@ class _HomePageViewState extends State<HomePageView> {
           BottomNavigationBarItem(
             icon: CounterBadge(
               stream: context.watch<HomeState>().nSignReqs,
-              child: const Icon(Icons.lock),
+              child: const Icon(Icons.draw),
             ),
             label: 'Signing',
           ),
           BottomNavigationBarItem(
             icon: CounterBadge(
               stream: context.watch<HomeState>().nGroupReqs,
-              child: const Icon(Icons.people),
+              child: const Icon(Icons.group),
             ),
             label: 'Groups',
           ),
