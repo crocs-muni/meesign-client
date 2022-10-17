@@ -12,6 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../app_container.dart';
 import '../routes.dart';
 import '../sync.dart';
+import '../widget/counter_badge.dart';
 import '../widget/dismissible.dart';
 import 'home_state.dart';
 
@@ -604,32 +605,16 @@ class _HomePageViewState extends State<HomePageView> {
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: StreamBuilder<int>(
+            icon: CounterBadge(
               stream: context.watch<HomeState>().nSignReqs,
-              initialData: 0,
-              builder: (context, snapshot) => Badge(
-                badgeContent: Text(
-                  '${snapshot.data ?? 0}',
-                  style: const TextStyle(color: Colors.white),
-                ),
-                child: const Icon(Icons.lock),
-                showBadge: (snapshot.data ?? 0) != 0,
-              ),
+              child: const Icon(Icons.lock),
             ),
             label: 'Signing',
           ),
           BottomNavigationBarItem(
-            icon: StreamBuilder<int>(
+            icon: CounterBadge(
               stream: context.watch<HomeState>().nGroupReqs,
-              initialData: 0,
-              builder: (context, snapshot) => Badge(
-                badgeContent: Text(
-                  '${snapshot.data ?? 0}',
-                  style: const TextStyle(color: Colors.white),
-                ),
-                child: const Icon(Icons.people),
-                showBadge: (snapshot.data ?? 0) != 0,
-              ),
+              child: const Icon(Icons.people),
             ),
             label: 'Groups',
           ),
