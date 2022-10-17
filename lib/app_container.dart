@@ -12,6 +12,7 @@ class AppContainer {
   late final DeviceRepository deviceRepository;
   late final GroupRepository groupRepository;
   late final FileRepository fileRepository;
+  late final ChallengeRepository challengeRepository;
 
   final bool allowBadCerts = const bool.fromEnvironment('ALLOW_BAD_CERTS');
 
@@ -28,5 +29,6 @@ class AppContainer {
     groupRepository = GroupRepository(client, taskSource, deviceRepository);
     fileRepository =
         FileRepository(client, taskSource, fileStore, groupRepository);
+    challengeRepository = ChallengeRepository(taskSource, groupRepository);
   }
 }

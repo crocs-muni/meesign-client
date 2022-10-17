@@ -131,7 +131,7 @@ void _openFile(String path) {
 
 // FIXME: this is more or less copy of GroupTile below,
 // this probably needs a rewrite
-class FileTile extends StatelessWidget {
+class SignTile extends StatelessWidget {
   final String name;
   final String group;
   final String? desc;
@@ -140,7 +140,7 @@ class FileTile extends StatelessWidget {
   final bool showActions;
   final List<Widget> actions;
 
-  const FileTile({
+  const SignTile({
     Key? key,
     required this.name,
     required this.group,
@@ -178,7 +178,7 @@ class FileTile extends StatelessWidget {
                 alignment: WrapAlignment.end,
                 spacing: 8,
                 runSpacing: 8,
-                children: actions,
+                children: showActions ? actions : [],
               ),
             ),
           ],
@@ -211,7 +211,7 @@ class SigningSubPage extends StatelessWidget {
             ),
           ];
 
-          return FileTile(
+          return SignTile(
             name: task.info.basename,
             group: task.info.group.name,
             desc: statusMessage(task),
@@ -229,7 +229,7 @@ class SigningSubPage extends StatelessWidget {
         finishedBuilder: (context, file) {
           return Deletable(
             dismissibleKey: ObjectKey(file),
-            child: FileTile(
+            child: SignTile(
               name: file.basename,
               group: file.group.name,
               trailing: const TaskStateIndicator(TaskState.finished, 1),
@@ -391,6 +391,54 @@ class GroupsSubPage extends StatelessWidget {
   }
 }
 
+class LogInSubPage extends StatelessWidget {
+  const LogInSubPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<HomeState>(builder: (context, model, child) {
+      return buildTaskListView<Challenge, Challenge>(
+        model.loginTasks,
+        model.loginTasks
+            .where((task) => task.state == TaskState.finished)
+            .map((task) => task.info)
+            .toList(),
+        finishedTitle: 'Finished',
+        emptyView: const EmptyList(
+          hint: 'Request for confirmation appears once you try to log in',
+        ),
+        unfinishedBuilder: (context, task) {
+          return SignTile(
+            name: task.info.name,
+            group: task.info.group.name,
+            desc: statusMessage(task),
+            trailing: TaskStateIndicator(task.state, task.round / task.nRounds),
+            initiallyExpanded: true,
+            showActions: task.approvable,
+            actions: [
+              OutlinedButton(
+                child: const Text('LOG IN'),
+                onPressed: () => model.joinLogin(task, agree: true),
+              ),
+              OutlinedButton(
+                child: const Text('DECLINE'),
+                onPressed: () => model.joinLogin(task, agree: false),
+              )
+            ],
+          );
+        },
+        finishedBuilder: (context, info) {
+          return SignTile(
+            name: info.name,
+            group: info.group.name,
+            trailing: const TaskStateIndicator(TaskState.finished, 1),
+          );
+        },
+      );
+    });
+  }
+}
+
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -402,6 +450,7 @@ class HomePage extends StatelessWidget {
         di.prefRepository,
         di.groupRepository,
         di.fileRepository,
+        di.challengeRepository,
       ),
       child: const HomePageView(),
     );
@@ -517,6 +566,7 @@ class _HomePageViewState extends State<HomePageView> {
   Widget build(BuildContext context) {
     const pages = [
       SigningSubPage(),
+      LogInSubPage(),
       GroupsSubPage(),
     ];
 
@@ -527,6 +577,7 @@ class _HomePageViewState extends State<HomePageView> {
         label: const Text('Sign'),
         icon: const Icon(Icons.add),
       ),
+      null,
       FloatingActionButton.extended(
         onPressed: _group,
         label: const Text('New'),
@@ -594,6 +645,13 @@ class _HomePageViewState extends State<HomePageView> {
               child: const Icon(Icons.draw),
             ),
             label: 'Signing',
+          ),
+          BottomNavigationBarItem(
+            icon: CounterBadge(
+              stream: context.watch<HomeState>().nLoginReqs,
+              child: const Icon(Icons.login),
+            ),
+            label: 'Log In',
           ),
           BottomNavigationBarItem(
             icon: CounterBadge(

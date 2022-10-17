@@ -20,17 +20,21 @@ class HomeState with ChangeNotifier {
 
   final GroupRepository _groupRepository;
   final FileRepository _fileRepository;
+  final ChallengeRepository _challengeRepository;
 
   Stream<int> nGroupReqs = const Stream.empty();
   Stream<int> nSignReqs = const Stream.empty();
+  Stream<int> nLoginReqs = const Stream.empty();
 
   List<Task<GroupBase>> groupTasks = [];
   List<Task<File>> signTasks = [];
+  List<Task<Challenge>> loginTasks = [];
 
   HomeState(
     PrefRepository prefRepository,
     this._groupRepository,
     this._fileRepository,
+    this._challengeRepository,
   ) {
     prefRepository.getDevice().then((value) {
       device = value;
@@ -41,11 +45,13 @@ class HomeState with ChangeNotifier {
   void _listen(Device device) {
     final groupTasksStream = _groupRepository.observeTasks(device.id);
     final signTasksStream = _fileRepository.observeTasks(device.id);
+    final loginTasksStream = _challengeRepository.observeTasks(device.id);
 
     int pending(List<Task<dynamic>> tasks) =>
         tasks.where((task) => task.approvable).length;
     nGroupReqs = groupTasksStream.map(pending);
     nSignReqs = signTasksStream.map(pending);
+    nLoginReqs = loginTasksStream.map(pending);
 
     groupTasksStream.listen((tasks) {
       groupTasks = tasks;
@@ -53,6 +59,10 @@ class HomeState with ChangeNotifier {
     });
     signTasksStream.listen((tasks) {
       signTasks = tasks;
+      notifyListeners();
+    });
+    loginTasksStream.listen((tasks) {
+      loginTasks = tasks;
       notifyListeners();
     });
 
@@ -80,4 +90,6 @@ class HomeState with ChangeNotifier {
       _groupRepository.approveTask(device!.id, task.id, agree: agree);
   Future<void> joinSign(Task<File> task, {required bool agree}) =>
       _fileRepository.approveTask(device!.id, task.id, agree: agree);
+  Future<void> joinLogin(Task<Challenge> task, {required bool agree}) =>
+      _challengeRepository.approveTask(device!.id, task.id, agree: agree);
 }

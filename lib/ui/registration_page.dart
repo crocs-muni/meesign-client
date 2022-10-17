@@ -91,6 +91,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       sync.init(device, [
         di.groupRepository,
         di.fileRepository,
+        di.challengeRepository,
       ]);
 
       Navigator.pushReplacementNamed(context, Routes.home);
