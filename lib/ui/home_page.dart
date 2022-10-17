@@ -520,17 +520,19 @@ class _HomePageViewState extends State<HomePageView> {
       GroupsSubPage(),
     ];
 
-    final signFab = FloatingActionButton.extended(
-      key: const ValueKey('SignFab'),
-      onPressed: _sign,
-      label: const Text('Sign'),
-      icon: const Icon(Icons.add),
-    );
-    final groupFab = FloatingActionButton.extended(
-      onPressed: _group,
-      label: const Text('New'),
-      icon: const Icon(Icons.add),
-    );
+    final fabs = [
+      FloatingActionButton.extended(
+        key: const ValueKey('SignFab'),
+        onPressed: _sign,
+        label: const Text('Sign'),
+        icon: const Icon(Icons.add),
+      ),
+      FloatingActionButton.extended(
+        onPressed: _group,
+        label: const Text('New'),
+        icon: const Icon(Icons.add),
+      )
+    ];
 
     return Scaffold(
       appBar: AppBar(
@@ -583,7 +585,7 @@ class _HomePageViewState extends State<HomePageView> {
         },
         child: pages[_index],
       ),
-      floatingActionButton: _index == 0 ? signFab : groupFab,
+      floatingActionButton: fabs[_index],
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
