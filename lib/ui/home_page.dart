@@ -14,6 +14,7 @@ import '../routes.dart';
 import '../sync.dart';
 import '../widget/counter_badge.dart';
 import '../widget/dismissible.dart';
+import '../widget/empty_list.dart';
 import 'home_state.dart';
 
 class TaskStateIndicator extends StatelessWidget {
@@ -43,32 +44,6 @@ class TaskStateIndicator extends StatelessWidget {
       case TaskState.failed:
         return Icon(Icons.error_outline, color: Theme.of(context).errorColor);
     }
-  }
-}
-
-class EmptyList extends StatelessWidget {
-  final String hint;
-
-  const EmptyList({Key? key, this.hint = ""}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            '0',
-            style: Theme.of(context).textTheme.headline3,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Nothing here yet.\n$hint',
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
   }
 }
 
