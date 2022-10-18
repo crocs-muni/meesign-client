@@ -89,7 +89,7 @@ class FileRepository extends TaskRepository<File> {
   }
 
   @override
-  bool isSyncable(rpc.Task rpcTask) => rpcTask.type == rpc.Task_TaskType.SIGN;
+  bool isSyncable(rpc.Task rpcTask) => rpcTask.type == rpc.TaskType.SIGN_PDF;
 
   Stream<List<File>> observeFiles(Uuid did) => _filesSubjects[did].stream;
 }

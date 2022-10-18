@@ -51,28 +51,34 @@ class KeyType extends $pb.ProtobufEnum {
   const KeyType._($core.int v, $core.String n) : super(v, n);
 }
 
-class Task_TaskType extends $pb.ProtobufEnum {
-  static const Task_TaskType GROUP = Task_TaskType._(
+class TaskType extends $pb.ProtobufEnum {
+  static const TaskType GROUP = TaskType._(
       0,
       const $core.bool.fromEnvironment('protobuf.omit_enum_names')
           ? ''
           : 'GROUP');
-  static const Task_TaskType SIGN = Task_TaskType._(
+  static const TaskType SIGN_PDF = TaskType._(
       1,
       const $core.bool.fromEnvironment('protobuf.omit_enum_names')
           ? ''
-          : 'SIGN');
+          : 'SIGN_PDF');
+  static const TaskType SIGN_CHALLENGE = TaskType._(
+      2,
+      const $core.bool.fromEnvironment('protobuf.omit_enum_names')
+          ? ''
+          : 'SIGN_CHALLENGE');
 
-  static const $core.List<Task_TaskType> values = <Task_TaskType>[
+  static const $core.List<TaskType> values = <TaskType>[
     GROUP,
-    SIGN,
+    SIGN_PDF,
+    SIGN_CHALLENGE,
   ];
 
-  static final $core.Map<$core.int, Task_TaskType> _byValue =
+  static final $core.Map<$core.int, TaskType> _byValue =
       $pb.ProtobufEnum.initByValue(values);
-  static Task_TaskType? valueOf($core.int value) => _byValue[value];
+  static TaskType? valueOf($core.int value) => _byValue[value];
 
-  const Task_TaskType._($core.int v, $core.String n) : super(v, n);
+  const TaskType._($core.int v, $core.String n) : super(v, n);
 }
 
 class Task_TaskState extends $pb.ProtobufEnum {

@@ -90,7 +90,7 @@ class GroupRepository extends TaskRepository<GroupBase> {
   }
 
   @override
-  bool isSyncable(rpc.Task rpcTask) => rpcTask.type == rpc.Task_TaskType.GROUP;
+  bool isSyncable(rpc.Task rpcTask) => rpcTask.type == rpc.TaskType.GROUP;
 
   Future<Group?> findGroupById(Uuid did, List<int> id) async =>
       _groups[did][id];

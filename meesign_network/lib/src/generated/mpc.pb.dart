@@ -855,15 +855,15 @@ class Task extends $pb.GeneratedMessage {
             ? ''
             : 'id',
         $pb.PbFieldType.OY)
-    ..e<Task_TaskType>(
+    ..e<TaskType>(
         2,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
             : 'type',
         $pb.PbFieldType.OE,
-        defaultOrMaker: Task_TaskType.GROUP,
-        valueOf: Task_TaskType.valueOf,
-        enumValues: Task_TaskType.values)
+        defaultOrMaker: TaskType.GROUP,
+        valueOf: TaskType.valueOf,
+        enumValues: TaskType.values)
     ..e<Task_TaskState>(
         3,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
@@ -914,7 +914,7 @@ class Task extends $pb.GeneratedMessage {
   Task._() : super();
   factory Task({
     $core.List<$core.int>? id,
-    Task_TaskType? type,
+    TaskType? type,
     Task_TaskState? state,
     $core.int? round,
     $core.int? attempt,
@@ -992,9 +992,9 @@ class Task extends $pb.GeneratedMessage {
   void clearId() => clearField(1);
 
   @$pb.TagNumber(2)
-  Task_TaskType get type => $_getN(1);
+  TaskType get type => $_getN(1);
   @$pb.TagNumber(2)
-  set type(Task_TaskType v) {
+  set type(TaskType v) {
     setField(2, v);
   }
 

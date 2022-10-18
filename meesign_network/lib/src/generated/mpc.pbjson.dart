@@ -32,6 +32,19 @@ const KeyType$json = const {
 /// Descriptor for `KeyType`. Decode as a `google.protobuf.EnumDescriptorProto`.
 final $typed_data.Uint8List keyTypeDescriptor = $convert
     .base64Decode('CgdLZXlUeXBlEgsKB1NpZ25QREYQABIOCgpTaWduRGlnZXN0EAE=');
+@$core.Deprecated('Use taskTypeDescriptor instead')
+const TaskType$json = const {
+  '1': 'TaskType',
+  '2': const [
+    const {'1': 'GROUP', '2': 0},
+    const {'1': 'SIGN_PDF', '2': 1},
+    const {'1': 'SIGN_CHALLENGE', '2': 2},
+  ],
+};
+
+/// Descriptor for `TaskType`. Decode as a `google.protobuf.EnumDescriptorProto`.
+final $typed_data.Uint8List taskTypeDescriptor = $convert.base64Decode(
+    'CghUYXNrVHlwZRIJCgVHUk9VUBAAEgwKCFNJR05fUERGEAESEgoOU0lHTl9DSEFMTEVOR0UQAg==');
 @$core.Deprecated('Use registrationRequestDescriptor instead')
 const RegistrationRequest$json = const {
   '1': 'RegistrationRequest',
@@ -188,7 +201,7 @@ const Task$json = const {
       '3': 2,
       '4': 1,
       '5': 14,
-      '6': '.meesign.Task.TaskType',
+      '6': '.meesign.TaskType',
       '10': 'type'
     },
     const {
@@ -222,19 +235,10 @@ const Task$json = const {
       '17': true
     },
   ],
-  '4': const [Task_TaskType$json, Task_TaskState$json],
+  '4': const [Task_TaskState$json],
   '8': const [
     const {'1': '_data'},
     const {'1': '_request'},
-  ],
-};
-
-@$core.Deprecated('Use taskDescriptor instead')
-const Task_TaskType$json = const {
-  '1': 'TaskType',
-  '2': const [
-    const {'1': 'GROUP', '2': 0},
-    const {'1': 'SIGN', '2': 1},
   ],
 };
 
@@ -251,7 +255,7 @@ const Task_TaskState$json = const {
 
 /// Descriptor for `Task`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List taskDescriptor = $convert.base64Decode(
-    'CgRUYXNrEg4KAmlkGAEgASgMUgJpZBIqCgR0eXBlGAIgASgOMhYubWVlc2lnbi5UYXNrLlRhc2tUeXBlUgR0eXBlEi0KBXN0YXRlGAMgASgOMhcubWVlc2lnbi5UYXNrLlRhc2tTdGF0ZVIFc3RhdGUSFAoFcm91bmQYBCABKA1SBXJvdW5kEhgKB2F0dGVtcHQYBSABKA1SB2F0dGVtcHQSFgoGYWNjZXB0GAYgASgNUgZhY2NlcHQSFgoGcmVqZWN0GAcgASgNUgZyZWplY3QSFwoEZGF0YRgIIAEoDEgAUgRkYXRhiAEBEh0KB3JlcXVlc3QYCSABKAxIAVIHcmVxdWVzdIgBASIfCghUYXNrVHlwZRIJCgVHUk9VUBAAEggKBFNJR04QASI/CglUYXNrU3RhdGUSCwoHQ1JFQVRFRBAAEgsKB1JVTk5JTkcQARIMCghGSU5JU0hFRBACEgoKBkZBSUxFRBADQgcKBV9kYXRhQgoKCF9yZXF1ZXN0');
+    'CgRUYXNrEg4KAmlkGAEgASgMUgJpZBIlCgR0eXBlGAIgASgOMhEubWVlc2lnbi5UYXNrVHlwZVIEdHlwZRItCgVzdGF0ZRgDIAEoDjIXLm1lZXNpZ24uVGFzay5UYXNrU3RhdGVSBXN0YXRlEhQKBXJvdW5kGAQgASgNUgVyb3VuZBIYCgdhdHRlbXB0GAUgASgNUgdhdHRlbXB0EhYKBmFjY2VwdBgGIAEoDVIGYWNjZXB0EhYKBnJlamVjdBgHIAEoDVIGcmVqZWN0EhcKBGRhdGEYCCABKAxIAFIEZGF0YYgBARIdCgdyZXF1ZXN0GAkgASgMSAFSB3JlcXVlc3SIAQEiPwoJVGFza1N0YXRlEgsKB0NSRUFURUQQABILCgdSVU5OSU5HEAESDAoIRklOSVNIRUQQAhIKCgZGQUlMRUQQA0IHCgVfZGF0YUIKCghfcmVxdWVzdA==');
 @$core.Deprecated('Use taskUpdateDescriptor instead')
 const TaskUpdate$json = const {
   '1': 'TaskUpdate',
