@@ -23,15 +23,28 @@ class Sync {
 
   Future<void> _subscribe() async {
     _retryTimer = null;
-    await Future.wait([
-      for (var r in _repositories)
-        r.subscribe(_device.id, onDone: _subscriptionDone)
-    ]);
-    subscribed.value = true;
+
+    Future<void> setUp(TaskRepository r) async {
+      await r.subscribe(_device.id, onDone: _subscriptionDone);
+      await r.sync(_device.id);
+    }
+
+    try {
+      await Future.wait(
+        [for (var r in _repositories) setUp(r)],
+      );
+      subscribed.value = true;
+    } on Exception {
+      _retry();
+    }
   }
 
   void _subscriptionDone() {
     subscribed.value = false;
+    _retry();
+  }
+
+  void _retry() {
     _retryTimer ??= Timer(const Duration(seconds: 2), _subscribe);
   }
 }
