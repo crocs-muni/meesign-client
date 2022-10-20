@@ -13,7 +13,11 @@ jobs:
         with:
           channel: 'stable'
       - uses: actions/checkout@v2
-      - run: flutter pub get
+      - run: |
+          for PKG in native network core; do
+            (cd meesign_$PKG; dart pub get)
+          done
+          flutter pub get
 
       - run: flutter analyze
       - run: flutter format --output none --set-exit-if-changed .
