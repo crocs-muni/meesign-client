@@ -252,12 +252,14 @@ class SigningSubPage extends StatelessWidget {
   }
 }
 
-String _nameInitials(String name, {int count = 2}) => name
-    .split(' ')
-    .where((w) => w.isNotEmpty)
-    .take(count)
-    .map((w) => w.characters.first.toUpperCase())
-    .join();
+extension Initials on String {
+  String get initials => split(' ')
+      .where((w) => w.isNotEmpty)
+      .take(2)
+      .map((w) => w.characters.first)
+      .join()
+      .toUpperCase();
+}
 
 class GroupTile extends StatelessWidget {
   final String name;
@@ -290,9 +292,7 @@ class GroupTile extends StatelessWidget {
           children: members
               .map((m) => Chip(
                     avatar: CircleAvatar(
-                      child: Text(
-                        _nameInitials(m, count: 1),
-                      ),
+                      child: Text(m.initials.characters.first),
                     ),
                     label: Text(m),
                   ))
@@ -316,9 +316,7 @@ class GroupTile extends StatelessWidget {
       title: Text(name),
       subtitle: desc != null ? Text(desc!) : null,
       leading: CircleAvatar(
-        child: Text(
-          _nameInitials(name),
-        ),
+        child: Text(name.initials),
       ),
       initiallyExpanded: initiallyExpanded,
       trailing: trailing,
@@ -546,9 +544,7 @@ class _HomePageViewState extends State<HomePageView> {
                           badgeColor: context.read<Sync>().subscribed.value
                               ? Colors.green
                               : Colors.orange,
-                          child: Text(
-                            _nameInitials(name),
-                          ),
+                          child: Text(name.initials),
                         );
                       },
                     ),
