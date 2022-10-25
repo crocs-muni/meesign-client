@@ -265,6 +265,7 @@ class GroupTile extends StatelessWidget {
   final String name;
   final String? desc;
   final List<String> members;
+  final int threshold;
   final Widget? trailing;
   final bool initiallyExpanded;
   final bool showActions;
@@ -275,6 +276,7 @@ class GroupTile extends StatelessWidget {
     required this.name,
     this.desc,
     required this.members,
+    required this.threshold,
     this.trailing,
     this.initiallyExpanded = false,
     this.showActions = true,
@@ -284,6 +286,13 @@ class GroupTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final children = <Widget>[
+      Container(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          'Threshold: $threshold / ${members.length}',
+          textAlign: TextAlign.left,
+        ),
+      ),
       Container(
         alignment: Alignment.topLeft,
         child: Wrap(
@@ -353,6 +362,7 @@ class GroupsSubPage extends StatelessWidget {
             name: group.name,
             desc: statusMessage(task),
             members: group.members.map((m) => m.name).toList(),
+            threshold: group.threshold,
             trailing: TaskStateIndicator(task.state, task.round / task.nRounds),
             initiallyExpanded: true,
             showActions: task.approvable,
@@ -372,6 +382,7 @@ class GroupsSubPage extends StatelessWidget {
           return GroupTile(
             name: group.name,
             members: group.members.map((m) => m.name).toList(),
+            threshold: group.threshold,
             trailing: const Icon(Icons.check, color: Colors.green),
           );
         },
