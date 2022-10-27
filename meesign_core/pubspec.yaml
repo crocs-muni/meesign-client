@@ -16,5 +16,6 @@ dependencies:
   synchronized: ^3.0.0+3
 
 dev_dependencies:
+  args: ^2.3.1
   lints: ^2.0.0
   test: ^1.16.0
