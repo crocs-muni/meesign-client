@@ -30,6 +30,7 @@ import '../widget/counter_badge.dart';
 import '../widget/dismissible.dart';
 import '../widget/empty_list.dart';
 import 'card_reader_page.dart';
+import 'device_page.dart';
 import 'home_state.dart';
 
 class TaskStateIndicator extends StatelessWidget {
@@ -860,9 +861,20 @@ class _HomePageViewState extends State<HomePageView> {
                   name,
                   overflow: TextOverflow.ellipsis,
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: AnimatedBuilder(
+                const SizedBox(width: 4),
+                IconButton(
+                  onPressed: () {
+                    final device = model.device;
+                    if (device == null) return;
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (BuildContext context) =>
+                            DevicePage(device: device),
+                      ),
+                    );
+                  },
+                  icon: AnimatedBuilder(
                     animation: context.read<Sync>().subscribed,
                     builder: (context, child) {
                       return Badge(
@@ -882,12 +894,6 @@ class _HomePageViewState extends State<HomePageView> {
               ],
             );
           }),
-          IconButton(
-            icon: const Icon(Icons.qr_code),
-            onPressed: () {
-              Navigator.pushNamed(context, Routes.qrIdentity);
-            },
-          ),
           // TODO: migrate to MenuAnchor?
           Consumer<HomeState>(builder: (context, model, child) {
             return PopupMenuButton(

@@ -16,7 +16,6 @@ import 'theme.dart';
 import 'ui/home_page.dart';
 import 'ui/init_page.dart';
 import 'ui/new_group_page.dart';
-import 'ui/qr_identity_page.dart';
 import 'ui/qr_reader_page.dart';
 import 'ui/search_peer_page.dart';
 import 'util/platform.dart';
@@ -126,7 +125,6 @@ class MyApp extends StatelessWidget {
         Routes.newGroup: (_) => const NewGroupPage(),
         Routes.newGroupSearch: (_) => const SearchPeerPage(),
         Routes.newGroupQr: (_) => const QrReaderPage(),
-        Routes.qrIdentity: (_) => const QrIdentityPage(),
         Routes.init: (_) => InitPage(
               prefillHost: prefillHost ?? 'meesign.crocs.fi.muni.cz',
               prefillName: prefillName ?? '',
