@@ -8,6 +8,7 @@ import 'package:rxdart/subjects.dart';
 
 import '../model/device.dart';
 import '../model/group.dart';
+import '../model/key_type.dart';
 import '../model/protocol.dart';
 import '../model/task.dart';
 import '../util/default_map.dart';
@@ -44,6 +45,7 @@ class GroupRepository extends TaskRepository<GroupBase> {
     List<Device> members,
     int threshold,
     Protocol protocol,
+    KeyType keyType,
   ) async {
     await _rpcClient.group(
       rpc.GroupRequest(
@@ -51,7 +53,7 @@ class GroupRepository extends TaskRepository<GroupBase> {
         name: name,
         threshold: threshold,
         protocol: protocol.toNetwork(),
-        keyType: rpc.KeyType.SignPDF,
+        keyType: keyType.toNetwork(),
       ),
     );
   }
@@ -63,12 +65,13 @@ class GroupRepository extends TaskRepository<GroupBase> {
     final ids = req.deviceIds.map((id) => Uuid(id)).toList();
     final members = (await _deviceRepository.findDevicesByIds(ids)).toList();
     final protocol = ProtocolConversion.fromNetwork(req.protocol);
+    final keyType = KeyTypeConversion.fromNetwork(req.keyType);
 
     return Task<GroupBase>(
       id: Uuid(rpcTask.id),
       nRounds: protocol.keygenRounds,
       context: Uint8List(0),
-      info: GroupBase(req.name, members, req.threshold, protocol),
+      info: GroupBase(req.name, members, req.threshold, protocol, keyType),
     );
   }
 

@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:meesign_core/meesign_core.dart';
+import 'package:meesign_core/src/model/key_type.dart';
 import 'package:test/test.dart';
 
 import 'matcher.dart';
@@ -75,7 +76,8 @@ Future<void> sign(
 
   await Future.wait(ds.map((d) => groupRepository.subscribe(d.id)));
 
-  await groupRepository.group('$t out of $n', ds, t, Protocol.gg18);
+  await groupRepository.group(
+      '$t out of $n', ds, t, Protocol.gg18, KeyType.signPdf);
   approveAllFirst(groupRepository, ds);
   final gs = await Future.wait(
     ds.map((d) => groupRepository.observeGroups(d.id).firstElement()),

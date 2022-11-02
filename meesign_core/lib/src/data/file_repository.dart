@@ -7,6 +7,7 @@ import 'package:meesign_network/grpc.dart' as rpc;
 import 'package:rxdart/subjects.dart';
 
 import '../model/file.dart';
+import '../model/key_type.dart';
 import '../model/protocol.dart';
 import '../model/task.dart';
 import '../util/default_map.dart';
@@ -56,6 +57,7 @@ class FileRepository extends TaskRepository<File> {
 
     final group = await _groupRepository.findGroupById(did, req.groupId);
     if (group == null) throw StateException();
+    if (group.keyType != KeyType.signPdf) throw StateException();
 
     final tid = Uuid(rpcTask.id);
     // FIXME: create random id for file?

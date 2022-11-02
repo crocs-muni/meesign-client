@@ -102,6 +102,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
         _members,
         _threshold,
         Protocol.gg18,
+        KeyType.signPdf,
       ),
     );
   }

@@ -4,6 +4,7 @@ import 'package:meesign_native/meesign_native.dart';
 import 'package:meesign_network/grpc.dart' as rpc;
 
 import '../model/challenge.dart';
+import '../model/key_type.dart';
 import '../model/protocol.dart';
 import '../model/task.dart';
 import '../util/uuid.dart';
@@ -24,6 +25,7 @@ class ChallengeRepository extends TaskRepository<Challenge> {
 
     final group = await _groupRepository.findGroupById(did, req.groupId);
     if (group == null) throw StateException();
+    if (group.keyType != KeyType.signDigest) throw StateException();
 
     return Task<Challenge>(
       id: Uuid(rpcTask.id),

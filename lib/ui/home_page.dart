@@ -549,9 +549,8 @@ class _HomePageViewState extends State<HomePageView> {
     if (res == null) return;
 
     try {
-      await context
-          .read<HomeState>()
-          .addGroup(res.name, res.members, res.threshold, res.protocol);
+      await context.read<HomeState>().addGroup(
+          res.name, res.members, res.threshold, res.protocol, res.keyType);
     } catch (e) {
       showErrorDialog(
         title: 'Group request failed',
