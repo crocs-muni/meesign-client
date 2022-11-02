@@ -474,8 +474,8 @@ class _HomePageViewState extends State<HomePageView> {
       builder: (context) {
         return SimpleDialog(
           title: const Text('Select group'),
-          // FIXME: only finished groups!
           children: groups
+              .where((group) => group.keyType == KeyType.signPdf)
               .map((group) => SimpleDialogOption(
                     child: Text(group.name),
                     onPressed: () {
