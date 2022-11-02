@@ -5,6 +5,8 @@
 # Conventional directory for build outputs.
 build/
 
+example/*.exe
+
 test/output
 
 # Omit committing pubspec.lock for library packages; see
