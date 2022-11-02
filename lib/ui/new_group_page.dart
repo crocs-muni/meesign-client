@@ -25,6 +25,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
   final List<Device> _members = [];
   final _nameController = TextEditingController();
   String? _nameErr, _memberErr;
+  KeyType _keyType = KeyType.signPdf;
 
   @override
   void initState() {
@@ -102,7 +103,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
         _members,
         _threshold,
         Protocol.gg18,
-        KeyType.signPdf,
+        _keyType,
       ),
     );
   }
@@ -216,6 +217,30 @@ class _NewGroupPageState extends State<NewGroupPage> {
               ),
               const Icon(Icons.people),
             ],
+          ),
+          const SizedBox(height: 16),
+          const Padding(
+            padding: EdgeInsets.only(bottom: 8),
+            child: Text('Purpose'),
+          ),
+          DropdownButtonFormField<KeyType>(
+            value: _keyType,
+            onChanged: (value) {
+              if (value != null) setState(() => _keyType = value);
+            },
+            items: const [
+              DropdownMenuItem<KeyType>(
+                value: KeyType.signPdf,
+                child: Text('Sign PDF'),
+              ),
+              DropdownMenuItem<KeyType>(
+                value: KeyType.signDigest,
+                child: Text('Log In'),
+              )
+            ],
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+            ),
           ),
         ],
       ),
