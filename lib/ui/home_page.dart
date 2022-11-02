@@ -266,6 +266,7 @@ class GroupTile extends StatelessWidget {
   final String? desc;
   final List<String> members;
   final int threshold;
+  final KeyType keyType;
   final Widget? trailing;
   final bool initiallyExpanded;
   final bool showActions;
@@ -277,6 +278,7 @@ class GroupTile extends StatelessWidget {
     this.desc,
     required this.members,
     required this.threshold,
+    required this.keyType,
     this.trailing,
     this.initiallyExpanded = false,
     this.showActions = true,
@@ -286,12 +288,12 @@ class GroupTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final children = <Widget>[
-      Container(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          'Threshold: $threshold / ${members.length}',
-          textAlign: TextAlign.left,
-        ),
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('Threshold: $threshold / ${members.length}'),
+          Text('Purpose: ${['Sign PDF', 'Log In'][keyType.index]}'),
+        ],
       ),
       Container(
         alignment: Alignment.topLeft,
@@ -363,6 +365,7 @@ class GroupsSubPage extends StatelessWidget {
             desc: statusMessage(task),
             members: group.members.map((m) => m.name).toList(),
             threshold: group.threshold,
+            keyType: group.keyType,
             trailing: TaskStateIndicator(task.state, task.round / task.nRounds),
             initiallyExpanded: true,
             showActions: task.approvable,
@@ -383,6 +386,7 @@ class GroupsSubPage extends StatelessWidget {
             name: group.name,
             members: group.members.map((m) => m.name).toList(),
             threshold: group.threshold,
+            keyType: group.keyType,
             trailing: const Icon(Icons.check, color: Colors.green),
           );
         },
