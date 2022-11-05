@@ -97,11 +97,12 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
     Navigator.pop(
       context,
-      {
-        'name': _nameController.text,
-        'members': _members,
-        'threshold': _threshold,
-      },
+      GroupBase(
+        _nameController.text,
+        _members,
+        _threshold,
+        Protocol.gg18,
+      ),
     );
   }
 

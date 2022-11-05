@@ -544,15 +544,14 @@ class _HomePageViewState extends State<HomePageView> {
   }
 
   Future<void> _group() async {
-    final res = await Navigator.pushNamed(context, Routes.newGroup)
-        as Map<String, Object>?;
+    final res =
+        await Navigator.pushNamed(context, Routes.newGroup) as GroupBase?;
     if (res == null) return;
 
     try {
-      final name = res['name'] as String;
-      final members = res['members'] as List<Device>;
-      final threshold = res['threshold'] as int;
-      await context.read<HomeState>().addGroup(name, members, threshold);
+      await context
+          .read<HomeState>()
+          .addGroup(res.name, res.members, res.threshold, res.protocol);
     } catch (e) {
       showErrorDialog(
         title: 'Group request failed',
