@@ -2,8 +2,8 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
-   sodipodi:docname="meesign-foreground.svg"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   sodipodi:docname="icon_foreground.svg"
    id="svg867"
    version="1.1"
    viewBox="0 0 108 108"
@@ -11,7 +11,6 @@
    width="108"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <sodipodi:namedview
@@ -28,14 +27,16 @@
      showguides="true"
      inkscape:guide-bbox="true"
      inkscape:zoom="5.421152"
-     inkscape:cx="76.644226"
-     inkscape:cy="44.639959"
+     inkscape:cx="76.828689"
+     inkscape:cy="44.639958"
      inkscape:window-width="1920"
      inkscape:window-height="1011"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g1477">
+     inkscape:current-layer="g1477"
+     inkscape:showpageshadow="2"
+     inkscape:deskcolor="#d1d1d1">
     <sodipodi:guide
        position="18,90"
        orientation="0,1"
@@ -53,51 +54,16 @@
     <sodipodi:guide
        position="18,90"
        orientation="1,0"
-       id="guide10896" />
+       id="guide10896"
+       inkscape:locked="false" />
     <sodipodi:guide
        position="90,18"
        orientation="1,0"
-       id="guide10898" />
+       id="guide10898"
+       inkscape:locked="false" />
   </sodipodi:namedview>
   <defs
-     id="defs864">
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient12041"
-       id="linearGradient12043"
-       x1="145.14432"
-       y1="116.43325"
-       x2="638.26624"
-       y2="609.55518"
-       gradientUnits="userSpaceOnUse">
-       <stop
-         style="stop-color:#000000;stop-opacity:0.35"
-         offset="0"
-         id="stop12037" />
-       <stop
-         style="stop-color:#000000;stop-opacity:0;"
-         offset="1"
-         id="stop12039" />
-    </linearGradient>
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient12041"
-       id="linearGradient14794"
-       gradientUnits="userSpaceOnUse"
-       x1="145.14432"
-       y1="116.43325"
-       x2="497.28336"
-       y2="468.5723">
-       <stop
-         style="stop-color:#000000;stop-opacity:0.35"
-         offset="0"
-         id="stop12037" />
-       <stop
-         style="stop-color:#000000;stop-opacity:0;"
-         offset="1"
-         id="stop12039" />
-    </linearGradient>
-  </defs>
+     id="defs864" />
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
@@ -107,19 +73,6 @@
        transform="matrix(0.16974505,0,0,0.16974505,23.841578,28.601542)">
       <g
          id="g1477">
-        <g
-           id="g8564"
-           style="fill:url(#linearGradient12043);fill-opacity:1">
-          <g
-             style="fill:url(#linearGradient12043);stroke-width:8.24219;fill-opacity:1;opacity:0.69887153"
-             id="g8561">
-            <path
-               d="m 30.3892,296.32 c 0,0 95.5768,-305.53846 294.5598,-293.01033 L 643.147,321.508 348.587,614.518 Z"
-               id="path8537"
-               style="fill:url(#linearGradient14794);fill-opacity:1"
-               sodipodi:nodetypes="ccccc" />
-          </g>
-        </g>
         <path
            d="m 30.389234,296.31952 c 0,0 95.576446,-305.537982 294.559396,-293.009854 0,0 -24.67712,39.966409 -86.96336,52.88188 0,0 28.99605,3.535904 52.49452,-4.302396 0,0 -14.10239,45.45568 -90.87015,51.70324 0,0 42.30717,10.97037 61.1076,4.69806 0,0 -5.10192,33.88365 -83.2626,50.72244 -4.63211,0.98906 -35.82881,8.79441 -10.76431,11.93469 0,0 36.02661,6.2888 45.44744,3.14028 0,0 -30.85877,46.21396 -106.55503,42.29892 -7.442698,-0.38739 -10.978593,0 -10.978593,0 z"
            id="path1075"
