@@ -89,7 +89,7 @@ class MyApp extends StatelessWidget {
       initialRoute: Routes.registration,
       routes: {
         // # FIXME add default keys to all pages?
-        Routes.home: (_) => const HomePage(key:Key("homepage")),
+        Routes.home: (_) => const HomePage(key: Key("homepage")),
         Routes.newGroup: (_) => const NewGroupPage(),
         Routes.newGroupSearch: (_) => const SearchPeerPage(),
         Routes.newGroupCard: (_) => const AddCardPage(),
