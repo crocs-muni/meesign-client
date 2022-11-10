@@ -135,6 +135,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   height: 32,
                 ),
                 TextField(
+                  key: Key("registration:textfield:name"),
                   controller: _nameController,
                   decoration: InputDecoration(
                     labelText: 'Name',
@@ -155,6 +156,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   height: 16,
                 ),
                 TextField(
+                  key: Key("registration:textfield:host"),
                   controller: _hostController,
                   decoration: InputDecoration(
                     labelText: 'Coordinator address',
@@ -174,6 +176,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   ElevatedButton(
+                    key: Key("registration:button:register"),
                     child: const Text(
                       'REGISTER',
                     ),

@@ -115,6 +115,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
         title: const Text('New Group'),
         actions: [
           IconButton(
+            key: Key("new_group_page:create_group"),
             onPressed: _tryCreate,
             icon: const Icon(Icons.send),
           ),
@@ -125,6 +126,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
         children: [
           const SizedBox(height: 16),
           TextField(
+            key: Key("groups:textfield:name"),
             controller: _nameController,
             decoration: InputDecoration(
               hintText: 'Group name',
@@ -170,6 +172,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                         onTap: () => _selectPeer(Routes.newGroupCard),
                       ),
                       ListTile(
+                        key: Key("new_group_page:search_peer"),
                         leading: const Icon(Icons.search),
                         title: const Text('Search peer'),
                         onTap: () => _selectPeer(Routes.newGroupSearch),
@@ -179,6 +182,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                 },
               );
             },
+            key: Key("new_group_page:new_member"),
             label: const Text('New member'),
             icon: const Icon(Icons.add),
             style: ElevatedButton.styleFrom(

@@ -49,3 +49,12 @@ To learn more about MeeSign, visit [our website](https://meesign.crocs.fi.muni.c
 The build can be customized by passing `--dart-define=OPTION=VALUE` to `flutter run` or `flutter build`, see `flutter run --help` for more details. The following definitions are considered:
 
 * `ALLOW_BAD_CERTS`: If `true`, certificate checks are skipped and any server certificate is accepted.
+
+## Integration tests (WIP)
+
+To run what is currently implemented first start the `meesign-server` (on `localhost` with the defualt `1337` port and then execute the test:
+```bash
+$ flutter drive --target integration_test/app_test.dart  --dart-define=ALLOW_BAD_CERTS=true --driver integration_test/driver.dart
+```
+
+Before each run you need to restart the MeeSign server otherwise the tests do not start from a cleanslate.

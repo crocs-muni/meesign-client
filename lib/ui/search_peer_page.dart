@@ -93,6 +93,8 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
                   itemBuilder: (context, index) {
                     final device = _queryResults[index];
                     return ListTile(
+                      // FIXME stupid don't do this, use device?
+                      key: Key("search_peer_page:" + device.name),
                       leading: const Icon(Icons.person),
                       trailing: Container(
                         width: 8,

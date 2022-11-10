@@ -361,6 +361,7 @@ class GroupsSubPage extends StatelessWidget {
           final group = task.info;
 
           return GroupTile(
+            key: Key("groups:subpage"),
             name: group.name,
             desc: statusMessage(task),
             members: group.members.map((m) => m.name).toList(),
@@ -581,6 +582,7 @@ class _HomePageViewState extends State<HomePageView> {
       ),
       null,
       FloatingActionButton.extended(
+        key: Key("homepage:new"),
         onPressed: _group,
         label: const Text('New'),
         icon: const Icon(Icons.add),
@@ -642,6 +644,7 @@ class _HomePageViewState extends State<HomePageView> {
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
+            // key: Key("homepage:signing"),
             icon: CounterBadge(
               stream: context.watch<HomeState>().nSignReqs,
               child: const Icon(Icons.draw),
@@ -649,6 +652,7 @@ class _HomePageViewState extends State<HomePageView> {
             label: 'Signing',
           ),
           BottomNavigationBarItem(
+            // key: Key("homepage:login"),
             icon: CounterBadge(
               stream: context.watch<HomeState>().nLoginReqs,
               child: const Icon(Icons.login),
@@ -657,6 +661,7 @@ class _HomePageViewState extends State<HomePageView> {
           ),
           BottomNavigationBarItem(
             icon: CounterBadge(
+              key: Key("homepage:groups"),
               stream: context.watch<HomeState>().nGroupReqs,
               child: const Icon(Icons.group),
             ),
