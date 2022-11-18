@@ -1,8 +1,10 @@
 use core::slice;
 use std::error::Error;
+use std::ffi::CStr;
 use std::ffi::CString;
 use std::os::raw::c_char;
 
+use crate::auth;
 use crate::protocol;
 use crate::protocols::gg18;
 
@@ -36,6 +38,10 @@ impl Drop for Buffer {
         }
     }
 }
+
+#[no_mangle]
+#[allow(unused_variables)]
+pub extern "C" fn buffer_free(buffer: Buffer) {}
 
 fn set_error(error_out: *mut *mut c_char, error: &dyn Error) {
     if !error_out.is_null() {
@@ -143,4 +149,55 @@ pub extern "C" fn protocol_sign(
     let ctx_ser = serde_json::to_vec(&ctx).unwrap();
 
     ProtocolResult::new(ctx_ser, vec![])
+}
+
+#[repr(C)]
+pub struct AuthKey {
+    key: Buffer,
+    csr: Buffer,
+}
+
+impl AuthKey {
+    pub fn new(key: Vec<u8>, csr: Vec<u8>) -> Self {
+        Self {
+            key: key.into(),
+            csr: csr.into(),
+        }
+    }
+}
+
+#[no_mangle]
+#[allow(unused_variables)]
+pub extern "C" fn auth_key_free(key: AuthKey) {}
+
+#[no_mangle]
+pub extern "C" fn auth_keygen(name: *const c_char, error_out: *mut *mut c_char) -> AuthKey {
+    let name = unsafe { CStr::from_ptr(name) }.to_str().unwrap();
+    match auth::gen_key_with_csr(name) {
+        Ok((key, csr)) => AuthKey::new(key, csr),
+        Err(error) => {
+            set_error(error_out, &error);
+            AuthKey::new(vec![], vec![])
+        }
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn auth_cert_key_to_pkcs12(
+    key_ptr: *const u8,
+    key_len: usize,
+    cert_ptr: *const u8,
+    cert_len: usize,
+    error_out: *mut *mut c_char,
+) -> Buffer {
+    let key_der = unsafe { slice::from_raw_parts(key_ptr, key_len) };
+    let cert_der = unsafe { slice::from_raw_parts(cert_ptr, cert_len) };
+
+    match auth::cert_key_to_pkcs12(key_der, cert_der) {
+        Ok(pkcs12) => pkcs12.into(),
+        Err(error) => {
+            set_error(error_out, &error);
+            vec![].into()
+        }
+    }
 }

@@ -21,6 +21,18 @@ class MpcSigsLib {
           lookup)
       : _lookup = lookup;
 
+  void buffer_free(
+    Buffer buffer,
+  ) {
+    return _buffer_free(
+      buffer,
+    );
+  }
+
+  late final _buffer_freePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(Buffer)>>('buffer_free');
+  late final _buffer_free = _buffer_freePtr.asFunction<void Function(Buffer)>();
+
   void error_free(
     ffi.Pointer<ffi.Char> error,
   ) {
@@ -129,6 +141,65 @@ class MpcSigsLib {
               ffi.Int32, ffi.Pointer<ffi.Uint8>, uintptr_t)>>('protocol_sign');
   late final _protocol_sign = _protocol_signPtr
       .asFunction<ProtocolResult Function(int, ffi.Pointer<ffi.Uint8>, int)>();
+
+  void auth_key_free(
+    AuthKey key,
+  ) {
+    return _auth_key_free(
+      key,
+    );
+  }
+
+  late final _auth_key_freePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(AuthKey)>>('auth_key_free');
+  late final _auth_key_free =
+      _auth_key_freePtr.asFunction<void Function(AuthKey)>();
+
+  AuthKey auth_keygen(
+    ffi.Pointer<ffi.Char> name,
+    ffi.Pointer<ffi.Pointer<ffi.Char>> error_out,
+  ) {
+    return _auth_keygen(
+      name,
+      error_out,
+    );
+  }
+
+  late final _auth_keygenPtr = _lookup<
+      ffi.NativeFunction<
+          AuthKey Function(ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('auth_keygen');
+  late final _auth_keygen = _auth_keygenPtr.asFunction<
+      AuthKey Function(
+          ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+
+  Buffer auth_cert_key_to_pkcs12(
+    ffi.Pointer<ffi.Uint8> key_ptr,
+    int key_len,
+    ffi.Pointer<ffi.Uint8> cert_ptr,
+    int cert_len,
+    ffi.Pointer<ffi.Pointer<ffi.Char>> error_out,
+  ) {
+    return _auth_cert_key_to_pkcs12(
+      key_ptr,
+      key_len,
+      cert_ptr,
+      cert_len,
+      error_out,
+    );
+  }
+
+  late final _auth_cert_key_to_pkcs12Ptr = _lookup<
+      ffi.NativeFunction<
+          Buffer Function(
+              ffi.Pointer<ffi.Uint8>,
+              uintptr_t,
+              ffi.Pointer<ffi.Uint8>,
+              uintptr_t,
+              ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('auth_cert_key_to_pkcs12');
+  late final _auth_cert_key_to_pkcs12 = _auth_cert_key_to_pkcs12Ptr.asFunction<
+      Buffer Function(ffi.Pointer<ffi.Uint8>, int, ffi.Pointer<ffi.Uint8>, int,
+          ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
 }
 
 abstract class ProtocolId {
@@ -151,4 +222,10 @@ class ProtocolResult extends ffi.Struct {
   external Buffer context;
 
   external Buffer data;
+}
+
+class AuthKey extends ffi.Struct {
+  external Buffer key;
+
+  external Buffer csr;
 }

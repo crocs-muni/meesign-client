@@ -145,3 +145,44 @@ class ProtocolWrapper {
     });
   }
 }
+
+class AuthKey {
+  final Uint8List key, csr;
+  AuthKey(this.key, this.csr);
+}
+
+class AuthWrapper {
+  static AuthKey keygen(String name) {
+    return using((Arena alloc) {
+      final namePtr = name.toNativeUtf8(allocator: alloc);
+      final error = alloc.using(Error(), Error.free);
+
+      final res = alloc.using(
+        _lib.auth_keygen(namePtr.cast(), error.ptr),
+        _lib.auth_key_free,
+      );
+
+      if (error.occured) throw Exception(error.message);
+
+      return AuthKey(res.key.dupToDart(), res.csr.dupToDart());
+    });
+  }
+
+  static List<int> certKeyToPkcs12(List<int> key, List<int> cert) {
+    return using((Arena alloc) {
+      final keyPtr = key.dupToNative(alloc);
+      final certPtr = cert.dupToNative(alloc);
+      final error = alloc.using(Error(), Error.free);
+
+      final res = alloc.using(
+        _lib.auth_cert_key_to_pkcs12(
+            keyPtr, key.length, certPtr, cert.length, error.ptr),
+        _lib.buffer_free,
+      );
+
+      if (error.occured) throw Exception(error.message);
+
+      return res.dupToDart();
+    });
+  }
+}
