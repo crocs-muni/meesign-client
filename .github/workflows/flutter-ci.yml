@@ -101,7 +101,7 @@ jobs:
     - name: Install Windows dependencies
       if: matrix.target == 'Windows'
       env:
-        VCPKG_DEFAULT_TRIPLET: x64-windows
+        VCPKG_DEFAULT_TRIPLET: x64-windows-static-md
       run: |
         vcpkg install zlib freetype openssl podofo
 
@@ -120,7 +120,6 @@ jobs:
         CMAKE_TOOLCHAIN_FILE: ${{ matrix.toolchain_file }}
         # env vars used by rust openssl
         VCPKG_ROOT: C:\vcpkg
-        VCPKGRS_DYNAMIC: 1
         # needed to fetch Android deps (podofo + freetype AARs)
         USERNAME: ${{ github.actor }}
         TOKEN: ${{ secrets.GITHUB_TOKEN }}

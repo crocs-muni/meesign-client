@@ -19,6 +19,7 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../../../../../meesign_native/nati
 add_library(mpc_sigs_lib SHARED IMPORTED)
 set_property(TARGET mpc_sigs_lib PROPERTY IMPORTED_LOCATION ${MPC_SIGS_LIB})
 add_dependencies(mpc_sigs_lib mpc_sigs)
+target_link_libraries(mpc_sigs_lib INTERFACE ${MPC_SIGS_DEPS})
 
 # FIXME: how to get rid of this dummy?
 add_library(dummy SHARED dummy.cpp)
