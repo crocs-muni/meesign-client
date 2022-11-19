@@ -21,7 +21,35 @@ class MpcSigsLib {
           lookup)
       : _lookup = lookup;
 
-  ffi.Pointer<ffi.Int> keygen(
+  void error_free(
+    ffi.Pointer<ffi.Char> error,
+  ) {
+    return _error_free(
+      error,
+    );
+  }
+
+  late final _error_freePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Char>)>>(
+          'error_free');
+  late final _error_free =
+      _error_freePtr.asFunction<void Function(ffi.Pointer<ffi.Char>)>();
+
+  void protocol_result_free(
+    ProtocolResult res,
+  ) {
+    return _protocol_result_free(
+      res,
+    );
+  }
+
+  late final _protocol_result_freePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ProtocolResult)>>(
+          'protocol_result_free');
+  late final _protocol_result_free =
+      _protocol_result_freePtr.asFunction<void Function(ProtocolResult)>();
+
+  ProtocolResult keygen(
     int proto_id,
   ) {
     return _keygen(
@@ -30,108 +58,58 @@ class MpcSigsLib {
   }
 
   late final _keygenPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Int> Function(ffi.Int32)>>(
-          'keygen');
-  late final _keygen =
-      _keygenPtr.asFunction<ffi.Pointer<ffi.Int> Function(int)>();
+      _lookup<ffi.NativeFunction<ProtocolResult Function(ffi.Int32)>>('keygen');
+  late final _keygen = _keygenPtr.asFunction<ProtocolResult Function(int)>();
 
-  ffi.Pointer<ffi.Int> protocol_advance(
+  ProtocolResult protocol_advance(
     ffi.Pointer<ffi.Uint8> ctx_ptr,
     int ctx_len,
     ffi.Pointer<ffi.Uint8> data_ptr,
     int data_len,
+    ffi.Pointer<ffi.Pointer<ffi.Char>> error_out,
   ) {
     return _protocol_advance(
       ctx_ptr,
       ctx_len,
       data_ptr,
       data_len,
+      error_out,
     );
   }
 
   late final _protocol_advancePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Pointer<ffi.Int> Function(ffi.Pointer<ffi.Uint8>, uintptr_t,
-              ffi.Pointer<ffi.Uint8>, uintptr_t)>>('protocol_advance');
+          ProtocolResult Function(
+              ffi.Pointer<ffi.Uint8>,
+              uintptr_t,
+              ffi.Pointer<ffi.Uint8>,
+              uintptr_t,
+              ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('protocol_advance');
   late final _protocol_advance = _protocol_advancePtr.asFunction<
-      ffi.Pointer<ffi.Int> Function(
-          ffi.Pointer<ffi.Uint8>, int, ffi.Pointer<ffi.Uint8>, int)>();
+      ProtocolResult Function(ffi.Pointer<ffi.Uint8>, int,
+          ffi.Pointer<ffi.Uint8>, int, ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
 
-  ffi.Pointer<ffi.Int> protocol_finish(
+  ProtocolResult protocol_finish(
     ffi.Pointer<ffi.Uint8> ctx_ptr,
     int ctx_len,
+    ffi.Pointer<ffi.Pointer<ffi.Char>> error_out,
   ) {
     return _protocol_finish(
       ctx_ptr,
       ctx_len,
+      error_out,
     );
   }
 
   late final _protocol_finishPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Pointer<ffi.Int> Function(
-              ffi.Pointer<ffi.Uint8>, uintptr_t)>>('protocol_finish');
-  late final _protocol_finish = _protocol_finishPtr
-      .asFunction<ffi.Pointer<ffi.Int> Function(ffi.Pointer<ffi.Uint8>, int)>();
+          ProtocolResult Function(ffi.Pointer<ffi.Uint8>, uintptr_t,
+              ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('protocol_finish');
+  late final _protocol_finish = _protocol_finishPtr.asFunction<
+      ProtocolResult Function(
+          ffi.Pointer<ffi.Uint8>, int, ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
 
-  Buffer result_context(
-    ffi.Pointer<ffi.Int> res_ptr,
-  ) {
-    return _result_context(
-      res_ptr,
-    );
-  }
-
-  late final _result_contextPtr =
-      _lookup<ffi.NativeFunction<Buffer Function(ffi.Pointer<ffi.Int>)>>(
-          'result_context');
-  late final _result_context =
-      _result_contextPtr.asFunction<Buffer Function(ffi.Pointer<ffi.Int>)>();
-
-  Buffer result_data(
-    ffi.Pointer<ffi.Int> res_ptr,
-  ) {
-    return _result_data(
-      res_ptr,
-    );
-  }
-
-  late final _result_dataPtr =
-      _lookup<ffi.NativeFunction<Buffer Function(ffi.Pointer<ffi.Int>)>>(
-          'result_data');
-  late final _result_data =
-      _result_dataPtr.asFunction<Buffer Function(ffi.Pointer<ffi.Int>)>();
-
-  ffi.Pointer<ffi.Char> result_error(
-    ffi.Pointer<ffi.Int> res_ptr,
-  ) {
-    return _result_error(
-      res_ptr,
-    );
-  }
-
-  late final _result_errorPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ffi.Char> Function(
-              ffi.Pointer<ffi.Int>)>>('result_error');
-  late final _result_error = _result_errorPtr
-      .asFunction<ffi.Pointer<ffi.Char> Function(ffi.Pointer<ffi.Int>)>();
-
-  void result_free(
-    ffi.Pointer<ffi.Int> res,
-  ) {
-    return _result_free(
-      res,
-    );
-  }
-
-  late final _result_freePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Int>)>>(
-          'result_free');
-  late final _result_free =
-      _result_freePtr.asFunction<void Function(ffi.Pointer<ffi.Int>)>();
-
-  ffi.Pointer<ffi.Int> sign(
+  ProtocolResult sign(
     int proto_id,
     ffi.Pointer<ffi.Uint8> group_ptr,
     int group_len,
@@ -145,10 +123,10 @@ class MpcSigsLib {
 
   late final _signPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Pointer<ffi.Int> Function(
+          ProtocolResult Function(
               ffi.Int32, ffi.Pointer<ffi.Uint8>, uintptr_t)>>('sign');
-  late final _sign = _signPtr.asFunction<
-      ffi.Pointer<ffi.Int> Function(int, ffi.Pointer<ffi.Uint8>, int)>();
+  late final _sign = _signPtr
+      .asFunction<ProtocolResult Function(int, ffi.Pointer<ffi.Uint8>, int)>();
 }
 
 abstract class ProtocolId {
@@ -160,6 +138,15 @@ class Buffer extends ffi.Struct {
 
   @uintptr_t()
   external int len;
+
+  @uintptr_t()
+  external int capacity;
 }
 
 typedef uintptr_t = ffi.UnsignedLong;
+
+class ProtocolResult extends ffi.Struct {
+  external Buffer context;
+
+  external Buffer data;
+}

@@ -48,23 +48,33 @@ class _TransProtocolData {
       );
 }
 
-class ProtocolWrapper {
-  static final MpcSigsLib _lib = MpcSigsLib(dlOpen('mpc_sigs'));
+final MpcSigsLib _lib = MpcSigsLib(dlOpen('mpc_sigs'));
 
-  static Never _throwResult(Pointer<Int> resPtr) {
-    final errMsg = _lib.result_error(resPtr).cast<Utf8>().toDartString();
-    throw ProtocolException(errMsg);
+class Error {
+  Pointer<Pointer<Char>> ptr;
+
+  bool get occured => ptr.value != nullptr;
+
+  String get message => ptr.value.cast<Utf8>().toDartString();
+
+  Error() : ptr = calloc();
+
+  static void free(Error error) {
+    _lib.error_free(error.ptr.value);
+    calloc.free(error.ptr);
+    error.ptr = nullptr;
   }
+}
 
+class ProtocolWrapper {
   static Uint8List keygen(int protoId) {
     return using((Arena alloc) {
-      final resPtr = alloc.using(
+      final res = alloc.using(
         _lib.keygen(protoId),
-        _lib.result_free,
+        _lib.protocol_result_free,
       );
 
-      final ctxBuf = _lib.result_context(resPtr);
-      return Uint8List.fromList(ctxBuf.asTypedList());
+      return Uint8List.fromList(res.context.asTypedList());
     });
   }
 
@@ -72,13 +82,12 @@ class ProtocolWrapper {
     return using((Arena alloc) {
       final groupBuf = _dup(alloc, group);
 
-      final resPtr = alloc.using(
+      final res = alloc.using(
         _lib.sign(protoId, groupBuf, group.length),
-        _lib.result_free,
+        _lib.protocol_result_free,
       );
 
-      final ctxBuf = _lib.result_context(resPtr);
-      return Uint8List.fromList(ctxBuf.asTypedList());
+      return Uint8List.fromList(res.context.asTypedList());
     });
   }
 
@@ -88,24 +97,23 @@ class ProtocolWrapper {
 
       final ctxBuf = _dup(alloc, protoData.context);
       final dataBuf = _dup(alloc, protoData.data);
+      final error = alloc.using(Error(), Error.free);
 
-      final resPtr = alloc.using(
+      final res = alloc.using(
         _lib.protocol_advance(
           ctxBuf,
           protoData.context.length,
           dataBuf,
           protoData.data.length,
+          error.ptr,
         ),
-        _lib.result_free,
+        _lib.protocol_result_free,
       );
 
-      final ctxOutBuf = _lib.result_context(resPtr);
-      if (ctxOutBuf.ptr == nullptr) _throwResult(resPtr);
-      final dataOutBuf = _lib.result_data(resPtr);
-
+      if (error.occured) throw ProtocolException(error.message);
       return _TransProtocolData(
-        ctxOutBuf.asTypedList(),
-        dataOutBuf.asTypedList(),
+        res.context.asTypedList(),
+        res.data.asTypedList(),
       );
     });
   }
@@ -121,15 +129,15 @@ class ProtocolWrapper {
   static Uint8List finish(Uint8List context) {
     return using((Arena alloc) {
       final ctxBuf = _dup(alloc, context);
+      final error = alloc.using(Error(), Error.free);
 
-      final resPtr = alloc.using(
-        _lib.protocol_finish(ctxBuf, context.length),
-        _lib.result_free,
+      final res = alloc.using(
+        _lib.protocol_finish(ctxBuf, context.length, error.ptr),
+        _lib.protocol_result_free,
       );
 
-      final dataOutBuf = _lib.result_data(resPtr);
-      if (dataOutBuf.ptr == nullptr) _throwResult(resPtr);
-      return Uint8List.fromList(dataOutBuf.asTypedList());
+      if (error.occured) throw ProtocolException(error.message);
+      return Uint8List.fromList(res.data.asTypedList());
     });
   }
 }
