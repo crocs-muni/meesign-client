@@ -34,7 +34,7 @@ fn serialize_uni<T: Serialize>(vec: Vec<T>) -> serde_json::Result<Vec<Vec<u8>>> 
 }
 
 /// Decode a protobuf message from the server
-fn unpack(data: &[u8]) -> Result<Vec<Vec<u8>>, prost::DecodeError> {
+fn unpack(data: &[u8]) -> std::result::Result<Vec<Vec<u8>>, prost::DecodeError> {
     let msgs = Gg18Message::decode(data)?.message;
     Ok(msgs)
 }
@@ -63,7 +63,7 @@ impl KeygenContext {
         KeygenContext::R0
     }
 
-    fn init(self, data: &[u8]) -> ProtocolResult<(Self, Vec<u8>)> {
+    fn init(self, data: &[u8]) -> Result<(Self, Vec<u8>)> {
         let msg = Gg18KeyGenInit::decode(data)?;
 
         let (parties, threshold, index) =
@@ -75,7 +75,7 @@ impl KeygenContext {
         Ok((Self::R1(c1), pack(ser)))
     }
 
-    fn update(self, data: &[u8]) -> ProtocolResult<(Self, Vec<u8>)> {
+    fn update(self, data: &[u8]) -> Result<(Self, Vec<u8>)> {
         let msgs = unpack(data)?;
         let n = msgs.len();
 
@@ -115,7 +115,7 @@ impl KeygenContext {
 
 #[typetag::serde]
 impl Protocol for KeygenContext {
-    fn advance(self: Box<Self>, data: &[u8]) -> ProtocolResult<(Box<dyn Protocol>, Vec<u8>)> {
+    fn advance(self: Box<Self>, data: &[u8]) -> Result<(Box<dyn Protocol>, Vec<u8>)> {
         let (ctx, data) = match *self {
             Self::R0 => self.init(data),
             _ => self.update(data),
@@ -123,7 +123,7 @@ impl Protocol for KeygenContext {
         Ok((Box::new(ctx), data))
     }
 
-    fn finish(self: Box<Self>) -> ProtocolResult<Vec<u8>> {
+    fn finish(self: Box<Self>) -> Result<Vec<u8>> {
         match *self {
             Self::Done(ctx) => Ok(serde_json::to_vec(&ctx).unwrap()),
             _ => Err("protocol not finished".into()),
@@ -151,7 +151,7 @@ impl SignContext {
         SignContext::R0(serde_json::from_slice(group).unwrap())
     }
 
-    fn init(self, data: &[u8]) -> ProtocolResult<(Self, Vec<u8>)> {
+    fn init(self, data: &[u8]) -> Result<(Self, Vec<u8>)> {
         let msg = Gg18SignInit::decode(data)?;
 
         // FIXME: proto fields should have matching types, i.e. i16, not i32
@@ -169,7 +169,7 @@ impl SignContext {
         Ok((Self::R1(c1), pack(ser)))
     }
 
-    fn update(self, data: &[u8]) -> ProtocolResult<(Self, Vec<u8>)> {
+    fn update(self, data: &[u8]) -> Result<(Self, Vec<u8>)> {
         let msgs = unpack(data)?;
         let n = msgs.len();
 
@@ -229,7 +229,7 @@ impl SignContext {
 
 #[typetag::serde]
 impl Protocol for SignContext {
-    fn advance(self: Box<Self>, data: &[u8]) -> ProtocolResult<(Box<dyn Protocol>, Vec<u8>)> {
+    fn advance(self: Box<Self>, data: &[u8]) -> Result<(Box<dyn Protocol>, Vec<u8>)> {
         let (ctx, data) = match *self {
             Self::R0(_) => self.init(data),
             _ => self.update(data),
@@ -237,7 +237,7 @@ impl Protocol for SignContext {
         Ok((Box::new(ctx), data))
     }
 
-    fn finish(self: Box<Self>) -> ProtocolResult<Vec<u8>> {
+    fn finish(self: Box<Self>) -> Result<Vec<u8>> {
         match *self {
             Self::Done(sig) => Ok(sig),
             _ => Err("protocol not finished".into()),

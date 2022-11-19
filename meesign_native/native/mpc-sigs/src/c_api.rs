@@ -51,7 +51,7 @@ fn err_to_cstr(err: Box<dyn Error>) -> CString {
     CString::new(format!("{:?}", err)).unwrap()
 }
 
-fn advance(ctx1_ser: &[u8], data_in: &[u8]) -> ProtocolResult<(Vec<u8>, Vec<u8>)> {
+fn advance(ctx1_ser: &[u8], data_in: &[u8]) -> crate::protocol::Result<(Vec<u8>, Vec<u8>)> {
     let ctx1: Box<dyn Protocol> = serde_json::from_slice(ctx1_ser).unwrap();
     let (ctx2, data_out) = ctx1.advance(data_in)?;
     let ctx2_ser = serde_json::to_vec(&ctx2).unwrap();
@@ -72,7 +72,7 @@ pub extern "C" fn protocol_advance(
     Box::into_raw(Box::new(res))
 }
 
-fn finish(ctx_ser: &[u8]) -> ProtocolResult<(Vec<u8>, Vec<u8>)> {
+fn finish(ctx_ser: &[u8]) -> crate::protocol::Result<(Vec<u8>, Vec<u8>)> {
     let ctx: Box<dyn Protocol> = serde_json::from_slice(ctx_ser).unwrap();
     let data_out = ctx.finish()?;
     Ok((vec![], data_out))
