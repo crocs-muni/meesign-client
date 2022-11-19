@@ -3,7 +3,7 @@ use std::error::Error;
 use std::ffi::CString;
 use std::os::raw::c_char;
 
-use crate::protocol::*;
+use crate::protocol;
 use crate::protocols::gg18;
 
 #[repr(C)]
@@ -72,15 +72,15 @@ pub extern "C" fn protocol_result_free(res: ProtocolResult) {}
 
 #[no_mangle]
 pub extern "C" fn protocol_keygen(proto_id: ProtocolId) -> ProtocolResult {
-    let ctx: Box<dyn Protocol> = Box::new(match proto_id {
+    let ctx: Box<dyn protocol::Protocol> = Box::new(match proto_id {
         ProtocolId::Gg18 => gg18::KeygenContext::new(),
     });
     let ctx_ser = serde_json::to_vec(&ctx).unwrap();
     ProtocolResult::new(ctx_ser, vec![])
 }
 
-fn advance(ctx1_ser: &[u8], data_in: &[u8]) -> Result<(Vec<u8>, Vec<u8>)> {
-    let ctx1: Box<dyn Protocol> = serde_json::from_slice(ctx1_ser).unwrap();
+fn advance(ctx1_ser: &[u8], data_in: &[u8]) -> protocol::Result<(Vec<u8>, Vec<u8>)> {
+    let ctx1: Box<dyn protocol::Protocol> = serde_json::from_slice(ctx1_ser).unwrap();
     let (ctx2, data_out) = ctx1.advance(data_in)?;
     let ctx2_ser = serde_json::to_vec(&ctx2).unwrap();
     Ok((ctx2_ser, data_out))
@@ -106,8 +106,8 @@ pub extern "C" fn protocol_advance(
     }
 }
 
-fn finish(ctx_ser: &[u8]) -> Result<(Vec<u8>, Vec<u8>)> {
-    let ctx: Box<dyn Protocol> = serde_json::from_slice(ctx_ser).unwrap();
+fn finish(ctx_ser: &[u8]) -> protocol::Result<(Vec<u8>, Vec<u8>)> {
+    let ctx: Box<dyn protocol::Protocol> = serde_json::from_slice(ctx_ser).unwrap();
     let data_out = ctx.finish()?;
     Ok((vec![], data_out))
 }
@@ -137,7 +137,7 @@ pub extern "C" fn protocol_sign(
 ) -> ProtocolResult {
     let group_ser = unsafe { slice::from_raw_parts(group_ptr, group_len) };
 
-    let ctx: Box<dyn Protocol> = Box::new(match proto_id {
+    let ctx: Box<dyn protocol::Protocol> = Box::new(match proto_id {
         ProtocolId::Gg18 => gg18::SignContext::new(group_ser),
     });
     let ctx_ser = serde_json::to_vec(&ctx).unwrap();
