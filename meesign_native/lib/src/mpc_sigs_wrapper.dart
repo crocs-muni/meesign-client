@@ -70,7 +70,7 @@ class ProtocolWrapper {
   static Uint8List keygen(int protoId) {
     return using((Arena alloc) {
       final res = alloc.using(
-        _lib.keygen(protoId),
+        _lib.protocol_keygen(protoId),
         _lib.protocol_result_free,
       );
 
@@ -83,7 +83,7 @@ class ProtocolWrapper {
       final groupBuf = _dup(alloc, group);
 
       final res = alloc.using(
-        _lib.sign(protoId, groupBuf, group.length),
+        _lib.protocol_sign(protoId, groupBuf, group.length),
         _lib.protocol_result_free,
       );
 

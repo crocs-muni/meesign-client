@@ -49,17 +49,19 @@ class MpcSigsLib {
   late final _protocol_result_free =
       _protocol_result_freePtr.asFunction<void Function(ProtocolResult)>();
 
-  ProtocolResult keygen(
+  ProtocolResult protocol_keygen(
     int proto_id,
   ) {
-    return _keygen(
+    return _protocol_keygen(
       proto_id,
     );
   }
 
-  late final _keygenPtr =
-      _lookup<ffi.NativeFunction<ProtocolResult Function(ffi.Int32)>>('keygen');
-  late final _keygen = _keygenPtr.asFunction<ProtocolResult Function(int)>();
+  late final _protocol_keygenPtr =
+      _lookup<ffi.NativeFunction<ProtocolResult Function(ffi.Int32)>>(
+          'protocol_keygen');
+  late final _protocol_keygen =
+      _protocol_keygenPtr.asFunction<ProtocolResult Function(int)>();
 
   ProtocolResult protocol_advance(
     ffi.Pointer<ffi.Uint8> ctx_ptr,
@@ -109,23 +111,23 @@ class MpcSigsLib {
       ProtocolResult Function(
           ffi.Pointer<ffi.Uint8>, int, ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
 
-  ProtocolResult sign(
+  ProtocolResult protocol_sign(
     int proto_id,
     ffi.Pointer<ffi.Uint8> group_ptr,
     int group_len,
   ) {
-    return _sign(
+    return _protocol_sign(
       proto_id,
       group_ptr,
       group_len,
     );
   }
 
-  late final _signPtr = _lookup<
+  late final _protocol_signPtr = _lookup<
       ffi.NativeFunction<
           ProtocolResult Function(
-              ffi.Int32, ffi.Pointer<ffi.Uint8>, uintptr_t)>>('sign');
-  late final _sign = _signPtr
+              ffi.Int32, ffi.Pointer<ffi.Uint8>, uintptr_t)>>('protocol_sign');
+  late final _protocol_sign = _protocol_signPtr
       .asFunction<ProtocolResult Function(int, ffi.Pointer<ffi.Uint8>, int)>();
 }
 

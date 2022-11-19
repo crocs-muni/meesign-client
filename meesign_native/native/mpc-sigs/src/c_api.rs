@@ -71,7 +71,7 @@ impl ProtocolResult {
 pub extern "C" fn protocol_result_free(res: ProtocolResult) {}
 
 #[no_mangle]
-pub extern "C" fn keygen(proto_id: ProtocolId) -> ProtocolResult {
+pub extern "C" fn protocol_keygen(proto_id: ProtocolId) -> ProtocolResult {
     let ctx: Box<dyn Protocol> = Box::new(match proto_id {
         ProtocolId::Gg18 => gg18::KeygenContext::new(),
     });
@@ -130,7 +130,7 @@ pub extern "C" fn protocol_finish(
 }
 
 #[no_mangle]
-pub extern "C" fn sign(
+pub extern "C" fn protocol_sign(
     proto_id: ProtocolId,
     group_ptr: *const u8,
     group_len: usize,
