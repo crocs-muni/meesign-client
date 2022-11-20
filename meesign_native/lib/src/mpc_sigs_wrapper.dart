@@ -15,14 +15,18 @@ import 'worker.dart';
 // TODO: consider newer alternative solutions
 // e.g. flutter rust bridge, membrane
 
-Pointer<Uint8> _dup(Allocator alloc, Uint8List src) {
-  final buf = alloc<Uint8>(src.length);
-  buf.asTypedList(src.length).setAll(0, src);
-  return buf;
+extension IntIterConversion on Iterable<int> {
+  Pointer<Uint8> dupToNative(Allocator alloc) {
+    final buf = alloc<Uint8>(length);
+    buf.asTypedList(length).setAll(0, this);
+    return buf;
+  }
 }
 
-extension MemUtil on Buffer {
+extension BufferConversion on Buffer {
   Uint8List asTypedList() => ptr.asTypedList(len);
+
+  Uint8List dupToDart() => Uint8List.fromList(asTypedList());
 }
 
 class ProtocolException implements Exception {
@@ -74,20 +78,20 @@ class ProtocolWrapper {
         _lib.protocol_result_free,
       );
 
-      return Uint8List.fromList(res.context.asTypedList());
+      return res.context.dupToDart();
     });
   }
 
   static Uint8List sign(int protoId, Uint8List group) {
     return using((Arena alloc) {
-      final groupBuf = _dup(alloc, group);
+      final groupBuf = group.dupToNative(alloc);
 
       final res = alloc.using(
         _lib.protocol_sign(protoId, groupBuf, group.length),
         _lib.protocol_result_free,
       );
 
-      return Uint8List.fromList(res.context.asTypedList());
+      return res.context.dupToDart();
     });
   }
 
@@ -95,8 +99,8 @@ class ProtocolWrapper {
     return using((Arena alloc) {
       final protoData = payload.materialize();
 
-      final ctxBuf = _dup(alloc, protoData.context);
-      final dataBuf = _dup(alloc, protoData.data);
+      final ctxBuf = protoData.context.dupToNative(alloc);
+      final dataBuf = protoData.data.dupToNative(alloc);
       final error = alloc.using(Error(), Error.free);
 
       final res = alloc.using(
@@ -128,7 +132,7 @@ class ProtocolWrapper {
 
   static Uint8List finish(Uint8List context) {
     return using((Arena alloc) {
-      final ctxBuf = _dup(alloc, context);
+      final ctxBuf = context.dupToNative(alloc);
       final error = alloc.using(Error(), Error.free);
 
       final res = alloc.using(
@@ -137,7 +141,7 @@ class ProtocolWrapper {
       );
 
       if (error.occured) throw ProtocolException(error.message);
-      return Uint8List.fromList(res.data.asTypedList());
+      return res.data.dupToDart();
     });
   }
 }
