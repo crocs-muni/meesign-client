@@ -24,30 +24,30 @@ class RegistrationRequest extends $pb.GeneratedMessage {
               ? ''
               : 'meesign'),
       createEmptyInstance: create)
-    ..a<$core.List<$core.int>>(
+    ..aOS(
         1,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
-            : 'identifier',
-        $pb.PbFieldType.OY)
-    ..aOS(
+            : 'name')
+    ..a<$core.List<$core.int>>(
         2,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
-            : 'name')
+            : 'csr',
+        $pb.PbFieldType.OY)
     ..hasRequiredFields = false;
 
   RegistrationRequest._() : super();
   factory RegistrationRequest({
-    $core.List<$core.int>? identifier,
     $core.String? name,
+    $core.List<$core.int>? csr,
   }) {
     final _result = create();
-    if (identifier != null) {
-      _result.identifier = identifier;
-    }
     if (name != null) {
       _result.name = name;
+    }
+    if (csr != null) {
+      _result.csr = csr;
     }
     return _result;
   }
@@ -79,28 +79,119 @@ class RegistrationRequest extends $pb.GeneratedMessage {
   static RegistrationRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.List<$core.int> get identifier => $_getN(0);
+  $core.String get name => $_getSZ(0);
   @$pb.TagNumber(1)
-  set identifier($core.List<$core.int> v) {
+  set name($core.String v) {
+    $_setString(0, v);
+  }
+
+  @$pb.TagNumber(1)
+  $core.bool hasName() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearName() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get csr => $_getN(1);
+  @$pb.TagNumber(2)
+  set csr($core.List<$core.int> v) {
+    $_setBytes(1, v);
+  }
+
+  @$pb.TagNumber(2)
+  $core.bool hasCsr() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearCsr() => clearField(2);
+}
+
+class RegistrationResponse extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      const $core.bool.fromEnvironment('protobuf.omit_message_names')
+          ? ''
+          : 'RegistrationResponse',
+      package: const $pb.PackageName(
+          const $core.bool.fromEnvironment('protobuf.omit_message_names')
+              ? ''
+              : 'meesign'),
+      createEmptyInstance: create)
+    ..a<$core.List<$core.int>>(
+        1,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'deviceId',
+        $pb.PbFieldType.OY)
+    ..a<$core.List<$core.int>>(
+        2,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'certificate',
+        $pb.PbFieldType.OY)
+    ..hasRequiredFields = false;
+
+  RegistrationResponse._() : super();
+  factory RegistrationResponse({
+    $core.List<$core.int>? deviceId,
+    $core.List<$core.int>? certificate,
+  }) {
+    final _result = create();
+    if (deviceId != null) {
+      _result.deviceId = deviceId;
+    }
+    if (certificate != null) {
+      _result.certificate = certificate;
+    }
+    return _result;
+  }
+  factory RegistrationResponse.fromBuffer($core.List<$core.int> i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(i, r);
+  factory RegistrationResponse.fromJson($core.String i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(i, r);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+      'Will be removed in next major version')
+  RegistrationResponse clone() =>
+      RegistrationResponse()..mergeFromMessage(this);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+      'Will be removed in next major version')
+  RegistrationResponse copyWith(void Function(RegistrationResponse) updates) =>
+      super.copyWith((message) => updates(message as RegistrationResponse))
+          as RegistrationResponse; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static RegistrationResponse create() => RegistrationResponse._();
+  RegistrationResponse createEmptyInstance() => create();
+  static $pb.PbList<RegistrationResponse> createRepeated() =>
+      $pb.PbList<RegistrationResponse>();
+  @$core.pragma('dart2js:noInline')
+  static RegistrationResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<RegistrationResponse>(create);
+  static RegistrationResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.List<$core.int> get deviceId => $_getN(0);
+  @$pb.TagNumber(1)
+  set deviceId($core.List<$core.int> v) {
     $_setBytes(0, v);
   }
 
   @$pb.TagNumber(1)
-  $core.bool hasIdentifier() => $_has(0);
+  $core.bool hasDeviceId() => $_has(0);
   @$pb.TagNumber(1)
-  void clearIdentifier() => clearField(1);
+  void clearDeviceId() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.String get name => $_getSZ(1);
+  $core.List<$core.int> get certificate => $_getN(1);
   @$pb.TagNumber(2)
-  set name($core.String v) {
-    $_setString(1, v);
+  set certificate($core.List<$core.int> v) {
+    $_setBytes(1, v);
   }
 
   @$pb.TagNumber(2)
-  $core.bool hasName() => $_has(1);
+  $core.bool hasCertificate() => $_has(1);
   @$pb.TagNumber(2)
-  void clearName() => clearField(2);
+  void clearCertificate() => clearField(2);
 }
 
 class GroupRequest extends $pb.GeneratedMessage {
@@ -550,8 +641,14 @@ class Device extends $pb.GeneratedMessage {
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
             : 'name')
-    ..a<$fixnum.Int64>(
+    ..a<$core.List<$core.int>>(
         3,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'certificate',
+        $pb.PbFieldType.OY)
+    ..a<$fixnum.Int64>(
+        4,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
             : 'lastActive',
@@ -563,6 +660,7 @@ class Device extends $pb.GeneratedMessage {
   factory Device({
     $core.List<$core.int>? identifier,
     $core.String? name,
+    $core.List<$core.int>? certificate,
     $fixnum.Int64? lastActive,
   }) {
     final _result = create();
@@ -571,6 +669,9 @@ class Device extends $pb.GeneratedMessage {
     }
     if (name != null) {
       _result.name = name;
+    }
+    if (certificate != null) {
+      _result.certificate = certificate;
     }
     if (lastActive != null) {
       _result.lastActive = lastActive;
@@ -628,16 +729,28 @@ class Device extends $pb.GeneratedMessage {
   void clearName() => clearField(2);
 
   @$pb.TagNumber(3)
-  $fixnum.Int64 get lastActive => $_getI64(2);
+  $core.List<$core.int> get certificate => $_getN(2);
   @$pb.TagNumber(3)
-  set lastActive($fixnum.Int64 v) {
-    $_setInt64(2, v);
+  set certificate($core.List<$core.int> v) {
+    $_setBytes(2, v);
   }
 
   @$pb.TagNumber(3)
-  $core.bool hasLastActive() => $_has(2);
+  $core.bool hasCertificate() => $_has(2);
   @$pb.TagNumber(3)
-  void clearLastActive() => clearField(3);
+  void clearCertificate() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $fixnum.Int64 get lastActive => $_getI64(3);
+  @$pb.TagNumber(4)
+  set lastActive($fixnum.Int64 v) {
+    $_setInt64(3, v);
+  }
+
+  @$pb.TagNumber(4)
+  $core.bool hasLastActive() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearLastActive() => clearField(4);
 }
 
 class SignRequest extends $pb.GeneratedMessage {
@@ -1102,22 +1215,16 @@ class TaskUpdate extends $pb.GeneratedMessage {
         1,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
-            : 'deviceId',
+            : 'task',
         $pb.PbFieldType.OY)
     ..a<$core.List<$core.int>>(
         2,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
-            : 'task',
-        $pb.PbFieldType.OY)
-    ..a<$core.List<$core.int>>(
-        3,
-        const $core.bool.fromEnvironment('protobuf.omit_field_names')
-            ? ''
             : 'data',
         $pb.PbFieldType.OY)
     ..a<$core.int>(
-        4,
+        3,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
             : 'attempt',
@@ -1126,15 +1233,11 @@ class TaskUpdate extends $pb.GeneratedMessage {
 
   TaskUpdate._() : super();
   factory TaskUpdate({
-    $core.List<$core.int>? deviceId,
     $core.List<$core.int>? task,
     $core.List<$core.int>? data,
     $core.int? attempt,
   }) {
     final _result = create();
-    if (deviceId != null) {
-      _result.deviceId = deviceId;
-    }
     if (task != null) {
       _result.task = task;
     }
@@ -1173,52 +1276,40 @@ class TaskUpdate extends $pb.GeneratedMessage {
   static TaskUpdate? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.List<$core.int> get deviceId => $_getN(0);
+  $core.List<$core.int> get task => $_getN(0);
   @$pb.TagNumber(1)
-  set deviceId($core.List<$core.int> v) {
+  set task($core.List<$core.int> v) {
     $_setBytes(0, v);
   }
 
   @$pb.TagNumber(1)
-  $core.bool hasDeviceId() => $_has(0);
+  $core.bool hasTask() => $_has(0);
   @$pb.TagNumber(1)
-  void clearDeviceId() => clearField(1);
+  void clearTask() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.List<$core.int> get task => $_getN(1);
+  $core.List<$core.int> get data => $_getN(1);
   @$pb.TagNumber(2)
-  set task($core.List<$core.int> v) {
+  set data($core.List<$core.int> v) {
     $_setBytes(1, v);
   }
 
   @$pb.TagNumber(2)
-  $core.bool hasTask() => $_has(1);
+  $core.bool hasData() => $_has(1);
   @$pb.TagNumber(2)
-  void clearTask() => clearField(2);
+  void clearData() => clearField(2);
 
   @$pb.TagNumber(3)
-  $core.List<$core.int> get data => $_getN(2);
+  $core.int get attempt => $_getIZ(2);
   @$pb.TagNumber(3)
-  set data($core.List<$core.int> v) {
-    $_setBytes(2, v);
-  }
-
-  @$pb.TagNumber(3)
-  $core.bool hasData() => $_has(2);
-  @$pb.TagNumber(3)
-  void clearData() => clearField(3);
-
-  @$pb.TagNumber(4)
-  $core.int get attempt => $_getIZ(3);
-  @$pb.TagNumber(4)
   set attempt($core.int v) {
-    $_setUnsignedInt32(3, v);
+    $_setUnsignedInt32(2, v);
   }
 
-  @$pb.TagNumber(4)
-  $core.bool hasAttempt() => $_has(3);
-  @$pb.TagNumber(4)
-  void clearAttempt() => clearField(4);
+  @$pb.TagNumber(3)
+  $core.bool hasAttempt() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearAttempt() => clearField(3);
 }
 
 class TasksRequest extends $pb.GeneratedMessage {
@@ -1557,14 +1648,8 @@ class TaskDecision extends $pb.GeneratedMessage {
             ? ''
             : 'task',
         $pb.PbFieldType.OY)
-    ..a<$core.List<$core.int>>(
-        2,
-        const $core.bool.fromEnvironment('protobuf.omit_field_names')
-            ? ''
-            : 'device',
-        $pb.PbFieldType.OY)
     ..aOB(
-        3,
+        2,
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
             : 'accept')
@@ -1573,15 +1658,11 @@ class TaskDecision extends $pb.GeneratedMessage {
   TaskDecision._() : super();
   factory TaskDecision({
     $core.List<$core.int>? task,
-    $core.List<$core.int>? device,
     $core.bool? accept,
   }) {
     final _result = create();
     if (task != null) {
       _result.task = task;
-    }
-    if (device != null) {
-      _result.device = device;
     }
     if (accept != null) {
       _result.accept = accept;
@@ -1628,28 +1709,16 @@ class TaskDecision extends $pb.GeneratedMessage {
   void clearTask() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.List<$core.int> get device => $_getN(1);
+  $core.bool get accept => $_getBF(1);
   @$pb.TagNumber(2)
-  set device($core.List<$core.int> v) {
-    $_setBytes(1, v);
-  }
-
-  @$pb.TagNumber(2)
-  $core.bool hasDevice() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearDevice() => clearField(2);
-
-  @$pb.TagNumber(3)
-  $core.bool get accept => $_getBF(2);
-  @$pb.TagNumber(3)
   set accept($core.bool v) {
-    $_setBool(2, v);
+    $_setBool(1, v);
   }
 
-  @$pb.TagNumber(3)
-  $core.bool hasAccept() => $_has(2);
-  @$pb.TagNumber(3)
-  void clearAccept() => clearField(3);
+  @$pb.TagNumber(2)
+  $core.bool hasAccept() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearAccept() => clearField(2);
 }
 
 class TaskAcknowledgement extends $pb.GeneratedMessage {
@@ -1668,25 +1737,15 @@ class TaskAcknowledgement extends $pb.GeneratedMessage {
             ? ''
             : 'taskId',
         $pb.PbFieldType.OY)
-    ..a<$core.List<$core.int>>(
-        2,
-        const $core.bool.fromEnvironment('protobuf.omit_field_names')
-            ? ''
-            : 'deviceId',
-        $pb.PbFieldType.OY)
     ..hasRequiredFields = false;
 
   TaskAcknowledgement._() : super();
   factory TaskAcknowledgement({
     $core.List<$core.int>? taskId,
-    $core.List<$core.int>? deviceId,
   }) {
     final _result = create();
     if (taskId != null) {
       _result.taskId = taskId;
-    }
-    if (deviceId != null) {
-      _result.deviceId = deviceId;
     }
     return _result;
   }
@@ -1728,18 +1787,6 @@ class TaskAcknowledgement extends $pb.GeneratedMessage {
   $core.bool hasTaskId() => $_has(0);
   @$pb.TagNumber(1)
   void clearTaskId() => clearField(1);
-
-  @$pb.TagNumber(2)
-  $core.List<$core.int> get deviceId => $_getN(1);
-  @$pb.TagNumber(2)
-  set deviceId($core.List<$core.int> v) {
-    $_setBytes(1, v);
-  }
-
-  @$pb.TagNumber(2)
-  $core.bool hasDeviceId() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearDeviceId() => clearField(2);
 }
 
 class LogRequest extends $pb.GeneratedMessage {
@@ -1757,25 +1804,15 @@ class LogRequest extends $pb.GeneratedMessage {
         const $core.bool.fromEnvironment('protobuf.omit_field_names')
             ? ''
             : 'message')
-    ..a<$core.List<$core.int>>(
-        2,
-        const $core.bool.fromEnvironment('protobuf.omit_field_names')
-            ? ''
-            : 'deviceId',
-        $pb.PbFieldType.OY)
     ..hasRequiredFields = false;
 
   LogRequest._() : super();
   factory LogRequest({
     $core.String? message,
-    $core.List<$core.int>? deviceId,
   }) {
     final _result = create();
     if (message != null) {
       _result.message = message;
-    }
-    if (deviceId != null) {
-      _result.deviceId = deviceId;
     }
     return _result;
   }
@@ -1816,18 +1853,6 @@ class LogRequest extends $pb.GeneratedMessage {
   $core.bool hasMessage() => $_has(0);
   @$pb.TagNumber(1)
   void clearMessage() => clearField(1);
-
-  @$pb.TagNumber(2)
-  $core.List<$core.int> get deviceId => $_getN(1);
-  @$pb.TagNumber(2)
-  set deviceId($core.List<$core.int> v) {
-    $_setBytes(1, v);
-  }
-
-  @$pb.TagNumber(2)
-  $core.bool hasDeviceId() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearDeviceId() => clearField(2);
 }
 
 class SubscribeRequest extends $pb.GeneratedMessage {
@@ -1840,24 +1865,10 @@ class SubscribeRequest extends $pb.GeneratedMessage {
               ? ''
               : 'meesign'),
       createEmptyInstance: create)
-    ..a<$core.List<$core.int>>(
-        1,
-        const $core.bool.fromEnvironment('protobuf.omit_field_names')
-            ? ''
-            : 'deviceId',
-        $pb.PbFieldType.OY)
     ..hasRequiredFields = false;
 
   SubscribeRequest._() : super();
-  factory SubscribeRequest({
-    $core.List<$core.int>? deviceId,
-  }) {
-    final _result = create();
-    if (deviceId != null) {
-      _result.deviceId = deviceId;
-    }
-    return _result;
-  }
+  factory SubscribeRequest() => create();
   factory SubscribeRequest.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
       create()..mergeFromBuffer(i, r);
@@ -1884,16 +1895,4 @@ class SubscribeRequest extends $pb.GeneratedMessage {
   static SubscribeRequest getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<SubscribeRequest>(create);
   static SubscribeRequest? _defaultInstance;
-
-  @$pb.TagNumber(1)
-  $core.List<$core.int> get deviceId => $_getN(0);
-  @$pb.TagNumber(1)
-  set deviceId($core.List<$core.int> v) {
-    $_setBytes(0, v);
-  }
-
-  @$pb.TagNumber(1)
-  $core.bool hasDeviceId() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearDeviceId() => clearField(1);
 }
