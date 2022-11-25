@@ -78,7 +78,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     try {
       final deviceRepository = DeviceRepository(
         ClientFactory.create(host,
-            certs: await di.certs, allowBadCerts: di.allowBadCerts),
+            serverCerts: await di.certs, allowBadCerts: di.allowBadCerts),
       );
       final device = await deviceRepository.register(
         _nameController.text,

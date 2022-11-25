@@ -23,7 +23,7 @@ class AppContainer {
 
   Future<void> init(String host) async {
     client = ClientFactory.create(host,
-        certs: await certs, allowBadCerts: allowBadCerts);
+        serverCerts: await certs, allowBadCerts: allowBadCerts);
     deviceRepository = DeviceRepository(client);
     final taskSource = TaskSource(client);
     groupRepository = GroupRepository(client, taskSource, deviceRepository);
