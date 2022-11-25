@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:meesign_core/meesign_core.dart';
-import 'package:meesign_core/src/model/key_type.dart';
 import 'package:test/test.dart';
 
 import 'matcher.dart';
@@ -102,19 +101,21 @@ Future<void> sign(
 const String outputPath = 'test/output';
 
 void main() {
-  late MPCClient client;
+  late KeyStore keyStore;
+  late NetworkDispatcher dispatcher;
   late DeviceRepository deviceRepository;
   late GroupRepository groupRepository;
   late FileRepository fileRepository;
 
   setUp(() {
-    client = ClientFactory.create('localhost', allowBadCerts: true);
-    deviceRepository = DeviceRepository(client);
-    final taskSource = TaskSource(client);
-    groupRepository = GroupRepository(client, taskSource, deviceRepository);
+    keyStore = KeyStore();
+    dispatcher = NetworkDispatcher('localhost', keyStore, allowBadCerts: true);
+    deviceRepository = DeviceRepository(dispatcher);
+    final taskSource = TaskSource(dispatcher);
+    groupRepository = GroupRepository(dispatcher, taskSource, deviceRepository);
     final fileStore = FileStore(SimpleDirProvider(outputPath));
     fileRepository =
-        FileRepository(client, taskSource, fileStore, groupRepository);
+        FileRepository(dispatcher, taskSource, fileStore, groupRepository);
   });
 
   Future<void> testSign({required int n, required int t}) =>

@@ -4,8 +4,9 @@ import 'package:meesign_core/meesign_data.dart';
 import 'data/tmp_dir_provider.dart';
 
 class AppContainer {
-  late final MPCClient client;
+  late final NetworkDispatcher dispatcher;
 
+  late final KeyStore keyStore = KeyStore();
   late final FileStore fileStore = FileStore(TmpDirProvider());
 
   late final PrefRepository prefRepository = PrefRepository();
@@ -16,19 +17,20 @@ class AppContainer {
 
   final bool allowBadCerts = const bool.fromEnvironment('ALLOW_BAD_CERTS');
 
-  Future<List<int>?> get certs async {
+  Future<List<int>?> get caCerts async {
     final data = await rootBundle.load('assets/ca-cert.pem');
     return data.lengthInBytes == 0 ? null : data.buffer.asUint8List();
   }
 
   Future<void> init(String host) async {
-    client = ClientFactory.create(host,
-        serverCerts: await certs, allowBadCerts: allowBadCerts);
-    deviceRepository = DeviceRepository(client);
-    final taskSource = TaskSource(client);
-    groupRepository = GroupRepository(client, taskSource, deviceRepository);
+    dispatcher = NetworkDispatcher(host, keyStore,
+        serverCerts: await caCerts, allowBadCerts: allowBadCerts);
+
+    deviceRepository = DeviceRepository(dispatcher);
+    final taskSource = TaskSource(dispatcher);
+    groupRepository = GroupRepository(dispatcher, taskSource, deviceRepository);
     fileRepository =
-        FileRepository(client, taskSource, fileStore, groupRepository);
+        FileRepository(dispatcher, taskSource, fileStore, groupRepository);
     challengeRepository = ChallengeRepository(taskSource, groupRepository);
   }
 }

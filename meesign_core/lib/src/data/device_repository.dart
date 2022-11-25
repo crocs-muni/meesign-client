@@ -2,16 +2,17 @@ import 'package:meesign_network/grpc.dart' as rpc;
 
 import '../model/device.dart';
 import '../util/uuid.dart';
+import 'network_dispatcher.dart';
 
 class DeviceRepository {
-  final rpc.MPCClient _rpcClient;
+  final NetworkDispatcher _dispatcher;
 
-  DeviceRepository(this._rpcClient);
+  DeviceRepository(this._dispatcher);
 
   Future<Device> register(String name) async {
     final device = Device.random(name, DeviceType.app);
 
-    await _rpcClient.register(
+    final resp = await _dispatcher.unauth.register(
       rpc.RegistrationRequest(identifier: device.id.bytes, name: name),
     );
 
@@ -19,7 +20,7 @@ class DeviceRepository {
   }
 
   Future<Iterable<Device>> getDevices() async {
-    final devices = await _rpcClient.getDevices(rpc.DevicesRequest());
+    final devices = await _dispatcher.unauth.getDevices(rpc.DevicesRequest());
 
     return devices.devices.map(
       (device) => Device(

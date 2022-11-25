@@ -14,12 +14,13 @@ import '../model/task.dart';
 import '../util/default_map.dart';
 import '../util/uuid.dart';
 import 'device_repository.dart';
+import 'network_dispatcher.dart';
 import 'task_repository.dart';
 
 // TODO: hide the group context from the outside world?
 
 class GroupRepository extends TaskRepository<GroupBase> {
-  final rpc.MPCClient _rpcClient;
+  final NetworkDispatcher _dispatcher;
   final DeviceRepository _deviceRepository;
 
   // Group also contains device-specific context, hence one map for each device
@@ -35,7 +36,7 @@ class GroupRepository extends TaskRepository<GroupBase> {
       DefaultMap(HashMap(), () => BehaviorSubject.seeded([]));
 
   GroupRepository(
-    this._rpcClient,
+    this._dispatcher,
     TaskSource taskSource,
     this._deviceRepository,
   ) : super(taskSource);
@@ -47,7 +48,7 @@ class GroupRepository extends TaskRepository<GroupBase> {
     Protocol protocol,
     KeyType keyType,
   ) async {
-    await _rpcClient.group(
+    await _dispatcher.unauth.group(
       rpc.GroupRequest(
         deviceIds: members.map((m) => m.id.bytes),
         name: name,

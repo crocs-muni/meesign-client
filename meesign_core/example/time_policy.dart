@@ -119,12 +119,15 @@ void main(List<String> args) async {
     return;
   }
 
-  final client = ClientFactory.create(options['host'], allowBadCerts: true);
-  final taskSource = TaskSource(client);
-  final deviceRepository = DeviceRepository(client);
-  final groupRepository = GroupRepository(client, taskSource, deviceRepository);
+  final keyStore = KeyStore();
+  final dispatcher =
+      NetworkDispatcher(options['host'], keyStore, allowBadCerts: true);
+  final taskSource = TaskSource(dispatcher);
+  final deviceRepository = DeviceRepository(dispatcher);
+  final groupRepository =
+      GroupRepository(dispatcher, taskSource, deviceRepository);
   final fileRepository =
-      FileRepository(client, taskSource, DummyFileStore(), groupRepository);
+      FileRepository(dispatcher, taskSource, DummyFileStore(), groupRepository);
   final challengeRepository = ChallengeRepository(taskSource, groupRepository);
 
   final device = await deviceRepository.register(options['name']);

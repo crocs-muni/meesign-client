@@ -13,18 +13,19 @@ import 'package:synchronized/synchronized.dart';
 import '../model/task.dart';
 import '../util/default_map.dart';
 import '../util/uuid.dart';
+import 'network_dispatcher.dart';
 
 class StateException implements Exception {}
 
 class TaskSource {
-  final rpc.MPCClient _rpcClient;
+  final NetworkDispatcher _dispatcher;
 
   final Map<Uuid, BcastRespStream<rpc.Task>> _streams = HashMap();
 
-  TaskSource(this._rpcClient);
+  TaskSource(this._dispatcher);
 
   Future<rpc.Resp> update(Uuid did, Uuid tid, List<int> data, int attempt) =>
-      _rpcClient.updateTask(rpc.TaskUpdate(
+      _dispatcher[did].updateTask(rpc.TaskUpdate(
         deviceId: did.bytes,
         task: tid.bytes,
         data: data,
@@ -32,27 +33,27 @@ class TaskSource {
       ));
 
   Future<void> approve(Uuid did, Uuid tid, {required bool agree}) =>
-      _rpcClient.decideTask(rpc.TaskDecision(
+      _dispatcher[did].decideTask(rpc.TaskDecision(
         task: tid.bytes,
         device: did.bytes,
         accept: agree,
       ));
 
   Future<void> acknowledge(Uuid did, Uuid tid) =>
-      _rpcClient.acknowledgeTask(rpc.TaskAcknowledgement(
+      _dispatcher[did].acknowledgeTask(rpc.TaskAcknowledgement(
         taskId: tid.bytes,
         deviceId: did.bytes,
       ));
 
   /// retrieve the task including all its details
   Future<rpc.Task> fetch(Uuid did, Uuid tid) =>
-      _rpcClient.getTask(rpc.TaskRequest(
+      _dispatcher[did].getTask(rpc.TaskRequest(
         deviceId: did.bytes,
         taskId: tid.bytes,
       ));
 
   Future<List<rpc.Task>> fetchAll(Uuid did) async {
-    final rpcTasks = await _rpcClient.getTasks(
+    final rpcTasks = await _dispatcher[did].getTasks(
       rpc.TasksRequest(deviceId: did.bytes),
     );
     return rpcTasks.tasks;
@@ -60,7 +61,7 @@ class TaskSource {
 
   BcastRespStream<rpc.Task> subscribe(Uuid did) {
     return _streams.putIfAbsent(did, () {
-      return _rpcClient
+      return _dispatcher[did]
           .subscribeUpdates(
         rpc.SubscribeRequest(deviceId: did.bytes),
       )

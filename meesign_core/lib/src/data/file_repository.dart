@@ -14,6 +14,7 @@ import '../util/default_map.dart';
 import '../util/uuid.dart';
 import 'file_store.dart';
 import 'group_repository.dart';
+import 'network_dispatcher.dart';
 import 'task_repository.dart';
 
 import 'package:path/path.dart' as path_pkg;
@@ -23,7 +24,7 @@ export 'file_store.dart';
 class FileRepository extends TaskRepository<File> {
   static const maxFileSize = 8 * 1024 * 1024;
 
-  final rpc.MPCClient _rpcClient;
+  final NetworkDispatcher _dispatcher;
   final FileStore _fileStore;
   final GroupRepository _groupRepository;
 
@@ -31,7 +32,7 @@ class FileRepository extends TaskRepository<File> {
       DefaultMap(HashMap(), () => BehaviorSubject.seeded([]));
 
   FileRepository(
-    this._rpcClient,
+    this._dispatcher,
     TaskSource taskSource,
     this._fileStore,
     this._groupRepository,
@@ -42,7 +43,7 @@ class FileRepository extends TaskRepository<File> {
     final bytes = await io.File(path).readAsBytes();
     String basename = path_pkg.basename(path);
 
-    await _rpcClient.sign(
+    await _dispatcher.unauth.sign(
       rpc.SignRequest(
         groupId: gid,
         name: basename,
