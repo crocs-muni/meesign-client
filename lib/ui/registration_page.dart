@@ -78,7 +78,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     try {
       final dispatcher = NetworkDispatcher(host, di.keyStore,
           serverCerts: await di.caCerts, allowBadCerts: di.allowBadCerts);
-      final deviceRepository = DeviceRepository(dispatcher);
+      final deviceRepository = DeviceRepository(dispatcher, di.keyStore);
       final device = await deviceRepository.register(
         _nameController.text,
       );

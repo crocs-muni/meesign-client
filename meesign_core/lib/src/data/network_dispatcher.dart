@@ -32,6 +32,7 @@ class NetworkDispatcher {
       );
 
   rpc.MPCClient operator [](Uuid did) {
-    return unauth;
+    _clients[did] ??= _createClient(certKey: _keyStore.load(did));
+    return _clients[did]!;
   }
 }

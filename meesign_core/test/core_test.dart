@@ -110,7 +110,7 @@ void main() {
   setUp(() {
     keyStore = KeyStore();
     dispatcher = NetworkDispatcher('localhost', keyStore, allowBadCerts: true);
-    deviceRepository = DeviceRepository(dispatcher);
+    deviceRepository = DeviceRepository(dispatcher, keyStore);
     final taskSource = TaskSource(dispatcher);
     groupRepository = GroupRepository(dispatcher, taskSource, deviceRepository);
     final fileStore = FileStore(SimpleDirProvider(outputPath));
