@@ -1,7 +1,7 @@
 @Timeout(Duration(seconds: 180))
 
 import 'dart:async';
-import 'dart:io';
+import 'dart:io' as io;
 
 import 'package:meesign_core/meesign_core.dart';
 import 'package:test/test.dart';
@@ -22,7 +22,7 @@ class SimpleDirProvider implements DirProvider {
   SimpleDirProvider(this.path);
 
   @override
-  Future<Directory> getStoreDirectory() async => Directory(path);
+  Future<io.Directory> getStoreDirectory() async => io.Directory(path);
 }
 
 // TODO: use stream matchers?
@@ -107,9 +107,16 @@ void main() {
   late GroupRepository groupRepository;
   late FileRepository fileRepository;
 
+  List<int>? serverCerts;
+  final String? serverCertsPath = io.Platform.environment['SERVER_CERTS'];
+  if (serverCertsPath != null) {
+    serverCerts = io.File(serverCertsPath).readAsBytesSync();
+  }
+
   setUp(() {
     keyStore = KeyStore();
-    dispatcher = NetworkDispatcher('localhost', keyStore, allowBadCerts: true);
+    dispatcher = NetworkDispatcher('localhost', keyStore,
+        serverCerts: serverCerts, allowBadCerts: serverCerts == null);
     deviceRepository = DeviceRepository(dispatcher, keyStore);
     final taskSource = TaskSource(dispatcher);
     groupRepository = GroupRepository(dispatcher, taskSource, deviceRepository);
@@ -127,7 +134,7 @@ void main() {
 
   tearDown(() {
     try {
-      Directory(outputPath).deleteSync(recursive: true);
+      io.Directory(outputPath).deleteSync(recursive: true);
     } catch (_) {}
   });
 }
