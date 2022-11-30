@@ -95,7 +95,7 @@ class MyApp extends StatelessWidget {
         Routes.newGroupQr: (_) => const QrReaderPage(),
         Routes.qrIdentity: (_) => const QrIdentityPage(),
         Routes.registration: (_) => RegistrationPage(
-              prefillHost: prefillHost ?? 'meesign.local',
+              prefillHost: prefillHost ?? 'meesign.crocs.fi.muni.cz',
               prefillName: prefillName ?? '',
             ),
       },
