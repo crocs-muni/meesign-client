@@ -372,10 +372,12 @@ class GroupsSubPage extends StatelessWidget {
             showActions: task.approvable,
             actions: [
               OutlinedButton(
+                key: Key("groups:subpage:join"),
                 child: const Text('JOIN'),
                 onPressed: () => model.joinGroup(task, agree: true),
               ),
               OutlinedButton(
+                key: Key("groups:subpage:decline"),
                 child: const Text('DECLINE'),
                 onPressed: () => model.joinGroup(task, agree: false),
               )
@@ -644,8 +646,8 @@ class _HomePageViewState extends State<HomePageView> {
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            // key: Key("homepage:signing"),
             icon: CounterBadge(
+              key: Key("homepage:signing"),
               stream: context.watch<HomeState>().nSignReqs,
               child: const Icon(Icons.draw),
             ),
