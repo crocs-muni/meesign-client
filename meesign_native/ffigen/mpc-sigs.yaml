@@ -10,3 +10,9 @@ headers:
     - '**bindings.h'
 preamble: |
   // ignore_for_file: camel_case_types, non_constant_identifier_names
+type-map:
+  typedefs:
+    'uintptr_t':
+      lib: 'ffi'
+      c-type: 'UintPtr'
+      dart-type: 'int'

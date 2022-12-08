@@ -95,9 +95,9 @@ class MpcSigsLib {
       ffi.NativeFunction<
           ProtocolResult Function(
               ffi.Pointer<ffi.Uint8>,
-              uintptr_t,
+              ffi.UintPtr,
               ffi.Pointer<ffi.Uint8>,
-              uintptr_t,
+              ffi.UintPtr,
               ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('protocol_advance');
   late final _protocol_advance = _protocol_advancePtr.asFunction<
       ProtocolResult Function(ffi.Pointer<ffi.Uint8>, int,
@@ -117,7 +117,7 @@ class MpcSigsLib {
 
   late final _protocol_finishPtr = _lookup<
       ffi.NativeFunction<
-          ProtocolResult Function(ffi.Pointer<ffi.Uint8>, uintptr_t,
+          ProtocolResult Function(ffi.Pointer<ffi.Uint8>, ffi.UintPtr,
               ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('protocol_finish');
   late final _protocol_finish = _protocol_finishPtr.asFunction<
       ProtocolResult Function(
@@ -137,8 +137,8 @@ class MpcSigsLib {
 
   late final _protocol_signPtr = _lookup<
       ffi.NativeFunction<
-          ProtocolResult Function(
-              ffi.Int32, ffi.Pointer<ffi.Uint8>, uintptr_t)>>('protocol_sign');
+          ProtocolResult Function(ffi.Int32, ffi.Pointer<ffi.Uint8>,
+              ffi.UintPtr)>>('protocol_sign');
   late final _protocol_sign = _protocol_signPtr
       .asFunction<ProtocolResult Function(int, ffi.Pointer<ffi.Uint8>, int)>();
 
@@ -193,9 +193,9 @@ class MpcSigsLib {
       ffi.NativeFunction<
           Buffer Function(
               ffi.Pointer<ffi.Uint8>,
-              uintptr_t,
+              ffi.UintPtr,
               ffi.Pointer<ffi.Uint8>,
-              uintptr_t,
+              ffi.UintPtr,
               ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('auth_cert_key_to_pkcs12');
   late final _auth_cert_key_to_pkcs12 = _auth_cert_key_to_pkcs12Ptr.asFunction<
       Buffer Function(ffi.Pointer<ffi.Uint8>, int, ffi.Pointer<ffi.Uint8>, int,
@@ -209,14 +209,12 @@ abstract class ProtocolId {
 class Buffer extends ffi.Struct {
   external ffi.Pointer<ffi.Uint8> ptr;
 
-  @uintptr_t()
+  @ffi.UintPtr()
   external int len;
 
-  @uintptr_t()
+  @ffi.UintPtr()
   external int capacity;
 }
-
-typedef uintptr_t = ffi.UnsignedLong;
 
 class ProtocolResult extends ffi.Struct {
   external Buffer context;
