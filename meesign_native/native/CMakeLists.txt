@@ -29,7 +29,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
 set(CARGO_CMD cargo build --target ${RUST_TARGET} ${CARGO_BUILD_TYPE_OPT})
 
 if(WIN32)
-  find_package(OpenSSL REQUIRED)
   set(
     CARGO_CMD
     ${CMAKE_COMMAND} -E env
@@ -73,8 +72,6 @@ elseif(ANDROID)
     AR=${CMAKE_AR}
     ${CARGO_CMD}
   )
-else()
-  find_package(OpenSSL REQUIRED)
 endif()
 
 add_custom_target(
