@@ -1,4 +1,3 @@
-import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 
 class CounterBadge extends StatelessWidget {
@@ -18,12 +17,9 @@ class CounterBadge extends StatelessWidget {
       initialData: 0,
       builder: (context, snapshot) {
         int count = snapshot.data ?? 0;
-        return Badge(
-          badgeContent: Text(
-            count.toString(),
-            style: const TextStyle(color: Colors.white),
-          ),
-          showBadge: count != 0,
+        return Badge.count(
+          count: count,
+          isLabelVisible: count > 0,
           child: child,
         );
       },

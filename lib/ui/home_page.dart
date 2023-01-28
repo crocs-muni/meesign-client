@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:animations/animations.dart';
-import 'package:badges/badges.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:meesign_core/meesign_data.dart';
@@ -602,18 +601,19 @@ class _HomePageViewState extends State<HomePageView> {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8),
-                  child: CircleAvatar(
-                    child: AnimatedBuilder(
-                      animation: context.read<Sync>().subscribed,
-                      builder: (context, child) {
-                        return Badge(
-                          badgeColor: context.read<Sync>().subscribed.value
-                              ? Colors.green
-                              : Colors.orange,
+                  child: AnimatedBuilder(
+                    animation: context.read<Sync>().subscribed,
+                    builder: (context, child) {
+                      return Badge(
+                        backgroundColor: context.read<Sync>().subscribed.value
+                            ? Colors.green
+                            : Colors.orange,
+                        smallSize: 8,
+                        child: CircleAvatar(
                           child: Text(name.initials),
-                        );
-                      },
-                    ),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],

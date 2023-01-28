@@ -46,7 +46,6 @@ dependencies:
   dart_pcsc:
     git: https://github.com/jjanku/dart_pcsc.git
   mobile_scanner: ^2.0.0
-  badges: ^2.0.2
   characters: ^1.2.0
   flutter_svg: ^1.0.3
   url_launcher: ^6.1.2
