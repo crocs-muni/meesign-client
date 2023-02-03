@@ -6,7 +6,6 @@ import 'package:ffi/ffi.dart';
 
 import 'dl_util.dart';
 import 'generated/mpc_sigs_lib.dart';
-import 'worker.dart';
 
 // TODO: profile the functions in this file
 // many chunks of data are copied, can it be avoided?
@@ -37,19 +36,6 @@ class ProtocolException implements Exception {
 class ProtocolData {
   final Uint8List context, data;
   ProtocolData(this.context, this.data);
-}
-
-class _TransProtocolData {
-  final TransferableTypedData _context, _data;
-
-  _TransProtocolData(Uint8List context, Uint8List data)
-      : _context = TransferableTypedData.fromList([context]),
-        _data = TransferableTypedData.fromList([data]);
-
-  ProtocolData materialize() => ProtocolData(
-        _context.materialize().asUint8List(),
-        _data.materialize().asUint8List(),
-      );
 }
 
 final MpcSigsLib _lib = MpcSigsLib(dlOpen('mpc_sigs'));
@@ -95,39 +81,33 @@ class ProtocolWrapper {
     });
   }
 
-  static _TransProtocolData _advanceWorker(_TransProtocolData payload) {
+  static ProtocolData _advanceWorker(Uint8List context, Uint8List data) {
     return using((Arena alloc) {
-      final protoData = payload.materialize();
-
-      final ctxBuf = protoData.context.dupToNative(alloc);
-      final dataBuf = protoData.data.dupToNative(alloc);
+      final ctxBuf = context.dupToNative(alloc);
+      final dataBuf = data.dupToNative(alloc);
       final error = alloc.using(Error(), Error.free);
 
       final res = alloc.using(
         _lib.protocol_advance(
           ctxBuf,
-          protoData.context.length,
+          context.length,
           dataBuf,
-          protoData.data.length,
+          data.length,
           error.ptr,
         ),
         _lib.protocol_result_free,
       );
 
       if (error.occured) throw ProtocolException(error.message);
-      return _TransProtocolData(
-        res.context.asTypedList(),
-        res.data.asTypedList(),
+      return ProtocolData(
+        res.context.dupToDart(),
+        res.data.dupToDart(),
       );
     });
   }
 
-  static Future<ProtocolData> advance(Uint8List context, Uint8List data) async {
-    final res = await inBackground(
-      _advanceWorker,
-      _TransProtocolData(context, data),
-    );
-    return res.materialize();
+  static Future<ProtocolData> advance(Uint8List context, Uint8List data) {
+    return Isolate.run(() => _advanceWorker(context, data));
   }
 
   static Uint8List finish(Uint8List context) {
