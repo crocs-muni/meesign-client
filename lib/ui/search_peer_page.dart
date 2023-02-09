@@ -3,6 +3,7 @@ import 'package:meesign_core/meesign_model.dart';
 import 'package:provider/provider.dart';
 
 import '../app_container.dart';
+import '../util/chars.dart';
 
 class SearchPeerPage extends StatefulWidget {
   const SearchPeerPage({Key? key}) : super(key: key);
@@ -93,7 +94,9 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
                   itemBuilder: (context, index) {
                     final device = _queryResults[index];
                     return ListTile(
-                      leading: const Icon(Icons.person),
+                      leading: CircleAvatar(
+                        child: Text(device.name.initials),
+                      ),
                       trailing: Container(
                         width: 8,
                         decoration: ShapeDecoration(

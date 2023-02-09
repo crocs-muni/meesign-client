@@ -50,12 +50,13 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
   Iterable<Widget> get _memberChips sync* {
     for (final Device member in _members) {
-      final icon =
-          member.type == DeviceType.app ? Icons.person : Icons.contactless;
       yield InputChip(
         label: Text(member.name),
         avatar: CircleAvatar(
-          child: Icon(icon),
+          child: Text(
+            member.name.initials,
+            style: Theme.of(context).textTheme.labelLarge,
+          ),
         ),
         onDeleted: () {
           setState(() {

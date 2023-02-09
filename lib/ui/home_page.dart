@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../app_container.dart';
 import '../routes.dart';
 import '../sync.dart';
+import '../util/chars.dart';
 import '../widget/counter_badge.dart';
 import '../widget/dismissible.dart';
 import '../widget/empty_list.dart';
@@ -166,8 +167,11 @@ class SignTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Chip(
-              avatar: const CircleAvatar(
-                child: Icon(Icons.group),
+              avatar: CircleAvatar(
+                child: Text(
+                  group.initials,
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
               ),
               label: Text(group),
             ),
@@ -251,15 +255,6 @@ class SigningSubPage extends StatelessWidget {
   }
 }
 
-extension Initials on String {
-  String get initials => split(' ')
-      .where((w) => w.isNotEmpty)
-      .take(2)
-      .map((w) => w.characters.first)
-      .join()
-      .toUpperCase();
-}
-
 class GroupTile extends StatelessWidget {
   final String name;
   final String? desc;
@@ -302,7 +297,10 @@ class GroupTile extends StatelessWidget {
           children: members
               .map((m) => Chip(
                     avatar: CircleAvatar(
-                      child: Text(m.initials.characters.first),
+                      child: Text(
+                        m.initials,
+                        style: Theme.of(context).textTheme.labelLarge,
+                      ),
                     ),
                     label: Text(m),
                   ))
