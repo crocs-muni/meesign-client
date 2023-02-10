@@ -10,6 +10,37 @@ import '../card/card.dart';
 import '../routes.dart';
 import '../util/chars.dart';
 
+class SheetActionButton extends StatelessWidget {
+  final Widget icon;
+  final Widget title;
+  final Function() onPressed;
+  final bool enabled;
+
+  const SheetActionButton({
+    Key? key,
+    required this.icon,
+    required this.title,
+    required this.onPressed,
+    this.enabled = true,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        children: [
+          IconButton(
+            onPressed: enabled ? onPressed : null,
+            icon: icon,
+          ),
+          title,
+        ],
+      ),
+    );
+  }
+}
+
 class NewGroupPage extends StatefulWidget {
   const NewGroupPage({Key? key}) : super(key: key);
 
@@ -144,36 +175,34 @@ class _NewGroupPageState extends State<NewGroupPage> {
           FilledButton.tonalIcon(
             onPressed: () {
               showModalBottomSheet(
-                elevation: 4,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(8),
-                    topRight: Radius.circular(8),
-                  ),
-                ),
                 context: context,
+                // TODO: https://github.com/flutter/flutter/issues/118619
+                constraints: const BoxConstraints(maxWidth: 640),
                 builder: (context) {
-                  return Column(
-                    // mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ListTile(
-                        leading: const Icon(Icons.qr_code),
-                        title: const Text('Scan QR code'),
-                        enabled: Platform.isAndroid || Platform.isIOS,
-                        onTap: () => _selectPeer(Routes.newGroupQr),
-                      ),
-                      ListTile(
-                        leading: const Icon(Icons.contactless_outlined),
-                        title: const Text('Add card'),
-                        enabled: CardManager.platformSupported,
-                        onTap: () => _selectPeer(Routes.newGroupCard),
-                      ),
-                      ListTile(
-                        leading: const Icon(Icons.search),
-                        title: const Text('Search peer'),
-                        onTap: () => _selectPeer(Routes.newGroupSearch),
-                      ),
-                    ],
+                  return SizedBox(
+                    height: 150,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SheetActionButton(
+                          icon: const Icon(Icons.qr_code),
+                          title: const Text('Scan'),
+                          enabled: Platform.isAndroid || Platform.isIOS,
+                          onPressed: () => _selectPeer(Routes.newGroupQr),
+                        ),
+                        SheetActionButton(
+                          icon: const Icon(Icons.contactless_outlined),
+                          title: const Text('Card'),
+                          enabled: CardManager.platformSupported,
+                          onPressed: () => _selectPeer(Routes.newGroupCard),
+                        ),
+                        SheetActionButton(
+                          icon: const Icon(Icons.search),
+                          title: const Text('Search'),
+                          onPressed: () => _selectPeer(Routes.newGroupSearch),
+                        ),
+                      ],
+                    ),
                   );
                 },
               );
