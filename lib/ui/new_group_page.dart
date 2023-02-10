@@ -160,7 +160,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
           TextField(
             controller: _nameController,
             decoration: InputDecoration(
-              hintText: 'Group name',
+              labelText: 'Name',
               border: const OutlineInputBorder(),
               errorText: _nameErr,
             ),
@@ -207,7 +207,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                 },
               );
             },
-            label: const Text('New member'),
+            label: const Text('Add Member'),
             icon: const Icon(Icons.add),
             style: _memberErr != null
                 ? FilledButton.styleFrom(

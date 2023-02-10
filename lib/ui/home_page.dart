@@ -353,7 +353,7 @@ class GroupsSubPage extends StatelessWidget {
         model.groups,
         finishedTitle: 'Groups',
         emptyView: const EmptyList(
-          hint: 'Try creating a new group',
+          hint: 'Try creating a new group.',
         ),
         unfinishedBuilder: (context, task) {
           final group = task.info;
@@ -407,7 +407,7 @@ class LogInSubPage extends StatelessWidget {
             .toList(),
         finishedTitle: 'Finished',
         emptyView: const EmptyList(
-          hint: 'Request for confirmation appears once you try to log in',
+          hint: 'Request for confirmation appears once you try to log in.',
         ),
         unfinishedBuilder: (context, task) {
           return SignTile(

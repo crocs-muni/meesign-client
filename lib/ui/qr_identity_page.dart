@@ -13,7 +13,7 @@ class QrIdentityPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Device code'),
+        title: const Text('Device Code'),
       ),
       body: const SafeArea(
         child: Center(

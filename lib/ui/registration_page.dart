@@ -156,7 +156,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 TextField(
                   controller: _hostController,
                   decoration: InputDecoration(
-                    labelText: 'Coordinator address',
+                    labelText: 'Server',
                     border: const OutlineInputBorder(),
                     errorText: _errorField == _hostController
                         ? 'Failed to register'
