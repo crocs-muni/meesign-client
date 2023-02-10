@@ -12,27 +12,12 @@ class QrIdentityPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Material(
-          color: Theme.of(context).colorScheme.surface,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: const [
-                    BackButton(),
-                  ],
-                ),
-              ),
-              const Expanded(
-                child: Center(
-                  child: DeviceQrCode(),
-                ),
-              ),
-            ],
-          ),
+      appBar: AppBar(
+        title: const Text('Device code'),
+      ),
+      body: const SafeArea(
+        child: Center(
+          child: DeviceQrCode(),
         ),
       ),
     );

@@ -102,58 +102,39 @@ class _CardReaderPageState<T> extends State<CardReaderPage<T>> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Material(
-          color: Theme.of(context).colorScheme.surface,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: const [
-                    BackButton(),
-                  ],
+      appBar: AppBar(),
+      body: ListView(
+        children: [
+          Material(
+            shape: const CircleBorder(),
+            color: _hasError
+                ? Theme.of(context).colorScheme.errorContainer
+                : Theme.of(context).colorScheme.primaryContainer,
+            child: Stack(
+              alignment: AlignmentDirectional.center,
+              children: [
+                SizedBox.square(
+                  dimension: 140,
+                  child: CircularProgressIndicator(
+                    value: _status == ReaderOkStatus.working ? null : 0,
+                  ),
                 ),
-              ),
-              // TODO: this can overflow
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Material(
-                    shape: const CircleBorder(),
-                    color: _hasError
-                        ? Theme.of(context).colorScheme.errorContainer
-                        : Theme.of(context).colorScheme.primaryContainer,
-                    child: Stack(
-                      alignment: AlignmentDirectional.center,
-                      children: [
-                        SizedBox.square(
-                          dimension: 140,
-                          child: CircularProgressIndicator(
-                            value: _status == ReaderOkStatus.working ? null : 0,
-                          ),
-                        ),
-                        const Icon(
-                          Icons.contactless,
-                          size: 64,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Text(
-                      _status.message,
-                      style: Theme.of(context).textTheme.titleLarge,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                const Icon(
+                  Icons.contactless,
+                  size: 64,
+                ),
+              ],
+            ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text(
+              _status.message,
+              style: Theme.of(context).textTheme.titleLarge,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
       ),
     );
   }

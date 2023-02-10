@@ -59,63 +59,38 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
 
   @override
   Widget build(BuildContext context) {
+    // TODO: migrate to showSearch/SearchDelegate?
     return Scaffold(
-      body: SafeArea(
-        child: Material(
-          color: Theme.of(context).colorScheme.surface,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const BackButton(),
-                    Expanded(
-                      child: TextField(
-                        controller: _queryController,
-                        decoration: const InputDecoration.collapsed(
-                          hintText: 'Search for peer',
-                        ),
-                        autofocus: true,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Divider(
-                thickness: 1,
-                height: 1,
-              ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: _queryResults.length,
-                  itemBuilder: (context, index) {
-                    final device = _queryResults[index];
-                    return ListTile(
-                      leading: CircleAvatar(
-                        child: Text(device.name.initials),
-                      ),
-                      trailing: Container(
-                        width: 8,
-                        decoration: ShapeDecoration(
-                          color:
-                              _isActive(device) ? Colors.green : Colors.orange,
-                          shape: const CircleBorder(),
-                        ),
-                      ),
-                      title: Text(device.name),
-                      onTap: () {
-                        Navigator.pop(context, device);
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
+      appBar: AppBar(
+        title: TextField(
+          controller: _queryController,
+          decoration: const InputDecoration.collapsed(
+            hintText: 'Search for peer',
           ),
+          autofocus: true,
         ),
+      ),
+      body: ListView.builder(
+        itemCount: _queryResults.length,
+        itemBuilder: (context, index) {
+          final device = _queryResults[index];
+          return ListTile(
+            leading: CircleAvatar(
+              child: Text(device.name.initials),
+            ),
+            trailing: Container(
+              width: 8,
+              decoration: ShapeDecoration(
+                color: _isActive(device) ? Colors.green : Colors.orange,
+                shape: const CircleBorder(),
+              ),
+            ),
+            title: Text(device.name),
+            onTap: () {
+              Navigator.pop(context, device);
+            },
+          );
+        },
       ),
     );
   }
