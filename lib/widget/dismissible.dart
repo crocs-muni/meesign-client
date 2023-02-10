@@ -76,12 +76,12 @@ class Deletable extends StatelessWidget {
       child: child,
       background: DismissibleBackground(
         alignment: Alignment.centerLeft,
-        color: Theme.of(context).errorColor,
+        color: Theme.of(context).colorScheme.errorContainer,
         icon: Icons.delete,
       ),
       secondaryBackground: DismissibleBackground(
         alignment: Alignment.centerRight,
-        color: Theme.of(context).errorColor,
+        color: Theme.of(context).colorScheme.errorContainer,
         icon: Icons.delete,
       ),
       confirmDismiss: (_) => showConfirmationDialog(

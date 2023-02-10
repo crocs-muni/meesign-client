@@ -65,7 +65,7 @@ class _QrReaderPageState extends State<QrReaderPage> {
                   ? Text(
                       'This code does not belong to any peer',
                       style: TextStyle(
-                        color: Theme.of(context).errorColor,
+                        color: Theme.of(context).colorScheme.error,
                       ),
                     )
                   : const Text('Scan the code of the peer'),

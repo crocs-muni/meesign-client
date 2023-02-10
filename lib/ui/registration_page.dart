@@ -119,7 +119,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 ),
                 SvgPicture.asset(
                   'assets/icon_logo.svg',
-                  color: Theme.of(context).colorScheme.secondary,
+                  color: Theme.of(context).colorScheme.primaryContainer,
                   width: 72,
                 ),
                 const SizedBox(
@@ -128,7 +128,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 Text(
                   'MeeSign',
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.headline4,
+                  style: Theme.of(context).textTheme.displayLarge,
                 ),
                 const SizedBox(
                   height: 32,
@@ -172,11 +172,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  ElevatedButton(
-                    child: const Text(
-                      'REGISTER',
-                    ),
+                  FilledButton(
                     onPressed: _working ? null : _register,
+                    child: const Text('Register'),
                   )
                 ],
               ),

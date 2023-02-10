@@ -16,7 +16,7 @@ class EmptyList extends StatelessWidget {
         children: [
           Text(
             '0',
-            style: Theme.of(context).textTheme.headline3,
+            style: Theme.of(context).textTheme.displayMedium,
           ),
           const SizedBox(height: 4),
           Text(

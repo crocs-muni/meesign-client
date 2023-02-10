@@ -118,6 +118,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
           IconButton(
             onPressed: _tryCreate,
             icon: const Icon(Icons.send),
+            tooltip: 'Create',
           ),
         ],
       ),
@@ -139,11 +140,8 @@ class _NewGroupPageState extends State<NewGroupPage> {
               )
             ],
           ),
-          const Padding(
-            padding: EdgeInsets.only(top: 8, bottom: 8),
-            child: Divider(),
-          ),
-          ElevatedButton.icon(
+          const SizedBox(height: 16),
+          FilledButton.tonalIcon(
             onPressed: () {
               showModalBottomSheet(
                 elevation: 4,
@@ -182,9 +180,11 @@ class _NewGroupPageState extends State<NewGroupPage> {
             },
             label: const Text('New member'),
             icon: const Icon(Icons.add),
-            style: ElevatedButton.styleFrom(
-              primary: _memberErr != null ? Theme.of(context).errorColor : null,
-            ),
+            style: _memberErr != null
+                ? FilledButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.errorContainer)
+                : null,
           ),
           const SizedBox(height: 16),
           Wrap(
@@ -192,10 +192,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
             runSpacing: 4.0,
             children: _memberChips.toList(),
           ),
-          const Padding(
-            padding: EdgeInsets.only(top: 8, bottom: 8),
-            child: Divider(),
-          ),
+          const SizedBox(height: 16),
           const Text(
             'Threshold',
           ),
@@ -224,24 +221,21 @@ class _NewGroupPageState extends State<NewGroupPage> {
             padding: EdgeInsets.only(bottom: 8),
             child: Text('Purpose'),
           ),
-          DropdownButtonFormField<KeyType>(
-            value: _keyType,
-            onChanged: (value) {
-              if (value != null) setState(() => _keyType = value);
+          SegmentedButton<KeyType>(
+            selected: {_keyType},
+            onSelectionChanged: (value) {
+              setState(() => _keyType = value.first);
             },
-            items: const [
-              DropdownMenuItem<KeyType>(
+            segments: const [
+              ButtonSegment<KeyType>(
                 value: KeyType.signPdf,
-                child: Text('Sign PDF'),
+                label: Text('Sign PDF'),
               ),
-              DropdownMenuItem<KeyType>(
+              ButtonSegment<KeyType>(
                 value: KeyType.signDigest,
-                child: Text('Log In'),
+                label: Text('Log In'),
               )
             ],
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-            ),
           ),
         ],
       ),

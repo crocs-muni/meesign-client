@@ -42,7 +42,8 @@ class TaskStateIndicator extends StatelessWidget {
       case TaskState.finished:
         return const Icon(Icons.check, color: Colors.green);
       case TaskState.failed:
-        return Icon(Icons.error_outline, color: Theme.of(context).errorColor);
+        return Icon(Icons.error_outline,
+            color: Theme.of(context).colorScheme.error);
     }
   }
 }
@@ -204,12 +205,12 @@ class SigningSubPage extends StatelessWidget {
         emptyView: const EmptyList(hint: 'Add new group first.'),
         unfinishedBuilder: (context, task) {
           final approveActions = <Widget>[
-            OutlinedButton(
-              child: const Text('SIGN'),
+            FilledButton.tonal(
+              child: const Text('Sign'),
               onPressed: () => model.joinSign(task, agree: true),
             ),
             OutlinedButton(
-              child: const Text('DECLINE'),
+              child: const Text('Decline'),
               onPressed: () => model.joinSign(task, agree: false),
             ),
           ];
@@ -221,8 +222,8 @@ class SigningSubPage extends StatelessWidget {
             trailing: TaskStateIndicator(task.state, task.round / task.nRounds),
             initiallyExpanded: true,
             actions: <Widget>[
-                  OutlinedButton(
-                    child: const Text('VIEW'),
+                  FilledButton.tonal(
+                    child: const Text('View'),
                     onPressed: () => _openFile(task.info.path),
                   ),
                 ] +
@@ -238,7 +239,7 @@ class SigningSubPage extends StatelessWidget {
               trailing: const TaskStateIndicator(TaskState.finished, 1),
               actions: <Widget>[
                 OutlinedButton(
-                  child: const Text('VIEW'),
+                  child: const Text('View'),
                   onPressed: () => _openFile(file.path),
                 ),
               ],
@@ -367,12 +368,12 @@ class GroupsSubPage extends StatelessWidget {
             initiallyExpanded: true,
             showActions: task.approvable,
             actions: [
-              OutlinedButton(
-                child: const Text('JOIN'),
+              FilledButton.tonal(
+                child: const Text('Join'),
                 onPressed: () => model.joinGroup(task, agree: true),
               ),
               OutlinedButton(
-                child: const Text('DECLINE'),
+                child: const Text('Decline'),
                 onPressed: () => model.joinGroup(task, agree: false),
               )
             ],
@@ -417,12 +418,12 @@ class LogInSubPage extends StatelessWidget {
             initiallyExpanded: true,
             showActions: task.approvable,
             actions: [
-              OutlinedButton(
-                child: const Text('LOG IN'),
+              FilledButton.tonal(
+                child: const Text('Log In'),
                 onPressed: () => model.joinLogin(task, agree: true),
               ),
               OutlinedButton(
-                child: const Text('DECLINE'),
+                child: const Text('Decline'),
                 onPressed: () => model.joinLogin(task, agree: false),
               )
             ],
@@ -637,23 +638,23 @@ class _HomePageViewState extends State<HomePageView> {
         child: pages[_index],
       ),
       floatingActionButton: fabs[_index],
-      bottomNavigationBar: BottomNavigationBar(
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
+      bottomNavigationBar: NavigationBar(
+        destinations: <Widget>[
+          NavigationDestination(
             icon: CounterBadge(
               stream: context.watch<HomeState>().nSignReqs,
               child: const Icon(Icons.draw),
             ),
             label: 'Signing',
           ),
-          BottomNavigationBarItem(
+          NavigationDestination(
             icon: CounterBadge(
               stream: context.watch<HomeState>().nLoginReqs,
               child: const Icon(Icons.login),
             ),
             label: 'Log In',
           ),
-          BottomNavigationBarItem(
+          NavigationDestination(
             icon: CounterBadge(
               stream: context.watch<HomeState>().nGroupReqs,
               child: const Icon(Icons.group),
@@ -661,8 +662,8 @@ class _HomePageViewState extends State<HomePageView> {
             label: 'Groups',
           ),
         ],
-        currentIndex: _index,
-        onTap: (index) {
+        selectedIndex: _index,
+        onDestinationSelected: (index) {
           setState(() {
             _index = index;
           });

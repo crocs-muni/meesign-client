@@ -121,8 +121,10 @@ class _CardReaderPageState<T> extends State<CardReaderPage<T>> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Material(
-                    elevation: 2,
                     shape: const CircleBorder(),
+                    color: _hasError
+                        ? Theme.of(context).colorScheme.errorContainer
+                        : Theme.of(context).colorScheme.primaryContainer,
                     child: Stack(
                       alignment: AlignmentDirectional.center,
                       children: [
@@ -132,12 +134,9 @@ class _CardReaderPageState<T> extends State<CardReaderPage<T>> {
                             value: _status == ReaderOkStatus.working ? null : 0,
                           ),
                         ),
-                        Icon(
+                        const Icon(
                           Icons.contactless,
-                          size: 100,
-                          color: _hasError
-                              ? Theme.of(context).colorScheme.error
-                              : Theme.of(context).colorScheme.secondary,
+                          size: 64,
                         ),
                       ],
                     ),
@@ -146,7 +145,7 @@ class _CardReaderPageState<T> extends State<CardReaderPage<T>> {
                     padding: const EdgeInsets.all(24),
                     child: Text(
                       _status.message,
-                      style: Theme.of(context).textTheme.subtitle1,
+                      style: Theme.of(context).textTheme.titleLarge,
                       textAlign: TextAlign.center,
                     ),
                   ),
