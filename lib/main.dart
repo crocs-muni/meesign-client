@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:args/args.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +22,17 @@ import 'ui/search_peer_page.dart';
 void printUsage(ArgParser parser, IOSink sink) {
   sink.writeln('Usage:');
   sink.writeln(parser.usage);
+}
+
+Future<Directory> getAppDir() async {
+  if (Platform.isAndroid || Platform.isIOS) {
+    return getApplicationSupportDirectory();
+  }
+  final path = path_pkg.join(
+    path_pkg.dirname(Platform.resolvedExecutable),
+    'app',
+  );
+  return Directory(path);
 }
 
 void main(List<String> args) async {
@@ -53,10 +63,7 @@ void main(List<String> args) async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  final tmp = await getTemporaryDirectory();
-  final unique = Random().nextInt(1 << 32);
-  final tmpName = path_pkg.join(tmp.path, 'meesign_client-$unique');
-  final appDir = Directory(tmpName);
+  final appDir = await getAppDir();
 
   runApp(
     Provider(
