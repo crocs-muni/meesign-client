@@ -119,7 +119,9 @@ void main(List<String> args) async {
     return;
   }
 
-  final keyStore = KeyStore();
+  final appDir = Directory('example/');
+
+  final keyStore = KeyStore(appDir);
   final dispatcher =
       NetworkDispatcher(options['host'], keyStore, allowBadCerts: true);
   final taskSource = TaskSource(dispatcher);

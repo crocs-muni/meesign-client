@@ -8,7 +8,7 @@ class AppContainer {
 
   late final NetworkDispatcher dispatcher;
 
-  late final KeyStore keyStore = KeyStore();
+  late final KeyStore keyStore = KeyStore(appDirectory);
   late final FileStore fileStore = FileStore(appDirectory);
 
   late final PrefRepository prefRepository = PrefRepository();

@@ -24,7 +24,7 @@ class DeviceRepository {
 
     final did = Uuid(resp.deviceId);
     final pkcs12 = AuthWrapper.certKeyToPkcs12(key.key, resp.certificate);
-    _keyStore.store(did, pkcs12);
+    await _keyStore.store(did, pkcs12);
     return Device(name, did, DeviceType.app, DateTime.now());
   }
 

@@ -105,7 +105,7 @@ void main() {
   }
 
   setUp(() {
-    keyStore = KeyStore();
+    keyStore = KeyStore(appDir);
     dispatcher = NetworkDispatcher('localhost', keyStore,
         serverCerts: serverCerts, allowBadCerts: serverCerts == null);
     deviceRepository = DeviceRepository(dispatcher, keyStore);
