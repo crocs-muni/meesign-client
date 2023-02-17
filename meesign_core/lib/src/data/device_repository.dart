@@ -56,4 +56,8 @@ class DeviceRepository {
     final devices = await getDevices();
     return ids.map((id) => devices.firstWhere((device) => device.id == id));
   }
+
+  Future<Device> findDeviceById(Uuid id) async {
+    return (await findDevicesByIds([id])).first;
+  }
 }
