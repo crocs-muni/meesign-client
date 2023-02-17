@@ -16,15 +16,6 @@ extension ListStream<T> on Stream<Iterable<T>> {
       map((iter) => iter.where(test)).firstElement();
 }
 
-class SimpleDirProvider implements DirProvider {
-  final String path;
-
-  SimpleDirProvider(this.path);
-
-  @override
-  Future<io.Directory> getStoreDirectory() async => io.Directory(path);
-}
-
 // TODO: use stream matchers?
 
 Future<void> approveFirst(
@@ -98,7 +89,7 @@ Future<void> sign(
   ));
 }
 
-const String outputPath = 'test/output';
+final appDir = io.Directory('test/output');
 
 void main() {
   late KeyStore keyStore;
@@ -120,7 +111,7 @@ void main() {
     deviceRepository = DeviceRepository(dispatcher, keyStore);
     final taskSource = TaskSource(dispatcher);
     groupRepository = GroupRepository(dispatcher, taskSource, deviceRepository);
-    final fileStore = FileStore(SimpleDirProvider(outputPath));
+    final fileStore = FileStore(appDir);
     fileRepository =
         FileRepository(dispatcher, taskSource, fileStore, groupRepository);
   });
@@ -134,7 +125,7 @@ void main() {
 
   tearDown(() {
     try {
-      io.Directory(outputPath).deleteSync(recursive: true);
+      appDir.deleteSync(recursive: true);
     } catch (_) {}
   });
 }

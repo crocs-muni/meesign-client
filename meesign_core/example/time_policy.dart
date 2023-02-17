@@ -60,7 +60,7 @@ extension Approval<T> on TaskRepository<T> {
 
 class DummyFileStore implements FileStore {
   @override
-  Future<String> getFilePath(Uuid did, Uuid id, String name) async => name;
+  String getFilePath(Uuid did, Uuid id, String name) => name;
 
   @override
   Future<String> storeFile(

@@ -1,8 +1,11 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:args/args.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:path/path.dart' as path_pkg;
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'app_container.dart';
@@ -22,7 +25,7 @@ void printUsage(ArgParser parser, IOSink sink) {
   sink.writeln(parser.usage);
 }
 
-void main(List<String> args) {
+void main(List<String> args) async {
   final parser = ArgParser()
     ..addFlag(
       'help',
@@ -48,9 +51,18 @@ void main(List<String> args) {
     printUsage(parser, stderr);
   }
 
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final tmp = await getTemporaryDirectory();
+  final unique = Random().nextInt(1 << 32);
+  final tmpName = path_pkg.join(tmp.path, 'meesign_client-$unique');
+  final appDir = Directory(tmpName);
+
   runApp(
     Provider(
-      create: (_) => AppContainer(),
+      create: (_) => AppContainer(
+        appDirectory: appDir,
+      ),
       child: Provider(
         create: (_) => Sync(),
         child: MyApp(
