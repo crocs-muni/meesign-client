@@ -1,12 +1,12 @@
-import '../model/device.dart';
+import '../util/uuid.dart';
 
 class PrefRepository {
   String? _host;
-  Device? _device;
+  Uuid? _did;
 
   Future<String?> getHost() async => _host;
-  Future<Device?> getDevice() async => _device;
+  Future<Uuid?> getDid() async => _did;
 
   void setHost(String host) => _host = host;
-  void setDevice(Device device) => _device = device;
+  void setDid(Uuid did) => _did = did;
 }

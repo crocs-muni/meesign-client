@@ -33,20 +33,22 @@ class HomeState with ChangeNotifier {
 
   HomeState(
     PrefRepository prefRepository,
+    DeviceRepository deviceRepository,
     this._groupRepository,
     this._fileRepository,
     this._challengeRepository,
   ) {
-    prefRepository.getDevice().then((value) {
-      device = value;
-      if (value != null) _listen(value);
+    prefRepository.getDid().then((did) async {
+      if (did == null) return;
+      _listen(did);
+      device = await deviceRepository.findDeviceById(did);
     });
   }
 
-  void _listen(Device device) {
-    final groupTasksStream = _groupRepository.observeTasks(device.id);
-    final signTasksStream = _fileRepository.observeTasks(device.id);
-    final loginTasksStream = _challengeRepository.observeTasks(device.id);
+  void _listen(Uuid did) {
+    final groupTasksStream = _groupRepository.observeTasks(did);
+    final signTasksStream = _fileRepository.observeTasks(did);
+    final loginTasksStream = _challengeRepository.observeTasks(did);
 
     int pending(List<Task<dynamic>> tasks) =>
         tasks.where((task) => task.approvable).length;
@@ -72,11 +74,11 @@ class HomeState with ChangeNotifier {
     // this can lead to inconsistencies in the ui when one stream gets updated
     // and the other one does not
 
-    _groupRepository.observeGroups(device.id).listen((groups) {
+    _groupRepository.observeGroups(did).listen((groups) {
       this.groups = groups;
       notifyListeners();
     });
-    _fileRepository.observeFiles(device.id).listen((files) {
+    _fileRepository.observeFiles(did).listen((files) {
       this.files = files;
       notifyListeners();
     });

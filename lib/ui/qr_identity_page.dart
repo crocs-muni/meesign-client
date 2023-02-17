@@ -34,10 +34,17 @@ class DeviceQrCode extends StatefulWidget {
 class _DeviceQrCodeState extends State<DeviceQrCode> {
   late final Future<Device?> _device;
 
+  Future<Device?> _getDevice() async {
+    final di = context.read<AppContainer>();
+    final did = await di.prefRepository.getDid();
+    if (did == null) return null;
+    return di.deviceRepository.findDeviceById(did);
+  }
+
   @override
   void initState() {
     super.initState();
-    _device = context.read<AppContainer>().prefRepository.getDevice();
+    _device = _getDevice();
   }
 
   @override

@@ -450,6 +450,7 @@ class HomePage extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => HomeState(
         di.prefRepository,
+        di.deviceRepository,
         di.groupRepository,
         di.fileRepository,
         di.challengeRepository,

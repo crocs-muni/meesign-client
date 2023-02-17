@@ -85,7 +85,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
       await di.init(host);
       di.prefRepository.setHost(host);
-      di.prefRepository.setDevice(device);
+      di.prefRepository.setDid(device.id);
 
       sync.init(device, [
         di.groupRepository,
