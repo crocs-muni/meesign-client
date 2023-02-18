@@ -5,17 +5,17 @@ import 'package:meesign_core/meesign_data.dart';
 
 class Sync {
   late final List<TaskRepository> _repositories;
-  late final Device _device;
+  late final Uuid _did;
 
   final ValueNotifier<bool> subscribed = ValueNotifier(false);
 
   Timer? _retryTimer;
 
   Future<void> init(
-    Device device,
+    Uuid did,
     List<TaskRepository> toSync,
   ) async {
-    _device = device;
+    _did = did;
     _repositories = toSync;
 
     _subscribe();
@@ -25,8 +25,8 @@ class Sync {
     _retryTimer = null;
 
     Future<void> setUp(TaskRepository r) async {
-      await r.subscribe(_device.id, onDone: _subscriptionDone);
-      await r.sync(_device.id);
+      await r.subscribe(_did, onDone: _subscriptionDone);
+      await r.sync(_did);
     }
 
     try {

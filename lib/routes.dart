@@ -5,5 +5,5 @@ class Routes {
   static const String newGroupCard = '$newGroup/card';
   static const String newGroupQr = '$newGroup/qr_reader';
   static const String qrIdentity = '/qr_identity';
-  static const String registration = '/registration';
+  static const String init = '/init';
 }
