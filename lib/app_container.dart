@@ -36,10 +36,13 @@ class AppContainer {
     deviceRepository =
         DeviceRepository(dispatcher, keyStore, database.deviceDao);
     final taskSource = TaskSource(dispatcher);
-    groupRepository = GroupRepository(dispatcher, taskSource, deviceRepository);
-    fileRepository =
-        FileRepository(dispatcher, taskSource, fileStore, groupRepository);
-    challengeRepository = ChallengeRepository(taskSource, groupRepository);
+    final taskDao = database.taskDao;
+    groupRepository =
+        GroupRepository(dispatcher, taskSource, taskDao, deviceRepository);
+    fileRepository = FileRepository(
+        dispatcher, taskSource, taskDao, fileStore, groupRepository);
+    challengeRepository =
+        ChallengeRepository(taskSource, taskDao, groupRepository);
   }
 
   void dispose() {

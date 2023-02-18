@@ -137,7 +137,6 @@ class _NewGroupPageState extends State<NewGroupPage> {
         _threshold,
         Protocol.gg18,
         _keyType,
-        Uint8List(0),
       ),
     );
   }

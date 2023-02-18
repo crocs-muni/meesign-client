@@ -1,16 +1,15 @@
-import 'dart:collection';
 import 'dart:io' as io;
 import 'dart:typed_data';
 
+import 'package:meesign_core/src/model/group.dart';
 import 'package:meesign_native/meesign_native.dart';
 import 'package:meesign_network/grpc.dart' as rpc;
-import 'package:rxdart/subjects.dart';
 
+import '../database/daos.dart';
+import '../database/database.dart' as db;
 import '../model/file.dart';
-import '../model/key_type.dart';
 import '../model/protocol.dart';
 import '../model/task.dart';
-import '../util/default_map.dart';
 import '../util/uuid.dart';
 import 'file_store.dart';
 import 'group_repository.dart';
@@ -25,18 +24,17 @@ class FileRepository extends TaskRepository<File> {
   static const maxFileSize = 8 * 1024 * 1024;
 
   final NetworkDispatcher _dispatcher;
+  final TaskDao _taskDao;
   final FileStore _fileStore;
   final GroupRepository _groupRepository;
-
-  final DefaultMap<Uuid, BehaviorSubject<List<File>>> _filesSubjects =
-      DefaultMap(HashMap(), () => BehaviorSubject.seeded([]));
 
   FileRepository(
     this._dispatcher,
     TaskSource taskSource,
+    this._taskDao,
     this._fileStore,
     this._groupRepository,
-  ) : super(taskSource);
+  ) : super(taskSource, _taskDao);
 
   Future<void> sign(String path, List<int> gid) async {
     // FIXME: delegate to FileStore?
@@ -53,46 +51,73 @@ class FileRepository extends TaskRepository<File> {
   }
 
   @override
-  Future<Task<File>> createTask(Uuid did, rpc.Task rpcTask) async {
+  Future<void> createTask(Uuid did, rpc.Task rpcTask) async {
     final req = rpc.SignRequest.fromBuffer(rpcTask.request);
 
-    final group = await _groupRepository.findGroupById(did, req.groupId);
-    if (group == null) throw StateException();
-    if (group.keyType != KeyType.signPdf) throw StateException();
-
-    final tid = Uuid(rpcTask.id);
+    final tid = rpcTask.id as Uint8List;
     // FIXME: create random id for file?
-    final path = await _fileStore.storeFile(did, tid, req.name, req.data);
-    final file = File(path, group);
+    await _fileStore.storeFile(did, Uuid.take(tid), req.name, req.data);
 
-    return Task<File>(
-      id: tid,
-      nRounds: group.protocol.signRounds,
-      context: Uint8List(0),
-      info: file,
+    await _taskDao.transaction(() async {
+      await _taskDao.upsertTask(
+        db.TasksCompanion.insert(
+          id: tid,
+          did: did.bytes,
+          state: TaskState.created,
+          // FIXME: make nullable?
+          context: Uint8List(0),
+        ),
+      );
+
+      await _taskDao.insertFile(
+        db.FilesCompanion.insert(
+          tid: tid,
+          did: did.bytes,
+          gid: req.groupId as Uint8List,
+          name: req.name,
+        ),
+      );
+    });
+  }
+
+  @override
+  Future<db.Task> initTask(Uuid did, db.Task task) async {
+    final file = await _taskDao.getFile(did.bytes, task.id);
+    final group = await _taskDao.getGroup(did.bytes, gid: file.gid);
+    return task.copyWith(
+      context: ProtocolWrapper.sign(
+        group.protocol.toNative(),
+        group.context,
+      ),
     );
   }
 
   @override
-  Task<File> initTask(Task<File> task) => task.copyWith(
-        context: ProtocolWrapper.sign(
-          task.info.group.protocol.toNative(),
-          task.info.group.context,
-        ),
-      );
-
-  @override
-  Future<void> finishTask(Uuid did, Task<File> task, rpc.Task rpcTask) async {
+  Future<void> finishTask(Uuid did, db.Task task, rpc.Task rpcTask) async {
     if (task.context.isNotEmpty) ProtocolWrapper.finish(task.context);
-    final File file = task.info;
-    await _fileStore.storeFile(did, task.id, file.basename, rpcTask.data);
-
-    final subject = _filesSubjects[did];
-    subject.add([...subject.value, file]);
+    final file = await _taskDao.getFile(did.bytes, task.id);
+    await _fileStore.storeFile(
+        did, Uuid.take(task.id), file.name, rpcTask.data);
   }
 
   @override
   bool isSyncable(rpc.Task rpcTask) => rpcTask.type == rpc.TaskType.SIGN_PDF;
 
-  Stream<List<File>> observeFiles(Uuid did) => _filesSubjects[did].stream;
+  @override
+  Stream<List<Task<File>>> observeTasks(Uuid did) {
+    Task<File> toModel(FileTask ft) {
+      final group = ft.group.toModel();
+      final path =
+          _fileStore.getFilePath(did, Uuid.take(ft.task.id), ft.file.name);
+      final file = File(path, group);
+      return TaskConversion.fromEntity(
+          ft.task, group.protocol.signRounds, file);
+    }
+
+    return _taskDao
+        .watchFileTasks(did.bytes)
+        .map((list) => list.map((toModel)).toList());
+  }
+
+  Stream<List<File>> observeFiles(Uuid did) => observeResults(did);
 }

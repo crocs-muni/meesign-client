@@ -36,3 +36,158 @@ class UserDao extends DatabaseAccessor<Database> with _$UserDaoMixin {
     return into(users).insertOnConflictUpdate(entity);
   }
 }
+
+@DriftAccessor(
+  tables: [Tasks, Groups, GroupMembers, Devices, Files, Challenges],
+)
+class TaskDao extends DatabaseAccessor<Database> with _$TaskDaoMixin {
+  TaskDao(Database db) : super(db);
+
+  Future<Task?> getTask(Uint8List did, Uint8List id) {
+    final query = select(tasks)
+      ..where((tasks) => tasks.did.equals(did) & tasks.id.equals(id));
+    return query.getSingleOrNull();
+  }
+
+  Future<void> upsertTask(TasksCompanion entity) {
+    return into(tasks).insertOnConflictUpdate(entity);
+  }
+
+  Future<void> insertGroup(GroupsCompanion entity) =>
+      into(groups).insert(entity);
+
+  Future<void> updateGroup(GroupsCompanion entity) =>
+      (update(groups)..whereSamePrimaryKey(entity)).write(entity);
+
+  Future<void> insertGroupMembers(Uint8List tid, List<Uint8List> dids) {
+    final entities = dids.map(
+      (did) => GroupMembersCompanion.insert(tid: tid, did: did),
+    );
+    return batch((batch) => batch.insertAll(groupMembers, entities,
+        mode: InsertMode.insertOrIgnore));
+  }
+
+  Future<Group> getGroup(Uint8List did, {Uint8List? tid, Uint8List? gid}) {
+    final query = select(groups)
+      ..where((groups) =>
+          groups.did.equals(did) &
+          (tid != null ? groups.tid.equals(tid) : groups.id.equals(gid!)));
+    return query.getSingle();
+  }
+
+  Future<List<Device>> getGroupMembers(Uint8List tid) {
+    final memberIds = selectOnly(groupMembers)
+      ..addColumns([groupMembers.did])
+      ..where(groupMembers.tid.equals(tid));
+
+    final query = select(devices)
+      ..where((device) => device.id.isInQuery(memberIds));
+    return query.get();
+  }
+
+  Stream<List<GroupTask>> watchGroupTasks(Uint8List did) {
+    final query = select(groups)..where((group) => group.did.equals(did));
+    final on = tasks.id.equalsExp(groups.tid) & tasks.did.equalsExp(groups.did);
+    return query
+        .join([
+          innerJoin(tasks, on),
+        ])
+        .watch()
+        .asyncMap(
+          (results) => Future.wait(
+            results.map(
+              (result) async {
+                final group = result.readTable(groups);
+                return GroupTask(
+                  result.readTable(tasks),
+                  PopulatedGroup(group, await getGroupMembers(group.tid)),
+                );
+              },
+            ),
+          ),
+        );
+  }
+
+  Future<void> insertFile(FilesCompanion entity) => into(files).insert(entity);
+
+  Future<File> getFile(Uint8List did, Uint8List tid) => (select(files)
+        ..where((file) => file.did.equals(did) & file.tid.equals(tid)))
+      .getSingle();
+
+  Stream<List<FileTask>> watchFileTasks(Uint8List did) {
+    final query = select(files)..where((file) => file.did.equals(did));
+    final onTask =
+        tasks.id.equalsExp(files.tid) & tasks.did.equalsExp(files.did);
+    final onGroup = groups.id.equalsExp(files.gid);
+    return query
+        .join([
+          innerJoin(tasks, onTask),
+          innerJoin(groups, onGroup),
+        ])
+        .map(
+          (res) => FileTask(
+            res.readTable(tasks),
+            res.readTable(files),
+            res.readTable(groups),
+          ),
+        )
+        .watch();
+  }
+
+  Future<void> insertChallenge(ChallengesCompanion entity) =>
+      into(challenges).insert(entity);
+
+  Future<Challenge> getChallenge(Uint8List did, Uint8List tid) =>
+      (select(challenges)
+            ..where((chal) => chal.did.equals(did) & chal.tid.equals(tid)))
+          .getSingle();
+
+  // TODO: is there a way to reduce the repetition?
+  Stream<List<ChallengeTask>> watchChallengeTasks(Uint8List did) {
+    final query = select(challenges)..where((file) => file.did.equals(did));
+    final onTask = tasks.id.equalsExp(challenges.tid) &
+        tasks.did.equalsExp(challenges.did);
+    final onGroup = groups.id.equalsExp(challenges.gid);
+    return query
+        .join([
+          innerJoin(tasks, onTask),
+          innerJoin(groups, onGroup),
+        ])
+        .map(
+          (res) => ChallengeTask(
+            res.readTable(tasks),
+            res.readTable(challenges),
+            res.readTable(groups),
+          ),
+        )
+        .watch();
+  }
+}
+
+class PopulatedGroup {
+  final Group group;
+  final List<Device> members;
+  const PopulatedGroup(this.group, this.members);
+}
+
+class GroupTask {
+  final Task task;
+  final PopulatedGroup group;
+  const GroupTask(this.task, this.group);
+}
+
+// FIXME mixin to add task, group?
+
+class FileTask {
+  final Task task;
+  final Group group;
+  final File file;
+  FileTask(this.task, this.file, this.group);
+}
+
+class ChallengeTask {
+  final Task task;
+  final Group group;
+  final Challenge challenge;
+  ChallengeTask(this.task, this.challenge, this.group);
+}

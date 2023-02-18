@@ -2,14 +2,15 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:typed_data';
 
+import 'package:meesign_core/src/database/daos.dart';
 import 'package:meesign_native/meesign_native.dart';
 import 'package:meesign_network/meesign_network.dart'
     show BcastRespStream, BcastRespStreamExt, GrpcError;
 import 'package:meesign_network/grpc.dart' as rpc;
 import 'package:meta/meta.dart';
-import 'package:rxdart/subjects.dart';
 import 'package:synchronized/synchronized.dart';
 
+import '../database/database.dart' as db;
 import '../model/task.dart';
 import '../util/default_map.dart';
 import '../util/uuid.dart';
@@ -24,9 +25,10 @@ class TaskSource {
 
   TaskSource(this._dispatcher);
 
-  Future<rpc.Resp> update(Uuid did, Uuid tid, List<int> data, int attempt) =>
+  Future<rpc.Resp> update(
+          Uuid did, Uint8List tid, List<int> data, int attempt) =>
       _dispatcher[did].updateTask(rpc.TaskUpdate(
-        task: tid.bytes,
+        task: tid,
         data: data,
         attempt: attempt,
       ));
@@ -37,9 +39,9 @@ class TaskSource {
         accept: agree,
       ));
 
-  Future<void> acknowledge(Uuid did, Uuid tid) =>
+  Future<void> acknowledge(Uuid did, Uint8List tid) =>
       _dispatcher[did].acknowledgeTask(rpc.TaskAcknowledgement(
-        taskId: tid.bytes,
+        taskId: tid,
       ));
 
   /// retrieve the task including all its details
@@ -75,37 +77,34 @@ class TaskSource {
 // TODO: create DeviceTaskRepository to simplify did handling?
 abstract class TaskRepository<T> {
   final TaskSource _taskSource;
+  final TaskDao _taskDao;
 
-  final DefaultMap<Uuid, Map<Uuid, Task<T>>> _tasks =
-      DefaultMap(HashMap(), () => HashMap());
-  final DefaultMap<Uuid, BehaviorSubject<List<Task<T>>>> _tasksSubjects =
-      DefaultMap(HashMap(), () => BehaviorSubject.seeded([]));
   final DefaultMap<Uuid, DefaultMap<Uuid, Lock>> _taskLocks =
       DefaultMap(HashMap(), () => DefaultMap(HashMap(), () => Lock()));
 
   final Map<Uuid, StreamSubscription<rpc.Task>> _subscriptions = HashMap();
 
-  TaskRepository(this._taskSource);
+  TaskRepository(this._taskSource, this._taskDao);
 
   @visibleForOverriding
-  Future<Task<T>> createTask(Uuid did, rpc.Task rpcTask);
+  Future<void> createTask(Uuid did, rpc.Task rpcTask);
   @visibleForOverriding
-  Task<T> initTask(Task<T> task);
+  Future<db.Task> initTask(Uuid did, db.Task task);
   @visibleForOverriding
-  Future<void> finishTask(Uuid did, Task<T> task, rpc.Task rpcTask);
+  Future<void> finishTask(Uuid did, db.Task task, rpc.Task rpcTask);
 
   // TODO: better way to compare states?
 
-  Future<Task<T>> _syncCreated(Uuid did, Task<T> task, rpc.Task rpcTask) async {
+  Future<db.Task> _syncCreated(Uuid did, db.Task task, rpc.Task rpcTask) async {
     return task;
   }
 
-  Future<Task<T>> _syncFailed(Task<T> task, rpc.Task rpcTask) async {
+  Future<db.Task> _syncFailed(db.Task task, rpc.Task rpcTask) async {
     return task.copyWith(context: Uint8List(0), state: TaskState.failed);
   }
 
-  Future<Task<T>> _syncFinished(
-      Uuid did, Task<T> task, rpc.Task rpcTask) async {
+  Future<db.Task> _syncFinished(
+      Uuid did, db.Task task, rpc.Task rpcTask) async {
     if (task.state == TaskState.finished || task.state == TaskState.failed) {
       return task;
     }
@@ -117,7 +116,7 @@ abstract class TaskRepository<T> {
     return task.copyWith(context: Uint8List(0), state: TaskState.finished);
   }
 
-  Future<Task<T>> _syncRunning(Uuid did, Task<T> task, rpc.Task rpcTask) async {
+  Future<db.Task> _syncRunning(Uuid did, db.Task task, rpc.Task rpcTask) async {
     if (task.state == TaskState.finished || task.state == TaskState.failed) {
       return task;
     }
@@ -135,7 +134,7 @@ abstract class TaskRepository<T> {
     if (rpcTask.round <= task.round) return task;
     if (rpcTask.round != task.round + 1) throw StateException();
 
-    if (task.round == 0) task = initTask(task);
+    if (task.round == 0) task = await initTask(did, task);
     final res = await ProtocolWrapper.advance(
       task.context,
       rpcTask.data as Uint8List,
@@ -156,7 +155,7 @@ abstract class TaskRepository<T> {
     );
   }
 
-  Task<T> _restart(Task<T> task, rpc.Task rpcTask) {
+  db.Task _restart(db.Task task, rpc.Task rpcTask) {
     return task.copyWith(
       state: TaskState.created,
       round: 0,
@@ -166,14 +165,15 @@ abstract class TaskRepository<T> {
   }
 
   Future<void> _syncTaskUnsafe(Uuid did, Uuid tid, rpc.Task rpcTask) async {
-    var task = _tasks[did][tid];
+    var task = await _taskDao.getTask(did.bytes, tid.bytes);
 
-    late final Task<T>? newTask;
+    late final db.Task? newTask;
 
     try {
       if (task == null) {
         rpcTask = await _taskSource.fetch(did, tid);
-        task = await createTask(did, rpcTask);
+        await createTask(did, rpcTask);
+        task = (await _taskDao.getTask(did.bytes, tid.bytes))!;
       }
 
       if (task.attempt < rpcTask.attempt) {
@@ -204,7 +204,7 @@ abstract class TaskRepository<T> {
       rethrow;
     } finally {
       if (newTask != null) {
-        _tasks[did][tid] = newTask;
+        await _taskDao.upsertTask(newTask.toCompanion(true));
       }
     }
   }
@@ -217,23 +217,14 @@ abstract class TaskRepository<T> {
     // FIXME: when to remove task lock?
   }
 
-  void _emit(Uuid did) {
-    // TODO: transform tasks to public model
-    _tasksSubjects[did].add(_tasks[did].values.toList(growable: false));
-  }
-
   @visibleForOverriding
   bool isSyncable(rpc.Task rpcTask);
 
   Future<void> sync(Uuid did) async {
     final rpcTasks = await _taskSource.fetchAll(did);
-    try {
-      await Future.wait(
-        rpcTasks.where(isSyncable).map((t) => _syncTask(did, t)),
-      );
-    } finally {
-      _emit(did);
-    }
+    await Future.wait(
+      rpcTasks.where(isSyncable).map((t) => _syncTask(did, t)),
+    );
   }
 
   Future<void> subscribe(
@@ -248,11 +239,7 @@ abstract class TaskRepository<T> {
     _subscriptions[did] = stream.listen(
       (rpcTask) async {
         if (!isSyncable(rpcTask)) return;
-        try {
-          await _syncTask(did, rpcTask);
-        } finally {
-          _emit(did);
-        }
+        await _syncTask(did, rpcTask);
       },
       onDone: () {
         _subscriptions.remove(did);
@@ -268,13 +255,12 @@ abstract class TaskRepository<T> {
       _subscriptions.remove(did)?.cancel();
 
   Future<void> _approveTaskUnsafe(Uuid did, Uuid tid, bool agree) async {
-    final task = _tasks[did][tid];
+    final task = await _taskDao.getTask(did.bytes, tid.bytes);
     if (task == null) throw StateException();
     if (task.approved) return;
 
     await _taskSource.approve(did, tid, agree: agree);
-    _tasks[did][tid] = task.copyWith(approved: true);
-    _emit(did);
+    await _taskDao.upsertTask(task.copyWith(approved: true).toCompanion(true));
   }
 
   Future<void> approveTask(Uuid did, Uuid tid, {required bool agree}) =>
@@ -282,7 +268,13 @@ abstract class TaskRepository<T> {
         () => _approveTaskUnsafe(did, tid, agree),
       );
 
-  Stream<List<Task<T>>> observeTasks(Uuid did) => _tasksSubjects[did].stream;
+  Stream<List<Task<T>>> observeTasks(Uuid did);
+
+  Stream<List<T>> observeResults(Uuid did) =>
+      observeTasks(did).map((tasks) => tasks
+          .where((task) => task.state == TaskState.finished)
+          .map((task) => task.info)
+          .toList());
 
   // TODO: provide finer control? expose just list of task ids?
 }

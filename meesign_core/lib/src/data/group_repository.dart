@@ -1,45 +1,30 @@
-import 'dart:collection';
-import 'dart:typed_data';
-
-import 'package:collection/collection.dart';
+import 'package:drift/drift.dart';
 import 'package:meesign_native/meesign_native.dart';
 import 'package:meesign_network/grpc.dart' as rpc;
-import 'package:rxdart/subjects.dart';
 
+import '../database/daos.dart';
+import '../database/database.dart' as db;
 import '../model/device.dart';
 import '../model/group.dart';
 import '../model/key_type.dart';
 import '../model/protocol.dart';
 import '../model/task.dart';
-import '../util/default_map.dart';
 import '../util/uuid.dart';
 import 'device_repository.dart';
 import 'network_dispatcher.dart';
 import 'task_repository.dart';
 
-// TODO: hide the group context from the outside world?
-
 class GroupRepository extends TaskRepository<Group> {
   final NetworkDispatcher _dispatcher;
+  final TaskDao _taskDao;
   final DeviceRepository _deviceRepository;
-
-  // Group also contains device-specific context, hence one map for each device
-  final DefaultMap<Uuid, Map<List<int>, Group>> _groups = DefaultMap(
-    HashMap(),
-    () => HashMap(
-      equals: const ListEquality().equals,
-      hashCode: const ListEquality().hash,
-    ),
-  );
-
-  final DefaultMap<Uuid, BehaviorSubject<List<Group>>> _groupsSubjects =
-      DefaultMap(HashMap(), () => BehaviorSubject.seeded([]));
 
   GroupRepository(
     this._dispatcher,
     TaskSource taskSource,
+    this._taskDao,
     this._deviceRepository,
-  ) : super(taskSource);
+  ) : super(taskSource, _taskDao);
 
   Future<void> group(
     String name,
@@ -60,47 +45,85 @@ class GroupRepository extends TaskRepository<Group> {
   }
 
   @override
-  Future<Task<Group>> createTask(Uuid did, rpc.Task rpcTask) async {
+  Future<void> createTask(Uuid did, rpc.Task rpcTask) async {
     final req = rpc.GroupRequest.fromBuffer(rpcTask.request);
 
+    final tid = rpcTask.id as Uint8List;
     final ids = req.deviceIds.map((id) => Uuid(id)).toList();
-    final members = (await _deviceRepository.getDevices(ids)).toList();
+    await _deviceRepository.getDevices(ids);
     final protocol = ProtocolConversion.fromNetwork(req.protocol);
     final keyType = KeyTypeConversion.fromNetwork(req.keyType);
 
-    return Task<Group>(
-      id: Uuid(rpcTask.id),
-      nRounds: protocol.keygenRounds,
-      context: Uint8List(0),
-      info: Group([], req.name, members, req.threshold, protocol, keyType,
-          Uint8List(0)),
+    // FIXME: how to move part of the transaction to TaskRepository?
+    await _taskDao.transaction(() async {
+      await _taskDao.upsertTask(
+        db.TasksCompanion.insert(
+          id: tid,
+          did: did.bytes,
+          state: TaskState.created,
+          // FIXME: make nullable?
+          context: Uint8List(0),
+        ),
+      );
+
+      await _taskDao.insertGroup(
+        db.GroupsCompanion.insert(
+          tid: tid,
+          did: did.bytes,
+          name: req.name,
+          threshold: req.threshold,
+          protocol: protocol,
+          keyType: keyType,
+          context: Uint8List(0),
+        ),
+      );
+
+      await _taskDao.insertGroupMembers(
+        tid,
+        ids.map((id) => id.bytes).toList(),
+      );
+    });
+  }
+
+  @override
+  Future<db.Task> initTask(Uuid did, db.Task task) async {
+    final group = await _taskDao.getGroup(did.bytes, tid: task.id);
+    return task.copyWith(
+      context: ProtocolWrapper.keygen(group.protocol.toNative()),
     );
   }
 
-  void _emit(Uuid did) {
-    _groupsSubjects[did].add(_groups[did].values.toList(growable: false));
-  }
-
   @override
-  Task<Group> initTask(Task<Group> task) => task.copyWith(
-        context: ProtocolWrapper.keygen(task.info.protocol.toNative()),
-      );
-
-  @override
-  Future<void> finishTask(Uuid did, Task<Group> task, rpc.Task rpcTask) async {
+  Future<void> finishTask(Uuid did, db.Task task, rpc.Task rpcTask) async {
     final id = Uint8List.fromList(rpcTask.data);
     final context = ProtocolWrapper.finish(task.context);
-    final group = task.info;
-    _groups[did][id] = Group(id, group.name, group.members, group.threshold,
-        group.protocol, group.keyType, context);
-    _emit(did);
+
+    // TODO: group with task update into a transaction?
+    await _taskDao.updateGroup(
+      db.GroupsCompanion(
+        did: Value(did.bytes),
+        tid: Value(task.id),
+        id: Value(id),
+        context: Value(context),
+      ),
+    );
   }
 
   @override
   bool isSyncable(rpc.Task rpcTask) => rpcTask.type == rpc.TaskType.GROUP;
 
-  Future<Group?> findGroupById(Uuid did, List<int> id) async =>
-      _groups[did][id];
+  @override
+  Stream<List<Task<Group>>> observeTasks(Uuid did) {
+    Task<Group> toModel(GroupTask gt) {
+      final group = gt.group.toModel();
+      return TaskConversion.fromEntity(
+          gt.task, group.protocol.keygenRounds, group);
+    }
 
-  Stream<List<Group>> observeGroups(Uuid did) => _groupsSubjects[did].stream;
+    return _taskDao
+        .watchGroupTasks(did.bytes)
+        .map((list) => list.map(toModel).toList());
+  }
+
+  Stream<List<Group>> observeGroups(Uuid did) => observeResults(did);
 }

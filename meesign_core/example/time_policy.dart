@@ -126,13 +126,15 @@ void main(List<String> args) async {
   final dispatcher =
       NetworkDispatcher(options['host'], keyStore, allowBadCerts: true);
   final taskSource = TaskSource(dispatcher);
+  final taskDao = database.taskDao;
   final deviceRepository =
       DeviceRepository(dispatcher, keyStore, database.deviceDao);
   final groupRepository =
-      GroupRepository(dispatcher, taskSource, deviceRepository);
-  final fileRepository =
-      FileRepository(dispatcher, taskSource, DummyFileStore(), groupRepository);
-  final challengeRepository = ChallengeRepository(taskSource, groupRepository);
+      GroupRepository(dispatcher, taskSource, taskDao, deviceRepository);
+  final fileRepository = FileRepository(
+      dispatcher, taskSource, taskDao, DummyFileStore(), groupRepository);
+  final challengeRepository =
+      ChallengeRepository(taskSource, taskDao, groupRepository);
 
   final device = await deviceRepository.register(options['name']);
   print('Registered as ${device.name}');

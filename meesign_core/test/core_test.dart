@@ -113,10 +113,12 @@ void main() {
     deviceRepository =
         DeviceRepository(dispatcher, keyStore, database.deviceDao);
     final taskSource = TaskSource(dispatcher);
-    groupRepository = GroupRepository(dispatcher, taskSource, deviceRepository);
+    final taskDao = database.taskDao;
+    groupRepository =
+        GroupRepository(dispatcher, taskSource, taskDao, deviceRepository);
     final fileStore = FileStore(appDir);
-    fileRepository =
-        FileRepository(dispatcher, taskSource, fileStore, groupRepository);
+    fileRepository = FileRepository(
+        dispatcher, taskSource, taskDao, fileStore, groupRepository);
   });
 
   Future<void> testSign({required int n, required int t}) =>

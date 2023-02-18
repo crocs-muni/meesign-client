@@ -1,7 +1,6 @@
-import 'dart:typed_data';
-
 import 'package:meta/meta.dart';
 
+import '../database/database.dart' as db;
 import '../util/uuid.dart';
 
 enum TaskState { created, running, finished, failed }
@@ -16,8 +15,6 @@ class Task<T> {
   final int nRounds;
   final int attempt;
   final T info;
-  // FIXME: create separate class hiding context
-  final Uint8List context;
 
   const Task({
     required this.id,
@@ -26,31 +23,20 @@ class Task<T> {
     this.round = 0,
     required this.nRounds,
     this.attempt = 0,
-    required this.context,
     required this.info,
   });
 
-  Task<T> copyWith({
-    Uuid? id,
-    TaskState? state,
-    bool? approved,
-    int? round,
-    int? nRounds,
-    int? attempt,
-    T? info,
-    Uint8List? context,
-  }) {
-    return Task(
-      id: id ?? this.id,
-      state: state ?? this.state,
-      approved: approved ?? this.approved,
-      round: round ?? this.round,
-      nRounds: nRounds ?? this.nRounds,
-      attempt: attempt ?? this.attempt,
-      info: info ?? this.info,
-      context: context ?? this.context,
-    );
-  }
-
   // TODO: implement comparison, hash
+}
+
+class TaskConversion {
+  static Task<T> fromEntity<T>(db.Task entity, int nRounds, T info) => Task<T>(
+        id: Uuid.take(entity.id),
+        state: entity.state,
+        approved: entity.approved,
+        round: entity.round,
+        nRounds: nRounds,
+        attempt: entity.attempt,
+        info: info,
+      );
 }
