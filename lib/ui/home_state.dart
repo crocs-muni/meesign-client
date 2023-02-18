@@ -41,7 +41,7 @@ class HomeState with ChangeNotifier {
     prefRepository.getDid().then((did) async {
       if (did == null) return;
       _listen(did);
-      device = await deviceRepository.findDeviceById(did);
+      device = await deviceRepository.getDevice(did);
     });
   }
 

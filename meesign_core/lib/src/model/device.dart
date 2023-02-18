@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:meta/meta.dart';
 
+import '../database/database.dart' as db;
 import '../util/uuid.dart';
 
 enum DeviceType {
@@ -28,4 +29,9 @@ class Device {
     final bytes = List.generate(idLen, (i) => rnd.nextInt(256));
     return Uuid(bytes);
   }
+}
+
+extension DeviceConversion on db.Device {
+  Device toModel() =>
+      Device(name, Uuid.take(id), DeviceType.app, DateTime.now());
 }

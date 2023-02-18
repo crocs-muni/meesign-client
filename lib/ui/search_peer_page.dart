@@ -25,7 +25,7 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
     Iterable<Device> results = [];
     try {
       final deviceRepository = context.read<AppContainer>().deviceRepository;
-      results = await deviceRepository.findDeviceByName(_queryController.text);
+      results = await deviceRepository.search(_queryController.text);
     } catch (_) {}
 
     _pivot = DateTime.now().subtract(activeThreshold);

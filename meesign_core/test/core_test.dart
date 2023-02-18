@@ -110,7 +110,8 @@ void main() {
     keyStore = KeyStore(appDir);
     dispatcher = NetworkDispatcher('localhost', keyStore,
         serverCerts: serverCerts, allowBadCerts: serverCerts == null);
-    deviceRepository = DeviceRepository(dispatcher, keyStore);
+    deviceRepository =
+        DeviceRepository(dispatcher, keyStore, database.deviceDao);
     final taskSource = TaskSource(dispatcher);
     groupRepository = GroupRepository(dispatcher, taskSource, deviceRepository);
     final fileStore = FileStore(appDir);

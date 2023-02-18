@@ -64,7 +64,7 @@ class GroupRepository extends TaskRepository<Group> {
     final req = rpc.GroupRequest.fromBuffer(rpcTask.request);
 
     final ids = req.deviceIds.map((id) => Uuid(id)).toList();
-    final members = (await _deviceRepository.findDevicesByIds(ids)).toList();
+    final members = (await _deviceRepository.getDevices(ids)).toList();
     final protocol = ProtocolConversion.fromNetwork(req.protocol);
     final keyType = KeyTypeConversion.fromNetwork(req.keyType);
 

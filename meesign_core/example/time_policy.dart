@@ -126,7 +126,8 @@ void main(List<String> args) async {
   final dispatcher =
       NetworkDispatcher(options['host'], keyStore, allowBadCerts: true);
   final taskSource = TaskSource(dispatcher);
-  final deviceRepository = DeviceRepository(dispatcher, keyStore);
+  final deviceRepository =
+      DeviceRepository(dispatcher, keyStore, database.deviceDao);
   final groupRepository =
       GroupRepository(dispatcher, taskSource, deviceRepository);
   final fileRepository =

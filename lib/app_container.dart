@@ -33,7 +33,8 @@ class AppContainer {
     dispatcher = NetworkDispatcher(host, keyStore,
         serverCerts: await caCerts, allowBadCerts: allowBadCerts);
 
-    deviceRepository = DeviceRepository(dispatcher, keyStore);
+    deviceRepository =
+        DeviceRepository(dispatcher, keyStore, database.deviceDao);
     final taskSource = TaskSource(dispatcher);
     groupRepository = GroupRepository(dispatcher, taskSource, deviceRepository);
     fileRepository =
