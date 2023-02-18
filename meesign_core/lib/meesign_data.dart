@@ -12,6 +12,6 @@ export 'src/data/task_repository.dart';
 export 'src/data/group_repository.dart';
 export 'src/data/file_repository.dart';
 export 'src/data/challenge_repository.dart';
-export 'src/data/pref_repository.dart';
+export 'src/data/user_repository.dart';
 
 export 'src/database/database.dart' show Database;

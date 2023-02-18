@@ -449,7 +449,7 @@ class HomePage extends StatelessWidget {
     final di = context.read<AppContainer>();
     return ChangeNotifierProvider(
       create: (context) => HomeState(
-        di.prefRepository,
+        di.userRepository,
         di.deviceRepository,
         di.groupRepository,
         di.fileRepository,

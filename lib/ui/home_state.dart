@@ -32,16 +32,16 @@ class HomeState with ChangeNotifier {
   List<Task<Challenge>> loginTasks = [];
 
   HomeState(
-    PrefRepository prefRepository,
+    UserRepository userRepository,
     DeviceRepository deviceRepository,
     this._groupRepository,
     this._fileRepository,
     this._challengeRepository,
   ) {
-    prefRepository.getDid().then((did) async {
-      if (did == null) return;
-      _listen(did);
-      device = await deviceRepository.getDevice(did);
+    userRepository.getUser().then((user) async {
+      if (user == null) return;
+      _listen(user.did);
+      device = await deviceRepository.getDevice(user.did);
     });
   }
 

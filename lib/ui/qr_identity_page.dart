@@ -36,7 +36,7 @@ class _DeviceQrCodeState extends State<DeviceQrCode> {
 
   Future<Device?> _getDevice() async {
     final di = context.read<AppContainer>();
-    final did = await di.prefRepository.getDid();
+    final did = (await di.userRepository.getUser())?.did;
     if (did == null) return null;
     return di.deviceRepository.getDevice(did);
   }

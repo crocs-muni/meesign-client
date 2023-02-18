@@ -7,5 +7,6 @@ export 'src/model/file.dart';
 export 'src/model/challenge.dart';
 export 'src/model/protocol.dart' show Protocol;
 export 'src/model/key_type.dart' show KeyType;
+export 'src/model/user.dart';
 
 export 'src/util/uuid.dart';
