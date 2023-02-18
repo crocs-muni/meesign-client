@@ -27,7 +27,7 @@ class HomeState with ChangeNotifier {
   Stream<int> nSignReqs = const Stream.empty();
   Stream<int> nLoginReqs = const Stream.empty();
 
-  List<Task<GroupBase>> groupTasks = [];
+  List<Task<Group>> groupTasks = [];
   List<Task<File>> signTasks = [];
   List<Task<Challenge>> loginTasks = [];
 
@@ -91,7 +91,7 @@ class HomeState with ChangeNotifier {
   Future<void> sign(String path, Group group) =>
       _fileRepository.sign(path, group.id);
 
-  Future<void> joinGroup(Task<GroupBase> task, {required bool agree}) =>
+  Future<void> joinGroup(Task<Group> task, {required bool agree}) =>
       _groupRepository.approveTask(device!.id, task.id, agree: agree);
   Future<void> joinSign(Task<File> task, {required bool agree}) =>
       _fileRepository.approveTask(device!.id, task.id, agree: agree);

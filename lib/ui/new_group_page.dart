@@ -130,12 +130,14 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
     Navigator.pop(
       context,
-      GroupBase(
+      Group(
+        const [],
         _nameController.text,
         _members,
         _threshold,
         Protocol.gg18,
         _keyType,
+        Uint8List(0),
       ),
     );
   }

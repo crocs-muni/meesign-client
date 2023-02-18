@@ -348,7 +348,7 @@ class GroupsSubPage extends StatelessWidget {
     return Consumer<HomeState>(builder: (context, model, child) {
       // FIXME: finished tasks should be removed at some time
 
-      return buildTaskListView<GroupBase, Group>(
+      return buildTaskListView<Group, Group>(
         model.groupTasks,
         model.groups,
         finishedTitle: 'Groups',
@@ -547,8 +547,7 @@ class _HomePageViewState extends State<HomePageView> {
   }
 
   Future<void> _group() async {
-    final res =
-        await Navigator.pushNamed(context, Routes.newGroup) as GroupBase?;
+    final res = await Navigator.pushNamed(context, Routes.newGroup) as Group?;
     if (res == null) return;
 
     try {

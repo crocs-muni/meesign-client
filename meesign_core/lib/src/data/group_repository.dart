@@ -19,7 +19,7 @@ import 'task_repository.dart';
 
 // TODO: hide the group context from the outside world?
 
-class GroupRepository extends TaskRepository<GroupBase> {
+class GroupRepository extends TaskRepository<Group> {
   final NetworkDispatcher _dispatcher;
   final DeviceRepository _deviceRepository;
 
@@ -60,7 +60,7 @@ class GroupRepository extends TaskRepository<GroupBase> {
   }
 
   @override
-  Future<Task<GroupBase>> createTask(Uuid did, rpc.Task rpcTask) async {
+  Future<Task<Group>> createTask(Uuid did, rpc.Task rpcTask) async {
     final req = rpc.GroupRequest.fromBuffer(rpcTask.request);
 
     final ids = req.deviceIds.map((id) => Uuid(id)).toList();
@@ -68,11 +68,12 @@ class GroupRepository extends TaskRepository<GroupBase> {
     final protocol = ProtocolConversion.fromNetwork(req.protocol);
     final keyType = KeyTypeConversion.fromNetwork(req.keyType);
 
-    return Task<GroupBase>(
+    return Task<Group>(
       id: Uuid(rpcTask.id),
       nRounds: protocol.keygenRounds,
       context: Uint8List(0),
-      info: GroupBase(req.name, members, req.threshold, protocol, keyType),
+      info: Group([], req.name, members, req.threshold, protocol, keyType,
+          Uint8List(0)),
     );
   }
 
@@ -81,15 +82,17 @@ class GroupRepository extends TaskRepository<GroupBase> {
   }
 
   @override
-  Task<GroupBase> initTask(Task<GroupBase> task) => task.copyWith(
+  Task<Group> initTask(Task<Group> task) => task.copyWith(
         context: ProtocolWrapper.keygen(task.info.protocol.toNative()),
       );
 
   @override
-  Future<void> finishTask(Uuid did, Task task, rpc.Task rpcTask) async {
+  Future<void> finishTask(Uuid did, Task<Group> task, rpc.Task rpcTask) async {
     final id = Uint8List.fromList(rpcTask.data);
     final context = ProtocolWrapper.finish(task.context);
-    _groups[did][id] = Group(id, context, task.info);
+    final group = task.info;
+    _groups[did][id] = Group(id, group.name, group.members, group.threshold,
+        group.protocol, group.keyType, context);
     _emit(did);
   }
 
