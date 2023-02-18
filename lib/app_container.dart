@@ -13,7 +13,7 @@ class AppContainer {
   late final KeyStore keyStore = KeyStore(appDirectory);
   late final FileStore fileStore = FileStore(appDirectory);
 
-  late final UserRepository userRepository = UserRepository();
+  late final UserRepository userRepository = UserRepository(database.userDao);
   late final DeviceRepository deviceRepository;
   late final GroupRepository groupRepository;
   late final FileRepository fileRepository;

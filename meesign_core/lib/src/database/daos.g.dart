@@ -6,3 +6,7 @@ part of 'daos.dart';
 mixin _$DeviceDaoMixin on DatabaseAccessor<Database> {
   $DevicesTable get devices => attachedDatabase.devices;
 }
+mixin _$UserDaoMixin on DatabaseAccessor<Database> {
+  $DevicesTable get devices => attachedDatabase.devices;
+  $UsersTable get users => attachedDatabase.users;
+}

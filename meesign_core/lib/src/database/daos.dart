@@ -22,3 +22,17 @@ class DeviceDao extends DatabaseAccessor<Database> with _$DeviceDaoMixin {
     await batch((batch) => batch.insertAllOnConflictUpdate(devices, entities));
   }
 }
+
+@DriftAccessor(tables: [Users])
+class UserDao extends DatabaseAccessor<Database> with _$UserDaoMixin {
+  UserDao(Database db) : super(db);
+
+  Future<User?> getUser() {
+    final query = select(users);
+    return query.getSingleOrNull();
+  }
+
+  Future<void> upsertUser(UsersCompanion entity) {
+    return into(users).insertOnConflictUpdate(entity);
+  }
+}

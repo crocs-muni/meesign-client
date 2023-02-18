@@ -12,8 +12,8 @@ import 'tables.dart';
 part 'database.g.dart';
 
 @DriftDatabase(
-  tables: [Devices],
-  daos: [DeviceDao],
+  tables: [Devices, Users],
+  daos: [DeviceDao, UserDao],
 )
 class Database extends _$Database {
   static const fileName = 'db.sqlite';

@@ -7,3 +7,11 @@ class Devices extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
+
+class Users extends Table {
+  BlobColumn get id => blob().references(Devices, #id)();
+  TextColumn get host => text()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}

@@ -172,13 +172,187 @@ class DevicesCompanion extends UpdateCompanion<Device> {
   }
 }
 
+class $UsersTable extends Users with TableInfo<$UsersTable, User> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $UsersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<Uint8List> id = GeneratedColumn<Uint8List>(
+      'id', aliasedName, false,
+      type: DriftSqlType.blob,
+      requiredDuringInsert: true,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('REFERENCES devices (id)'));
+  static const VerificationMeta _hostMeta = const VerificationMeta('host');
+  @override
+  late final GeneratedColumn<String> host = GeneratedColumn<String>(
+      'host', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [id, host];
+  @override
+  String get aliasedName => _alias ?? 'users';
+  @override
+  String get actualTableName => 'users';
+  @override
+  VerificationContext validateIntegrity(Insertable<User> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('host')) {
+      context.handle(
+          _hostMeta, host.isAcceptableOrUnknown(data['host']!, _hostMeta));
+    } else if (isInserting) {
+      context.missing(_hostMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  User map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return User(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}id'])!,
+      host: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}host'])!,
+    );
+  }
+
+  @override
+  $UsersTable createAlias(String alias) {
+    return $UsersTable(attachedDatabase, alias);
+  }
+}
+
+class User extends DataClass implements Insertable<User> {
+  final Uint8List id;
+  final String host;
+  const User({required this.id, required this.host});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<Uint8List>(id);
+    map['host'] = Variable<String>(host);
+    return map;
+  }
+
+  UsersCompanion toCompanion(bool nullToAbsent) {
+    return UsersCompanion(
+      id: Value(id),
+      host: Value(host),
+    );
+  }
+
+  factory User.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return User(
+      id: serializer.fromJson<Uint8List>(json['id']),
+      host: serializer.fromJson<String>(json['host']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<Uint8List>(id),
+      'host': serializer.toJson<String>(host),
+    };
+  }
+
+  User copyWith({Uint8List? id, String? host}) => User(
+        id: id ?? this.id,
+        host: host ?? this.host,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('User(')
+          ..write('id: $id, ')
+          ..write('host: $host')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash($driftBlobEquality.hash(id), host);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is User &&
+          $driftBlobEquality.equals(other.id, this.id) &&
+          other.host == this.host);
+}
+
+class UsersCompanion extends UpdateCompanion<User> {
+  final Value<Uint8List> id;
+  final Value<String> host;
+  const UsersCompanion({
+    this.id = const Value.absent(),
+    this.host = const Value.absent(),
+  });
+  UsersCompanion.insert({
+    required Uint8List id,
+    required String host,
+  })  : id = Value(id),
+        host = Value(host);
+  static Insertable<User> custom({
+    Expression<Uint8List>? id,
+    Expression<String>? host,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (host != null) 'host': host,
+    });
+  }
+
+  UsersCompanion copyWith({Value<Uint8List>? id, Value<String>? host}) {
+    return UsersCompanion(
+      id: id ?? this.id,
+      host: host ?? this.host,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<Uint8List>(id.value);
+    }
+    if (host.present) {
+      map['host'] = Variable<String>(host.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('UsersCompanion(')
+          ..write('id: $id, ')
+          ..write('host: $host')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$Database extends GeneratedDatabase {
   _$Database(QueryExecutor e) : super(e);
   late final $DevicesTable devices = $DevicesTable(this);
+  late final $UsersTable users = $UsersTable(this);
   late final DeviceDao deviceDao = DeviceDao(this as Database);
+  late final UserDao userDao = UserDao(this as Database);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [devices];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [devices, users];
 }
