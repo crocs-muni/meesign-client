@@ -121,6 +121,7 @@ void main(List<String> args) async {
 
   final appDir = Directory('example/');
 
+  final database = Database(appDir);
   final keyStore = KeyStore(appDir);
   final dispatcher =
       NetworkDispatcher(options['host'], keyStore, allowBadCerts: true);
@@ -151,4 +152,6 @@ void main(List<String> args) async {
     print('Checking time for "${task.info.name}": ${ok ? 'OK' : 'NOK'}');
     return ok;
   });
+
+  await database.close();
 }

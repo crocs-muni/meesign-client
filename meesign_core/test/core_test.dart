@@ -92,6 +92,7 @@ Future<void> sign(
 final appDir = io.Directory('test/output');
 
 void main() {
+  late Database database;
   late KeyStore keyStore;
   late NetworkDispatcher dispatcher;
   late DeviceRepository deviceRepository;
@@ -105,6 +106,7 @@ void main() {
   }
 
   setUp(() {
+    database = Database(appDir);
     keyStore = KeyStore(appDir);
     dispatcher = NetworkDispatcher('localhost', keyStore,
         serverCerts: serverCerts, allowBadCerts: serverCerts == null);
@@ -123,8 +125,9 @@ void main() {
   test('3-3 sign', () => testSign(n: 3, t: 3));
   test('3-5 sign', () => testSign(n: 5, t: 3));
 
-  tearDown(() {
+  tearDown(() async {
     try {
+      await database.close();
       appDir.deleteSync(recursive: true);
     } catch (_) {}
   });

@@ -6,6 +6,8 @@ import 'package:meesign_core/meesign_data.dart';
 class AppContainer {
   final Directory appDirectory;
 
+  final Database database;
+
   late final NetworkDispatcher dispatcher;
 
   late final KeyStore keyStore = KeyStore(appDirectory);
@@ -19,7 +21,8 @@ class AppContainer {
 
   final bool allowBadCerts = const bool.fromEnvironment('ALLOW_BAD_CERTS');
 
-  AppContainer({required this.appDirectory});
+  AppContainer({required this.appDirectory})
+      : database = Database(appDirectory);
 
   Future<List<int>?> get caCerts async {
     final data = await rootBundle.load('assets/ca-cert.pem');
@@ -36,5 +39,9 @@ class AppContainer {
     fileRepository =
         FileRepository(dispatcher, taskSource, fileStore, groupRepository);
     challengeRepository = ChallengeRepository(taskSource, groupRepository);
+  }
+
+  void dispose() {
+    database.close();
   }
 }

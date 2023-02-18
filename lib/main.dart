@@ -66,10 +66,11 @@ void main(List<String> args) async {
   final appDir = await getAppDir();
 
   runApp(
-    Provider(
+    Provider<AppContainer>(
       create: (_) => AppContainer(
         appDirectory: appDir,
       ),
+      dispose: (_, appContainer) => appContainer.dispose(),
       child: Provider(
         create: (_) => Sync(),
         child: MyApp(
