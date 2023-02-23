@@ -8,6 +8,7 @@ import 'package:meta/meta.dart';
 class Uuid {
   final Uint8List bytes;
   Uuid(List<int> bytes) : bytes = Uint8List.fromList(bytes);
+  Uuid.take(this.bytes);
 
   @override
   bool operator ==(other) {
