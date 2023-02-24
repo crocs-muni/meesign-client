@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:meesign_core/meesign_data.dart';
+import 'package:rxdart/rxdart.dart';
 
 extension TaskDetails on Task {
   bool get approvable =>
@@ -49,9 +50,10 @@ class HomeState with ChangeNotifier {
 
     int pending(List<Task<dynamic>> tasks) =>
         tasks.where((task) => task.approvable).length;
-    nGroupReqs = groupTasksStream.map(pending);
-    nSignReqs = signTasksStream.map(pending);
-    nLoginReqs = loginTasksStream.map(pending);
+    nGroupReqs = groupTasksStream.map(pending).shareValue();
+    nSignReqs = signTasksStream.map(pending).shareValue();
+    nLoginReqs = loginTasksStream.map(pending).shareValue();
+    notifyListeners();
 
     groupTasksStream.listen((tasks) {
       groupTasks = tasks;
