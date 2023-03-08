@@ -193,7 +193,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                         SheetActionButton(
                           icon: const Icon(Icons.contactless_outlined),
                           title: const Text('Card'),
-                          enabled: CardManager.platformSupported,
+                          enabled: false,
                           onPressed: () => _selectPeer(Routes.newGroupCard),
                         ),
                         SheetActionButton(
