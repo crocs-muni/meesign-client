@@ -73,7 +73,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     final di = context.read<AppContainer>();
     final sync = context.read<Sync>();
 
-    final host = _hostController.text;
+    final host = _hostController.text.trim();
 
     try {
       final dispatcher = NetworkDispatcher(host, di.keyStore,
