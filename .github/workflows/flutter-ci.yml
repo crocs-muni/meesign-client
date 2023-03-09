@@ -37,13 +37,13 @@ jobs:
           asset_extension: .zip
           asset_content_type: application/zip
           toolchain_file: C:\vcpkg\scripts\buildsystems\vcpkg.cmake
-        - os: ubuntu-20.04
+        - os: ubuntu-latest
           target: Linux
           build_target: linux
           build_path: build/linux/x64/release/bundle
           asset_extension: .tar.gz
           asset_content_type: application/gzip
-        - os: ubuntu-20.04
+        - os: ubuntu-latest
           target: Android
           build_target: apk
           build_path: build/app/outputs/flutter-apk
