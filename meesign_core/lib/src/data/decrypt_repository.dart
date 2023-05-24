@@ -1,31 +1,47 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:drift/drift.dart';
 import 'package:meesign_native/meesign_native.dart';
 import 'package:meesign_network/grpc.dart' as rpc;
 
 import '../database/daos.dart';
 import '../database/database.dart' as db;
-import '../model/challenge.dart';
+import '../model/decrypt.dart';
 import '../model/group.dart';
 import '../model/protocol.dart';
 import '../model/task.dart';
 import '../util/uuid.dart';
 import 'group_repository.dart';
 import 'task_repository.dart';
+import 'network_dispatcher.dart';
 
-class ChallengeRepository extends TaskRepository<Challenge> {
+class DecryptRepository extends TaskRepository<Decrypt> {
   final TaskDao _taskDao;
   final GroupRepository _groupRepository;
+  final NetworkDispatcher _dispatcher;
 
-  ChallengeRepository(
+  DecryptRepository(
+    this._dispatcher,
     TaskSource taskSource,
     this._taskDao,
     this._groupRepository,
   ) : super(taskSource, _taskDao);
 
+  Future<void> decrypt(
+      String description, List<int> data, List<int> gid) async {
+    await _dispatcher.unauth.decrypt(
+      rpc.DecryptRequest(
+        groupId: gid,
+        name: description,
+        data: data,
+      ),
+    );
+  }
+
   @override
   Future<void> createTask(Uuid did, rpc.Task rpcTask) async {
-    final req = rpc.SignRequest.fromBuffer(rpcTask.request);
+    final req = rpc.DecryptRequest.fromBuffer(rpcTask.request);
 
     // FIXME: too similar to files?
     final tid = rpcTask.id as Uint8List;
@@ -41,8 +57,8 @@ class ChallengeRepository extends TaskRepository<Challenge> {
         ),
       );
 
-      await _taskDao.insertChallenge(
-        db.ChallengesCompanion.insert(
+      await _taskDao.insertDecrypt(
+        db.DecryptsCompanion.insert(
           tid: tid,
           did: did.bytes,
           gid: req.groupId as Uint8List,
@@ -55,8 +71,8 @@ class ChallengeRepository extends TaskRepository<Challenge> {
 
   @override
   Future<db.Task> initTask(Uuid did, db.Task task) async {
-    final challenge = await _taskDao.getChallenge(did.bytes, task.id);
-    final group = await _taskDao.getGroup(did.bytes, gid: challenge.gid);
+    final decrypt = await _taskDao.getDecrypt(did.bytes, task.id);
+    final group = await _taskDao.getGroup(did.bytes, gid: decrypt.gid);
     return task.copyWith(
       context: ProtocolWrapper.init(
         group.protocol.toNative(),
@@ -67,24 +83,32 @@ class ChallengeRepository extends TaskRepository<Challenge> {
 
   @override
   Future<void> finishTask(Uuid did, db.Task task, rpc.Task rpcTask) async {
-    if (task.context.isNotEmpty) ProtocolWrapper.finish(task.context);
+    if (task.context.isNotEmpty) {
+      final result = ProtocolWrapper.finish(task.context);
+      await _taskDao.updateDecrypt(db.DecryptsCompanion(
+        tid: Value(task.id),
+        did: Value(task.did),
+        data: Value(result),
+      ));
+    }
   }
 
   @override
-  bool isSyncable(rpc.Task rpcTask) =>
-      rpcTask.type == rpc.TaskType.SIGN_CHALLENGE;
+  bool isSyncable(rpc.Task rpcTask) => rpcTask.type == rpc.TaskType.DECRYPT;
 
   @override
-  Stream<List<Task<Challenge>>> observeTasks(Uuid did) {
-    Task<Challenge> toModel(ChallengeTask ct) {
-      final group = ct.group.toModel();
-      final challenge = Challenge(ct.challenge.name, group, ct.challenge.data);
+  Stream<List<Task<Decrypt>>> observeTasks(Uuid did) {
+    Task<Decrypt> toModel(DecryptTask dt) {
+      final group = dt.group.toModel();
+      final decrypt = Decrypt(dt.decrypt.name, group, dt.decrypt.data);
       return TaskConversion.fromEntity(
-          ct.task, group.protocol.signRounds, challenge);
+          dt.task, group.protocol.signRounds, decrypt);
     }
 
     return _taskDao
-        .watchChallengeTasks(did.bytes)
+        .watchDecryptTasks(did.bytes)
         .map((list) => list.map((toModel)).toList());
   }
+
+  Stream<List<Decrypt>> observeDecrypts(Uuid did) => observeResults(did);
 }

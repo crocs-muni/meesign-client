@@ -2,7 +2,8 @@ import 'package:meesign_network/grpc.dart' as rpc;
 
 enum KeyType {
   signPdf,
-  signDigest,
+  signChallenge,
+  decrypt,
 }
 
 extension KeyTypeConversion on KeyType {
@@ -10,8 +11,10 @@ extension KeyTypeConversion on KeyType {
     switch (this) {
       case KeyType.signPdf:
         return rpc.KeyType.SignPDF;
-      case KeyType.signDigest:
-        return rpc.KeyType.SignDigest;
+      case KeyType.signChallenge:
+        return rpc.KeyType.SignChallenge;
+      case KeyType.decrypt:
+        return rpc.KeyType.Decrypt;
     }
   }
 
@@ -19,8 +22,10 @@ extension KeyTypeConversion on KeyType {
     switch (keyType) {
       case rpc.KeyType.SignPDF:
         return KeyType.signPdf;
-      case rpc.KeyType.SignDigest:
-        return KeyType.signDigest;
+      case rpc.KeyType.SignChallenge:
+        return KeyType.signChallenge;
+      case rpc.KeyType.Decrypt:
+        return KeyType.decrypt;
       default:
         throw ArgumentError('Unknown key type');
     }

@@ -18,6 +18,7 @@ class AppContainer {
   late final GroupRepository groupRepository;
   late final FileRepository fileRepository;
   late final ChallengeRepository challengeRepository;
+  late final DecryptRepository decryptRepository;
 
   final bool allowBadCerts = const bool.fromEnvironment('ALLOW_BAD_CERTS');
 
@@ -43,6 +44,8 @@ class AppContainer {
         dispatcher, taskSource, taskDao, fileStore, groupRepository);
     challengeRepository =
         ChallengeRepository(taskSource, taskDao, groupRepository);
+    decryptRepository =
+        DecryptRepository(dispatcher, taskSource, taskDao, groupRepository);
   }
 
   void dispose() {

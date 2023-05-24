@@ -113,7 +113,7 @@ impl KeygenContext {
     }
 }
 
-#[typetag::serde]
+#[typetag::serde(name = "gg18_keygen")]
 impl Protocol for KeygenContext {
     fn advance(self: Box<Self>, data: &[u8]) -> Result<(Box<dyn Protocol>, Vec<u8>)> {
         let (ctx, data) = match *self {
@@ -227,7 +227,7 @@ impl SignContext {
     }
 }
 
-#[typetag::serde]
+#[typetag::serde(name = "gg18_sign")]
 impl Protocol for SignContext {
     fn advance(self: Box<Self>, data: &[u8]) -> Result<(Box<dyn Protocol>, Vec<u8>)> {
         let (ctx, data) = match *self {

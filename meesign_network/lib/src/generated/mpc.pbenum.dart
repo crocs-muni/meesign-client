@@ -15,9 +15,15 @@ class ProtocolType extends $pb.ProtobufEnum {
       const $core.bool.fromEnvironment('protobuf.omit_enum_names')
           ? ''
           : 'GG18');
+  static const ProtocolType ELGAMAL = ProtocolType._(
+      1,
+      const $core.bool.fromEnvironment('protobuf.omit_enum_names')
+          ? ''
+          : 'ELGAMAL');
 
   static const $core.List<ProtocolType> values = <ProtocolType>[
     GG18,
+    ELGAMAL,
   ];
 
   static final $core.Map<$core.int, ProtocolType> _byValue =
@@ -33,15 +39,21 @@ class KeyType extends $pb.ProtobufEnum {
       const $core.bool.fromEnvironment('protobuf.omit_enum_names')
           ? ''
           : 'SignPDF');
-  static const KeyType SignDigest = KeyType._(
+  static const KeyType SignChallenge = KeyType._(
       1,
       const $core.bool.fromEnvironment('protobuf.omit_enum_names')
           ? ''
-          : 'SignDigest');
+          : 'SignChallenge');
+  static const KeyType Decrypt = KeyType._(
+      2,
+      const $core.bool.fromEnvironment('protobuf.omit_enum_names')
+          ? ''
+          : 'Decrypt');
 
   static const $core.List<KeyType> values = <KeyType>[
     SignPDF,
-    SignDigest,
+    SignChallenge,
+    Decrypt,
   ];
 
   static final $core.Map<$core.int, KeyType> _byValue =
@@ -67,11 +79,17 @@ class TaskType extends $pb.ProtobufEnum {
       const $core.bool.fromEnvironment('protobuf.omit_enum_names')
           ? ''
           : 'SIGN_CHALLENGE');
+  static const TaskType DECRYPT = TaskType._(
+      3,
+      const $core.bool.fromEnvironment('protobuf.omit_enum_names')
+          ? ''
+          : 'DECRYPT');
 
   static const $core.List<TaskType> values = <TaskType>[
     GROUP,
     SIGN_PDF,
     SIGN_CHALLENGE,
+    DECRYPT,
   ];
 
   static final $core.Map<$core.int, TaskType> _byValue =

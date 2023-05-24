@@ -123,23 +123,23 @@ class MpcSigsLib {
       ProtocolResult Function(
           ffi.Pointer<ffi.Uint8>, int, ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
 
-  ProtocolResult protocol_sign(
+  ProtocolResult protocol_init(
     int proto_id,
     ffi.Pointer<ffi.Uint8> group_ptr,
     int group_len,
   ) {
-    return _protocol_sign(
+    return _protocol_init(
       proto_id,
       group_ptr,
       group_len,
     );
   }
 
-  late final _protocol_signPtr = _lookup<
+  late final _protocol_initPtr = _lookup<
       ffi.NativeFunction<
           ProtocolResult Function(ffi.Int32, ffi.Pointer<ffi.Uint8>,
-              ffi.UintPtr)>>('protocol_sign');
-  late final _protocol_sign = _protocol_signPtr
+              ffi.UintPtr)>>('protocol_init');
+  late final _protocol_init = _protocol_initPtr
       .asFunction<ProtocolResult Function(int, ffi.Pointer<ffi.Uint8>, int)>();
 
   void auth_key_free(
@@ -200,10 +200,33 @@ class MpcSigsLib {
   late final _auth_cert_key_to_pkcs12 = _auth_cert_key_to_pkcs12Ptr.asFunction<
       Buffer Function(ffi.Pointer<ffi.Uint8>, int, ffi.Pointer<ffi.Uint8>, int,
           ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
+
+  Buffer encrypt(
+    ffi.Pointer<ffi.Uint8> msg_ptr,
+    int msg_len,
+    ffi.Pointer<ffi.Uint8> key_ptr,
+    int key_len,
+  ) {
+    return _encrypt(
+      msg_ptr,
+      msg_len,
+      key_ptr,
+      key_len,
+    );
+  }
+
+  late final _encryptPtr = _lookup<
+      ffi.NativeFunction<
+          Buffer Function(ffi.Pointer<ffi.Uint8>, ffi.UintPtr,
+              ffi.Pointer<ffi.Uint8>, ffi.UintPtr)>>('encrypt');
+  late final _encrypt = _encryptPtr.asFunction<
+      Buffer Function(
+          ffi.Pointer<ffi.Uint8>, int, ffi.Pointer<ffi.Uint8>, int)>();
 }
 
 abstract class ProtocolId {
   static const int Gg18 = 0;
+  static const int Elgamal = 1;
 }
 
 class Buffer extends ffi.Struct {

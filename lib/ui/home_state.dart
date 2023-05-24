@@ -16,20 +16,24 @@ class HomeState with ChangeNotifier {
 
   List<Group> groups = [];
   List<File> files = [];
+  List<Decrypt> decrypts = [];
 
   Device? device;
 
   final GroupRepository _groupRepository;
   final FileRepository _fileRepository;
   final ChallengeRepository _challengeRepository;
+  final DecryptRepository _decryptRepository;
 
   Stream<int> nGroupReqs = const Stream.empty();
   Stream<int> nSignReqs = const Stream.empty();
   Stream<int> nLoginReqs = const Stream.empty();
+  Stream<int> nDecryptReqs = const Stream.empty();
 
   List<Task<Group>> groupTasks = [];
   List<Task<File>> signTasks = [];
   List<Task<Challenge>> loginTasks = [];
+  List<Task<Decrypt>> decryptTasks = [];
 
   HomeState(
     UserRepository userRepository,
@@ -37,6 +41,7 @@ class HomeState with ChangeNotifier {
     this._groupRepository,
     this._fileRepository,
     this._challengeRepository,
+    this._decryptRepository,
   ) {
     userRepository.getUser().then((user) async {
       if (user == null) return;
@@ -49,12 +54,14 @@ class HomeState with ChangeNotifier {
     final groupTasksStream = _groupRepository.observeTasks(did);
     final signTasksStream = _fileRepository.observeTasks(did);
     final loginTasksStream = _challengeRepository.observeTasks(did);
+    final decryptTasksStream = _decryptRepository.observeTasks(did);
 
     int pending(List<Task<dynamic>> tasks) =>
         tasks.where((task) => task.approvable).length;
     nGroupReqs = groupTasksStream.map(pending).shareValue();
     nSignReqs = signTasksStream.map(pending).shareValue();
     nLoginReqs = loginTasksStream.map(pending).shareValue();
+    nDecryptReqs = decryptTasksStream.map(pending).shareValue();
     notifyListeners();
 
     groupTasksStream.listen((tasks) {
@@ -67,6 +74,10 @@ class HomeState with ChangeNotifier {
     });
     loginTasksStream.listen((tasks) {
       loginTasks = tasks;
+      notifyListeners();
+    });
+    decryptTasksStream.listen((tasks) {
+      decryptTasks = tasks;
       notifyListeners();
     });
 
@@ -82,6 +93,10 @@ class HomeState with ChangeNotifier {
       this.files = files;
       notifyListeners();
     });
+    _decryptRepository.observeDecrypts(did).listen((decrypts) {
+      this.decrypts = decrypts;
+      notifyListeners();
+    });
   }
 
   Future<void> addGroup(String name, List<Device> members, int threshold,
@@ -91,10 +106,15 @@ class HomeState with ChangeNotifier {
   Future<void> sign(String path, Group group) =>
       _fileRepository.sign(path, group.id);
 
+  Future<void> decrypt(String description, List<int> data, Group group) =>
+      _decryptRepository.decrypt(description, data, group.id);
+
   Future<void> joinGroup(Task<Group> task, {required bool agree}) =>
       _groupRepository.approveTask(device!.id, task.id, agree: agree);
   Future<void> joinSign(Task<File> task, {required bool agree}) =>
       _fileRepository.approveTask(device!.id, task.id, agree: agree);
   Future<void> joinLogin(Task<Challenge> task, {required bool agree}) =>
       _challengeRepository.approveTask(device!.id, task.id, agree: agree);
+  Future<void> joinDecrypt(Task<Decrypt> task, {required bool agree}) =>
+      _decryptRepository.approveTask(device!.id, task.id, agree: agree);
 }

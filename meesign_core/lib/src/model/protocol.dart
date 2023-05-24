@@ -2,7 +2,8 @@ import 'package:meesign_native/meesign_native.dart';
 import 'package:meesign_network/grpc.dart';
 
 enum Protocol {
-  gg18(6, 10);
+  gg18(6, 10),
+  elgamal(4, 2);
 
   final int keygenRounds;
   final int signRounds;
@@ -15,6 +16,8 @@ extension ProtocolConversion on Protocol {
     switch (this) {
       case Protocol.gg18:
         return ProtocolId.Gg18;
+      case Protocol.elgamal:
+        return ProtocolId.Elgamal;
     }
   }
 
@@ -22,6 +25,8 @@ extension ProtocolConversion on Protocol {
     switch (this) {
       case Protocol.gg18:
         return ProtocolType.GG18;
+      case Protocol.elgamal:
+        return ProtocolType.ELGAMAL;
     }
   }
 
@@ -29,6 +34,8 @@ extension ProtocolConversion on Protocol {
     switch (protocolType) {
       case ProtocolType.GG18:
         return Protocol.gg18;
+      case ProtocolType.ELGAMAL:
+        return Protocol.elgamal;
       default:
         throw ArgumentError('Unknown protocol');
     }

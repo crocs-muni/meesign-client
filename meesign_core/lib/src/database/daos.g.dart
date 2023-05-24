@@ -17,4 +17,5 @@ mixin _$TaskDaoMixin on DatabaseAccessor<Database> {
   $GroupMembersTable get groupMembers => attachedDatabase.groupMembers;
   $FilesTable get files => attachedDatabase.files;
   $ChallengesTable get challenges => attachedDatabase.challenges;
+  $DecryptsTable get decrypts => attachedDatabase.decrypts;
 }

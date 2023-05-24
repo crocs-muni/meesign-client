@@ -16,7 +16,7 @@ import '../model/task.dart';
 part 'database.g.dart';
 
 @DriftDatabase(
-  tables: [Devices, Users, Tasks, Groups, GroupMembers, Files, Challenges],
+  tables: [Devices, Users, Tasks, Groups, GroupMembers, Files, Challenges, Decrypts],
   daos: [DeviceDao, UserDao, TaskDao],
 )
 class Database extends _$Database {

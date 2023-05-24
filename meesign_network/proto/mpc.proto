@@ -2,9 +2,11 @@ syntax = "proto3";
 package meesign;
 
 service MPC {
+  rpc GetServerInfo(ServerInfoRequest) returns (ServerInfo);
   rpc Register(RegistrationRequest) returns (RegistrationResponse);
   rpc Sign(SignRequest) returns (Task);
   rpc Group(GroupRequest) returns (Task);
+  rpc Decrypt(DecryptRequest) returns (Task);
   rpc GetTask(TaskRequest) returns (Task);
   rpc UpdateTask(TaskUpdate) returns (Resp); // auth required
   rpc DecideTask(TaskDecision) returns (Resp); // auth required
@@ -16,19 +18,28 @@ service MPC {
   rpc SubscribeUpdates(SubscribeRequest) returns (stream Task); // auth required
 }
 
+message ServerInfoRequest {}
+
+message ServerInfo {
+  string version = 1;
+}
+
 enum ProtocolType {
   GG18 = 0;
+  ELGAMAL = 1;
 }
 
 enum KeyType {
   SignPDF = 0;
-  SignDigest = 1;
+  SignChallenge = 1;
+  Decrypt = 2;
 }
 
 enum TaskType {
   GROUP = 0;
   SIGN_PDF = 1;
   SIGN_CHALLENGE = 2;
+  DECRYPT = 3;
 }
 
 message RegistrationRequest {
@@ -79,6 +90,12 @@ message SignRequest {
   bytes data = 3;
 }
 
+message DecryptRequest {
+  string name = 1;
+  bytes group_id = 2;
+  bytes data = 3;
+}
+
 message TaskRequest {
   bytes task_id = 1;
   optional bytes device_id = 2;
@@ -96,14 +113,10 @@ message Task {
   TaskState state = 3;
   uint32 round = 4;
   uint32 attempt = 5;
-  // Number of task accepts
-  uint32 accept = 6;
-  // Number of task rejects
-  uint32 reject = 7;
-  // If present, the task is waiting for recipient's action
-  optional bytes data = 8;
-  // Serialized SignRequest or TaskRequest; present only when queried directly
-  optional bytes request = 9;
+  uint32 accept = 6; // Number of task accepts
+  uint32 reject = 7; // Number of task rejects
+  optional bytes data = 8; // If present, the task is waiting for recipient's action
+  optional bytes request = 9; // Serialized SignRequest or TaskRequest; present only when queried directly
 }
 
 message TaskUpdate {

@@ -85,7 +85,7 @@ class FileRepository extends TaskRepository<File> {
     final file = await _taskDao.getFile(did.bytes, task.id);
     final group = await _taskDao.getGroup(did.bytes, gid: file.gid);
     return task.copyWith(
-      context: ProtocolWrapper.sign(
+      context: ProtocolWrapper.init(
         group.protocol.toNative(),
         group.context,
       ),

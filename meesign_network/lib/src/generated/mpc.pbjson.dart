@@ -14,24 +14,26 @@ const ProtocolType$json = const {
   '1': 'ProtocolType',
   '2': const [
     const {'1': 'GG18', '2': 0},
+    const {'1': 'ELGAMAL', '2': 1},
   ],
 };
 
 /// Descriptor for `ProtocolType`. Decode as a `google.protobuf.EnumDescriptorProto`.
-final $typed_data.Uint8List protocolTypeDescriptor =
-    $convert.base64Decode('CgxQcm90b2NvbFR5cGUSCAoER0cxOBAA');
+final $typed_data.Uint8List protocolTypeDescriptor = $convert
+    .base64Decode('CgxQcm90b2NvbFR5cGUSCAoER0cxOBAAEgsKB0VMR0FNQUwQAQ==');
 @$core.Deprecated('Use keyTypeDescriptor instead')
 const KeyType$json = const {
   '1': 'KeyType',
   '2': const [
     const {'1': 'SignPDF', '2': 0},
-    const {'1': 'SignDigest', '2': 1},
+    const {'1': 'SignChallenge', '2': 1},
+    const {'1': 'Decrypt', '2': 2},
   ],
 };
 
 /// Descriptor for `KeyType`. Decode as a `google.protobuf.EnumDescriptorProto`.
-final $typed_data.Uint8List keyTypeDescriptor = $convert
-    .base64Decode('CgdLZXlUeXBlEgsKB1NpZ25QREYQABIOCgpTaWduRGlnZXN0EAE=');
+final $typed_data.Uint8List keyTypeDescriptor = $convert.base64Decode(
+    'CgdLZXlUeXBlEgsKB1NpZ25QREYQABIRCg1TaWduQ2hhbGxlbmdlEAESCwoHRGVjcnlwdBAC');
 @$core.Deprecated('Use taskTypeDescriptor instead')
 const TaskType$json = const {
   '1': 'TaskType',
@@ -39,12 +41,32 @@ const TaskType$json = const {
     const {'1': 'GROUP', '2': 0},
     const {'1': 'SIGN_PDF', '2': 1},
     const {'1': 'SIGN_CHALLENGE', '2': 2},
+    const {'1': 'DECRYPT', '2': 3},
   ],
 };
 
 /// Descriptor for `TaskType`. Decode as a `google.protobuf.EnumDescriptorProto`.
 final $typed_data.Uint8List taskTypeDescriptor = $convert.base64Decode(
-    'CghUYXNrVHlwZRIJCgVHUk9VUBAAEgwKCFNJR05fUERGEAESEgoOU0lHTl9DSEFMTEVOR0UQAg==');
+    'CghUYXNrVHlwZRIJCgVHUk9VUBAAEgwKCFNJR05fUERGEAESEgoOU0lHTl9DSEFMTEVOR0UQAhILCgdERUNSWVBUEAM=');
+@$core.Deprecated('Use serverInfoRequestDescriptor instead')
+const ServerInfoRequest$json = const {
+  '1': 'ServerInfoRequest',
+};
+
+/// Descriptor for `ServerInfoRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List serverInfoRequestDescriptor =
+    $convert.base64Decode('ChFTZXJ2ZXJJbmZvUmVxdWVzdA==');
+@$core.Deprecated('Use serverInfoDescriptor instead')
+const ServerInfo$json = const {
+  '1': 'ServerInfo',
+  '2': const [
+    const {'1': 'version', '3': 1, '4': 1, '5': 9, '10': 'version'},
+  ],
+};
+
+/// Descriptor for `ServerInfo`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List serverInfoDescriptor = $convert
+    .base64Decode('CgpTZXJ2ZXJJbmZvEhgKB3ZlcnNpb24YASABKAlSB3ZlcnNpb24=');
 @$core.Deprecated('Use registrationRequestDescriptor instead')
 const RegistrationRequest$json = const {
   '1': 'RegistrationRequest',
@@ -181,6 +203,19 @@ const SignRequest$json = const {
 /// Descriptor for `SignRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List signRequestDescriptor = $convert.base64Decode(
     'CgtTaWduUmVxdWVzdBISCgRuYW1lGAEgASgJUgRuYW1lEhkKCGdyb3VwX2lkGAIgASgMUgdncm91cElkEhIKBGRhdGEYAyABKAxSBGRhdGE=');
+@$core.Deprecated('Use decryptRequestDescriptor instead')
+const DecryptRequest$json = const {
+  '1': 'DecryptRequest',
+  '2': const [
+    const {'1': 'name', '3': 1, '4': 1, '5': 9, '10': 'name'},
+    const {'1': 'group_id', '3': 2, '4': 1, '5': 12, '10': 'groupId'},
+    const {'1': 'data', '3': 3, '4': 1, '5': 12, '10': 'data'},
+  ],
+};
+
+/// Descriptor for `DecryptRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List decryptRequestDescriptor = $convert.base64Decode(
+    'Cg5EZWNyeXB0UmVxdWVzdBISCgRuYW1lGAEgASgJUgRuYW1lEhkKCGdyb3VwX2lkGAIgASgMUgdncm91cElkEhIKBGRhdGEYAyABKAxSBGRhdGE=');
 @$core.Deprecated('Use taskRequestDescriptor instead')
 const TaskRequest$json = const {
   '1': 'TaskRequest',

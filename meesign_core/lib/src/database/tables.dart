@@ -79,3 +79,14 @@ class Challenges extends Table {
   @override
   Set<Column> get primaryKey => {tid, did};
 }
+
+class Decrypts extends Table {
+  BlobColumn get tid => blob()();
+  BlobColumn get did => blob()();
+  BlobColumn get gid => blob().references(Groups, #id)();
+  TextColumn get name => text()();
+  BlobColumn get data => blob()();
+
+  @override
+  Set<Column> get primaryKey => {tid, did};
+}

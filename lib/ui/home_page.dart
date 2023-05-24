@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:animations/animations.dart';
@@ -7,6 +8,7 @@ import 'package:meesign_core/meesign_data.dart';
 import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:meesign_native/meesign_native.dart';
 
 import '../app_container.dart';
 import '../routes.dart';
@@ -287,7 +289,7 @@ class GroupTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text('Threshold: $threshold / ${members.length}'),
-          Text('Purpose: ${['Sign PDF', 'Log In'][keyType.index]}'),
+          Text('Purpose: ${['Sign PDF', 'Log In', 'Decrypt'][keyType.index]}'),
         ],
       ),
       Container(
@@ -441,6 +443,55 @@ class LogInSubPage extends StatelessWidget {
   }
 }
 
+class DecryptSubPage extends StatelessWidget {
+  const DecryptSubPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<HomeState>(builder: (context, model, child) {
+      return buildTaskListView<Decrypt, Decrypt>(
+        model.decryptTasks,
+        model.decryptTasks
+            .where((task) => task.state == TaskState.finished)
+            .map((task) => task.info)
+            .toList(),
+        finishedTitle: 'Finished',
+        emptyView: const EmptyList(
+          hint: 'Requests for decryptions.',
+        ),
+        unfinishedBuilder: (context, task) {
+          return SignTile(
+            name: task.info.name,
+            group: task.info.group.name,
+            desc: statusMessage(task),
+            trailing: TaskStateIndicator(task.state, task.round / task.nRounds),
+            initiallyExpanded: true,
+            showActions: task.approvable,
+            actions: [
+              FilledButton.tonal(
+                child: const Text('Decrypt'),
+                onPressed: () => model.joinDecrypt(task, agree: true),
+              ),
+              OutlinedButton(
+                child: const Text('Decline'),
+                onPressed: () => model.joinDecrypt(task, agree: false),
+              )
+            ],
+          );
+        },
+        finishedBuilder: (context, info) {
+          return SignTile(
+            name: info.name,
+            group: info.group.name,
+            trailing: const TaskStateIndicator(TaskState.finished, 1),
+            desc: utf8.decode(info.data, allowMalformed: true),
+          );
+        },
+      );
+    });
+  }
+}
+
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -454,6 +505,7 @@ class HomePage extends StatelessWidget {
         di.groupRepository,
         di.fileRepository,
         di.challengeRepository,
+        di.decryptRepository,
       ),
       child: const HomePageView(),
     );
@@ -470,7 +522,7 @@ class HomePageView extends StatefulWidget {
 class _HomePageViewState extends State<HomePageView> {
   int _index = 0;
 
-  Future<Group?> _selectGroup() async {
+  Future<Group?> _selectGroup(keyType) async {
     final groups = context.read<HomeState>().groups;
     return showDialog<Group?>(
       context: context,
@@ -478,7 +530,7 @@ class _HomePageViewState extends State<HomePageView> {
         return SimpleDialog(
           title: const Text('Select group'),
           children: groups
-              .where((group) => group.keyType == KeyType.signPdf)
+              .where((group) => group.keyType == keyType)
               .map((group) => SimpleDialogOption(
                     child: Text(group.name),
                     onPressed: () {
@@ -487,6 +539,49 @@ class _HomePageViewState extends State<HomePageView> {
                   ))
               .toList(),
         );
+      },
+    );
+  }
+
+  Future<List<String>?> _inputMessage() async {
+    return showDialog<List<String>?>(
+      context: context,
+      builder: (context) {
+        var description = TextEditingController();
+        var message = TextEditingController();
+
+        return SimpleDialog(title: const Text('Input message'), children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: TextField(
+              controller: description,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Description',
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              controller: message,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Message',
+              ),
+            ),
+          ),
+          Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                  onPressed: () {
+                    var result = List<String>.empty(growable: true);
+                    result.add(description.text);
+                    result.add(message.text);
+                    Navigator.pop(context, result);
+                  },
+                  child: const Text("Next"))),
+        ]);
       },
     );
   }
@@ -532,7 +627,7 @@ class _HomePageViewState extends State<HomePageView> {
       return;
     }
 
-    final group = await _selectGroup();
+    final group = await _selectGroup(KeyType.signPdf);
     if (group == null) return;
 
     try {
@@ -562,11 +657,32 @@ class _HomePageViewState extends State<HomePageView> {
     }
   }
 
+  Future<void> _encrypt() async {
+    final message = await _inputMessage();
+    if (message == null) return;
+
+    final group = await _selectGroup(KeyType.decrypt); // TODO change
+    if (group == null) return;
+
+    final data = ElGamalWrapper.encrypt(message[1], group.id);
+
+    try {
+      await context.read<HomeState>().decrypt(message[0], data, group);
+    } catch (e) {
+      showErrorDialog(
+        title: 'Decryption request failed',
+        desc: 'Please try again.',
+      );
+      rethrow;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     const pages = [
       SigningSubPage(),
       LogInSubPage(),
+      DecryptSubPage(),
       GroupsSubPage(),
     ];
 
@@ -578,6 +694,12 @@ class _HomePageViewState extends State<HomePageView> {
         icon: const Icon(Icons.add),
       ),
       null,
+      FloatingActionButton.extended(
+        key: const ValueKey('EncryptFab'),
+        onPressed: _encrypt,
+        label: const Text('Encrypt'),
+        icon: const Icon(Icons.add),
+      ),
       FloatingActionButton.extended(
         onPressed: _group,
         label: const Text('New'),
@@ -654,6 +776,12 @@ class _HomePageViewState extends State<HomePageView> {
             ),
             label: 'Log In',
           ),
+          NavigationDestination(
+              icon: CounterBadge(
+                stream: context.watch<HomeState>().nDecryptReqs,
+                child: const Icon(Icons.key),
+              ),
+              label: 'Decrypt'),
           NavigationDestination(
             icon: CounterBadge(
               stream: context.watch<HomeState>().nGroupReqs,

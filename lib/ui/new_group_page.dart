@@ -135,7 +135,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
         _nameController.text,
         _members,
         _threshold,
-        Protocol.gg18,
+        _keyType == KeyType.decrypt ? Protocol.elgamal : Protocol.gg18,
         _keyType,
       ),
     );
@@ -262,8 +262,12 @@ class _NewGroupPageState extends State<NewGroupPage> {
                 label: Text('Sign PDF'),
               ),
               ButtonSegment<KeyType>(
-                value: KeyType.signDigest,
+                value: KeyType.signChallenge,
                 label: Text('Log In'),
+              ),
+              ButtonSegment<KeyType>(
+                value: KeyType.decrypt,
+                label: Text('Decrypt'),
               )
             ],
           ),

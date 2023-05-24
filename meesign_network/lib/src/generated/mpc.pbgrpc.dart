@@ -14,6 +14,11 @@ import 'mpc.pb.dart' as $0;
 export 'mpc.pb.dart';
 
 class MPCClient extends $grpc.Client {
+  static final _$getServerInfo =
+      $grpc.ClientMethod<$0.ServerInfoRequest, $0.ServerInfo>(
+          '/meesign.MPC/GetServerInfo',
+          ($0.ServerInfoRequest value) => value.writeToBuffer(),
+          ($core.List<$core.int> value) => $0.ServerInfo.fromBuffer(value));
   static final _$register =
       $grpc.ClientMethod<$0.RegistrationRequest, $0.RegistrationResponse>(
           '/meesign.MPC/Register',
@@ -27,6 +32,10 @@ class MPCClient extends $grpc.Client {
   static final _$group = $grpc.ClientMethod<$0.GroupRequest, $0.Task>(
       '/meesign.MPC/Group',
       ($0.GroupRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $0.Task.fromBuffer(value));
+  static final _$decrypt = $grpc.ClientMethod<$0.DecryptRequest, $0.Task>(
+      '/meesign.MPC/Decrypt',
+      ($0.DecryptRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.Task.fromBuffer(value));
   static final _$getTask = $grpc.ClientMethod<$0.TaskRequest, $0.Task>(
       '/meesign.MPC/GetTask',
@@ -72,6 +81,12 @@ class MPCClient extends $grpc.Client {
       $core.Iterable<$grpc.ClientInterceptor>? interceptors})
       : super(channel, options: options, interceptors: interceptors);
 
+  $grpc.ResponseFuture<$0.ServerInfo> getServerInfo(
+      $0.ServerInfoRequest request,
+      {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$getServerInfo, request, options: options);
+  }
+
   $grpc.ResponseFuture<$0.RegistrationResponse> register(
       $0.RegistrationRequest request,
       {$grpc.CallOptions? options}) {
@@ -86,6 +101,11 @@ class MPCClient extends $grpc.Client {
   $grpc.ResponseFuture<$0.Task> group($0.GroupRequest request,
       {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$group, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.Task> decrypt($0.DecryptRequest request,
+      {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$decrypt, request, options: options);
   }
 
   $grpc.ResponseFuture<$0.Task> getTask($0.TaskRequest request,
@@ -140,6 +160,13 @@ abstract class MPCServiceBase extends $grpc.Service {
   $core.String get $name => 'meesign.MPC';
 
   MPCServiceBase() {
+    $addMethod($grpc.ServiceMethod<$0.ServerInfoRequest, $0.ServerInfo>(
+        'GetServerInfo',
+        getServerInfo_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.ServerInfoRequest.fromBuffer(value),
+        ($0.ServerInfo value) => value.writeToBuffer()));
     $addMethod(
         $grpc.ServiceMethod<$0.RegistrationRequest, $0.RegistrationResponse>(
             'Register',
@@ -162,6 +189,13 @@ abstract class MPCServiceBase extends $grpc.Service {
         false,
         false,
         ($core.List<$core.int> value) => $0.GroupRequest.fromBuffer(value),
+        ($0.Task value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.DecryptRequest, $0.Task>(
+        'Decrypt',
+        decrypt_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.DecryptRequest.fromBuffer(value),
         ($0.Task value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.TaskRequest, $0.Task>(
         'GetTask',
@@ -229,6 +263,11 @@ abstract class MPCServiceBase extends $grpc.Service {
         ($0.Task value) => value.writeToBuffer()));
   }
 
+  $async.Future<$0.ServerInfo> getServerInfo_Pre($grpc.ServiceCall call,
+      $async.Future<$0.ServerInfoRequest> request) async {
+    return getServerInfo(call, await request);
+  }
+
   $async.Future<$0.RegistrationResponse> register_Pre($grpc.ServiceCall call,
       $async.Future<$0.RegistrationRequest> request) async {
     return register(call, await request);
@@ -242,6 +281,11 @@ abstract class MPCServiceBase extends $grpc.Service {
   $async.Future<$0.Task> group_Pre(
       $grpc.ServiceCall call, $async.Future<$0.GroupRequest> request) async {
     return group(call, await request);
+  }
+
+  $async.Future<$0.Task> decrypt_Pre(
+      $grpc.ServiceCall call, $async.Future<$0.DecryptRequest> request) async {
+    return decrypt(call, await request);
   }
 
   $async.Future<$0.Task> getTask_Pre(
@@ -289,10 +333,14 @@ abstract class MPCServiceBase extends $grpc.Service {
     yield* subscribeUpdates(call, await request);
   }
 
+  $async.Future<$0.ServerInfo> getServerInfo(
+      $grpc.ServiceCall call, $0.ServerInfoRequest request);
   $async.Future<$0.RegistrationResponse> register(
       $grpc.ServiceCall call, $0.RegistrationRequest request);
   $async.Future<$0.Task> sign($grpc.ServiceCall call, $0.SignRequest request);
   $async.Future<$0.Task> group($grpc.ServiceCall call, $0.GroupRequest request);
+  $async.Future<$0.Task> decrypt(
+      $grpc.ServiceCall call, $0.DecryptRequest request);
   $async.Future<$0.Task> getTask(
       $grpc.ServiceCall call, $0.TaskRequest request);
   $async.Future<$0.Resp> updateTask(

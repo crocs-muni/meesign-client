@@ -38,7 +38,7 @@ class UserDao extends DatabaseAccessor<Database> with _$UserDaoMixin {
 }
 
 @DriftAccessor(
-  tables: [Tasks, Groups, GroupMembers, Devices, Files, Challenges],
+  tables: [Tasks, Groups, GroupMembers, Devices, Files, Challenges, Decrypts],
 )
 class TaskDao extends DatabaseAccessor<Database> with _$TaskDaoMixin {
   TaskDao(Database db) : super(db);
@@ -162,6 +162,38 @@ class TaskDao extends DatabaseAccessor<Database> with _$TaskDaoMixin {
         )
         .watch();
   }
+
+  Future<void> insertDecrypt(DecryptsCompanion entity) =>
+      into(decrypts).insert(entity);
+
+  Future<Decrypt> getDecrypt(Uint8List did, Uint8List tid) =>
+      (select(decrypts)
+            ..where((decrypt) => decrypt.did.equals(did) & decrypt.tid.equals(tid)))
+          .getSingle();
+
+  Future<void> updateDecrypt(DecryptsCompanion entity) =>
+      (update(decrypts)..whereSamePrimaryKey(entity)).write(entity);
+
+  // TODO: is there a way to reduce the repetition?
+  Stream<List<DecryptTask>> watchDecryptTasks(Uint8List did) {
+    final query = select(decrypts)..where((file) => file.did.equals(did));
+    final onTask = tasks.id.equalsExp(decrypts.tid) &
+        tasks.did.equalsExp(decrypts.did);
+    final onGroup = groups.id.equalsExp(decrypts.gid);
+    return query
+        .join([
+          innerJoin(tasks, onTask),
+          innerJoin(groups, onGroup),
+        ])
+        .map(
+          (res) => DecryptTask(
+            res.readTable(tasks),
+            res.readTable(decrypts),
+            res.readTable(groups),
+          ),
+        )
+        .watch();
+  }
 }
 
 class PopulatedGroup {
@@ -190,4 +222,11 @@ class ChallengeTask {
   final Group group;
   final Challenge challenge;
   ChallengeTask(this.task, this.challenge, this.group);
+}
+
+class DecryptTask {
+  final Task task;
+  final Group group;
+  final Decrypt decrypt;
+  DecryptTask(this.task, this.decrypt, this.group);
 }

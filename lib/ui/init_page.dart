@@ -37,6 +37,7 @@ class InitPageState extends State<InitPage> {
       di.groupRepository,
       di.fileRepository,
       di.challengeRepository,
+      di.decryptRepository,
     ]);
 
     if (mounted) {

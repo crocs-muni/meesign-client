@@ -124,29 +124,36 @@ class Device extends DataClass implements Insertable<Device> {
 class DevicesCompanion extends UpdateCompanion<Device> {
   final Value<Uint8List> id;
   final Value<String> name;
+  final Value<int> rowid;
   const DevicesCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   DevicesCompanion.insert({
     required Uint8List id,
     required String name,
+    this.rowid = const Value.absent(),
   })  : id = Value(id),
         name = Value(name);
   static Insertable<Device> custom({
     Expression<Uint8List>? id,
     Expression<String>? name,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
-  DevicesCompanion copyWith({Value<Uint8List>? id, Value<String>? name}) {
+  DevicesCompanion copyWith(
+      {Value<Uint8List>? id, Value<String>? name, Value<int>? rowid}) {
     return DevicesCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -159,6 +166,9 @@ class DevicesCompanion extends UpdateCompanion<Device> {
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -166,7 +176,8 @@ class DevicesCompanion extends UpdateCompanion<Device> {
   String toString() {
     return (StringBuffer('DevicesCompanion(')
           ..write('id: $id, ')
-          ..write('name: $name')
+          ..write('name: $name, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -296,29 +307,36 @@ class User extends DataClass implements Insertable<User> {
 class UsersCompanion extends UpdateCompanion<User> {
   final Value<Uint8List> id;
   final Value<String> host;
+  final Value<int> rowid;
   const UsersCompanion({
     this.id = const Value.absent(),
     this.host = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   UsersCompanion.insert({
     required Uint8List id,
     required String host,
+    this.rowid = const Value.absent(),
   })  : id = Value(id),
         host = Value(host);
   static Insertable<User> custom({
     Expression<Uint8List>? id,
     Expression<String>? host,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (host != null) 'host': host,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
-  UsersCompanion copyWith({Value<Uint8List>? id, Value<String>? host}) {
+  UsersCompanion copyWith(
+      {Value<Uint8List>? id, Value<String>? host, Value<int>? rowid}) {
     return UsersCompanion(
       id: id ?? this.id,
       host: host ?? this.host,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -331,6 +349,9 @@ class UsersCompanion extends UpdateCompanion<User> {
     if (host.present) {
       map['host'] = Variable<String>(host.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -338,7 +359,8 @@ class UsersCompanion extends UpdateCompanion<User> {
   String toString() {
     return (StringBuffer('UsersCompanion(')
           ..write('id: $id, ')
-          ..write('host: $host')
+          ..write('host: $host, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -610,6 +632,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
   final Value<int> round;
   final Value<int> attempt;
   final Value<Uint8List> context;
+  final Value<int> rowid;
   const TasksCompanion({
     this.id = const Value.absent(),
     this.did = const Value.absent(),
@@ -618,6 +641,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.round = const Value.absent(),
     this.attempt = const Value.absent(),
     this.context = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   TasksCompanion.insert({
     required Uint8List id,
@@ -627,6 +651,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.round = const Value.absent(),
     this.attempt = const Value.absent(),
     required Uint8List context,
+    this.rowid = const Value.absent(),
   })  : id = Value(id),
         did = Value(did),
         state = Value(state),
@@ -639,6 +664,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     Expression<int>? round,
     Expression<int>? attempt,
     Expression<Uint8List>? context,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -648,6 +674,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       if (round != null) 'round': round,
       if (attempt != null) 'attempt': attempt,
       if (context != null) 'context': context,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
@@ -658,7 +685,8 @@ class TasksCompanion extends UpdateCompanion<Task> {
       Value<bool>? approved,
       Value<int>? round,
       Value<int>? attempt,
-      Value<Uint8List>? context}) {
+      Value<Uint8List>? context,
+      Value<int>? rowid}) {
     return TasksCompanion(
       id: id ?? this.id,
       did: did ?? this.did,
@@ -667,6 +695,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       round: round ?? this.round,
       attempt: attempt ?? this.attempt,
       context: context ?? this.context,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -695,6 +724,9 @@ class TasksCompanion extends UpdateCompanion<Task> {
     if (context.present) {
       map['context'] = Variable<Uint8List>(context.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -707,7 +739,8 @@ class TasksCompanion extends UpdateCompanion<Task> {
           ..write('approved: $approved, ')
           ..write('round: $round, ')
           ..write('attempt: $attempt, ')
-          ..write('context: $context')
+          ..write('context: $context, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -1005,6 +1038,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
   final Value<Protocol> protocol;
   final Value<KeyType> keyType;
   final Value<Uint8List> context;
+  final Value<int> rowid;
   const GroupsCompanion({
     this.id = const Value.absent(),
     this.tid = const Value.absent(),
@@ -1014,6 +1048,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
     this.protocol = const Value.absent(),
     this.keyType = const Value.absent(),
     this.context = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   GroupsCompanion.insert({
     this.id = const Value.absent(),
@@ -1024,6 +1059,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
     required Protocol protocol,
     required KeyType keyType,
     required Uint8List context,
+    this.rowid = const Value.absent(),
   })  : tid = Value(tid),
         did = Value(did),
         name = Value(name),
@@ -1040,6 +1076,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
     Expression<String>? protocol,
     Expression<String>? keyType,
     Expression<Uint8List>? context,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1050,6 +1087,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
       if (protocol != null) 'protocol': protocol,
       if (keyType != null) 'key_type': keyType,
       if (context != null) 'context': context,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
@@ -1061,7 +1099,8 @@ class GroupsCompanion extends UpdateCompanion<Group> {
       Value<int>? threshold,
       Value<Protocol>? protocol,
       Value<KeyType>? keyType,
-      Value<Uint8List>? context}) {
+      Value<Uint8List>? context,
+      Value<int>? rowid}) {
     return GroupsCompanion(
       id: id ?? this.id,
       tid: tid ?? this.tid,
@@ -1071,6 +1110,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
       protocol: protocol ?? this.protocol,
       keyType: keyType ?? this.keyType,
       context: context ?? this.context,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -1103,6 +1143,9 @@ class GroupsCompanion extends UpdateCompanion<Group> {
     if (context.present) {
       map['context'] = Variable<Uint8List>(context.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -1116,7 +1159,8 @@ class GroupsCompanion extends UpdateCompanion<Group> {
           ..write('threshold: $threshold, ')
           ..write('protocol: $protocol, ')
           ..write('keyType: $keyType, ')
-          ..write('context: $context')
+          ..write('context: $context, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -1252,30 +1296,36 @@ class GroupMember extends DataClass implements Insertable<GroupMember> {
 class GroupMembersCompanion extends UpdateCompanion<GroupMember> {
   final Value<Uint8List> tid;
   final Value<Uint8List> did;
+  final Value<int> rowid;
   const GroupMembersCompanion({
     this.tid = const Value.absent(),
     this.did = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   GroupMembersCompanion.insert({
     required Uint8List tid,
     required Uint8List did,
+    this.rowid = const Value.absent(),
   })  : tid = Value(tid),
         did = Value(did);
   static Insertable<GroupMember> custom({
     Expression<Uint8List>? tid,
     Expression<Uint8List>? did,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (tid != null) 'tid': tid,
       if (did != null) 'did': did,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   GroupMembersCompanion copyWith(
-      {Value<Uint8List>? tid, Value<Uint8List>? did}) {
+      {Value<Uint8List>? tid, Value<Uint8List>? did, Value<int>? rowid}) {
     return GroupMembersCompanion(
       tid: tid ?? this.tid,
       did: did ?? this.did,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -1288,6 +1338,9 @@ class GroupMembersCompanion extends UpdateCompanion<GroupMember> {
     if (did.present) {
       map['did'] = Variable<Uint8List>(did.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -1295,7 +1348,8 @@ class GroupMembersCompanion extends UpdateCompanion<GroupMember> {
   String toString() {
     return (StringBuffer('GroupMembersCompanion(')
           ..write('tid: $tid, ')
-          ..write('did: $did')
+          ..write('did: $did, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -1477,17 +1531,20 @@ class FilesCompanion extends UpdateCompanion<File> {
   final Value<Uint8List> did;
   final Value<Uint8List> gid;
   final Value<String> name;
+  final Value<int> rowid;
   const FilesCompanion({
     this.tid = const Value.absent(),
     this.did = const Value.absent(),
     this.gid = const Value.absent(),
     this.name = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   FilesCompanion.insert({
     required Uint8List tid,
     required Uint8List did,
     required Uint8List gid,
     required String name,
+    this.rowid = const Value.absent(),
   })  : tid = Value(tid),
         did = Value(did),
         gid = Value(gid),
@@ -1497,12 +1554,14 @@ class FilesCompanion extends UpdateCompanion<File> {
     Expression<Uint8List>? did,
     Expression<Uint8List>? gid,
     Expression<String>? name,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (tid != null) 'tid': tid,
       if (did != null) 'did': did,
       if (gid != null) 'gid': gid,
       if (name != null) 'name': name,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
@@ -1510,12 +1569,14 @@ class FilesCompanion extends UpdateCompanion<File> {
       {Value<Uint8List>? tid,
       Value<Uint8List>? did,
       Value<Uint8List>? gid,
-      Value<String>? name}) {
+      Value<String>? name,
+      Value<int>? rowid}) {
     return FilesCompanion(
       tid: tid ?? this.tid,
       did: did ?? this.did,
       gid: gid ?? this.gid,
       name: name ?? this.name,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -1534,6 +1595,9 @@ class FilesCompanion extends UpdateCompanion<File> {
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -1543,7 +1607,8 @@ class FilesCompanion extends UpdateCompanion<File> {
           ..write('tid: $tid, ')
           ..write('did: $did, ')
           ..write('gid: $gid, ')
-          ..write('name: $name')
+          ..write('name: $name, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -1757,12 +1822,14 @@ class ChallengesCompanion extends UpdateCompanion<Challenge> {
   final Value<Uint8List> gid;
   final Value<String> name;
   final Value<Uint8List> data;
+  final Value<int> rowid;
   const ChallengesCompanion({
     this.tid = const Value.absent(),
     this.did = const Value.absent(),
     this.gid = const Value.absent(),
     this.name = const Value.absent(),
     this.data = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   ChallengesCompanion.insert({
     required Uint8List tid,
@@ -1770,6 +1837,7 @@ class ChallengesCompanion extends UpdateCompanion<Challenge> {
     required Uint8List gid,
     required String name,
     required Uint8List data,
+    this.rowid = const Value.absent(),
   })  : tid = Value(tid),
         did = Value(did),
         gid = Value(gid),
@@ -1781,6 +1849,7 @@ class ChallengesCompanion extends UpdateCompanion<Challenge> {
     Expression<Uint8List>? gid,
     Expression<String>? name,
     Expression<Uint8List>? data,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (tid != null) 'tid': tid,
@@ -1788,6 +1857,7 @@ class ChallengesCompanion extends UpdateCompanion<Challenge> {
       if (gid != null) 'gid': gid,
       if (name != null) 'name': name,
       if (data != null) 'data': data,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
@@ -1796,13 +1866,15 @@ class ChallengesCompanion extends UpdateCompanion<Challenge> {
       Value<Uint8List>? did,
       Value<Uint8List>? gid,
       Value<String>? name,
-      Value<Uint8List>? data}) {
+      Value<Uint8List>? data,
+      Value<int>? rowid}) {
     return ChallengesCompanion(
       tid: tid ?? this.tid,
       did: did ?? this.did,
       gid: gid ?? this.gid,
       name: name ?? this.name,
       data: data ?? this.data,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -1824,6 +1896,9 @@ class ChallengesCompanion extends UpdateCompanion<Challenge> {
     if (data.present) {
       map['data'] = Variable<Uint8List>(data.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -1834,7 +1909,309 @@ class ChallengesCompanion extends UpdateCompanion<Challenge> {
           ..write('did: $did, ')
           ..write('gid: $gid, ')
           ..write('name: $name, ')
+          ..write('data: $data, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $DecryptsTable extends Decrypts with TableInfo<$DecryptsTable, Decrypt> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DecryptsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _tidMeta = const VerificationMeta('tid');
+  @override
+  late final GeneratedColumn<Uint8List> tid = GeneratedColumn<Uint8List>(
+      'tid', aliasedName, false,
+      type: DriftSqlType.blob, requiredDuringInsert: true);
+  static const VerificationMeta _didMeta = const VerificationMeta('did');
+  @override
+  late final GeneratedColumn<Uint8List> did = GeneratedColumn<Uint8List>(
+      'did', aliasedName, false,
+      type: DriftSqlType.blob, requiredDuringInsert: true);
+  static const VerificationMeta _gidMeta = const VerificationMeta('gid');
+  @override
+  late final GeneratedColumn<Uint8List> gid = GeneratedColumn<Uint8List>(
+      'gid', aliasedName, false,
+      type: DriftSqlType.blob,
+      requiredDuringInsert: true,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('REFERENCES "groups" (id)'));
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _dataMeta = const VerificationMeta('data');
+  @override
+  late final GeneratedColumn<Uint8List> data = GeneratedColumn<Uint8List>(
+      'data', aliasedName, false,
+      type: DriftSqlType.blob, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [tid, did, gid, name, data];
+  @override
+  String get aliasedName => _alias ?? 'decrypts';
+  @override
+  String get actualTableName => 'decrypts';
+  @override
+  VerificationContext validateIntegrity(Insertable<Decrypt> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('tid')) {
+      context.handle(
+          _tidMeta, tid.isAcceptableOrUnknown(data['tid']!, _tidMeta));
+    } else if (isInserting) {
+      context.missing(_tidMeta);
+    }
+    if (data.containsKey('did')) {
+      context.handle(
+          _didMeta, did.isAcceptableOrUnknown(data['did']!, _didMeta));
+    } else if (isInserting) {
+      context.missing(_didMeta);
+    }
+    if (data.containsKey('gid')) {
+      context.handle(
+          _gidMeta, gid.isAcceptableOrUnknown(data['gid']!, _gidMeta));
+    } else if (isInserting) {
+      context.missing(_gidMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('data')) {
+      context.handle(
+          _dataMeta, this.data.isAcceptableOrUnknown(data['data']!, _dataMeta));
+    } else if (isInserting) {
+      context.missing(_dataMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {tid, did};
+  @override
+  Decrypt map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Decrypt(
+      tid: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}tid'])!,
+      did: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}did'])!,
+      gid: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}gid'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      data: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}data'])!,
+    );
+  }
+
+  @override
+  $DecryptsTable createAlias(String alias) {
+    return $DecryptsTable(attachedDatabase, alias);
+  }
+}
+
+class Decrypt extends DataClass implements Insertable<Decrypt> {
+  final Uint8List tid;
+  final Uint8List did;
+  final Uint8List gid;
+  final String name;
+  final Uint8List data;
+  const Decrypt(
+      {required this.tid,
+      required this.did,
+      required this.gid,
+      required this.name,
+      required this.data});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['tid'] = Variable<Uint8List>(tid);
+    map['did'] = Variable<Uint8List>(did);
+    map['gid'] = Variable<Uint8List>(gid);
+    map['name'] = Variable<String>(name);
+    map['data'] = Variable<Uint8List>(data);
+    return map;
+  }
+
+  DecryptsCompanion toCompanion(bool nullToAbsent) {
+    return DecryptsCompanion(
+      tid: Value(tid),
+      did: Value(did),
+      gid: Value(gid),
+      name: Value(name),
+      data: Value(data),
+    );
+  }
+
+  factory Decrypt.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Decrypt(
+      tid: serializer.fromJson<Uint8List>(json['tid']),
+      did: serializer.fromJson<Uint8List>(json['did']),
+      gid: serializer.fromJson<Uint8List>(json['gid']),
+      name: serializer.fromJson<String>(json['name']),
+      data: serializer.fromJson<Uint8List>(json['data']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'tid': serializer.toJson<Uint8List>(tid),
+      'did': serializer.toJson<Uint8List>(did),
+      'gid': serializer.toJson<Uint8List>(gid),
+      'name': serializer.toJson<String>(name),
+      'data': serializer.toJson<Uint8List>(data),
+    };
+  }
+
+  Decrypt copyWith(
+          {Uint8List? tid,
+          Uint8List? did,
+          Uint8List? gid,
+          String? name,
+          Uint8List? data}) =>
+      Decrypt(
+        tid: tid ?? this.tid,
+        did: did ?? this.did,
+        gid: gid ?? this.gid,
+        name: name ?? this.name,
+        data: data ?? this.data,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('Decrypt(')
+          ..write('tid: $tid, ')
+          ..write('did: $did, ')
+          ..write('gid: $gid, ')
+          ..write('name: $name, ')
           ..write('data: $data')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      $driftBlobEquality.hash(tid),
+      $driftBlobEquality.hash(did),
+      $driftBlobEquality.hash(gid),
+      name,
+      $driftBlobEquality.hash(data));
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Decrypt &&
+          $driftBlobEquality.equals(other.tid, this.tid) &&
+          $driftBlobEquality.equals(other.did, this.did) &&
+          $driftBlobEquality.equals(other.gid, this.gid) &&
+          other.name == this.name &&
+          $driftBlobEquality.equals(other.data, this.data));
+}
+
+class DecryptsCompanion extends UpdateCompanion<Decrypt> {
+  final Value<Uint8List> tid;
+  final Value<Uint8List> did;
+  final Value<Uint8List> gid;
+  final Value<String> name;
+  final Value<Uint8List> data;
+  final Value<int> rowid;
+  const DecryptsCompanion({
+    this.tid = const Value.absent(),
+    this.did = const Value.absent(),
+    this.gid = const Value.absent(),
+    this.name = const Value.absent(),
+    this.data = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DecryptsCompanion.insert({
+    required Uint8List tid,
+    required Uint8List did,
+    required Uint8List gid,
+    required String name,
+    required Uint8List data,
+    this.rowid = const Value.absent(),
+  })  : tid = Value(tid),
+        did = Value(did),
+        gid = Value(gid),
+        name = Value(name),
+        data = Value(data);
+  static Insertable<Decrypt> custom({
+    Expression<Uint8List>? tid,
+    Expression<Uint8List>? did,
+    Expression<Uint8List>? gid,
+    Expression<String>? name,
+    Expression<Uint8List>? data,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (tid != null) 'tid': tid,
+      if (did != null) 'did': did,
+      if (gid != null) 'gid': gid,
+      if (name != null) 'name': name,
+      if (data != null) 'data': data,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DecryptsCompanion copyWith(
+      {Value<Uint8List>? tid,
+      Value<Uint8List>? did,
+      Value<Uint8List>? gid,
+      Value<String>? name,
+      Value<Uint8List>? data,
+      Value<int>? rowid}) {
+    return DecryptsCompanion(
+      tid: tid ?? this.tid,
+      did: did ?? this.did,
+      gid: gid ?? this.gid,
+      name: name ?? this.name,
+      data: data ?? this.data,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (tid.present) {
+      map['tid'] = Variable<Uint8List>(tid.value);
+    }
+    if (did.present) {
+      map['did'] = Variable<Uint8List>(did.value);
+    }
+    if (gid.present) {
+      map['gid'] = Variable<Uint8List>(gid.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (data.present) {
+      map['data'] = Variable<Uint8List>(data.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DecryptsCompanion(')
+          ..write('tid: $tid, ')
+          ..write('did: $did, ')
+          ..write('gid: $gid, ')
+          ..write('name: $name, ')
+          ..write('data: $data, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -1849,6 +2226,7 @@ abstract class _$Database extends GeneratedDatabase {
   late final $GroupMembersTable groupMembers = $GroupMembersTable(this);
   late final $FilesTable files = $FilesTable(this);
   late final $ChallengesTable challenges = $ChallengesTable(this);
+  late final $DecryptsTable decrypts = $DecryptsTable(this);
   late final DeviceDao deviceDao = DeviceDao(this as Database);
   late final UserDao userDao = UserDao(this as Database);
   late final TaskDao taskDao = TaskDao(this as Database);
@@ -1856,6 +2234,14 @@ abstract class _$Database extends GeneratedDatabase {
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [devices, users, tasks, groups, groupMembers, files, challenges];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+        devices,
+        users,
+        tasks,
+        groups,
+        groupMembers,
+        files,
+        challenges,
+        decrypts
+      ];
 }
