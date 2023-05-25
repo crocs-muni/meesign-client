@@ -24,8 +24,8 @@ jobs:
       - run: flutter format --output none --set-exit-if-changed .
 
 
-  create-build:
-    name: Create ${{ matrix.target }} build
+  build:
+    name: ${{ matrix.target }} build
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
