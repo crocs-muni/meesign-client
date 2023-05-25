@@ -24,6 +24,34 @@ jobs:
       - run: flutter format --output none --set-exit-if-changed .
 
 
+  dart-test:
+    name: Dart test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: dart-lang/setup-dart@v1
+      - uses: actions/checkout@v3
+
+      - name: Install native
+        run: |
+          cargo build --release
+          echo "LD_LIBRARY_PATH=$(pwd)/target/release/" >> "$GITHUB_ENV"
+        working-directory: meesign_native/native/mpc-sigs
+
+      - name: Setup server
+        run: |
+          wget https://raw.githubusercontent.com/crocs-muni/meesign-server/main/generate_keys.sh
+          bash generate_keys.sh
+          chmod a+r keys/*
+          podman pull crocsmuni/meesign:nightly
+          podman run --detach \
+            --publish 1337:1337 --volume $(pwd)/keys/:/meesign/keys/:Z \
+            crocsmuni/meesign:nightly
+
+      - name: Run tests
+        run: cd meesign_core; dart test
+
+
   build:
     name: ${{ matrix.target }} build
     runs-on: ${{ matrix.os }}
