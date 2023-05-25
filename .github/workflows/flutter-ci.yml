@@ -12,6 +12,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+          cache: true
       - uses: actions/checkout@v3
       - run: |
           for PKG in native network core; do
@@ -60,6 +61,7 @@ jobs:
       uses: subosito/flutter-action@v2
       with:
         channel: stable
+        cache: true
 
     - name: Install Android dependencies
       if: matrix.target == 'Android'
@@ -112,8 +114,7 @@ jobs:
         flutter config --enable-linux-desktop
         flutter config --enable-windows-desktop
 
-    # Check setup, fetch dart packages
-    - run: flutter doctor -v
+    # Fetch dart packages
     - run: flutter pub get
 
     - name: Build app
