@@ -9,10 +9,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: subosito/flutter-action@v1
+      - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: |
           for PKG in native network core; do
             (cd meesign_$PKG; dart pub get)
@@ -30,7 +30,7 @@ jobs:
       matrix:
         target: [Windows, Linux, Android]
         include:
-        - os: windows-2022
+        - os: windows-latest
           target: Windows
           build_target: windows
           build_path: build\windows\runner\Release
@@ -54,18 +54,19 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Clone Flutter repository with stable channel
-      uses: subosito/flutter-action@4389e6cbc6cb8a4b18c628ff96ff90be0e926aa8
+      uses: subosito/flutter-action@v2
       with:
         channel: stable
 
     - name: Install Android dependencies
       if: matrix.target == 'Android'
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v3
       with:
-        java-version: '12.x'
+        java-version: '17'
+        distribution: 'temurin'
 
     - name: Set up Rust for Android
       if: matrix.target == 'Android'
@@ -92,7 +93,7 @@ jobs:
           pkg-config cmake ninja-build
 
     - name: Cache Vcpkg packages
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       if: matrix.target == 'Windows'
       with:
         path: C:\vcpkg
@@ -151,7 +152,7 @@ jobs:
 
     # Upload the build.
     - name: Upload build outputs
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: meesign_client_${{ matrix.target }}${{ matrix.asset_extension }}
         path: ./meesign_client_${{ matrix.target }}${{ matrix.asset_extension }}
