@@ -41,10 +41,11 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
+    ndkVersion '25.2.9519653'
     externalNativeBuild {
         cmake {
             path file('src/main/cpp/CMakeLists.txt')
-            version '3.18.1'
+            version '3.22.1'
         }
     }
 
