@@ -41,7 +41,7 @@ impl Drop for Buffer {
 
 #[no_mangle]
 #[allow(unused_variables)]
-pub extern "C" fn buffer_free(buffer: Buffer) {}
+pub unsafe extern "C" fn buffer_free(buffer: Buffer) {}
 
 fn set_error(error_out: *mut *mut c_char, error: &dyn Error) {
     if !error_out.is_null() {
@@ -51,7 +51,7 @@ fn set_error(error_out: *mut *mut c_char, error: &dyn Error) {
 }
 
 #[no_mangle]
-pub extern "C" fn error_free(error: *mut c_char) {
+pub unsafe extern "C" fn error_free(error: *mut c_char) {
     if !error.is_null() {
         unsafe { CString::from_raw(error) };
     }
@@ -74,10 +74,10 @@ impl ProtocolResult {
 
 #[no_mangle]
 #[allow(unused_variables)]
-pub extern "C" fn protocol_result_free(res: ProtocolResult) {}
+pub unsafe extern "C" fn protocol_result_free(res: ProtocolResult) {}
 
 #[no_mangle]
-pub extern "C" fn protocol_keygen(proto_id: ProtocolId) -> ProtocolResult {
+pub unsafe extern "C" fn protocol_keygen(proto_id: ProtocolId) -> ProtocolResult {
     let ctx: Box<dyn protocol::Protocol> = Box::new(match proto_id {
         ProtocolId::Gg18 => gg18::KeygenContext::new(),
     });
@@ -93,7 +93,7 @@ fn advance(ctx1_ser: &[u8], data_in: &[u8]) -> protocol::Result<(Vec<u8>, Vec<u8
 }
 
 #[no_mangle]
-pub extern "C" fn protocol_advance(
+pub unsafe extern "C" fn protocol_advance(
     ctx_ptr: *const u8,
     ctx_len: usize,
     data_ptr: *const u8,
@@ -119,7 +119,7 @@ fn finish(ctx_ser: &[u8]) -> protocol::Result<(Vec<u8>, Vec<u8>)> {
 }
 
 #[no_mangle]
-pub extern "C" fn protocol_finish(
+pub unsafe extern "C" fn protocol_finish(
     ctx_ptr: *const u8,
     ctx_len: usize,
     error_out: *mut *mut c_char,
@@ -136,7 +136,7 @@ pub extern "C" fn protocol_finish(
 }
 
 #[no_mangle]
-pub extern "C" fn protocol_sign(
+pub unsafe extern "C" fn protocol_sign(
     proto_id: ProtocolId,
     group_ptr: *const u8,
     group_len: usize,
@@ -168,10 +168,10 @@ impl AuthKey {
 
 #[no_mangle]
 #[allow(unused_variables)]
-pub extern "C" fn auth_key_free(key: AuthKey) {}
+pub unsafe extern "C" fn auth_key_free(key: AuthKey) {}
 
 #[no_mangle]
-pub extern "C" fn auth_keygen(name: *const c_char, error_out: *mut *mut c_char) -> AuthKey {
+pub unsafe extern "C" fn auth_keygen(name: *const c_char, error_out: *mut *mut c_char) -> AuthKey {
     let name = unsafe { CStr::from_ptr(name) }.to_str().unwrap();
     match auth::gen_key_with_csr(name) {
         Ok((key, csr)) => AuthKey::new(key, csr),
@@ -183,7 +183,7 @@ pub extern "C" fn auth_keygen(name: *const c_char, error_out: *mut *mut c_char) 
 }
 
 #[no_mangle]
-pub extern "C" fn auth_cert_key_to_pkcs12(
+pub unsafe extern "C" fn auth_cert_key_to_pkcs12(
     key_ptr: *const u8,
     key_len: usize,
     cert_ptr: *const u8,
