@@ -166,10 +166,9 @@ class TaskDao extends DatabaseAccessor<Database> with _$TaskDaoMixin {
   Future<void> insertDecrypt(DecryptsCompanion entity) =>
       into(decrypts).insert(entity);
 
-  Future<Decrypt> getDecrypt(Uint8List did, Uint8List tid) =>
-      (select(decrypts)
-            ..where((decrypt) => decrypt.did.equals(did) & decrypt.tid.equals(tid)))
-          .getSingle();
+  Future<Decrypt> getDecrypt(Uint8List did, Uint8List tid) => (select(decrypts)
+        ..where((decrypt) => decrypt.did.equals(did) & decrypt.tid.equals(tid)))
+      .getSingle();
 
   Future<void> updateDecrypt(DecryptsCompanion entity) =>
       (update(decrypts)..whereSamePrimaryKey(entity)).write(entity);
@@ -177,8 +176,8 @@ class TaskDao extends DatabaseAccessor<Database> with _$TaskDaoMixin {
   // TODO: is there a way to reduce the repetition?
   Stream<List<DecryptTask>> watchDecryptTasks(Uint8List did) {
     final query = select(decrypts)..where((file) => file.did.equals(did));
-    final onTask = tasks.id.equalsExp(decrypts.tid) &
-        tasks.did.equalsExp(decrypts.did);
+    final onTask =
+        tasks.id.equalsExp(decrypts.tid) & tasks.did.equalsExp(decrypts.did);
     final onGroup = groups.id.equalsExp(decrypts.gid);
     return query
         .join([
