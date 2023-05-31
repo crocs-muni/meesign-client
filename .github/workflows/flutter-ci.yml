@@ -21,7 +21,7 @@ jobs:
           flutter pub get
 
       - run: flutter analyze --no-fatal-infos
-      - run: flutter format --output none --set-exit-if-changed .
+      - run: dart format --output none --set-exit-if-changed .
 
 
   dart-test:
