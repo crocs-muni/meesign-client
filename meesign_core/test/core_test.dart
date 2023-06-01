@@ -78,7 +78,7 @@ Future<void> sign(
 
   await fileRepository.sign('test/file.pdf', gs[0].id);
   approveAllFirst(fileRepository, ds.take(t));
-  final fs = await Future.wait(
+  await Future.wait(
     ds.map((d) => fileRepository.observeFiles(d.id).firstElement()),
   );
 
@@ -117,8 +117,7 @@ void main() {
     groupRepository =
         GroupRepository(dispatcher, taskSource, taskDao, deviceRepository);
     final fileStore = FileStore(appDir);
-    fileRepository = FileRepository(
-        dispatcher, taskSource, taskDao, fileStore, groupRepository);
+    fileRepository = FileRepository(dispatcher, taskSource, taskDao, fileStore);
   });
 
   Future<void> testSign({required int n, required int t}) =>

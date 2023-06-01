@@ -131,10 +131,9 @@ void main(List<String> args) async {
       DeviceRepository(dispatcher, keyStore, database.deviceDao);
   final groupRepository =
       GroupRepository(dispatcher, taskSource, taskDao, deviceRepository);
-  final fileRepository = FileRepository(
-      dispatcher, taskSource, taskDao, DummyFileStore(), groupRepository);
-  final challengeRepository =
-      ChallengeRepository(taskSource, taskDao, groupRepository);
+  final fileRepository =
+      FileRepository(dispatcher, taskSource, taskDao, DummyFileStore());
+  final challengeRepository = ChallengeRepository(taskSource, taskDao);
 
   final device = await deviceRepository.register(options['name']);
   print('Registered as ${device.name}');

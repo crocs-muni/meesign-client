@@ -12,7 +12,6 @@ import '../model/protocol.dart';
 import '../model/task.dart';
 import '../util/uuid.dart';
 import 'file_store.dart';
-import 'group_repository.dart';
 import 'network_dispatcher.dart';
 import 'task_repository.dart';
 
@@ -26,14 +25,12 @@ class FileRepository extends TaskRepository<File> {
   final NetworkDispatcher _dispatcher;
   final TaskDao _taskDao;
   final FileStore _fileStore;
-  final GroupRepository _groupRepository;
 
   FileRepository(
     this._dispatcher,
     TaskSource taskSource,
     this._taskDao,
     this._fileStore,
-    this._groupRepository,
   ) : super(taskSource, _taskDao);
 
   Future<void> sign(String path, List<int> gid) async {

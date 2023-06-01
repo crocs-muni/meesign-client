@@ -5,6 +5,7 @@ import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'card.dart';
 
 class NfcCard extends Card {
+  // ignore: unused_field
   final NFCTag _tag;
 
   NfcCard(this._tag);

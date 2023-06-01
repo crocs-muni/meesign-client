@@ -6,7 +6,6 @@ import 'package:meesign_core/meesign_model.dart';
 
 import 'dart:io';
 
-import '../card/card.dart';
 import '../routes.dart';
 import '../util/chars.dart';
 

@@ -10,17 +10,14 @@ import '../model/group.dart';
 import '../model/protocol.dart';
 import '../model/task.dart';
 import '../util/uuid.dart';
-import 'group_repository.dart';
 import 'task_repository.dart';
 
 class ChallengeRepository extends TaskRepository<Challenge> {
   final TaskDao _taskDao;
-  final GroupRepository _groupRepository;
 
   ChallengeRepository(
     TaskSource taskSource,
     this._taskDao,
-    this._groupRepository,
   ) : super(taskSource, _taskDao);
 
   @override

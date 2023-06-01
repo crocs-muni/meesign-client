@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:drift/drift.dart';
 import 'package:meesign_native/meesign_native.dart';
 import 'package:meesign_network/grpc.dart' as rpc;
@@ -12,20 +9,17 @@ import '../model/group.dart';
 import '../model/protocol.dart';
 import '../model/task.dart';
 import '../util/uuid.dart';
-import 'group_repository.dart';
 import 'task_repository.dart';
 import 'network_dispatcher.dart';
 
 class DecryptRepository extends TaskRepository<Decrypt> {
   final TaskDao _taskDao;
-  final GroupRepository _groupRepository;
   final NetworkDispatcher _dispatcher;
 
   DecryptRepository(
     this._dispatcher,
     TaskSource taskSource,
     this._taskDao,
-    this._groupRepository,
   ) : super(taskSource, _taskDao);
 
   Future<void> decrypt(
