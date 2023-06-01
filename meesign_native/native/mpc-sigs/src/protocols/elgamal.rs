@@ -1,10 +1,6 @@
-mod meesign {
-    include!(concat!(env!("OUT_DIR"), "/meesign.rs"));
-}
-
+use super::meesign::{ProtocolGroupInit, ProtocolInit, ProtocolType};
 use crate::protocol::*;
-// TODO: could these messages be protocol-agnostic?
-// if yes, serialization could be moved outside
+use crate::protocols::{deserialize_vec, inflate, pack, serialize_bcast, serialize_uni, unpack};
 use curve25519_dalek::ristretto::{CompressedRistretto, RistrettoPoint};
 use curve25519_dalek::scalar::Scalar;
 use elastic_elgamal::dkg::*;
@@ -12,49 +8,10 @@ use elastic_elgamal::group::ElementOps;
 use elastic_elgamal::group::Ristretto;
 use elastic_elgamal::sharing::{ActiveParticipant, Params};
 use elastic_elgamal::{Ciphertext, LogEqualityProof, PublicKey, VerifiableDecryption};
-use meesign::{ProtocolGroupInit, ProtocolInit, ProtocolMessage, ProtocolType};
 use rand::rngs::OsRng;
 
 use prost::Message;
-// TODO: use bincode instead?
 use serde::{Deserialize, Serialize};
-
-fn deserialize_vec<'de, T: Deserialize<'de>>(vec: &'de [Vec<u8>]) -> serde_json::Result<Vec<T>> {
-    vec.into_iter()
-        .map(|item| serde_json::from_slice::<T>(item))
-        .collect()
-}
-
-fn inflate<T: Clone>(value: T, n: usize) -> Vec<T> {
-    std::iter::repeat(value).take(n).collect()
-}
-
-/// Serialize value and repeat the result n times,
-/// as the current server always expects one message for each party
-fn serialize_bcast<T: Serialize>(value: &T, n: usize) -> serde_json::Result<Vec<Vec<u8>>> {
-    let ser = serde_json::to_vec(value)?;
-    Ok(inflate(ser, n))
-}
-
-/// Serialize vector of unicast messages
-fn serialize_uni<T: Serialize>(vec: Vec<T>) -> serde_json::Result<Vec<Vec<u8>>> {
-    vec.iter().map(|item| serde_json::to_vec(item)).collect()
-}
-
-/// Decode a protobuf message from the server
-fn unpack(data: &[u8]) -> std::result::Result<Vec<Vec<u8>>, prost::DecodeError> {
-    let msgs = ProtocolMessage::decode(data)?.message;
-    Ok(msgs)
-}
-
-/// Encode msgs as a protobuf message for the server
-fn pack(msgs: Vec<Vec<u8>>) -> Vec<u8> {
-    ProtocolMessage {
-        protocol_type: ProtocolType::Elgamal.into(),
-        message: msgs,
-    }
-    .encode_to_vec()
-}
 
 #[derive(Serialize, Deserialize)]
 pub enum KeygenContext {
@@ -64,9 +21,6 @@ pub enum KeygenContext {
     R3(u16, ParticipantExchangingSecrets<Ristretto>),
     Done(ActiveParticipant<Ristretto>),
 }
-
-// TODO: use trait objects like tofn?
-// maybe macros could help as well?
 
 impl KeygenContext {
     pub fn new() -> Self {
@@ -88,7 +42,7 @@ impl KeygenContext {
         let c = dkg.commitment();
         let ser = serialize_bcast(&c, msg.parties as usize - 1)?;
 
-        Ok((Self::R1(index, dkg), pack(ser)))
+        Ok((Self::R1(index, dkg), pack(ser, ProtocolType::Elgamal)))
     }
 
     fn update(self, data: &[u8]) -> Result<(Self, Vec<u8>)> {
@@ -105,7 +59,7 @@ impl KeygenContext {
                     }
                     dkg.insert_commitment(i, msg);
                 }
-                if dkg.missing_commitments().next() != None {
+                if dkg.missing_commitments().next().is_some() {
                     panic!("Missing commitments.");
                 }
                 let dkg = dkg.finish_commitment_phase();
@@ -122,7 +76,7 @@ impl KeygenContext {
                     }
                     dkg.insert_public_polynomial(i, msg).unwrap();
                 }
-                if dkg.missing_public_polynomials().next() != None {
+                if dkg.missing_public_polynomials().next().is_some() {
                     panic!("Missing polynomials.");
                 }
                 let dkg = dkg.finish_polynomials_phase();
@@ -147,7 +101,7 @@ impl KeygenContext {
                     }
                     dkg.insert_secret_share(i, msg)?;
                 }
-                if dkg.missing_shares().next() != None {
+                if dkg.missing_shares().next().is_some() {
                     panic!("Missing shares.");
                 }
                 let dkg = dkg.complete().unwrap();
@@ -158,7 +112,7 @@ impl KeygenContext {
             Self::Done(_) => todo!(),
         };
 
-        Ok((c, pack(ser)))
+        Ok((c, pack(ser, ProtocolType::Elgamal)))
     }
 }
 
@@ -218,15 +172,17 @@ impl DecryptContext {
 
         let (share, proof) = ctx.decrypt_share(ct, &mut OsRng);
 
-        let mut shares: Vec<(usize, VerifiableDecryption<Ristretto>)> = Vec::new();
-        shares.push((ctx.index(), share));
+        let shares: Vec<(usize, VerifiableDecryption<Ristretto>)> = vec![(ctx.index(), share)];
 
         let ser = serialize_bcast(
             &serde_json::to_string(&(share, proof)).unwrap().as_bytes(),
             parties - 1,
         )?;
 
-        Ok((Self::R1(ctx, shares, indices, local_index, ct), pack(ser)))
+        Ok((
+            Self::R1(ctx, shares, indices, local_index, ct),
+            pack(ser, ProtocolType::Elgamal),
+        ))
     }
 
     fn update(self, data: &[u8]) -> Result<(Self, Vec<u8>)> {
@@ -237,7 +193,7 @@ impl DecryptContext {
             Self::R1(ctx, mut shares, indices, local_index, ct) => {
                 let data: Vec<Vec<u8>> = deserialize_vec(&msgs)?;
                 for (mut i, msg) in data.into_iter().enumerate() {
-                    if i >= local_index as usize {
+                    if i >= local_index {
                         i += 1;
                     }
                     let msg: (VerifiableDecryption<Ristretto>, LogEqualityProof<Ristretto>) =
@@ -264,7 +220,7 @@ impl DecryptContext {
             Self::Done(_) => todo!(),
         };
 
-        Ok((c, pack(ser)))
+        Ok((c, pack(ser, ProtocolType::Elgamal)))
     }
 }
 
@@ -318,7 +274,7 @@ pub fn decode(p: RistrettoPoint) -> Vec<u8> {
 pub fn encrypt(msg: &[u8], pk: &[u8]) -> Vec<u8> {
     let pk: PublicKey<Ristretto> = PublicKey::from_bytes(pk).unwrap();
 
-    let m_e: <Ristretto as ElementOps>::Element = try_encode(msg).unwrap().into();
+    let m_e: <Ristretto as ElementOps>::Element = try_encode(msg).unwrap();
     let ct = pk.encrypt_element(m_e, &mut OsRng);
     serde_json::to_vec(&ct).unwrap()
 }
@@ -327,7 +283,7 @@ pub fn encrypt(msg: &[u8], pk: &[u8]) -> Vec<u8> {
 mod tests {
     use prost::bytes::Bytes;
 
-    use super::*;
+    use super::{super::ProtocolMessage, *};
 
     #[test]
     fn test_encode() {
@@ -514,5 +470,6 @@ mod tests {
         assert_eq!(p1_msg, p2_msg);
         assert_eq!(msg, p1_msg[0].as_slice());
         assert_eq!(msg, Box::new(p1).finish().unwrap().as_slice());
+        assert_eq!(msg, Box::new(p2).finish().unwrap().as_slice());
     }
 }
