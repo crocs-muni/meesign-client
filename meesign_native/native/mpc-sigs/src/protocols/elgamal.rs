@@ -160,15 +160,19 @@ impl DecryptContext {
         // FIXME: proto fields should have matching types, i.e. i16, not i32
         let indices: Vec<u16> = msg.indices.clone().into_iter().map(|i| i as u16).collect();
         let parties = indices.len();
-        let local_index = indices.iter().position(|x| *x as u32 == msg.index).unwrap();
         let ct: Ciphertext<Ristretto> = serde_json::from_slice(&msg.data).unwrap();
 
         let ctx = match self {
             Self::R0(ctx) => ctx,
             _ => unreachable!(),
         };
+        let local_index = indices
+            .iter()
+            .position(|x| *x as usize == ctx.index())
+            .unwrap();
 
         assert_eq!(ctx.index(), indices[local_index] as usize);
+        assert_eq!(local_index, msg.index as usize);
 
         let (share, proof) = ctx.decrypt_share(ct, &mut OsRng);
 
