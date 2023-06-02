@@ -77,14 +77,12 @@ class DecryptRepository extends TaskRepository<Decrypt> {
 
   @override
   Future<void> finishTask(Uuid did, db.Task task, rpc.Task rpcTask) async {
-    if (task.context.isNotEmpty) {
-      final result = ProtocolWrapper.finish(task.context);
-      await _taskDao.updateDecrypt(db.DecryptsCompanion(
-        tid: Value(task.id),
-        did: Value(task.did),
-        data: Value(result),
-      ));
-    }
+    if (task.context.isNotEmpty) ProtocolWrapper.finish(task.context);
+    await _taskDao.updateDecrypt(db.DecryptsCompanion(
+      tid: Value(task.id),
+      did: Value(task.did),
+      data: Value(rpcTask.data as Uint8List),
+    ));
   }
 
   @override
