@@ -24,7 +24,7 @@ pub enum KeygenContext {
 
 impl KeygenContext {
     pub fn new() -> Self {
-        KeygenContext::R0
+        Self::R0
     }
 
     fn init(self, data: &[u8]) -> Result<(Self, Vec<u8>)> {
@@ -283,7 +283,8 @@ pub fn encrypt(msg: &[u8], pk: &[u8]) -> Vec<u8> {
 mod tests {
     use prost::bytes::Bytes;
 
-    use super::{super::ProtocolMessage, *};
+    use super::super::meesign::ProtocolMessage;
+    use super::*;
 
     #[test]
     fn test_encode() {
@@ -305,7 +306,6 @@ mod tests {
         let p1 = KeygenContext::new();
         let p2 = KeygenContext::new();
 
-        // Initialize
         let (p1, p1_data) = p1
             .init(
                 &(ProtocolGroupInit {
@@ -324,6 +324,33 @@ mod tests {
                     index: 1,
                     parties,
                     threshold,
+                })
+                .encode_to_vec(),
+            )
+            .unwrap();
+
+        let p1_msg = ProtocolMessage::decode(Bytes::from(p1_data))
+            .unwrap()
+            .message;
+        let p2_msg = ProtocolMessage::decode(Bytes::from(p2_data))
+            .unwrap()
+            .message;
+
+        let (p1, p1_data) = p1
+            .update(
+                &(ProtocolMessage {
+                    protocol_type,
+                    message: vec![p2_msg[0].clone()],
+                })
+                .encode_to_vec(),
+            )
+            .unwrap();
+
+        let (p2, p2_data) = p2
+            .update(
+                &(ProtocolMessage {
+                    protocol_type,
+                    message: vec![p1_msg[0].clone()],
                 })
                 .encode_to_vec(),
             )
