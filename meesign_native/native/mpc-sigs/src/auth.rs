@@ -30,7 +30,10 @@ pub fn gen_key_with_csr(name: &str) -> Result<(Vec<u8>, Vec<u8>), ErrorStack> {
 pub fn cert_key_to_pkcs12(key_der: &[u8], cert_der: &[u8]) -> Result<Vec<u8>, ErrorStack> {
     let key = PKey::private_key_from_der(key_der)?;
     let cert = X509::from_der(cert_der)?;
-    let builder = Pkcs12::builder();
-    let pkcs12 = builder.build("", "meesign auth key", &key, &cert)?;
-    pkcs12.to_der()
+    Pkcs12::builder()
+        .name("meesign auth key")
+        .pkey(&key)
+        .cert(&cert)
+        .build2("")?
+        .to_der()
 }
