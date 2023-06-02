@@ -212,9 +212,16 @@ pub unsafe extern "C" fn encrypt(
     msg_len: usize,
     key_ptr: *const u8,
     key_len: usize,
+    error_out: *mut *mut c_char,
 ) -> Buffer {
     let msg = unsafe { slice::from_raw_parts(msg_ptr, msg_len) };
     let key = unsafe { slice::from_raw_parts(key_ptr, key_len) };
 
-    elgamal::encrypt(msg, key).into()
+    match elgamal::encrypt(msg, key) {
+        Ok(ciphertext) => ciphertext.into(),
+        Err(error) => {
+            set_error(error_out, &*error);
+            vec![].into()
+        }
+    }
 }

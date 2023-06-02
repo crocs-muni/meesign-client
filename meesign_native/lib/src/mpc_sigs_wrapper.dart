@@ -175,8 +175,8 @@ class ElGamalWrapper {
       final error = alloc.using(Error(), Error.free);
 
       final res = alloc.using(
-        _lib.encrypt(
-            messagePtr.cast(), message.length, publicKeyPtr, publicKey.length),
+        _lib.encrypt(messagePtr.cast(), message.length, publicKeyPtr,
+            publicKey.length, error.ptr),
         _lib.buffer_free,
       );
 

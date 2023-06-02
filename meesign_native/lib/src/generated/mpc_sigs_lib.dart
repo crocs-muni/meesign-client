@@ -206,22 +206,28 @@ class MpcSigsLib {
     int msg_len,
     ffi.Pointer<ffi.Uint8> key_ptr,
     int key_len,
+    ffi.Pointer<ffi.Pointer<ffi.Char>> error_out,
   ) {
     return _encrypt(
       msg_ptr,
       msg_len,
       key_ptr,
       key_len,
+      error_out,
     );
   }
 
   late final _encryptPtr = _lookup<
       ffi.NativeFunction<
-          Buffer Function(ffi.Pointer<ffi.Uint8>, ffi.UintPtr,
-              ffi.Pointer<ffi.Uint8>, ffi.UintPtr)>>('encrypt');
+          Buffer Function(
+              ffi.Pointer<ffi.Uint8>,
+              ffi.UintPtr,
+              ffi.Pointer<ffi.Uint8>,
+              ffi.UintPtr,
+              ffi.Pointer<ffi.Pointer<ffi.Char>>)>>('encrypt');
   late final _encrypt = _encryptPtr.asFunction<
-      Buffer Function(
-          ffi.Pointer<ffi.Uint8>, int, ffi.Pointer<ffi.Uint8>, int)>();
+      Buffer Function(ffi.Pointer<ffi.Uint8>, int, ffi.Pointer<ffi.Uint8>, int,
+          ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
 }
 
 abstract class ProtocolId {

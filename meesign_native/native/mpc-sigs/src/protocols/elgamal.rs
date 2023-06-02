@@ -1,13 +1,16 @@
 use super::meesign::{ProtocolGroupInit, ProtocolInit, ProtocolType};
 use crate::protocol::*;
 use crate::protocols::{deserialize_vec, inflate, pack, serialize_bcast, serialize_uni, unpack};
-use curve25519_dalek::ristretto::{CompressedRistretto, RistrettoPoint};
-use curve25519_dalek::scalar::Scalar;
-use elastic_elgamal::dkg::*;
-use elastic_elgamal::group::ElementOps;
-use elastic_elgamal::group::Ristretto;
-use elastic_elgamal::sharing::{ActiveParticipant, Params};
-use elastic_elgamal::{Ciphertext, LogEqualityProof, PublicKey, VerifiableDecryption};
+use curve25519_dalek::{
+    ristretto::{CompressedRistretto, RistrettoPoint},
+    scalar::Scalar,
+};
+use elastic_elgamal::{
+    dkg::*,
+    group::{ElementOps, Ristretto},
+    sharing::{ActiveParticipant, Params},
+    Ciphertext, LogEqualityProof, PublicKey, VerifiableDecryption,
+};
 use rand::rngs::OsRng;
 
 use prost::Message;
@@ -16,9 +19,9 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize)]
 pub enum KeygenContext {
     R0,
-    R1(u16, ParticipantCollectingCommitments<Ristretto>),
-    R2(u16, ParticipantCollectingPolynomials<Ristretto>),
-    R3(u16, ParticipantExchangingSecrets<Ristretto>),
+    R1(ParticipantCollectingCommitments<Ristretto>, u16),
+    R2(ParticipantCollectingPolynomials<Ristretto>, u16),
+    R3(ParticipantExchangingSecrets<Ristretto>, u16),
     Done(ActiveParticipant<Ristretto>),
 }
 
@@ -30,7 +33,9 @@ impl KeygenContext {
     fn init(self, data: &[u8]) -> Result<(Self, Vec<u8>)> {
         let msg = ProtocolGroupInit::decode(data)?;
 
-        // TODO assert msg.protocol_type is elgamal
+        if msg.protocol_type != ProtocolType::Elgamal as i32 {
+            return Err("wrong protocol type".into());
+        }
 
         let (parties, threshold, index) =
             (msg.parties as u16, msg.threshold as u16, msg.index as u16);
@@ -42,7 +47,7 @@ impl KeygenContext {
         let c = dkg.commitment();
         let ser = serialize_bcast(&c, msg.parties as usize - 1)?;
 
-        Ok((Self::R1(index, dkg), pack(ser, ProtocolType::Elgamal)))
+        Ok((Self::R1(dkg, index), pack(ser, ProtocolType::Elgamal)))
     }
 
     fn update(self, data: &[u8]) -> Result<(Self, Vec<u8>)> {
@@ -50,8 +55,8 @@ impl KeygenContext {
         let n = msgs.len();
 
         let (c, ser) = match self {
-            Self::R0 => unreachable!(),
-            Self::R1(idx, mut dkg) => {
+            Self::R0 => return Err("protocol not initialized".into()),
+            Self::R1(mut dkg, idx) => {
                 let data = deserialize_vec(&msgs)?;
                 for (mut i, msg) in data.into_iter().enumerate() {
                     if i >= idx as usize {
@@ -60,24 +65,24 @@ impl KeygenContext {
                     dkg.insert_commitment(i, msg);
                 }
                 if dkg.missing_commitments().next().is_some() {
-                    panic!("Missing commitments.");
+                    return Err("not enough commitments".into());
                 }
                 let dkg = dkg.finish_commitment_phase();
                 let public_info = dkg.public_info();
                 let ser = serialize_bcast(&public_info, n)?;
 
-                (Self::R2(idx, dkg), ser)
+                (Self::R2(dkg, idx), ser)
             }
-            Self::R2(idx, mut dkg) => {
+            Self::R2(mut dkg, idx) => {
                 let data = deserialize_vec(&msgs)?;
                 for (mut i, msg) in data.into_iter().enumerate() {
                     if i >= idx as usize {
                         i += 1;
                     }
-                    dkg.insert_public_polynomial(i, msg).unwrap();
+                    dkg.insert_public_polynomial(i, msg)?
                 }
                 if dkg.missing_public_polynomials().next().is_some() {
-                    panic!("Missing polynomials.");
+                    return Err("not enough polynomials".into());
                 }
                 let dkg = dkg.finish_polynomials_phase();
 
@@ -91,9 +96,9 @@ impl KeygenContext {
                 }
                 let ser = serialize_uni(shares)?;
 
-                (Self::R3(idx, dkg), ser)
+                (Self::R3(dkg, idx), ser)
             }
-            Self::R3(idx, mut dkg) => {
+            Self::R3(mut dkg, idx) => {
                 let data = deserialize_vec(&msgs)?;
                 for (mut i, msg) in data.into_iter().enumerate() {
                     if i >= idx as usize {
@@ -102,14 +107,14 @@ impl KeygenContext {
                     dkg.insert_secret_share(i, msg)?;
                 }
                 if dkg.missing_shares().next().is_some() {
-                    panic!("Missing shares.");
+                    return Err("not enough shares".into());
                 }
-                let dkg = dkg.complete().unwrap();
+                let dkg = dkg.complete()?;
                 let ser = inflate(dkg.key_set().shared_key().as_bytes().to_vec(), n);
 
                 (Self::Done(dkg), ser)
             }
-            Self::Done(_) => todo!(),
+            Self::Done(_) => return Err("protocol already finished".into()),
         };
 
         Ok((c, pack(ser, ProtocolType::Elgamal)))
@@ -128,121 +133,126 @@ impl Protocol for KeygenContext {
 
     fn finish(self: Box<Self>) -> Result<Vec<u8>> {
         match *self {
-            Self::Done(ctx) => Ok(serde_json::to_vec(&ctx).unwrap()),
+            Self::Done(ctx) => Ok(serde_json::to_vec(&ctx)?),
             _ => Err("protocol not finished".into()),
         }
     }
 }
 
 #[derive(Serialize, Deserialize)]
-pub enum DecryptContext {
-    R0(ActiveParticipant<Ristretto>),
-    R1(
-        ActiveParticipant<Ristretto>,
-        Vec<(usize, VerifiableDecryption<Ristretto>)>,
-        Vec<u16>,
-        usize,
-        Ciphertext<Ristretto>,
-    ),
-    Done(Vec<u8>),
+pub struct DecryptContext {
+    ctx: ActiveParticipant<Ristretto>,
+    ciphertext: Ciphertext<Ristretto>,
+    indices: Vec<u16>,
+    shares: Vec<(usize, VerifiableDecryption<Ristretto>)>,
+    result: Option<Vec<u8>>,
 }
 
 impl DecryptContext {
     pub fn new(group: &[u8]) -> Self {
-        DecryptContext::R0(serde_json::from_slice(group).unwrap())
+        Self {
+            ctx: serde_json::from_slice(group).expect("could not deserialize group context"),
+            ciphertext: Ciphertext::zero(),
+            indices: Vec::new(),
+            shares: Vec::new(),
+            result: None,
+        }
     }
 
-    fn init(self, data: &[u8]) -> Result<(Self, Vec<u8>)> {
+    fn init(mut self, data: &[u8]) -> Result<(Self, Vec<u8>)> {
         let msg = ProtocolInit::decode(data)?;
 
-        // TODO check protocol type
+        if msg.protocol_type != ProtocolType::Elgamal as i32 {
+            return Err("wrong protocol type".into());
+        }
 
         // FIXME: proto fields should have matching types, i.e. i16, not i32
-        let indices: Vec<u16> = msg.indices.clone().into_iter().map(|i| i as u16).collect();
-        let parties = indices.len();
-        let ct: Ciphertext<Ristretto> = serde_json::from_slice(&msg.data).unwrap();
+        self.indices = msg.indices.clone().into_iter().map(|i| i as u16).collect();
+        self.ciphertext = serde_json::from_slice(&msg.data)?;
 
-        let ctx = match self {
-            Self::R0(ctx) => ctx,
-            _ => unreachable!(),
-        };
-        let local_index = indices
-            .iter()
-            .position(|x| *x as usize == ctx.index())
-            .unwrap();
-
-        assert_eq!(ctx.index(), indices[local_index] as usize);
-        assert_eq!(local_index, msg.index as usize);
-
-        let (share, proof) = ctx.decrypt_share(ct, &mut OsRng);
-
-        let shares: Vec<(usize, VerifiableDecryption<Ristretto>)> = vec![(ctx.index(), share)];
+        let (share, proof) = self.ctx.decrypt_share(self.ciphertext, &mut OsRng);
 
         let ser = serialize_bcast(
-            &serde_json::to_string(&(share, proof)).unwrap().as_bytes(),
-            parties - 1,
+            &serde_json::to_string(&(share, proof))?.as_bytes(),
+            self.indices.len() - 1,
         )?;
 
-        Ok((
-            Self::R1(ctx, shares, indices, local_index, ct),
-            pack(ser, ProtocolType::Elgamal),
-        ))
+        let share = (self.ctx.index(), share);
+        self.shares.push(share);
+
+        Ok((self, pack(ser, ProtocolType::Elgamal)))
     }
 
-    fn update(self, data: &[u8]) -> Result<(Self, Vec<u8>)> {
+    fn update(mut self, data: &[u8]) -> Result<(Self, Vec<u8>)> {
+        if self.shares.is_empty() {
+            return Err("protocol not initialized".into());
+        }
+        if self.result.is_some() {
+            return Err("protocol already finished".into());
+        }
+
         let msgs = unpack(data)?;
 
-        let (c, ser) = match self {
-            Self::R0(_) => unreachable!(),
-            Self::R1(ctx, mut shares, indices, local_index, ct) => {
-                let data: Vec<Vec<u8>> = deserialize_vec(&msgs)?;
-                for (mut i, msg) in data.into_iter().enumerate() {
-                    if i >= local_index {
-                        i += 1;
-                    }
-                    let msg: (VerifiableDecryption<Ristretto>, LogEqualityProof<Ristretto>) =
-                        serde_json::from_slice(&msg).unwrap();
-                    ctx.key_set()
-                        .verify_share(msg.0.into(), ct, indices[i].into(), &msg.1)
-                        .unwrap();
-                    shares.push((indices[i].into(), msg.0));
-                }
+        let data: Vec<Vec<u8>> = deserialize_vec(&msgs)?;
+        let local_index = self
+            .indices
+            .iter()
+            .position(|x| *x as usize == self.ctx.index())
+            .ok_or("participant index not included")?;
+        assert_eq!(self.ctx.index(), self.indices[local_index] as usize);
 
-                let msg = decode(
-                    ct.blinded_element()
-                        - ctx
-                            .key_set()
-                            .params()
-                            .combine_shares(shares)
-                            .unwrap()
-                            .as_element(),
-                );
-
-                let ser = inflate(msg.clone(), indices.len() - 1);
-                (Self::Done(msg), ser)
+        for (mut i, msg) in data.into_iter().enumerate() {
+            if i >= local_index {
+                i += 1;
             }
-            Self::Done(_) => todo!(),
-        };
+            let msg: (VerifiableDecryption<Ristretto>, LogEqualityProof<Ristretto>) =
+                serde_json::from_slice(&msg)?;
+            self.ctx
+                .key_set()
+                .verify_share(
+                    msg.0.into(),
+                    self.ciphertext,
+                    self.indices[i].into(),
+                    &msg.1,
+                )
+                .unwrap();
+            self.shares.push((self.indices[i].into(), msg.0));
+        }
 
-        Ok((c, pack(ser, ProtocolType::Elgamal)))
+        let msg = decode(
+            self.ciphertext.blinded_element()
+                - self
+                    .ctx
+                    .key_set()
+                    .params()
+                    .combine_shares(self.shares.clone())
+                    .unwrap()
+                    .as_element(),
+        );
+        self.result = Some(msg.clone());
+
+        let ser = inflate(msg.clone(), self.indices.len() - 1);
+
+        Ok((self, pack(ser, ProtocolType::Elgamal)))
     }
 }
 
 #[typetag::serde(name = "elgamal_decrypt")]
 impl Protocol for DecryptContext {
     fn advance(self: Box<Self>, data: &[u8]) -> Result<(Box<dyn Protocol>, Vec<u8>)> {
-        let (ctx, data) = match *self {
-            Self::R0(_) => self.init(data),
-            _ => self.update(data),
+        let (ctx, data) = if self.shares.is_empty() {
+            self.init(data)
+        } else {
+            self.update(data)
         }?;
         Ok((Box::new(ctx), data))
     }
 
     fn finish(self: Box<Self>) -> Result<Vec<u8>> {
-        match *self {
-            Self::Done(sig) => Ok(sig),
-            _ => Err("protocol not finished".into()),
+        if self.result.is_none() {
+            return Err("protocol not finished".into());
         }
+        Ok(self.result.unwrap())
     }
 }
 
@@ -275,12 +285,12 @@ pub fn decode(p: RistrettoPoint) -> Vec<u8> {
     scalar_bytes[1..(scalar_bytes[0] as usize + 1)].to_vec()
 }
 
-pub fn encrypt(msg: &[u8], pk: &[u8]) -> Vec<u8> {
+pub fn encrypt(msg: &[u8], pk: &[u8]) -> Result<Vec<u8>> {
     let pk: PublicKey<Ristretto> = PublicKey::from_bytes(pk).unwrap();
 
-    let m_e: <Ristretto as ElementOps>::Element = try_encode(msg).unwrap();
-    let ct = pk.encrypt_element(m_e, &mut OsRng);
-    serde_json::to_vec(&ct).unwrap()
+    let encoded: <Ristretto as ElementOps>::Element = try_encode(msg).ok_or("encoding failed")?;
+    let ct = pk.encrypt_element(encoded, &mut OsRng);
+    Ok(serde_json::to_vec(&ct)?)
 }
 
 #[cfg(test)]
@@ -436,7 +446,7 @@ mod tests {
     fn test_decrypt() {
         let (p1, p2, pk) = keygen();
         let msg = b"hello";
-        let ct = encrypt(msg, &pk);
+        let ct = encrypt(msg, &pk).unwrap();
 
         let p1 = DecryptContext::new(&p1);
         let p2 = DecryptContext::new(&p2);
