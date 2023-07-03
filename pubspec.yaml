@@ -45,9 +45,9 @@ dependencies:
   async: ^2.8.2
   dart_pcsc:
     git: https://github.com/jjanku/dart_pcsc.git
-  mobile_scanner: ^2.0.0
+  mobile_scanner: ^3.3.0
   characters: ^1.2.0
-  flutter_svg: ^1.0.3
+  flutter_svg: ^2.0.7
   url_launcher: ^6.1.2
   meesign_core:
     path: meesign_core

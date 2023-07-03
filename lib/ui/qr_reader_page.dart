@@ -26,11 +26,14 @@ class _QrReaderPageState extends State<QrReaderPage> {
     super.dispose();
   }
 
-  void _onDetect(Barcode data, MobileScannerArguments? _) {
+  void _onDetect(BarcodeCapture capture) {
     _errorTimer?.cancel();
 
+    final barcodes = capture.barcodes;
+    if (barcodes.isEmpty) return;
+
     try {
-      final device = _coder.decode(data.rawValue);
+      final device = _coder.decode(barcodes.first.rawValue);
       controller.dispose();
       Navigator.pop(context, device);
     } catch (e) {
@@ -53,7 +56,6 @@ class _QrReaderPageState extends State<QrReaderPage> {
           Expanded(
             flex: 5,
             child: MobileScanner(
-              allowDuplicates: false,
               onDetect: _onDetect,
               controller: controller,
             ),

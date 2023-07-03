@@ -50,9 +50,17 @@ class _DeviceQrCodeState extends State<DeviceQrCode> {
           return Container();
         }
 
-        return QrImage(
+        final color = Theme.of(context).colorScheme.onSurface;
+        return QrImageView(
           padding: const EdgeInsets.all(24),
-          foregroundColor: Theme.of(context).colorScheme.onSurface,
+          eyeStyle: QrEyeStyle(
+            eyeShape: QrEyeShape.square,
+            color: color,
+          ),
+          dataModuleStyle: QrDataModuleStyle(
+            dataModuleShape: QrDataModuleShape.square,
+            color: color,
+          ),
           data: QrCoder().encode(snapshot.data!),
         );
       },
