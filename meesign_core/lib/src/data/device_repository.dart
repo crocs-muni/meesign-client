@@ -19,10 +19,9 @@ class DeviceRepository {
     final key = AuthWrapper.keygen(name);
 
     final resp = await _dispatcher.unauth.register(
-      rpc.RegistrationRequest(
-        name: name,
-        csr: key.csr,
-      ),
+      rpc.RegistrationRequest()
+        ..name = name
+        ..csr = key.csr,
     );
 
     final did = Uuid(resp.deviceId);

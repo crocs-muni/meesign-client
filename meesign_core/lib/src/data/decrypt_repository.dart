@@ -25,11 +25,10 @@ class DecryptRepository extends TaskRepository<Decrypt> {
   Future<void> decrypt(
       String description, List<int> data, List<int> gid) async {
     await _dispatcher.unauth.decrypt(
-      rpc.DecryptRequest(
-        groupId: gid,
-        name: description,
-        data: data,
-      ),
+      rpc.DecryptRequest()
+        ..groupId = gid
+        ..name = description
+        ..data = data,
     );
   }
 

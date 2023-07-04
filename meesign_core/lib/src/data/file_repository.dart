@@ -39,11 +39,10 @@ class FileRepository extends TaskRepository<File> {
     String basename = path_pkg.basename(path);
 
     await _dispatcher.unauth.sign(
-      rpc.SignRequest(
-        groupId: gid,
-        name: basename,
-        data: bytes,
-      ),
+      rpc.SignRequest()
+        ..groupId = gid
+        ..name = basename
+        ..data = bytes,
     );
   }
 

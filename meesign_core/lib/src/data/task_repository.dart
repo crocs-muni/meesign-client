@@ -27,33 +27,35 @@ class TaskSource {
 
   Future<rpc.Resp> update(
           Uuid did, Uint8List tid, List<int> data, int attempt) =>
-      _dispatcher[did].updateTask(rpc.TaskUpdate(
-        task: tid,
-        data: data,
-        attempt: attempt,
-      ));
+      _dispatcher[did].updateTask(
+        rpc.TaskUpdate()
+          ..task = tid
+          ..data = data
+          ..attempt = attempt,
+      );
 
   Future<void> approve(Uuid did, Uuid tid, {required bool agree}) =>
-      _dispatcher[did].decideTask(rpc.TaskDecision(
-        task: tid.bytes,
-        accept: agree,
-      ));
+      _dispatcher[did].decideTask(
+        rpc.TaskDecision()
+          ..task = tid.bytes
+          ..accept = agree,
+      );
 
   Future<void> acknowledge(Uuid did, Uint8List tid) =>
-      _dispatcher[did].acknowledgeTask(rpc.TaskAcknowledgement(
-        taskId: tid,
-      ));
+      _dispatcher[did].acknowledgeTask(
+        rpc.TaskAcknowledgement()..taskId = tid,
+      );
 
   /// retrieve the task including all its details
-  Future<rpc.Task> fetch(Uuid did, Uuid tid) =>
-      _dispatcher[did].getTask(rpc.TaskRequest(
-        deviceId: did.bytes,
-        taskId: tid.bytes,
-      ));
+  Future<rpc.Task> fetch(Uuid did, Uuid tid) => _dispatcher[did].getTask(
+        rpc.TaskRequest()
+          ..deviceId = did.bytes
+          ..taskId = tid.bytes,
+      );
 
   Future<List<rpc.Task>> fetchAll(Uuid did) async {
     final rpcTasks = await _dispatcher[did].getTasks(
-      rpc.TasksRequest(deviceId: did.bytes),
+      rpc.TasksRequest()..deviceId = did.bytes,
     );
     return rpcTasks.tasks;
   }

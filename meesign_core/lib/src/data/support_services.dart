@@ -16,5 +16,5 @@ class SupportServices {
 
   Future<void> log(Uuid? did, String message) =>
       (did != null ? _dispatcher[did] : _dispatcher.unauth)
-          .log(rpc.LogRequest(message: message));
+          .log(rpc.LogRequest()..message = message);
 }

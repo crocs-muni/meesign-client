@@ -34,13 +34,12 @@ class GroupRepository extends TaskRepository<Group> {
     KeyType keyType,
   ) async {
     await _dispatcher.unauth.group(
-      rpc.GroupRequest(
-        deviceIds: members.map((m) => m.id.bytes),
-        name: name,
-        threshold: threshold,
-        protocol: protocol.toNetwork(),
-        keyType: keyType.toNetwork(),
-      ),
+      rpc.GroupRequest()
+        ..deviceIds.addAll(members.map((m) => m.id.bytes))
+        ..name = name
+        ..threshold = threshold
+        ..protocol = protocol.toNetwork()
+        ..keyType = keyType.toNetwork(),
     );
   }
 
