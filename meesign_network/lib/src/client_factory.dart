@@ -47,12 +47,14 @@ class ClientFactory {
     List<int>? serverCerts,
     bool allowBadCerts = false,
     int port = 1337,
+    Duration? connectTimeout,
   }) =>
       MPCClient(
         ClientChannel(
           host,
           port: port,
           options: ChannelOptions(
+            connectTimeout: connectTimeout,
             credentials: ClientChannelCredentials(
               key,
               password,

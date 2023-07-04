@@ -29,6 +29,7 @@ class NetworkDispatcher {
         serverCerts: serverCerts,
         allowBadCerts: allowBadCerts,
         port: port,
+        connectTimeout: const Duration(seconds: 8),
       );
 
   rpc.MPCClient operator [](Uuid did) {
