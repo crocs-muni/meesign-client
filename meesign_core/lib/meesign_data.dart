@@ -14,5 +14,6 @@ export 'src/data/file_repository.dart';
 export 'src/data/challenge_repository.dart';
 export 'src/data/decrypt_repository.dart';
 export 'src/data/user_repository.dart';
+export 'src/data/support_services.dart';
 
 export 'src/database/database.dart' show Database;
