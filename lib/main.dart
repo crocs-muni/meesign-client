@@ -1,8 +1,10 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:args/args.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:logging/logging.dart';
 import 'package:path/path.dart' as path_pkg;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -36,6 +38,17 @@ Future<Directory> getAppDir() async {
 }
 
 void main(List<String> args) async {
+  Logger.root.level = Level.WARNING;
+
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    Logger.root.severe(details.toString(), details.exception, details.stack);
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    Logger.root.severe(error.toString(), error, stack);
+    return false;
+  };
+
   final parser = ArgParser()
     ..addFlag(
       'help',

@@ -1,7 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/services.dart';
+import 'package:logging/logging.dart';
 import 'package:meesign_core/meesign_data.dart';
+
+import 'reporter.dart';
 
 class AppContainer {
   final Directory appDirectory;
@@ -12,6 +15,9 @@ class AppContainer {
 
   late final KeyStore keyStore = KeyStore(appDirectory);
   late final FileStore fileStore = FileStore(appDirectory);
+
+  late final SupportServices supportServices;
+  final Reporter reporter = Reporter(Logger.root);
 
   late final UserRepository userRepository = UserRepository(database.userDao);
   late final DeviceRepository deviceRepository;
@@ -33,6 +39,9 @@ class AppContainer {
   Future<void> init(String host) async {
     dispatcher = NetworkDispatcher(host, keyStore,
         serverCerts: await caCerts, allowBadCerts: allowBadCerts);
+
+    supportServices = SupportServices(dispatcher);
+    reporter.init(supportServices);
 
     deviceRepository =
         DeviceRepository(dispatcher, keyStore, database.deviceDao);
