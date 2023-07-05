@@ -168,9 +168,9 @@ class AuthWrapper {
 }
 
 class ElGamalWrapper {
-  static List<int> encrypt(String message, List<int> publicKey) {
+  static List<int> encrypt(List<int> message, List<int> publicKey) {
     return using((Arena alloc) {
-      final messagePtr = message.toNativeUtf8(allocator: alloc);
+      final messagePtr = message.dupToNative(alloc);
       final publicKeyPtr = publicKey.dupToNative(alloc);
       final error = alloc.using(Error(), Error.free);
 

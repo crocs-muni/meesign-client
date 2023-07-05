@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:meesign_core/meesign_data.dart';
@@ -107,7 +108,7 @@ class HomeState with ChangeNotifier {
       _fileRepository.sign(path, group.id);
 
   Future<void> encrypt(String description, String message, Group group) =>
-      _decryptRepository.encrypt(description, message, group.id);
+      _decryptRepository.encrypt(description, utf8.encode(message), group.id);
 
   Future<void> joinGroup(Task<Group> task, {required bool agree}) =>
       _groupRepository.approveTask(device!.id, task.id, agree: agree);

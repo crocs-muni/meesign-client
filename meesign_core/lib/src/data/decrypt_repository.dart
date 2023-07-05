@@ -25,7 +25,7 @@ class DecryptRepository extends TaskRepository<Decrypt> {
   /// Encrypt a message for the given group.
   Future<void> encrypt(
     String description,
-    String message,
+    List<int> message,
     List<int> gid,
   ) async {
     final data = ElGamalWrapper.encrypt(message, gid);
