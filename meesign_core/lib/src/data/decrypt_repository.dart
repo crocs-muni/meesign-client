@@ -22,8 +22,13 @@ class DecryptRepository extends TaskRepository<Decrypt> {
     this._taskDao,
   ) : super(taskSource, _taskDao);
 
-  Future<void> decrypt(
-      String description, List<int> data, List<int> gid) async {
+  /// Encrypt a message for the given group.
+  Future<void> encrypt(
+    String description,
+    String message,
+    List<int> gid,
+  ) async {
+    final data = ElGamalWrapper.encrypt(message, gid);
     await _dispatcher.unauth.decrypt(
       rpc.DecryptRequest()
         ..groupId = gid

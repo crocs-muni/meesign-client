@@ -8,7 +8,6 @@ import 'package:meesign_core/meesign_data.dart';
 import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:meesign_native/meesign_native.dart';
 
 import '../app_container.dart';
 import '../routes.dart';
@@ -664,10 +663,8 @@ class _HomePageViewState extends State<HomePageView> {
     final group = await _selectGroup(KeyType.decrypt); // TODO change
     if (group == null) return;
 
-    final data = ElGamalWrapper.encrypt(message[1], group.id);
-
     try {
-      await context.read<HomeState>().decrypt(message[0], data, group);
+      await context.read<HomeState>().encrypt(message[0], message[1], group);
     } catch (e) {
       showErrorDialog(
         title: 'Decryption request failed',

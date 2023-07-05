@@ -106,8 +106,8 @@ class HomeState with ChangeNotifier {
   Future<void> sign(String path, Group group) =>
       _fileRepository.sign(path, group.id);
 
-  Future<void> decrypt(String description, List<int> data, Group group) =>
-      _decryptRepository.decrypt(description, data, group.id);
+  Future<void> encrypt(String description, String message, Group group) =>
+      _decryptRepository.encrypt(description, message, group.id);
 
   Future<void> joinGroup(Task<Group> task, {required bool agree}) =>
       _groupRepository.approveTask(device!.id, task.id, agree: agree);
