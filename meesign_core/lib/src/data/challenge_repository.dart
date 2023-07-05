@@ -1,5 +1,4 @@
-import 'dart:typed_data';
-
+import 'package:drift/drift.dart';
 import 'package:meesign_native/meesign_native.dart';
 import 'package:meesign_network/grpc.dart' as rpc;
 
@@ -33,8 +32,6 @@ class ChallengeRepository extends TaskRepository<Challenge> {
           id: tid,
           did: did.bytes,
           state: TaskState.created,
-          // FIXME: make nullable?
-          context: Uint8List(0),
         ),
       );
 
@@ -55,16 +52,17 @@ class ChallengeRepository extends TaskRepository<Challenge> {
     final challenge = await _taskDao.getChallenge(did.bytes, task.id);
     final group = await _taskDao.getGroup(did.bytes, gid: challenge.gid);
     return task.copyWith(
-      context: ProtocolWrapper.init(
+      context: Value(ProtocolWrapper.init(
         group.protocol.toNative(),
         group.context,
-      ),
+      )),
     );
   }
 
   @override
   Future<void> finishTask(Uuid did, db.Task task, rpc.Task rpcTask) async {
-    if (task.context.isNotEmpty) ProtocolWrapper.finish(task.context);
+    final context = task.context;
+    if (context != null) ProtocolWrapper.finish(context);
   }
 
   @override

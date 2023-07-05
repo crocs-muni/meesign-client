@@ -27,7 +27,7 @@ class Tasks extends Table {
   BoolColumn get approved => boolean().withDefault(const Constant(false))();
   IntColumn get round => integer().withDefault(const Constant(0))();
   IntColumn get attempt => integer().withDefault(const Constant(0))();
-  BlobColumn get context => blob()();
+  BlobColumn get context => blob().nullable()();
 
   @override
   Set<Column> get primaryKey => {id, did};

@@ -419,8 +419,8 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
       const VerificationMeta('context');
   @override
   late final GeneratedColumn<Uint8List> context = GeneratedColumn<Uint8List>(
-      'context', aliasedName, false,
-      type: DriftSqlType.blob, requiredDuringInsert: true);
+      'context', aliasedName, true,
+      type: DriftSqlType.blob, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns =>
       [id, did, state, approved, round, attempt, context];
@@ -460,8 +460,6 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
     if (data.containsKey('context')) {
       context.handle(_contextMeta,
           this.context.isAcceptableOrUnknown(data['context']!, _contextMeta));
-    } else if (isInserting) {
-      context.missing(_contextMeta);
     }
     return context;
   }
@@ -485,7 +483,7 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
       attempt: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}attempt'])!,
       context: attachedDatabase.typeMapping
-          .read(DriftSqlType.blob, data['${effectivePrefix}context'])!,
+          .read(DriftSqlType.blob, data['${effectivePrefix}context']),
     );
   }
 
@@ -505,7 +503,7 @@ class Task extends DataClass implements Insertable<Task> {
   final bool approved;
   final int round;
   final int attempt;
-  final Uint8List context;
+  final Uint8List? context;
   const Task(
       {required this.id,
       required this.did,
@@ -513,7 +511,7 @@ class Task extends DataClass implements Insertable<Task> {
       required this.approved,
       required this.round,
       required this.attempt,
-      required this.context});
+      this.context});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -526,7 +524,9 @@ class Task extends DataClass implements Insertable<Task> {
     map['approved'] = Variable<bool>(approved);
     map['round'] = Variable<int>(round);
     map['attempt'] = Variable<int>(attempt);
-    map['context'] = Variable<Uint8List>(context);
+    if (!nullToAbsent || context != null) {
+      map['context'] = Variable<Uint8List>(context);
+    }
     return map;
   }
 
@@ -538,7 +538,9 @@ class Task extends DataClass implements Insertable<Task> {
       approved: Value(approved),
       round: Value(round),
       attempt: Value(attempt),
-      context: Value(context),
+      context: context == null && nullToAbsent
+          ? const Value.absent()
+          : Value(context),
     );
   }
 
@@ -553,7 +555,7 @@ class Task extends DataClass implements Insertable<Task> {
       approved: serializer.fromJson<bool>(json['approved']),
       round: serializer.fromJson<int>(json['round']),
       attempt: serializer.fromJson<int>(json['attempt']),
-      context: serializer.fromJson<Uint8List>(json['context']),
+      context: serializer.fromJson<Uint8List?>(json['context']),
     );
   }
   @override
@@ -567,7 +569,7 @@ class Task extends DataClass implements Insertable<Task> {
       'approved': serializer.toJson<bool>(approved),
       'round': serializer.toJson<int>(round),
       'attempt': serializer.toJson<int>(attempt),
-      'context': serializer.toJson<Uint8List>(context),
+      'context': serializer.toJson<Uint8List?>(context),
     };
   }
 
@@ -578,7 +580,7 @@ class Task extends DataClass implements Insertable<Task> {
           bool? approved,
           int? round,
           int? attempt,
-          Uint8List? context}) =>
+          Value<Uint8List?> context = const Value.absent()}) =>
       Task(
         id: id ?? this.id,
         did: did ?? this.did,
@@ -586,7 +588,7 @@ class Task extends DataClass implements Insertable<Task> {
         approved: approved ?? this.approved,
         round: round ?? this.round,
         attempt: attempt ?? this.attempt,
-        context: context ?? this.context,
+        context: context.present ? context.value : this.context,
       );
   @override
   String toString() {
@@ -631,7 +633,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
   final Value<bool> approved;
   final Value<int> round;
   final Value<int> attempt;
-  final Value<Uint8List> context;
+  final Value<Uint8List?> context;
   final Value<int> rowid;
   const TasksCompanion({
     this.id = const Value.absent(),
@@ -650,12 +652,11 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.approved = const Value.absent(),
     this.round = const Value.absent(),
     this.attempt = const Value.absent(),
-    required Uint8List context,
+    this.context = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : id = Value(id),
         did = Value(did),
-        state = Value(state),
-        context = Value(context);
+        state = Value(state);
   static Insertable<Task> custom({
     Expression<Uint8List>? id,
     Expression<Uint8List>? did,
@@ -685,7 +686,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       Value<bool>? approved,
       Value<int>? round,
       Value<int>? attempt,
-      Value<Uint8List>? context,
+      Value<Uint8List?>? context,
       Value<int>? rowid}) {
     return TasksCompanion(
       id: id ?? this.id,

@@ -1,5 +1,4 @@
-import 'dart:typed_data';
-
+import 'package:drift/drift.dart';
 import 'package:meesign_core/src/model/group.dart';
 import 'package:meesign_native/meesign_native.dart';
 import 'package:meesign_network/grpc.dart' as rpc;
@@ -53,8 +52,6 @@ class FileRepository extends TaskRepository<File> {
           id: tid,
           did: did.bytes,
           state: TaskState.created,
-          // FIXME: make nullable?
-          context: Uint8List(0),
         ),
       );
 
@@ -74,16 +71,17 @@ class FileRepository extends TaskRepository<File> {
     final file = await _taskDao.getFile(did.bytes, task.id);
     final group = await _taskDao.getGroup(did.bytes, gid: file.gid);
     return task.copyWith(
-      context: ProtocolWrapper.init(
+      context: Value(ProtocolWrapper.init(
         group.protocol.toNative(),
         group.context,
-      ),
+      )),
     );
   }
 
   @override
   Future<void> finishTask(Uuid did, db.Task task, rpc.Task rpcTask) async {
-    if (task.context.isNotEmpty) ProtocolWrapper.finish(task.context);
+    final context = task.context;
+    if (context != null) ProtocolWrapper.finish(context);
     final file = await _taskDao.getFile(did.bytes, task.id);
     await _fileStore.storeFile(
         did, Uuid.take(task.id), file.name, rpcTask.data);

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:typed_data';
 
+import 'package:drift/drift.dart';
 import 'package:meesign_core/src/database/daos.dart';
 import 'package:meesign_native/meesign_native.dart';
 import 'package:meesign_network/meesign_network.dart'
@@ -103,7 +103,7 @@ abstract class TaskRepository<T> {
   }
 
   Future<db.Task> _syncFailed(db.Task task, rpc.Task rpcTask) async {
-    return task.copyWith(context: Uint8List(0), state: TaskState.failed);
+    return task.copyWith(context: Value(null), state: TaskState.failed);
   }
 
   Future<db.Task> _syncFinished(
@@ -116,7 +116,7 @@ abstract class TaskRepository<T> {
     await finishTask(did, task, rpcTask);
     await _taskSource.acknowledge(did, task.id);
 
-    return task.copyWith(context: Uint8List(0), state: TaskState.finished);
+    return task.copyWith(context: Value(null), state: TaskState.finished);
   }
 
   Future<db.Task> _syncRunning(Uuid did, db.Task task, rpc.Task rpcTask) async {
@@ -124,7 +124,7 @@ abstract class TaskRepository<T> {
       return task;
     }
 
-    bool activeParticipant = task.context.isNotEmpty || rpcTask.hasData();
+    bool activeParticipant = task.context != null || rpcTask.hasData();
     if (!activeParticipant) {
       return task.copyWith(
         state: TaskState.running,
@@ -139,7 +139,7 @@ abstract class TaskRepository<T> {
 
     if (task.round == 0) task = await initTask(did, task);
     final res = await ProtocolWrapper.advance(
-      task.context,
+      task.context!,
       rpcTask.data as Uint8List,
     );
     // TODO: rollback if we fail to deliver the update
@@ -154,7 +154,7 @@ abstract class TaskRepository<T> {
     return task.copyWith(
       state: TaskState.running,
       round: task.round + 1,
-      context: res.context,
+      context: Value(res.context),
     );
   }
 
@@ -163,7 +163,7 @@ abstract class TaskRepository<T> {
       state: TaskState.created,
       round: 0,
       attempt: rpcTask.attempt,
-      context: Uint8List(0),
+      context: Value(null),
     );
   }
 
@@ -203,7 +203,7 @@ abstract class TaskRepository<T> {
     } on Exception {
       // TODO: some errors need to be reported to the server,
       // sometimes we can rollback (e.g. in case of network errors)
-      newTask = task?.copyWith(context: Uint8List(0), state: TaskState.failed);
+      newTask = task?.copyWith(context: Value(null), state: TaskState.failed);
       rethrow;
     } finally {
       if (newTask != null) {

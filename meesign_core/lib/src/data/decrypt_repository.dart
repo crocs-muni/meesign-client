@@ -50,8 +50,6 @@ class DecryptRepository extends TaskRepository<Decrypt> {
           id: tid,
           did: did.bytes,
           state: TaskState.created,
-          // FIXME: make nullable?
-          context: Uint8List(0),
         ),
       );
 
@@ -72,16 +70,17 @@ class DecryptRepository extends TaskRepository<Decrypt> {
     final decrypt = await _taskDao.getDecrypt(did.bytes, task.id);
     final group = await _taskDao.getGroup(did.bytes, gid: decrypt.gid);
     return task.copyWith(
-      context: ProtocolWrapper.init(
+      context: Value(ProtocolWrapper.init(
         group.protocol.toNative(),
         group.context,
-      ),
+      )),
     );
   }
 
   @override
   Future<void> finishTask(Uuid did, db.Task task, rpc.Task rpcTask) async {
-    if (task.context.isNotEmpty) ProtocolWrapper.finish(task.context);
+    final context = task.context;
+    if (context != null) ProtocolWrapper.finish(context);
     await _taskDao.updateDecrypt(db.DecryptsCompanion(
       tid: Value(task.id),
       did: Value(task.did),
