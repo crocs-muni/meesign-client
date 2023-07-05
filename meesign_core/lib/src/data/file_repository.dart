@@ -1,4 +1,3 @@
-import 'dart:io' as io;
 import 'dart:typed_data';
 
 import 'package:meesign_core/src/model/group.dart';
@@ -14,8 +13,6 @@ import '../util/uuid.dart';
 import 'file_store.dart';
 import 'network_dispatcher.dart';
 import 'task_repository.dart';
-
-import 'package:path/path.dart' as path_pkg;
 
 export 'file_store.dart';
 
@@ -33,16 +30,12 @@ class FileRepository extends TaskRepository<File> {
     this._fileStore,
   ) : super(taskSource, _taskDao);
 
-  Future<void> sign(String path, List<int> gid) async {
-    // FIXME: delegate to FileStore?
-    final bytes = await io.File(path).readAsBytes();
-    String basename = path_pkg.basename(path);
-
+  Future<void> sign(String name, List<int> data, List<int> gid) async {
     await _dispatcher.unauth.sign(
       rpc.SignRequest()
         ..groupId = gid
-        ..name = basename
-        ..data = bytes,
+        ..name = name
+        ..data = data,
     );
   }
 

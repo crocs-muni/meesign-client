@@ -51,6 +51,8 @@ void sync(
   );
 }
 
+const testFilePath = 'test/file.pdf';
+
 Future<void> sign(
   DeviceRepository deviceRepository,
   GroupRepository groupRepository,
@@ -76,7 +78,8 @@ Future<void> sign(
 
   await Future.wait(ds.map((d) => fileRepository.subscribe(d.id)));
 
-  await fileRepository.sign('test/file.pdf', gs[0].id);
+  final data = await io.File(testFilePath).readAsBytes();
+  await fileRepository.sign('test.pdf', data, gs[0].id);
   approveAllFirst(fileRepository, ds.take(t));
   await Future.wait(
     ds.map((d) => fileRepository.observeFiles(d.id).firstElement()),
