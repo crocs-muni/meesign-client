@@ -24,7 +24,7 @@ class GroupRepository extends TaskRepository<Group> {
     TaskSource taskSource,
     this._taskDao,
     this._deviceRepository,
-  ) : super(taskSource, _taskDao);
+  ) : super(rpc.TaskType.GROUP, taskSource, _taskDao);
 
   Future<void> group(
     String name,
@@ -107,9 +107,6 @@ class GroupRepository extends TaskRepository<Group> {
       ),
     );
   }
-
-  @override
-  bool isSyncable(rpc.Task rpcTask) => rpcTask.type == rpc.TaskType.GROUP;
 
   @override
   Stream<List<Task<Group>>> observeTasks(Uuid did) {

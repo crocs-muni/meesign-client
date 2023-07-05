@@ -28,7 +28,7 @@ class FileRepository extends TaskRepository<File> {
     TaskSource taskSource,
     this._taskDao,
     this._fileStore,
-  ) : super(taskSource, _taskDao);
+  ) : super(rpc.TaskType.SIGN_PDF, taskSource, _taskDao);
 
   Future<void> sign(String name, List<int> data, List<int> gid) async {
     await _dispatcher.unauth.sign(
@@ -88,9 +88,6 @@ class FileRepository extends TaskRepository<File> {
     await _fileStore.storeFile(
         did, Uuid.take(task.id), file.name, rpcTask.data);
   }
-
-  @override
-  bool isSyncable(rpc.Task rpcTask) => rpcTask.type == rpc.TaskType.SIGN_PDF;
 
   @override
   Stream<List<Task<File>>> observeTasks(Uuid did) {

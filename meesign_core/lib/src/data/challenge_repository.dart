@@ -18,7 +18,7 @@ class ChallengeRepository extends TaskRepository<Challenge> {
   ChallengeRepository(
     TaskSource taskSource,
     this._taskDao,
-  ) : super(taskSource, _taskDao);
+  ) : super(rpc.TaskType.SIGN_CHALLENGE, taskSource, _taskDao);
 
   @override
   Future<void> createTask(Uuid did, rpc.Task rpcTask) async {
@@ -66,10 +66,6 @@ class ChallengeRepository extends TaskRepository<Challenge> {
   Future<void> finishTask(Uuid did, db.Task task, rpc.Task rpcTask) async {
     if (task.context.isNotEmpty) ProtocolWrapper.finish(task.context);
   }
-
-  @override
-  bool isSyncable(rpc.Task rpcTask) =>
-      rpcTask.type == rpc.TaskType.SIGN_CHALLENGE;
 
   @override
   Stream<List<Task<Challenge>>> observeTasks(Uuid did) {

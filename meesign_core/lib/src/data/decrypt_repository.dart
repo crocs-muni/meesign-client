@@ -20,7 +20,7 @@ class DecryptRepository extends TaskRepository<Decrypt> {
     this._dispatcher,
     TaskSource taskSource,
     this._taskDao,
-  ) : super(taskSource, _taskDao);
+  ) : super(rpc.TaskType.DECRYPT, taskSource, _taskDao);
 
   /// Encrypt a message for the given group.
   Future<void> encrypt(
@@ -88,9 +88,6 @@ class DecryptRepository extends TaskRepository<Decrypt> {
       data: Value(rpcTask.data as Uint8List),
     ));
   }
-
-  @override
-  bool isSyncable(rpc.Task rpcTask) => rpcTask.type == rpc.TaskType.DECRYPT;
 
   @override
   Stream<List<Task<Decrypt>>> observeTasks(Uuid did) {

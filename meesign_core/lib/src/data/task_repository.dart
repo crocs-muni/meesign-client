@@ -78,6 +78,7 @@ class TaskSource {
 
 // TODO: create DeviceTaskRepository to simplify did handling?
 abstract class TaskRepository<T> {
+  final rpc.TaskType _taskType;
   final TaskSource _taskSource;
   final TaskDao _taskDao;
 
@@ -86,7 +87,7 @@ abstract class TaskRepository<T> {
 
   final Map<Uuid, StreamSubscription<rpc.Task>> _subscriptions = HashMap();
 
-  TaskRepository(this._taskSource, this._taskDao);
+  TaskRepository(this._taskType, this._taskSource, this._taskDao);
 
   @visibleForOverriding
   Future<void> createTask(Uuid did, rpc.Task rpcTask);
@@ -219,13 +220,10 @@ abstract class TaskRepository<T> {
     // FIXME: when to remove task lock?
   }
 
-  @visibleForOverriding
-  bool isSyncable(rpc.Task rpcTask);
-
   Future<void> sync(Uuid did) async {
     final rpcTasks = await _taskSource.fetchAll(did);
     await Future.wait(
-      rpcTasks.where(isSyncable).map((t) => _syncTask(did, t)),
+      rpcTasks.where((t) => t.type == _taskType).map((t) => _syncTask(did, t)),
     );
   }
 
@@ -240,7 +238,7 @@ abstract class TaskRepository<T> {
 
     _subscriptions[did] = stream.listen(
       (rpcTask) async {
-        if (!isSyncable(rpcTask)) return;
+        if (rpcTask.type != _taskType) return;
         await _syncTask(did, rpcTask);
       },
       onDone: () {
