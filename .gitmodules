@@ -1,0 +1,3 @@
+[submodule "meesign_native/native/meesign-crypto"]
+	path = meesign_native/native/meesign-crypto
+	url = https://github.com/crocs-muni/meesign-crypto

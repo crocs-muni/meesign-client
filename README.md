@@ -25,7 +25,7 @@ To learn more about MeeSign, visit [our website](https://meesign.crocs.fi.muni.c
 3. Clone the repository:
 
    ```bash
-   git clone https://github.com/crocs-muni/meesign-client
+   git clone https://github.com/crocs-muni/meesign-client --recurse-submodules
    ```
 
 4. Copy MeeSign CA certificate to `assets/ca-cert.pem`

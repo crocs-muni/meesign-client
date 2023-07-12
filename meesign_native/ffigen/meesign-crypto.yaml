@@ -1,9 +1,9 @@
-name: 'MpcSigsLib'
-description: 'Bindings to mpc-sigs C API'
-output: 'lib/src/generated/mpc_sigs_lib.dart'
+name: 'MeeSignCryptoLib'
+description: 'Bindings to meesign-crypto C API'
+output: 'lib/src/generated/meesign_crypto_lib.dart'
 headers:
   entry-points:
-    - 'native/mpc-sigs/include/bindings.h'
+    - 'native/meesign-crypto/include/bindings.h'
   # by default, code is generated recursively for all included headers,
   # so specify only the headers we need (most notably avoid system headers)
   include-directives:

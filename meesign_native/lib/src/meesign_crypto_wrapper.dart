@@ -5,7 +5,7 @@ import 'dart:typed_data';
 import 'package:ffi/ffi.dart';
 
 import 'dl_util.dart';
-import 'generated/mpc_sigs_lib.dart';
+import 'generated/meesign_crypto_lib.dart';
 
 // TODO: profile the functions in this file
 // many chunks of data are copied, can it be avoided?
@@ -38,7 +38,7 @@ class ProtocolData {
   ProtocolData(this.context, this.data);
 }
 
-final MpcSigsLib _lib = MpcSigsLib(dlOpen('mpc_sigs'));
+final MeeSignCryptoLib _lib = MeeSignCryptoLib(dlOpen('meesign_crypto'));
 
 class Error {
   Pointer<Pointer<Char>> ptr;

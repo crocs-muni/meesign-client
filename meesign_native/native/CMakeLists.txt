@@ -17,11 +17,11 @@ else()
   set(CARGO_BUILD_TYPE_OPT "$<$<NOT:$<CONFIG:Debug>>:--release>")
 endif()
 
-set(MPC_SIGS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/mpc-sigs")
-set(MPC_SIGS_BUILD_DIR "${MPC_SIGS_DIR}/target/${RUST_TARGET}/${RUST_BUILD_TYPE}")
-set(MPC_SIGS_LIB "${MPC_SIGS_BUILD_DIR}/${CMAKE_SHARED_LIBRARY_PREFIX}mpc_sigs${CMAKE_SHARED_LIBRARY_SUFFIX}")
+set(MEESIGN_CRYPTO_DIR "${CMAKE_CURRENT_SOURCE_DIR}/meesign-crypto")
+set(MEESIGN_CRYPTO_BUILD_DIR "${MEESIGN_CRYPTO_DIR}/target/${RUST_TARGET}/${RUST_BUILD_TYPE}")
+set(MEESIGN_CRYPTO_LIB "${MEESIGN_CRYPTO_BUILD_DIR}/${CMAKE_SHARED_LIBRARY_PREFIX}meesign_crypto${CMAKE_SHARED_LIBRARY_SUFFIX}")
 if(WIN32)
-  set(MPC_SIGS_IMPLIB "${MPC_SIGS_LIB}.lib")
+  set(MEESIGN_CRYPTO_IMPLIB "${MEESIGN_CRYPTO_LIB}.lib")
 endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
@@ -46,9 +46,9 @@ elseif(ANDROID)
   get_filename_component(SSL_LIB_DIR ${SSL_LIB_LOCATION} DIRECTORY)
   get_target_property(CRYPTO_INCLUDE_DIR OpenSSL::Crypto INTERFACE_INCLUDE_DIRECTORIES)
 
-  list(APPEND MPC_SIGS_DEPS ${CRYPTO_LIB_LOCATION})
-  list(APPEND MPC_SIGS_DEPS ${SSL_LIB_LOCATION})
-  set(MPC_SIGS_DEPS ${MPC_SIGS_DEPS} PARENT_SCOPE)
+  list(APPEND MEESIGN_CRYPTO_DEPS ${CRYPTO_LIB_LOCATION})
+  list(APPEND MEESIGN_CRYPTO_DEPS ${SSL_LIB_LOCATION})
+  set(MEESIGN_CRYPTO_DEPS ${MEESIGN_CRYPTO_DEPS} PARENT_SCOPE)
 
   # invoke cargo so that openssl-sys
   # correctly finds our Android OpenSSL distribution
@@ -75,18 +75,18 @@ elseif(ANDROID)
 endif()
 
 add_custom_target(
-  cargo_mpc_sigs
+  cargo_meesign_crypto
   COMMAND ${CARGO_CMD}
-  WORKING_DIRECTORY ${MPC_SIGS_DIR}
-  BYPRODUCTS ${MPC_SIGS_LIB} ${MPC_SIGS_IMPLIB}
+  WORKING_DIRECTORY ${MEESIGN_CRYPTO_DIR}
+  BYPRODUCTS ${MEESIGN_CRYPTO_LIB} ${MEESIGN_CRYPTO_IMPLIB}
 )
 
-add_library(mpc_sigs INTERFACE)
-add_dependencies(mpc_sigs cargo_mpc_sigs)
+add_library(meesign_crypto INTERFACE)
+add_dependencies(meesign_crypto cargo_meesign_crypto)
 if(WIN32)
-  target_link_libraries(mpc_sigs INTERFACE "${MPC_SIGS_IMPLIB}")
+  target_link_libraries(meesign_crypto INTERFACE "${MEESIGN_CRYPTO_IMPLIB}")
 else()
-  target_link_libraries(mpc_sigs INTERFACE "${MPC_SIGS_LIB}")
+  target_link_libraries(meesign_crypto INTERFACE "${MEESIGN_CRYPTO_LIB}")
 endif()
 
-set(MPC_SIGS_LIB "${MPC_SIGS_LIB}" PARENT_SCOPE)
+set(MEESIGN_CRYPTO_LIB "${MEESIGN_CRYPTO_LIB}" PARENT_SCOPE)

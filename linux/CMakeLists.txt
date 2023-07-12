@@ -72,7 +72,7 @@ include(flutter/generated_plugins.cmake)
 set(RUST_TARGET "x86_64-unknown-linux-gnu")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../meesign_native/native" native)
 
-target_link_libraries(${BINARY_NAME} PRIVATE mpc_sigs)
+target_link_libraries(${BINARY_NAME} PRIVATE meesign_crypto)
 
 # === Installation ===
 # By default, "installing" just makes a relocatable bundle in the build
@@ -105,7 +105,7 @@ if(PLUGIN_BUNDLED_LIBRARIES)
     COMPONENT Runtime)
 endif()
 
-install(FILES "${MPC_SIGS_LIB}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
+install(FILES "${MEESIGN_CRYPTO_LIB}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
   COMPONENT Runtime)
 
 # Fully re-copy the assets directory on each build to avoid having stale files
