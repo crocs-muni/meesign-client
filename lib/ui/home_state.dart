@@ -30,12 +30,12 @@ class HomeState with ChangeNotifier {
 
   Stream<int> nGroupReqs = const Stream.empty();
   Stream<int> nSignReqs = const Stream.empty();
-  Stream<int> nLoginReqs = const Stream.empty();
+  Stream<int> nChallengeReqs = const Stream.empty();
   Stream<int> nDecryptReqs = const Stream.empty();
 
   List<Task<Group>> groupTasks = [];
   List<Task<File>> signTasks = [];
-  List<Task<Challenge>> loginTasks = [];
+  List<Task<Challenge>> challengeTasks = [];
   List<Task<Decrypt>> decryptTasks = [];
 
   HomeState(
@@ -56,14 +56,14 @@ class HomeState with ChangeNotifier {
   void _listen(Uuid did) {
     final groupTasksStream = _groupRepository.observeTasks(did);
     final signTasksStream = _fileRepository.observeTasks(did);
-    final loginTasksStream = _challengeRepository.observeTasks(did);
+    final challengeTasksStream = _challengeRepository.observeTasks(did);
     final decryptTasksStream = _decryptRepository.observeTasks(did);
 
     int pending(List<Task<dynamic>> tasks) =>
         tasks.where((task) => task.approvable).length;
     nGroupReqs = groupTasksStream.map(pending).shareValue();
     nSignReqs = signTasksStream.map(pending).shareValue();
-    nLoginReqs = loginTasksStream.map(pending).shareValue();
+    nChallengeReqs = challengeTasksStream.map(pending).shareValue();
     nDecryptReqs = decryptTasksStream.map(pending).shareValue();
     notifyListeners();
 
@@ -75,8 +75,8 @@ class HomeState with ChangeNotifier {
       signTasks = tasks;
       notifyListeners();
     });
-    loginTasksStream.listen((tasks) {
-      loginTasks = tasks;
+    challengeTasksStream.listen((tasks) {
+      challengeTasks = tasks;
       notifyListeners();
     });
     decryptTasksStream.listen((tasks) {
@@ -119,7 +119,7 @@ class HomeState with ChangeNotifier {
       _groupRepository.approveTask(device!.id, task.id, agree: agree);
   Future<void> joinSign(Task<File> task, {required bool agree}) =>
       _fileRepository.approveTask(device!.id, task.id, agree: agree);
-  Future<void> joinLogin(Task<Challenge> task, {required bool agree}) =>
+  Future<void> joinChallenge(Task<Challenge> task, {required bool agree}) =>
       _challengeRepository.approveTask(device!.id, task.id, agree: agree);
   Future<void> joinDecrypt(Task<Decrypt> task, {required bool agree}) =>
       _decryptRepository.approveTask(device!.id, task.id, agree: agree);

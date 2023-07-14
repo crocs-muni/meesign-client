@@ -1,9 +1,13 @@
+import 'package:meesign_core/src/model/protocol.dart';
 import 'package:meesign_network/grpc.dart' as rpc;
 
 enum KeyType {
-  signPdf,
-  signChallenge,
-  decrypt,
+  signPdf([Protocol.gg18]),
+  signChallenge([Protocol.gg18, Protocol.frost]),
+  decrypt([Protocol.elgamal]);
+
+  final List<Protocol> supportedProtocols;
+  const KeyType(this.supportedProtocols);
 }
 
 extension KeyTypeConversion on KeyType {

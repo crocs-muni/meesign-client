@@ -56,6 +56,8 @@ class _NewGroupPageState extends State<NewGroupPage> {
   final _nameController = TextEditingController();
   String? _nameErr, _memberErr;
   KeyType _keyType = KeyType.signPdf;
+  Protocol _protocol = KeyType.signPdf.supportedProtocols.first;
+  bool _advancedOptions = false;
 
   @override
   void initState() {
@@ -134,7 +136,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
         _nameController.text,
         _members,
         _threshold,
-        _keyType == KeyType.decrypt ? Protocol.elgamal : Protocol.gg18,
+        _protocol,
         _keyType,
       ),
     );
@@ -253,7 +255,10 @@ class _NewGroupPageState extends State<NewGroupPage> {
           SegmentedButton<KeyType>(
             selected: {_keyType},
             onSelectionChanged: (value) {
-              setState(() => _keyType = value.first);
+              setState(() => {
+                    _protocol = value.first.supportedProtocols.first,
+                    _keyType = value.first
+                  });
             },
             segments: const [
               ButtonSegment<KeyType>(
@@ -262,13 +267,75 @@ class _NewGroupPageState extends State<NewGroupPage> {
               ),
               ButtonSegment<KeyType>(
                 value: KeyType.signChallenge,
-                label: Text('Log In'),
+                label: Text('Challenge'),
               ),
               ButtonSegment<KeyType>(
                 value: KeyType.decrypt,
                 label: Text('Decrypt'),
               )
             ],
+          ),
+          const SizedBox(height: 16),
+          ExpansionPanelList(
+            children: [
+              ExpansionPanel(
+                  headerBuilder: (context, isOpen) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16.0, horizontal: 8.0),
+                      child: Text(
+                        'Advanced options',
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onBackground
+                                  .withOpacity(0.5),
+                            ),
+                      ),
+                    );
+                  },
+                  body: LayoutBuilder(
+                    builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                      return SizedBox(
+                        width: constraints.maxWidth,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 16),
+                                const Padding(
+                                  padding: EdgeInsets.only(bottom: 8),
+                                  child: Text('Protocol'),
+                                ),
+                                DropdownButton(
+                                  isExpanded: true,
+                                  value: _protocol,
+                                  items: _keyType.supportedProtocols
+                                      .map((Protocol item) {
+                                    return DropdownMenuItem(
+                                      value: item,
+                                      child: Text(item.name.toUpperCase()),
+                                    );
+                                  }).toList(),
+                                  icon: const Icon(Icons.keyboard_arrow_down),
+                                  onChanged: (Protocol? value) {
+                                    setState(() {
+                                      _protocol = value!;
+                                    });
+                                  },
+                                )
+                              ]),
+                        ),
+                      );
+                    },
+                  ),
+                  canTapOnHeader: true,
+                  isExpanded: _advancedOptions)
+            ],
+            expansionCallback: (_, isOpen) =>
+                setState(() => _advancedOptions = !isOpen),
           ),
         ],
       ),

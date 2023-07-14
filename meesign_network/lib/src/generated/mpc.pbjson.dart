@@ -19,12 +19,13 @@ const ProtocolType$json = {
   '2': [
     {'1': 'GG18', '2': 0},
     {'1': 'ELGAMAL', '2': 1},
+    {'1': 'FROST', '2': 2},
   ],
 };
 
 /// Descriptor for `ProtocolType`. Decode as a `google.protobuf.EnumDescriptorProto`.
-final $typed_data.Uint8List protocolTypeDescriptor = $convert
-    .base64Decode('CgxQcm90b2NvbFR5cGUSCAoER0cxOBAAEgsKB0VMR0FNQUwQAQ==');
+final $typed_data.Uint8List protocolTypeDescriptor = $convert.base64Decode(
+    'CgxQcm90b2NvbFR5cGUSCAoER0cxOBAAEgsKB0VMR0FNQUwQARIJCgVGUk9TVBAC');
 
 @$core.Deprecated('Use keyTypeDescriptor instead')
 const KeyType$json = {

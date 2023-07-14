@@ -288,7 +288,11 @@ class GroupTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text('Threshold: $threshold / ${members.length}'),
-          Text('Purpose: ${['Sign PDF', 'Log In', 'Decrypt'][keyType.index]}'),
+          Text('Purpose: ${[
+            'Sign PDF',
+            'Challenge',
+            'Decrypt'
+          ][keyType.index]}'),
         ],
       ),
       Container(
@@ -401,14 +405,14 @@ class LogInSubPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<HomeState>(builder: (context, model, child) {
       return buildTaskListView<Challenge, Challenge>(
-        model.loginTasks,
-        model.loginTasks
+        model.challengeTasks,
+        model.challengeTasks
             .where((task) => task.state == TaskState.finished)
             .map((task) => task.info)
             .toList(),
         finishedTitle: 'Finished',
         emptyView: const EmptyList(
-          hint: 'Request for confirmation appears once you try to log in.',
+          hint: 'Challenge signing requests.',
         ),
         unfinishedBuilder: (context, task) {
           return SignTile(
@@ -420,12 +424,12 @@ class LogInSubPage extends StatelessWidget {
             showActions: task.approvable,
             actions: [
               FilledButton.tonal(
-                child: const Text('Log In'),
-                onPressed: () => model.joinLogin(task, agree: true),
+                child: const Text('Sign'),
+                onPressed: () => model.joinChallenge(task, agree: true),
               ),
               OutlinedButton(
                 child: const Text('Decline'),
-                onPressed: () => model.joinLogin(task, agree: false),
+                onPressed: () => model.joinChallenge(task, agree: false),
               )
             ],
           );
@@ -768,10 +772,10 @@ class _HomePageViewState extends State<HomePageView> {
           ),
           NavigationDestination(
             icon: CounterBadge(
-              stream: context.watch<HomeState>().nLoginReqs,
-              child: const Icon(Icons.login),
+              stream: context.watch<HomeState>().nChallengeReqs,
+              child: const Icon(Icons.quiz),
             ),
-            label: 'Log In',
+            label: 'Challenge',
           ),
           NavigationDestination(
               icon: CounterBadge(
