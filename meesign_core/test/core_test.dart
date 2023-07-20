@@ -47,6 +47,7 @@ void main() {
   late DeviceRepository deviceRepository;
   late GroupRepository groupRepository;
   late FileRepository fileRepository;
+  late ChallengeRepository challengeRepository;
   late DecryptRepository decryptRepository;
 
   List<int>? serverCerts;
@@ -68,6 +69,7 @@ void main() {
         GroupRepository(dispatcher, taskSource, taskDao, deviceRepository);
     final fileStore = FileStore(appDir);
     fileRepository = FileRepository(dispatcher, taskSource, taskDao, fileStore);
+    challengeRepository = ChallengeRepository(dispatcher, taskSource, taskDao);
     decryptRepository = DecryptRepository(dispatcher, taskSource, taskDao);
   });
 
@@ -114,6 +116,25 @@ void main() {
     );
   }
 
+  Future<void> testSignChallenge(Protocol protocol,
+      {required int n, required int t}) async {
+    final rng = Random();
+    final message = List.generate(1024, (_) => rng.nextInt(256));
+
+    await testRepository(
+      challengeRepository,
+      KeyType.signChallenge,
+      protocol,
+      n: n,
+      t: t,
+      createTask: (_, Group g) async {
+        await challengeRepository.sign('test challenge', message, g.id);
+      },
+    );
+
+    // TODO: verify signatures
+  }
+
   Future<void> testDecrypt({required int n, required int t}) async {
     final rng = Random();
     final message = List.generate(1024, (_) => rng.nextInt(256));
@@ -138,6 +159,21 @@ void main() {
     test('2-3', () => testSignPdf(n: 3, t: 2));
     test('3-3', () => testSignPdf(n: 3, t: 3));
     test('15-20', () => testSignPdf(n: 20, t: 15), tags: 'large');
+  });
+
+  group('challenge', () {
+    group('gg18', () {
+      test('2-3', () => testSignChallenge(Protocol.gg18, n: 3, t: 2));
+      test('3-3', () => testSignChallenge(Protocol.gg18, n: 3, t: 3));
+      test('15-20', () => testSignChallenge(Protocol.gg18, n: 20, t: 15),
+          tags: 'large');
+    });
+    group('frost', () {
+      test('2-3', () => testSignChallenge(Protocol.frost, n: 3, t: 2));
+      test('3-3', () => testSignChallenge(Protocol.frost, n: 3, t: 3));
+      test('15-20', () => testSignChallenge(Protocol.frost, n: 20, t: 15),
+          tags: 'large');
+    });
   });
 
   group('decrypt', () {

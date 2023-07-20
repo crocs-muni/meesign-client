@@ -133,7 +133,8 @@ void main(List<String> args) async {
       GroupRepository(dispatcher, taskSource, taskDao, deviceRepository);
   final fileRepository =
       FileRepository(dispatcher, taskSource, taskDao, DummyFileStore());
-  final challengeRepository = ChallengeRepository(taskSource, taskDao);
+  final challengeRepository =
+      ChallengeRepository(dispatcher, taskSource, taskDao);
 
   final device = await deviceRepository.register(options['name']);
   print('Registered as ${device.name}');

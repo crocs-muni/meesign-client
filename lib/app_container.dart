@@ -50,7 +50,7 @@ class AppContainer {
     groupRepository =
         GroupRepository(dispatcher, taskSource, taskDao, deviceRepository);
     fileRepository = FileRepository(dispatcher, taskSource, taskDao, fileStore);
-    challengeRepository = ChallengeRepository(taskSource, taskDao);
+    challengeRepository = ChallengeRepository(dispatcher, taskSource, taskDao);
     decryptRepository = DecryptRepository(dispatcher, taskSource, taskDao);
   }
 

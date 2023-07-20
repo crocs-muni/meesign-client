@@ -9,15 +9,28 @@ import '../model/group.dart';
 import '../model/protocol.dart';
 import '../model/task.dart';
 import '../util/uuid.dart';
+import 'network_dispatcher.dart';
 import 'task_repository.dart';
 
 class ChallengeRepository extends TaskRepository<Challenge> {
+  final NetworkDispatcher _dispatcher;
   final TaskDao _taskDao;
 
   ChallengeRepository(
+    this._dispatcher,
     TaskSource taskSource,
     this._taskDao,
   ) : super(rpc.TaskType.SIGN_CHALLENGE, taskSource, _taskDao);
+
+  // FIXME: same as file repo
+  Future<void> sign(String name, List<int> data, List<int> gid) async {
+    await _dispatcher.unauth.sign(
+      rpc.SignRequest()
+        ..groupId = gid
+        ..name = name
+        ..data = data,
+    );
+  }
 
   @override
   Future<void> createTask(Uuid did, rpc.Task rpcTask) async {
