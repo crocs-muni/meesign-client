@@ -134,13 +134,17 @@ void main() {
     expect(results.first, equals(message));
   }
 
-  test('2-3 sign PDF', () => testSignPdf(n: 3, t: 2));
-  test('3-3 sign PDF', () => testSignPdf(n: 3, t: 3));
-  test('3-5 sign PDF', () => testSignPdf(n: 5, t: 3));
+  group('sign PDF', () {
+    test('2-3', () => testSignPdf(n: 3, t: 2));
+    test('3-3', () => testSignPdf(n: 3, t: 3));
+    test('3-5', () => testSignPdf(n: 5, t: 3));
+  });
 
-  test('2-3 decrypt', () => testDecrypt(n: 3, t: 2));
-  test('3-3 decrypt', () => testDecrypt(n: 3, t: 3));
-  test('3-5 decrypt', () => testDecrypt(n: 5, t: 3));
+  group('decrypt', () {
+    test('2-3', () => testDecrypt(n: 3, t: 2));
+    test('3-3', () => testDecrypt(n: 3, t: 3));
+    test('3-5', () => testDecrypt(n: 5, t: 3));
+  });
 
   tearDown(() async {
     try {
