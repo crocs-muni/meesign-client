@@ -42,6 +42,9 @@ jobs:
           version: "23.x"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Install pdfsig
+        run: sudo apt-get install -y poppler-utils
+
       - name: Install native
         run: |
           cargo build --release

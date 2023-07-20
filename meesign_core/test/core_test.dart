@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:io' as io;
+import 'dart:io';
 import 'dart:math';
 
 import 'package:meesign_core/meesign_core.dart';
@@ -35,6 +36,11 @@ Future<void> approveAllFirst(
     Future.wait(
       devices.map((d) => approveFirst(taskRepository, d)),
     );
+
+Future<void> verifyPdfSignature(String path) async {
+  final res = await Process.run('pdfsig', ['-nocert', path]);
+  expect(res.stdout, contains('Signature is Valid.'));
+}
 
 const testFilePath = 'test/file.pdf';
 
@@ -103,7 +109,7 @@ void main() {
   }
 
   Future<void> testSignPdf({required int n, required int t}) async {
-    await testRepository(
+    final files = await testRepository(
       fileRepository,
       KeyType.signPdf,
       Protocol.gg18,
@@ -114,6 +120,10 @@ void main() {
         await fileRepository.sign('test.pdf', data, g.id);
       },
     );
+
+    for (var file in files) {
+      await verifyPdfSignature(file.path);
+    }
   }
 
   Future<void> testSignChallenge(Protocol protocol,
