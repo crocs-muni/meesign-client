@@ -53,45 +53,6 @@ void sync(
 
 const testFilePath = 'test/file.pdf';
 
-Future<void> sign(
-  DeviceRepository deviceRepository,
-  GroupRepository groupRepository,
-  FileRepository fileRepository, {
-  required int n,
-  required int t,
-}) async {
-  assert(2 <= t && t <= n);
-
-  final ds = await Future.wait(
-    [for (var i = 0; i < n; i++) deviceRepository.register('d$i')],
-  );
-
-  await Future.wait(ds.map((d) => groupRepository.subscribe(d.id)));
-
-  await groupRepository.group(
-      '$t out of $n', ds, t, Protocol.gg18, KeyType.signPdf);
-  approveAllFirst(groupRepository, ds);
-  final gs = await Future.wait(
-    ds.map((d) => groupRepository.observeGroups(d.id).firstElement()),
-  );
-  expect(gs.map((g) => g.id), allEqual);
-
-  await Future.wait(ds.map((d) => fileRepository.subscribe(d.id)));
-
-  final data = await io.File(testFilePath).readAsBytes();
-  await fileRepository.sign('test.pdf', data, gs[0].id);
-  approveAllFirst(fileRepository, ds.take(t));
-  await Future.wait(
-    ds.map((d) => fileRepository.observeFiles(d.id).firstElement()),
-  );
-
-  await Future.wait(ds.map(
-    (d) => fileRepository
-        .observeTasks(d.id)
-        .firstElementWhere((t) => t.state == TaskState.finished),
-  ));
-}
-
 final appDir = io.Directory('test/output');
 
 void main() {
@@ -123,12 +84,52 @@ void main() {
     fileRepository = FileRepository(dispatcher, taskSource, taskDao, fileStore);
   });
 
-  Future<void> testSign({required int n, required int t}) =>
-      sign(deviceRepository, groupRepository, fileRepository, n: n, t: t);
+  Future<List<T>> testRepository<T>(
+    TaskRepository<T> taskRepository,
+    KeyType keyType,
+    Protocol protocol, {
+    required int n,
+    required int t,
+    required Future<void> Function(TaskRepository, Group) createTask,
+  }) async {
+    final ds = await Future.wait(
+      [for (var i = 0; i < n; ++i) deviceRepository.register('d$i')],
+    );
 
-  test('2-3 sign', () => testSign(n: 3, t: 2));
-  test('3-3 sign', () => testSign(n: 3, t: 3));
-  test('3-5 sign', () => testSign(n: 5, t: 3));
+    await Future.wait(ds.map((d) => groupRepository.subscribe(d.id)));
+    await groupRepository.group(
+        '$t $n ${keyType.name} ${protocol.name}', ds, t, protocol, keyType);
+    await approveAllFirst(groupRepository, ds);
+    final gs = await Future.wait(
+      ds.map((d) => groupRepository.observeGroups(d.id).firstElement()),
+    );
+    expect(gs.map((g) => g.id), allEqual);
+
+    await Future.wait(ds.map((d) => taskRepository.subscribe(d.id)));
+    await createTask(taskRepository, gs.first);
+    approveAllFirst(taskRepository, ds.take(t));
+    return await Future.wait(
+      ds.map((d) => taskRepository.observeResults(d.id).firstElement()),
+    );
+  }
+
+  Future<void> testSignPdf({required int n, required int t}) async {
+    await testRepository(
+      fileRepository,
+      KeyType.signPdf,
+      Protocol.gg18,
+      n: n,
+      t: t,
+      createTask: (_, Group g) async {
+        final data = await io.File(testFilePath).readAsBytes();
+        await fileRepository.sign('test.pdf', data, g.id);
+      },
+    );
+  }
+
+  test('2-3 sign PDF', () => testSignPdf(n: 3, t: 2));
+  test('3-3 sign PDF', () => testSignPdf(n: 3, t: 3));
+  test('3-5 sign PDF', () => testSignPdf(n: 5, t: 3));
 
   tearDown(() async {
     try {
