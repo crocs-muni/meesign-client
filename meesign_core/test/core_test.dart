@@ -137,13 +137,13 @@ void main() {
   group('sign PDF', () {
     test('2-3', () => testSignPdf(n: 3, t: 2));
     test('3-3', () => testSignPdf(n: 3, t: 3));
-    test('3-5', () => testSignPdf(n: 5, t: 3));
+    test('15-20', () => testSignPdf(n: 20, t: 15), tags: 'large');
   });
 
   group('decrypt', () {
     test('2-3', () => testDecrypt(n: 3, t: 2));
     test('3-3', () => testDecrypt(n: 3, t: 3));
-    test('3-5', () => testDecrypt(n: 5, t: 3));
+    test('15-20', () => testDecrypt(n: 20, t: 15), tags: 'large');
   });
 
   tearDown(() async {
