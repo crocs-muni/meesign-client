@@ -35,22 +35,6 @@ Future<void> approveAllFirst(
       devices.map((d) => approveFirst(taskRepository, d)),
     );
 
-void sync(
-  GroupRepository groupRepository,
-  FileRepository fileRepository,
-  Iterable<Device> devices,
-) async {
-  await Future.wait(devices.map((d) async {
-    await groupRepository.sync(d.id);
-    await fileRepository.sync(d.id);
-  }));
-
-  Timer(
-    Duration(milliseconds: 100),
-    () => sync(groupRepository, fileRepository, devices),
-  );
-}
-
 const testFilePath = 'test/file.pdf';
 
 final appDir = io.Directory('test/output');
