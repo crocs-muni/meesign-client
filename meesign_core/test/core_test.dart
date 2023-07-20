@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:io' as io;
+import 'dart:math';
 
 import 'package:meesign_core/meesign_core.dart';
 import 'package:test/test.dart';
@@ -46,6 +47,7 @@ void main() {
   late DeviceRepository deviceRepository;
   late GroupRepository groupRepository;
   late FileRepository fileRepository;
+  late DecryptRepository decryptRepository;
 
   List<int>? serverCerts;
   final String? serverCertsPath = io.Platform.environment['SERVER_CERTS'];
@@ -66,6 +68,7 @@ void main() {
         GroupRepository(dispatcher, taskSource, taskDao, deviceRepository);
     final fileStore = FileStore(appDir);
     fileRepository = FileRepository(dispatcher, taskSource, taskDao, fileStore);
+    decryptRepository = DecryptRepository(dispatcher, taskSource, taskDao);
   });
 
   Future<List<T>> testRepository<T>(
@@ -111,9 +114,33 @@ void main() {
     );
   }
 
+  Future<void> testDecrypt({required int n, required int t}) async {
+    final rng = Random();
+    final message = List.generate(1024, (_) => rng.nextInt(256));
+
+    final decrypts = await testRepository(
+      decryptRepository,
+      KeyType.decrypt,
+      Protocol.elgamal,
+      n: n,
+      t: t,
+      createTask: (_, Group g) async {
+        await decryptRepository.encrypt('test secret', message, g.id);
+      },
+    );
+    final results = [for (var d in decrypts) d.data];
+
+    expect(results, allEqual);
+    expect(results.first, equals(message));
+  }
+
   test('2-3 sign PDF', () => testSignPdf(n: 3, t: 2));
   test('3-3 sign PDF', () => testSignPdf(n: 3, t: 3));
   test('3-5 sign PDF', () => testSignPdf(n: 5, t: 3));
+
+  test('2-3 decrypt', () => testDecrypt(n: 3, t: 2));
+  test('3-3 decrypt', () => testDecrypt(n: 3, t: 3));
+  test('3-5 decrypt', () => testDecrypt(n: 5, t: 3));
 
   tearDown(() async {
     try {
