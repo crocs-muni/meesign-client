@@ -40,6 +40,37 @@ class SheetActionButton extends StatelessWidget {
   }
 }
 
+class OptionTile extends StatelessWidget {
+  final String title;
+  final EdgeInsets padding;
+  final List<Widget> children;
+
+  const OptionTile({
+    super.key,
+    required this.title,
+    this.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    this.children = const [],
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: padding,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+              Text(
+                title,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              const SizedBox(height: 8),
+            ] +
+            children,
+      ),
+    );
+  }
+}
+
 class NewGroupPage extends StatefulWidget {
   const NewGroupPage({Key? key}) : super(key: key);
 
@@ -156,126 +187,134 @@ class _NewGroupPageState extends State<NewGroupPage> {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.only(left: 16, right: 16),
         children: [
-          const SizedBox(height: 16),
-          TextField(
-            controller: _nameController,
-            decoration: InputDecoration(
-              labelText: 'Name',
-              border: const OutlineInputBorder(),
-              errorText: _nameErr,
-            ),
-            maxLength: 32,
-            inputFormatters: [
-              FilteringTextInputFormatter.deny(
-                RegExp('[${RegExp.escape(asciiPunctuationChars)}]'),
-              )
+          OptionTile(
+            title: 'Name',
+            children: [
+              TextField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  // labelText: 'Name',
+                  border: const OutlineInputBorder(),
+                  errorText: _nameErr,
+                ),
+                maxLength: 32,
+                inputFormatters: [
+                  FilteringTextInputFormatter.deny(
+                    RegExp('[${RegExp.escape(asciiPunctuationChars)}]'),
+                  )
+                ],
+              ),
             ],
           ),
-          const SizedBox(height: 16),
-          FilledButton.tonalIcon(
-            onPressed: () {
-              showModalBottomSheet(
-                context: context,
-                // TODO: https://github.com/flutter/flutter/issues/118619
-                constraints: const BoxConstraints(maxWidth: 640),
-                builder: (context) {
-                  return SizedBox(
-                    height: 150,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SheetActionButton(
-                          icon: const Icon(Icons.qr_code),
-                          title: const Text('Scan'),
-                          enabled: Platform.isAndroid || Platform.isIOS,
-                          onPressed: () => _selectPeer(Routes.newGroupQr),
+          OptionTile(
+            title: 'Members',
+            children: [
+              FilledButton.tonalIcon(
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    // TODO: https://github.com/flutter/flutter/issues/118619
+                    constraints: const BoxConstraints(maxWidth: 640),
+                    builder: (context) {
+                      return SizedBox(
+                        height: 150,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SheetActionButton(
+                              icon: const Icon(Icons.qr_code),
+                              title: const Text('Scan'),
+                              enabled: Platform.isAndroid || Platform.isIOS,
+                              onPressed: () => _selectPeer(Routes.newGroupQr),
+                            ),
+                            SheetActionButton(
+                              icon: const Icon(Icons.contactless_outlined),
+                              title: const Text('Card'),
+                              enabled: false,
+                              onPressed: () => _selectPeer(Routes.newGroupCard),
+                            ),
+                            SheetActionButton(
+                              icon: const Icon(Icons.search),
+                              title: const Text('Search'),
+                              onPressed: () =>
+                                  _selectPeer(Routes.newGroupSearch),
+                            ),
+                          ],
                         ),
-                        SheetActionButton(
-                          icon: const Icon(Icons.contactless_outlined),
-                          title: const Text('Card'),
-                          enabled: false,
-                          onPressed: () => _selectPeer(Routes.newGroupCard),
-                        ),
-                        SheetActionButton(
-                          icon: const Icon(Icons.search),
-                          title: const Text('Search'),
-                          onPressed: () => _selectPeer(Routes.newGroupSearch),
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   );
                 },
-              );
-            },
-            label: const Text('Add Member'),
-            icon: const Icon(Icons.add),
-            style: _memberErr != null
-                ? FilledButton.styleFrom(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.errorContainer)
-                : null,
+                label: const Text('Add'),
+                icon: const Icon(Icons.add),
+                style: _memberErr != null
+                    ? FilledButton.styleFrom(
+                        backgroundColor:
+                            Theme.of(context).colorScheme.errorContainer)
+                    : null,
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8.0,
+                runSpacing: 4.0,
+                children: _memberChips.toList(),
+              ),
+            ],
           ),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 8.0,
-            runSpacing: 4.0,
-            children: _memberChips.toList(),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Threshold',
-          ),
-          Row(
+          OptionTile(
+            title: 'Threshold',
             children: [
-              const Icon(Icons.person),
-              Expanded(
-                child: Slider(
-                  value: min(_threshold, _members.length).toDouble(),
-                  min: 0,
-                  max: _members.length.toDouble(),
-                  divisions: max(1, _members.length),
-                  label: '$_threshold',
-                  onChanged: _members.length > _minThreshold
-                      ? (value) => setState(() {
-                            _setThreshold(value.round());
-                          })
-                      : null,
-                ),
+              Row(
+                children: [
+                  const Icon(Icons.person),
+                  Expanded(
+                    child: Slider(
+                      value: min(_threshold, _members.length).toDouble(),
+                      min: 0,
+                      max: _members.length.toDouble(),
+                      divisions: max(1, _members.length),
+                      label: '$_threshold',
+                      onChanged: _members.length > _minThreshold
+                          ? (value) => setState(() {
+                                _setThreshold(value.round());
+                              })
+                          : null,
+                    ),
+                  ),
+                  const Icon(Icons.people),
+                ],
               ),
-              const Icon(Icons.people),
             ],
           ),
-          const SizedBox(height: 16),
-          const Padding(
-            padding: EdgeInsets.only(bottom: 8),
-            child: Text('Purpose'),
-          ),
-          SegmentedButton<KeyType>(
-            selected: {_keyType},
-            onSelectionChanged: (value) {
-              setState(() => {
-                    _protocol = value.first.supportedProtocols.first,
-                    _keyType = value.first
-                  });
-            },
-            segments: const [
-              ButtonSegment<KeyType>(
-                value: KeyType.signPdf,
-                label: Text('Sign PDF'),
+          OptionTile(
+            title: 'Purpose',
+            children: [
+              SegmentedButton<KeyType>(
+                selected: {_keyType},
+                onSelectionChanged: (value) {
+                  setState(() => {
+                        _protocol = value.first.supportedProtocols.first,
+                        _keyType = value.first
+                      });
+                },
+                segments: const [
+                  ButtonSegment<KeyType>(
+                    value: KeyType.signPdf,
+                    label: Text('Sign PDF'),
+                  ),
+                  ButtonSegment<KeyType>(
+                    value: KeyType.signChallenge,
+                    label: Text('Challenge'),
+                  ),
+                  ButtonSegment<KeyType>(
+                    value: KeyType.decrypt,
+                    label: Text('Decrypt'),
+                  )
+                ],
               ),
-              ButtonSegment<KeyType>(
-                value: KeyType.signChallenge,
-                label: Text('Challenge'),
-              ),
-              ButtonSegment<KeyType>(
-                value: KeyType.decrypt,
-                label: Text('Decrypt'),
-              )
             ],
           ),
-          const SizedBox(height: 16),
           ExpansionPanelList(
             children: [
               ExpansionPanel(
