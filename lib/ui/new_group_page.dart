@@ -88,7 +88,6 @@ class _NewGroupPageState extends State<NewGroupPage> {
   String? _nameErr, _memberErr;
   KeyType _keyType = KeyType.signPdf;
   Protocol _protocol = KeyType.signPdf.supportedProtocols.first;
-  bool _advancedOptions = false;
 
   @override
   void initState() {
@@ -315,66 +314,31 @@ class _NewGroupPageState extends State<NewGroupPage> {
               ),
             ],
           ),
-          ExpansionPanelList(
+          ExpansionTile(
+            title: const Text('Advanced options'),
+            collapsedTextColor:
+                Theme.of(context).textTheme.bodyLarge?.color?.withOpacity(0.5),
+            expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              ExpansionPanel(
-                  headerBuilder: (context, isOpen) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 16.0, horizontal: 8.0),
-                      child: Text(
-                        'Advanced options',
-                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onBackground
-                                  .withOpacity(0.5),
-                            ),
-                      ),
-                    );
-                  },
-                  body: LayoutBuilder(
-                    builder:
-                        (BuildContext context, BoxConstraints constraints) {
-                      return SizedBox(
-                        width: constraints.maxWidth,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(height: 16),
-                                const Padding(
-                                  padding: EdgeInsets.only(bottom: 8),
-                                  child: Text('Protocol'),
-                                ),
-                                DropdownButton(
-                                  isExpanded: true,
-                                  value: _protocol,
-                                  items: _keyType.supportedProtocols
-                                      .map((Protocol item) {
-                                    return DropdownMenuItem(
-                                      value: item,
-                                      child: Text(item.name.toUpperCase()),
-                                    );
-                                  }).toList(),
-                                  icon: const Icon(Icons.keyboard_arrow_down),
-                                  onChanged: (Protocol? value) {
-                                    setState(() {
-                                      _protocol = value!;
-                                    });
-                                  },
-                                )
-                              ]),
-                        ),
-                      );
+              OptionTile(
+                title: 'Protocol',
+                children: [
+                  SegmentedButton<Protocol>(
+                    selected: {_protocol},
+                    onSelectionChanged: (value) {
+                      setState(() => _protocol = value.first);
                     },
+                    segments: [
+                      for (var protocol in _keyType.supportedProtocols)
+                        ButtonSegment<Protocol>(
+                          value: protocol,
+                          label: Text(protocol.name.toUpperCase()),
+                        ),
+                    ],
                   ),
-                  canTapOnHeader: true,
-                  isExpanded: _advancedOptions)
+                ],
+              )
             ],
-            expansionCallback: (_, isOpen) =>
-                setState(() => _advancedOptions = !isOpen),
           ),
         ],
       ),
