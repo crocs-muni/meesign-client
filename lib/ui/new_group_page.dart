@@ -178,10 +178,12 @@ class _NewGroupPageState extends State<NewGroupPage> {
       appBar: AppBar(
         title: const Text('New Group'),
         actions: [
-          IconButton(
-            onPressed: _tryCreate,
-            icon: const Icon(Icons.send),
-            tooltip: 'Create',
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: FilledButton(
+              onPressed: _tryCreate,
+              child: const Text('Create'),
+            ),
           ),
         ],
       ),
