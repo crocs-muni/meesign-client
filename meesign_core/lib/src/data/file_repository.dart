@@ -44,7 +44,8 @@ class FileRepository extends TaskRepository<File> {
 
     final tid = rpcTask.id as Uint8List;
     // FIXME: create random id for file?
-    await _fileStore.storeFile(did, Uuid.take(tid), req.name, req.data);
+    await _fileStore.storeFile(did, Uuid.take(tid), req.name, req.data,
+        work: true);
 
     await _taskDao.transaction(() async {
       await _taskDao.upsertTask(
@@ -91,8 +92,9 @@ class FileRepository extends TaskRepository<File> {
   Stream<List<Task<File>>> observeTasks(Uuid did) {
     Task<File> toModel(FileTask ft) {
       final group = ft.group.toModel();
-      final path =
-          _fileStore.getFilePath(did, Uuid.take(ft.task.id), ft.file.name);
+      final path = _fileStore.getFilePath(
+          did, Uuid.take(ft.task.id), ft.file.name,
+          work: ft.task.state != TaskState.finished);
       final file = File(path, group);
       return TaskConversion.fromEntity(
           ft.task, group.protocol.signRounds, file);

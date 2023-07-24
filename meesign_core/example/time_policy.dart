@@ -60,12 +60,13 @@ extension Approval<T> on TaskRepository<T> {
 
 class DummyFileStore implements FileStore {
   @override
-  String getFilePath(Uuid did, Uuid id, String name) => name;
+  String getFilePath(Uuid did, Uuid id, String name, {bool work = false}) =>
+      name;
 
   @override
-  Future<String> storeFile(
-          Uuid did, Uuid id, String name, List<int> data) async =>
-      getFilePath(did, id, name);
+  Future<String> storeFile(Uuid did, Uuid id, String name, List<int> data,
+          {bool work = false}) async =>
+      getFilePath(did, id, name, work: work);
 }
 
 void printUsage(ArgParser parser, IOSink sink) {

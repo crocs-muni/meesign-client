@@ -9,18 +9,22 @@ class FileStore {
 
   FileStore(this._dir);
 
-  String getFilePath(Uuid did, Uuid id, String name) {
+  // TODO: when to remove work files? (issues with file locks,
+  // https://github.com/crocs-muni/meesign-client/issues/3)
+
+  String getFilePath(Uuid did, Uuid id, String name, {bool work = false}) {
     return path_pkg.join(
       _dir.path,
       did.encode(),
+      work ? 'workfiles' : 'outputs',
       id.encode(),
       name,
     );
   }
 
-  Future<String> storeFile(
-      Uuid did, Uuid id, String name, List<int> data) async {
-    final path = getFilePath(did, id, name);
+  Future<String> storeFile(Uuid did, Uuid id, String name, List<int> data,
+      {bool work = false}) async {
+    final path = getFilePath(did, id, name, work: work);
     await io.Directory(path_pkg.dirname(path)).create(recursive: true);
     await io.File(path).writeAsBytes(data, flush: true);
     return path;
