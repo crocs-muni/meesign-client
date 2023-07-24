@@ -7,7 +7,7 @@ environment:
   sdk: '>=2.19.0 <3.0.0'
 
 dependencies:
-  ffi: ^1.1.2
+  ffi: ^2.0.2
 
 dev_dependencies:
   ffigen: ^6.0.0
