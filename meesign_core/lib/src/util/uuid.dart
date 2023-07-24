@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
+import 'package:convert/convert.dart';
 import 'package:meta/meta.dart';
 
 // TODO: use uuid package?
@@ -19,4 +21,6 @@ class Uuid {
   // FIXME: is this useable in a hashmap?
   @override
   int get hashCode => (const ListEquality()).hash(bytes);
+
+  String encode({Codec<List<int>, String> codec = hex}) => codec.encode(bytes);
 }

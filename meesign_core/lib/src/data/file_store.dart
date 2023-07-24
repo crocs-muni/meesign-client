@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io' as io;
 
 import 'package:path/path.dart' as path_pkg;
@@ -13,8 +12,8 @@ class FileStore {
   String getFilePath(Uuid did, Uuid id, String name) {
     return path_pkg.join(
       _dir.path,
-      base64Url.encode(did.bytes),
-      base64Url.encode(id.bytes),
+      did.encode(),
+      id.encode(),
       name,
     );
   }

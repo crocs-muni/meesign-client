@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io' as io;
 
 import 'package:meesign_core/meesign_data.dart';
@@ -15,7 +14,7 @@ class KeyStore {
     return io.File(
       path_pkg.join(
         _dir.path,
-        base64Url.encode(did.bytes),
+        did.encode(),
         fileName,
       ),
     );
