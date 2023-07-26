@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io' as io;
 
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/foundation.dart';
 import 'package:meesign_core/meesign_data.dart';
-import 'package:path/path.dart' as path_pkg;
 import 'package:rxdart/rxdart.dart';
 
 extension TaskDetails on Task {
@@ -106,10 +105,8 @@ class HomeState with ChangeNotifier {
           Protocol protocol, KeyType keyType) =>
       _groupRepository.group(name, members, threshold, protocol, keyType);
 
-  Future<void> sign(String path, Group group) async {
-    final data = await io.File(path).readAsBytes();
-    String name = path_pkg.basename(path);
-    await _fileRepository.sign(name, data, group.id);
+  Future<void> sign(XFile file, Group group) async {
+    await _fileRepository.sign(file.name, await file.readAsBytes(), group.id);
   }
 
   Future<void> encrypt(String description, String message, Group group) =>

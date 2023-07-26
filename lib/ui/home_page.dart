@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:animations/animations.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:meesign_core/meesign_data.dart';
 import 'package:open_file/open_file.dart';
@@ -589,13 +590,30 @@ class _HomePageViewState extends State<HomePageView> {
     );
   }
 
-  static Future<FilePickerResult?> _pickPdfFile() async =>
-      FilePicker.platform.pickFiles(
+  static Future<XFile?> _pickPdfFile() async {
+    XFile? file;
+
+    if (Platform.isAndroid) {
+      // TODO: migrate to file_selector completely
+      // once it allows us to retrieve the display name of the file
+      final res = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf'],
         withData: false,
         withReadStream: false,
       );
+      final path = res?.files.firstOrNull?.path;
+      if (path != null) file = XFile(path);
+    } else {
+      file = await openFile(
+        acceptedTypeGroups: const [
+          XTypeGroup(label: 'PDF Documents', extensions: ['pdf']),
+        ],
+      );
+    }
+
+    return file;
+  }
 
   void showErrorDialog({required String title, required String desc}) =>
       showDialog<void>(
@@ -615,14 +633,10 @@ class _HomePageViewState extends State<HomePageView> {
       );
 
   Future<void> _sign() async {
-    final res = await _pickPdfFile();
-    if (res == null || res.files.isEmpty) return;
+    final file = await _pickPdfFile();
+    if (file == null) return;
 
-    final file = res.files.first;
-    final path = file.path;
-    if (path == null) return;
-
-    if (file.size > HomeState.maxFileSize) {
+    if (await file.length() > HomeState.maxFileSize) {
       showErrorDialog(
         title: 'File too large',
         desc: 'Please select a smaller one.',
@@ -634,7 +648,7 @@ class _HomePageViewState extends State<HomePageView> {
     if (group == null) return;
 
     try {
-      await context.read<HomeState>().sign(path, group);
+      await context.read<HomeState>().sign(file, group);
     } catch (e) {
       showErrorDialog(
         title: 'Sign request failed',
