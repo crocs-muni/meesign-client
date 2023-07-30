@@ -86,14 +86,14 @@ class GroupRepository extends TaskRepository<Group> {
   Future<db.Task> initTask(Uuid did, db.Task task) async {
     final group = await _taskDao.getGroup(did.bytes, tid: task.id);
     return task.copyWith(
-      context: Value(ProtocolWrapper.keygen(group.protocol.toNative())),
+      context: Value(await ProtocolWrapper.keygen(group.protocol.toNative())),
     );
   }
 
   @override
   Future<void> finishTask(Uuid did, db.Task task, rpc.Task rpcTask) async {
     final id = Uint8List.fromList(rpcTask.data);
-    final context = ProtocolWrapper.finish(task.context!);
+    final context = await ProtocolWrapper.finish(task.context!);
 
     // TODO: group with task update into a transaction?
     await _taskDao.updateGroup(

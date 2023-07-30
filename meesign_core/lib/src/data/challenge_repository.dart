@@ -65,7 +65,7 @@ class ChallengeRepository extends TaskRepository<Challenge> {
     final challenge = await _taskDao.getChallenge(did.bytes, task.id);
     final group = await _taskDao.getGroup(did.bytes, gid: challenge.gid);
     return task.copyWith(
-      context: Value(ProtocolWrapper.init(
+      context: Value(await ProtocolWrapper.init(
         group.protocol.toNative(),
         group.context,
       )),

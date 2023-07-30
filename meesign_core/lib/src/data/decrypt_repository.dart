@@ -28,7 +28,7 @@ class DecryptRepository extends TaskRepository<Decrypt> {
     List<int> message,
     List<int> gid,
   ) async {
-    final data = ElGamalWrapper.encrypt(message, gid);
+    final data = await ElGamalWrapper.encrypt(message, gid);
     await _dispatcher.unauth.decrypt(
       rpc.DecryptRequest()
         ..groupId = gid
@@ -70,7 +70,7 @@ class DecryptRepository extends TaskRepository<Decrypt> {
     final decrypt = await _taskDao.getDecrypt(did.bytes, task.id);
     final group = await _taskDao.getGroup(did.bytes, gid: decrypt.gid);
     return task.copyWith(
-      context: Value(ProtocolWrapper.init(
+      context: Value(await ProtocolWrapper.init(
         group.protocol.toNative(),
         group.context,
       )),

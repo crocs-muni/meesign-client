@@ -57,7 +57,7 @@ class Error {
 }
 
 class ProtocolWrapper {
-  static Uint8List keygen(int protoId) {
+  static Future<Uint8List> keygen(int protoId) async {
     return using((Arena alloc) {
       final res = alloc.using(
         _lib.protocol_keygen(protoId),
@@ -68,7 +68,7 @@ class ProtocolWrapper {
     });
   }
 
-  static Uint8List init(int protoId, Uint8List group) {
+  static Future<Uint8List> init(int protoId, Uint8List group) async {
     return using((Arena alloc) {
       final groupBuf = group.dupToNative(alloc);
 
@@ -110,7 +110,7 @@ class ProtocolWrapper {
     return Isolate.run(() => _advanceWorker(context, data));
   }
 
-  static Uint8List finish(Uint8List context) {
+  static Future<Uint8List> finish(Uint8List context) async {
     return using((Arena alloc) {
       final ctxBuf = context.dupToNative(alloc);
       final error = alloc.using(Error(), Error.free);
@@ -168,7 +168,8 @@ class AuthWrapper {
 }
 
 class ElGamalWrapper {
-  static List<int> encrypt(List<int> message, List<int> publicKey) {
+  static Future<List<int>> encrypt(
+      List<int> message, List<int> publicKey) async {
     return using((Arena alloc) {
       final messagePtr = message.dupToNative(alloc);
       final publicKeyPtr = publicKey.dupToNative(alloc);
