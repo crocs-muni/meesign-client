@@ -230,12 +230,6 @@ class MeeSignCryptoLib {
           ffi.Pointer<ffi.Pointer<ffi.Char>>)>();
 }
 
-abstract class ProtocolId {
-  static const int Gg18 = 0;
-  static const int Elgamal = 1;
-  static const int Frost = 2;
-}
-
 class Buffer extends ffi.Struct {
   external ffi.Pointer<ffi.Uint8> ptr;
 
