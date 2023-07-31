@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 import 'package:meesign_core/meesign_data.dart';
@@ -38,7 +39,8 @@ class AppContainer {
 
   Future<void> init(String host) async {
     dispatcher = NetworkDispatcher(host, keyStore,
-        serverCerts: await caCerts, allowBadCerts: allowBadCerts);
+        serverCerts: kIsWeb ? null : await caCerts,
+        allowBadCerts: allowBadCerts);
 
     supportServices = SupportServices(dispatcher);
     reporter.init(supportServices);

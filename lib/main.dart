@@ -1,7 +1,7 @@
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:args/args.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
@@ -27,6 +27,7 @@ void printUsage(ArgParser parser, IOSink sink) {
 }
 
 Future<Directory> getAppDir() async {
+  if (kIsWeb) return Directory('');
   if (Platform.isAndroid || Platform.isIOS) {
     return getApplicationSupportDirectory();
   }

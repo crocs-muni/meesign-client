@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:meesign_core/meesign_model.dart';
@@ -226,7 +227,8 @@ class _NewGroupPageState extends State<NewGroupPage> {
                             SheetActionButton(
                               icon: const Icon(Icons.qr_code),
                               title: const Text('Scan'),
-                              enabled: Platform.isAndroid || Platform.isIOS,
+                              enabled: !kIsWeb &&
+                                  (Platform.isAndroid || Platform.isIOS),
                               onPressed: () => _selectPeer(Routes.newGroupQr),
                             ),
                             SheetActionButton(

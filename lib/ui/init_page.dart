@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -176,18 +177,21 @@ class _RegistrationFormState extends State<RegistrationForm> {
     late final Device device;
 
     try {
+      final serverCerts = kIsWeb ? null : await di.caCerts;
       final dispatcher = NetworkDispatcher(host, di.keyStore,
-          serverCerts: await di.caCerts, allowBadCerts: di.allowBadCerts);
+          serverCerts: serverCerts, allowBadCerts: di.allowBadCerts);
       final deviceRepository =
           DeviceRepository(dispatcher, di.keyStore, di.database.deviceDao);
       device = await deviceRepository.register(
         _nameController.text,
+        auth: !kIsWeb,
       );
     } catch (e) {
       setState(() {
         _working = false;
         _errorField = _hostController;
       });
+      rethrow;
     }
 
     widget.onRegistered(User(device.id, host));

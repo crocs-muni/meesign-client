@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'nfc_card.dart';
-import 'pcsc_card.dart';
+// import 'pcsc_card.dart';
 
 class CommandApdu {
   final _builder = BytesBuilder();
@@ -67,7 +67,7 @@ abstract class CardManager {
       return NfcCardManager();
     }
     if (Platform.isLinux || Platform.isWindows) {
-      return PcscCardManager();
+      // return PcscCardManager();
     }
     throw UnsupportedError('Platform not supported');
   }

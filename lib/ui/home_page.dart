@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:animations/animations.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:file_selector/file_selector.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:meesign_core/meesign_data.dart';
 import 'package:open_file/open_file.dart';
@@ -123,7 +124,7 @@ Widget buildTaskListView<T, U>(
 }
 
 void _openFile(Uri uri) {
-  if (Platform.isLinux) {
+  if (kIsWeb || Platform.isLinux) {
     launchUrl(uri);
   } else {
     // FIXME: try to avoid open_file package,
@@ -599,7 +600,7 @@ class _HomePageViewState extends State<HomePageView> {
   static Future<XFile?> _pickPdfFile() async {
     XFile? file;
 
-    if (Platform.isAndroid) {
+    if (!kIsWeb && Platform.isAndroid) {
       // TODO: migrate to file_selector completely
       // once it allows us to retrieve the display name of the file
       final res = await FilePicker.platform.pickFiles(
