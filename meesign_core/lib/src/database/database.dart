@@ -1,9 +1,8 @@
 import 'dart:io' as io;
 
 import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
-import 'package:path/path.dart' as path_pkg;
 
+import 'constructor.dart' if (dart.library.html) 'constructor_web.dart';
 import 'daos.dart';
 import 'tables.dart';
 // FIXME: bug in modular generation? necessary for TaskState
@@ -31,12 +30,8 @@ part 'database.g.dart';
 class Database extends _$Database {
   static const fileName = 'db.sqlite';
 
-  Database(io.Directory dir) : super(_open(dir));
-
-  static LazyDatabase _open(io.Directory dir) => LazyDatabase(() async {
-        final file = io.File(path_pkg.join(dir.path, fileName));
-        return NativeDatabase.createInBackground(file);
-      });
+  // TODO: Directory -> String?
+  Database(io.Directory dir) : super(constructDatabase(dir.path, fileName));
 
   @override
   int get schemaVersion => 1;
