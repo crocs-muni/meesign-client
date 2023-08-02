@@ -29,6 +29,7 @@ class TaskSource {
           Uuid did, Uint8List tid, List<int> data, int attempt) =>
       _dispatcher[did].updateTask(
         rpc.TaskUpdate()
+          ..deviceId = did.bytes
           ..task = tid
           ..data = data
           ..attempt = attempt,
@@ -37,13 +38,16 @@ class TaskSource {
   Future<void> approve(Uuid did, Uuid tid, {required bool agree}) =>
       _dispatcher[did].decideTask(
         rpc.TaskDecision()
+          ..deviceId = did.bytes
           ..task = tid.bytes
           ..accept = agree,
       );
 
   Future<void> acknowledge(Uuid did, Uint8List tid) =>
       _dispatcher[did].acknowledgeTask(
-        rpc.TaskAcknowledgement()..taskId = tid,
+        rpc.TaskAcknowledgement()
+          ..deviceId = did.bytes
+          ..taskId = tid,
       );
 
   /// retrieve the task including all its details
@@ -64,7 +68,7 @@ class TaskSource {
     return _streams.putIfAbsent(did, () {
       return _dispatcher[did]
           .subscribeUpdates(
-        rpc.SubscribeRequest(),
+        rpc.SubscribeRequest()..deviceId = did.bytes,
       )
           .asBcastRespStream(
         onCancel: (subscription) {

@@ -1051,6 +1051,8 @@ class TaskUpdate extends $pb.GeneratedMessage {
     ..a<$core.List<$core.int>>(
         2, _omitFieldNames ? '' : 'data', $pb.PbFieldType.OY)
     ..a<$core.int>(3, _omitFieldNames ? '' : 'attempt', $pb.PbFieldType.OU3)
+    ..a<$core.List<$core.int>>(
+        4, _omitFieldNames ? '' : 'deviceId', $pb.PbFieldType.OY)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('Using this can add significant overhead to your binary. '
@@ -1109,6 +1111,18 @@ class TaskUpdate extends $pb.GeneratedMessage {
   $core.bool hasAttempt() => $_has(2);
   @$pb.TagNumber(3)
   void clearAttempt() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.List<$core.int> get deviceId => $_getN(3);
+  @$pb.TagNumber(4)
+  set deviceId($core.List<$core.int> v) {
+    $_setBytes(3, v);
+  }
+
+  @$pb.TagNumber(4)
+  $core.bool hasDeviceId() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearDeviceId() => clearField(4);
 }
 
 class TasksRequest extends $pb.GeneratedMessage {
@@ -1373,6 +1387,8 @@ class TaskDecision extends $pb.GeneratedMessage {
     ..a<$core.List<$core.int>>(
         1, _omitFieldNames ? '' : 'task', $pb.PbFieldType.OY)
     ..aOB(2, _omitFieldNames ? '' : 'accept')
+    ..a<$core.List<$core.int>>(
+        3, _omitFieldNames ? '' : 'deviceId', $pb.PbFieldType.OY)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('Using this can add significant overhead to your binary. '
@@ -1421,6 +1437,18 @@ class TaskDecision extends $pb.GeneratedMessage {
   $core.bool hasAccept() => $_has(1);
   @$pb.TagNumber(2)
   void clearAccept() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.List<$core.int> get deviceId => $_getN(2);
+  @$pb.TagNumber(3)
+  set deviceId($core.List<$core.int> v) {
+    $_setBytes(2, v);
+  }
+
+  @$pb.TagNumber(3)
+  $core.bool hasDeviceId() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearDeviceId() => clearField(3);
 }
 
 class TaskAcknowledgement extends $pb.GeneratedMessage {
@@ -1439,6 +1467,8 @@ class TaskAcknowledgement extends $pb.GeneratedMessage {
       createEmptyInstance: create)
     ..a<$core.List<$core.int>>(
         1, _omitFieldNames ? '' : 'taskId', $pb.PbFieldType.OY)
+    ..a<$core.List<$core.int>>(
+        2, _omitFieldNames ? '' : 'deviceId', $pb.PbFieldType.OY)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('Using this can add significant overhead to your binary. '
@@ -1475,6 +1505,18 @@ class TaskAcknowledgement extends $pb.GeneratedMessage {
   $core.bool hasTaskId() => $_has(0);
   @$pb.TagNumber(1)
   void clearTaskId() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.int> get deviceId => $_getN(1);
+  @$pb.TagNumber(2)
+  set deviceId($core.List<$core.int> v) {
+    $_setBytes(1, v);
+  }
+
+  @$pb.TagNumber(2)
+  $core.bool hasDeviceId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearDeviceId() => clearField(2);
 }
 
 class LogRequest extends $pb.GeneratedMessage {
@@ -1542,6 +1584,8 @@ class SubscribeRequest extends $pb.GeneratedMessage {
       _omitMessageNames ? '' : 'SubscribeRequest',
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meesign'),
       createEmptyInstance: create)
+    ..a<$core.List<$core.int>>(
+        1, _omitFieldNames ? '' : 'deviceId', $pb.PbFieldType.OY)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('Using this can add significant overhead to your binary. '
@@ -1566,6 +1610,18 @@ class SubscribeRequest extends $pb.GeneratedMessage {
   static SubscribeRequest getDefault() => _defaultInstance ??=
       $pb.GeneratedMessage.$_defaultFor<SubscribeRequest>(create);
   static SubscribeRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.List<$core.int> get deviceId => $_getN(0);
+  @$pb.TagNumber(1)
+  set deviceId($core.List<$core.int> v) {
+    $_setBytes(0, v);
+  }
+
+  @$pb.TagNumber(1)
+  $core.bool hasDeviceId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearDeviceId() => clearField(1);
 }
 
 const _omitFieldNames = $core.bool.fromEnvironment('protobuf.omit_field_names');

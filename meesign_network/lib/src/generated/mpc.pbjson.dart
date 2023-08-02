@@ -83,28 +83,42 @@ const RegistrationRequest$json = {
   '1': 'RegistrationRequest',
   '2': [
     {'1': 'name', '3': 1, '4': 1, '5': 9, '10': 'name'},
-    {'1': 'csr', '3': 2, '4': 1, '5': 12, '10': 'csr'},
+    {'1': 'csr', '3': 2, '4': 1, '5': 12, '9': 0, '10': 'csr', '17': true},
+  ],
+  '8': [
+    {'1': '_csr'},
   ],
 };
 
 /// Descriptor for `RegistrationRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List registrationRequestDescriptor = $convert.base64Decode(
-    'ChNSZWdpc3RyYXRpb25SZXF1ZXN0EhIKBG5hbWUYASABKAlSBG5hbWUSEAoDY3NyGAIgASgMUg'
-    'Njc3I=');
+    'ChNSZWdpc3RyYXRpb25SZXF1ZXN0EhIKBG5hbWUYASABKAlSBG5hbWUSFQoDY3NyGAIgASgMSA'
+    'BSA2NzcogBAUIGCgRfY3Ny');
 
 @$core.Deprecated('Use registrationResponseDescriptor instead')
 const RegistrationResponse$json = {
   '1': 'RegistrationResponse',
   '2': [
     {'1': 'device_id', '3': 1, '4': 1, '5': 12, '10': 'deviceId'},
-    {'1': 'certificate', '3': 2, '4': 1, '5': 12, '10': 'certificate'},
+    {
+      '1': 'certificate',
+      '3': 2,
+      '4': 1,
+      '5': 12,
+      '9': 0,
+      '10': 'certificate',
+      '17': true
+    },
+  ],
+  '8': [
+    {'1': '_certificate'},
   ],
 };
 
 /// Descriptor for `RegistrationResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List registrationResponseDescriptor = $convert.base64Decode(
-    'ChRSZWdpc3RyYXRpb25SZXNwb25zZRIbCglkZXZpY2VfaWQYASABKAxSCGRldmljZUlkEiAKC2'
-    'NlcnRpZmljYXRlGAIgASgMUgtjZXJ0aWZpY2F0ZQ==');
+    'ChRSZWdpc3RyYXRpb25SZXNwb25zZRIbCglkZXZpY2VfaWQYASABKAxSCGRldmljZUlkEiUKC2'
+    'NlcnRpZmljYXRlGAIgASgMSABSC2NlcnRpZmljYXRliAEBQg4KDF9jZXJ0aWZpY2F0ZQ==');
 
 @$core.Deprecated('Use groupRequestDescriptor instead')
 const GroupRequest$json = {
@@ -207,16 +221,27 @@ const Device$json = {
   '2': [
     {'1': 'identifier', '3': 1, '4': 1, '5': 12, '10': 'identifier'},
     {'1': 'name', '3': 2, '4': 1, '5': 9, '10': 'name'},
-    {'1': 'certificate', '3': 3, '4': 1, '5': 12, '10': 'certificate'},
+    {
+      '1': 'certificate',
+      '3': 3,
+      '4': 1,
+      '5': 12,
+      '9': 0,
+      '10': 'certificate',
+      '17': true
+    },
     {'1': 'last_active', '3': 4, '4': 1, '5': 4, '10': 'lastActive'},
+  ],
+  '8': [
+    {'1': '_certificate'},
   ],
 };
 
 /// Descriptor for `Device`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List deviceDescriptor = $convert.base64Decode(
     'CgZEZXZpY2USHgoKaWRlbnRpZmllchgBIAEoDFIKaWRlbnRpZmllchISCgRuYW1lGAIgASgJUg'
-    'RuYW1lEiAKC2NlcnRpZmljYXRlGAMgASgMUgtjZXJ0aWZpY2F0ZRIfCgtsYXN0X2FjdGl2ZRgE'
-    'IAEoBFIKbGFzdEFjdGl2ZQ==');
+    'RuYW1lEiUKC2NlcnRpZmljYXRlGAMgASgMSABSC2NlcnRpZmljYXRliAEBEh8KC2xhc3RfYWN0'
+    'aXZlGAQgASgEUgpsYXN0QWN0aXZlQg4KDF9jZXJ0aWZpY2F0ZQ==');
 
 @$core.Deprecated('Use signRequestDescriptor instead')
 const SignRequest$json = {
@@ -341,6 +366,7 @@ final $typed_data.Uint8List taskDescriptor = $convert.base64Decode(
 const TaskUpdate$json = {
   '1': 'TaskUpdate',
   '2': [
+    {'1': 'device_id', '3': 4, '4': 1, '5': 12, '10': 'deviceId'},
     {'1': 'task', '3': 1, '4': 1, '5': 12, '10': 'task'},
     {'1': 'data', '3': 2, '4': 1, '5': 12, '10': 'data'},
     {'1': 'attempt', '3': 3, '4': 1, '5': 13, '10': 'attempt'},
@@ -349,8 +375,8 @@ const TaskUpdate$json = {
 
 /// Descriptor for `TaskUpdate`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List taskUpdateDescriptor = $convert.base64Decode(
-    'CgpUYXNrVXBkYXRlEhIKBHRhc2sYASABKAxSBHRhc2sSEgoEZGF0YRgCIAEoDFIEZGF0YRIYCg'
-    'dhdHRlbXB0GAMgASgNUgdhdHRlbXB0');
+    'CgpUYXNrVXBkYXRlEhsKCWRldmljZV9pZBgEIAEoDFIIZGV2aWNlSWQSEgoEdGFzaxgBIAEoDF'
+    'IEdGFzaxISCgRkYXRhGAIgASgMUgRkYXRhEhgKB2F0dGVtcHQYAyABKA1SB2F0dGVtcHQ=');
 
 @$core.Deprecated('Use tasksRequestDescriptor instead')
 const TasksRequest$json = {
@@ -454,6 +480,7 @@ final $typed_data.Uint8List respDescriptor =
 const TaskDecision$json = {
   '1': 'TaskDecision',
   '2': [
+    {'1': 'device_id', '3': 3, '4': 1, '5': 12, '10': 'deviceId'},
     {'1': 'task', '3': 1, '4': 1, '5': 12, '10': 'task'},
     {'1': 'accept', '3': 2, '4': 1, '5': 8, '10': 'accept'},
   ],
@@ -461,21 +488,22 @@ const TaskDecision$json = {
 
 /// Descriptor for `TaskDecision`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List taskDecisionDescriptor = $convert.base64Decode(
-    'CgxUYXNrRGVjaXNpb24SEgoEdGFzaxgBIAEoDFIEdGFzaxIWCgZhY2NlcHQYAiABKAhSBmFjY2'
-    'VwdA==');
+    'CgxUYXNrRGVjaXNpb24SGwoJZGV2aWNlX2lkGAMgASgMUghkZXZpY2VJZBISCgR0YXNrGAEgAS'
+    'gMUgR0YXNrEhYKBmFjY2VwdBgCIAEoCFIGYWNjZXB0');
 
 @$core.Deprecated('Use taskAcknowledgementDescriptor instead')
 const TaskAcknowledgement$json = {
   '1': 'TaskAcknowledgement',
   '2': [
     {'1': 'task_id', '3': 1, '4': 1, '5': 12, '10': 'taskId'},
+    {'1': 'device_id', '3': 2, '4': 1, '5': 12, '10': 'deviceId'},
   ],
 };
 
 /// Descriptor for `TaskAcknowledgement`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List taskAcknowledgementDescriptor =
-    $convert.base64Decode(
-        'ChNUYXNrQWNrbm93bGVkZ2VtZW50EhcKB3Rhc2tfaWQYASABKAxSBnRhc2tJZA==');
+final $typed_data.Uint8List taskAcknowledgementDescriptor = $convert.base64Decode(
+    'ChNUYXNrQWNrbm93bGVkZ2VtZW50EhcKB3Rhc2tfaWQYASABKAxSBnRhc2tJZBIbCglkZXZpY2'
+    'VfaWQYAiABKAxSCGRldmljZUlk');
 
 @$core.Deprecated('Use logRequestDescriptor instead')
 const LogRequest$json = {
@@ -492,8 +520,11 @@ final $typed_data.Uint8List logRequestDescriptor = $convert
 @$core.Deprecated('Use subscribeRequestDescriptor instead')
 const SubscribeRequest$json = {
   '1': 'SubscribeRequest',
+  '2': [
+    {'1': 'device_id', '3': 1, '4': 1, '5': 12, '10': 'deviceId'},
+  ],
 };
 
 /// Descriptor for `SubscribeRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List subscribeRequestDescriptor =
-    $convert.base64Decode('ChBTdWJzY3JpYmVSZXF1ZXN0');
+final $typed_data.Uint8List subscribeRequestDescriptor = $convert.base64Decode(
+    'ChBTdWJzY3JpYmVSZXF1ZXN0EhsKCWRldmljZV9pZBgBIAEoDFIIZGV2aWNlSWQ=');
