@@ -9,11 +9,11 @@ import '../model/file.dart';
 import '../model/protocol.dart';
 import '../model/task.dart';
 import '../util/uuid.dart';
-import 'file_store.dart';
+import 'file_store.dart' if (dart.library.html) 'file_store_web.dart';
 import 'network_dispatcher.dart';
 import 'task_repository.dart';
 
-export 'file_store.dart';
+export 'file_store.dart' if (dart.library.html) 'file_store_web.dart';
 
 class FileRepository extends TaskRepository<File> {
   static const maxFileSize = 8 * 1024 * 1024;
