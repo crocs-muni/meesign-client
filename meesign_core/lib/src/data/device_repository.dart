@@ -15,19 +15,28 @@ class DeviceRepository {
 
   DeviceRepository(this._dispatcher, this._keyStore, this._deviceDao);
 
-  Future<Device> register(String name) async {
-    final key = AuthWrapper.keygen(name);
+  Future<Device> register(String name, {bool auth = true}) async {
+    late Uuid did;
 
-    final resp = await _dispatcher.unauth.register(
-      rpc.RegistrationRequest()
-        ..name = name
-        ..csr = key.csr,
-    );
+    if (auth) {
+      final key = AuthWrapper.keygen(name);
 
-    final did = Uuid(resp.deviceId);
-    final pkcs12 = AuthWrapper.certKeyToPkcs12(key.key, resp.certificate);
-    // TODO: store key in db for consistency?
-    await _keyStore.store(did, pkcs12);
+      final resp = await _dispatcher.unauth.register(
+        rpc.RegistrationRequest()
+          ..name = name
+          ..csr = key.csr,
+      );
+
+      did = Uuid(resp.deviceId);
+      final pkcs12 = AuthWrapper.certKeyToPkcs12(key.key, resp.certificate);
+      // TODO: store key in db for consistency?
+      await _keyStore.store(did, pkcs12);
+    } else {
+      final resp = await _dispatcher.unauth
+          .register(rpc.RegistrationRequest()..name = name);
+      did = Uuid(resp.deviceId);
+    }
+
     await _deviceDao.insertDevice(
       db.DevicesCompanion.insert(id: did.bytes, name: name),
     );
