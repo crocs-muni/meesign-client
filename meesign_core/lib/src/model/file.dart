@@ -5,9 +5,9 @@ import 'group.dart';
 
 @immutable
 class File {
+  final String id;
   final String name;
-  final String path;
   final Group group;
 
-  const File(this.name, this.path, this.group);
+  const File(this.id, this.name, this.group);
 }

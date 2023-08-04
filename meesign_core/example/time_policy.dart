@@ -60,13 +60,15 @@ extension Approval<T> on TaskRepository<T> {
 
 class DummyFileStore implements FileStore {
   @override
-  String getFilePath(Uuid did, Uuid id, String name, {bool work = false}) =>
-      name;
+  String getFileId(Uuid did, Uuid id, String name, {bool work = false}) => name;
 
   @override
   Future<String> storeFile(Uuid did, Uuid id, String name, List<int> data,
           {bool work = false}) async =>
-      getFilePath(did, id, name, work: work);
+      getFileId(did, id, name, work: work);
+
+  @override
+  Future<Uri> accessFile(String id) async => Uri();
 }
 
 void printUsage(ArgParser parser, IOSink sink) {
@@ -148,7 +150,7 @@ void main(List<String> args) async {
   groupRepository.approveAll(device.id, agree: (_) => true);
   fileRepository.approveAll(device.id, agree: (task) {
     bool ok = Time.now().within(from, to);
-    print('Checking time for "${task.info.path}": ${ok ? 'OK' : 'NOK'}');
+    print('Checking time for "${task.info.name}": ${ok ? 'OK' : 'NOK'}');
     return ok;
   });
   challengeRepository.approveAll(device.id, agree: (task) {

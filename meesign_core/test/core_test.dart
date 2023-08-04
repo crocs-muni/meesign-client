@@ -122,7 +122,8 @@ void main() {
     );
 
     for (var file in files) {
-      await verifyPdfSignature(file.path);
+      final path = (await fileRepository.accessFile(file.id)).toFilePath();
+      await verifyPdfSignature(path);
     }
   }
 

@@ -122,13 +122,13 @@ Widget buildTaskListView<T, U>(
   );
 }
 
-void _openFile(String path) {
+void _openFile(Uri uri) {
   if (Platform.isLinux) {
-    launchUrl(Uri.file(path));
+    launchUrl(uri);
   } else {
     // FIXME: try to avoid open_file package,
     // it seems to be of low quality
-    OpenFile.open(path);
+    OpenFile.open(uri.toFilePath());
   }
 }
 
@@ -226,7 +226,11 @@ class SigningSubPage extends StatelessWidget {
             actions: <Widget>[
                   FilledButton.tonal(
                     child: const Text('View'),
-                    onPressed: () => _openFile(task.info.path),
+                    onPressed: () async {
+                      _openFile(await context
+                          .read<HomeState>()
+                          .accessFile(task.info));
+                    },
                   ),
                 ] +
                 (task.approvable ? approveActions : []),
@@ -242,7 +246,9 @@ class SigningSubPage extends StatelessWidget {
               actions: <Widget>[
                 OutlinedButton(
                   child: const Text('View'),
-                  onPressed: () => _openFile(file.path),
+                  onPressed: () async {
+                    _openFile(await context.read<HomeState>().accessFile(file));
+                  },
                 ),
               ],
             ),

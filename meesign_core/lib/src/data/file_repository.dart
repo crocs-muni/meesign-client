@@ -92,10 +92,9 @@ class FileRepository extends TaskRepository<File> {
   Stream<List<Task<File>>> observeTasks(Uuid did) {
     Task<File> toModel(FileTask ft) {
       final group = ft.group.toModel();
-      final path = _fileStore.getFilePath(
-          did, Uuid.take(ft.task.id), ft.file.name,
+      final id = _fileStore.getFileId(did, Uuid.take(ft.task.id), ft.file.name,
           work: ft.task.state != TaskState.finished);
-      final file = File(ft.file.name, path, group);
+      final file = File(id, ft.file.name, group);
       return TaskConversion.fromEntity(
           ft.task, group.protocol.signRounds, file);
     }
@@ -106,4 +105,6 @@ class FileRepository extends TaskRepository<File> {
   }
 
   Stream<List<File>> observeFiles(Uuid did) => observeResults(did);
+
+  Future<Uri> accessFile(String id) => _fileStore.accessFile(id);
 }

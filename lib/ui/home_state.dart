@@ -120,4 +120,6 @@ class HomeState with ChangeNotifier {
       _challengeRepository.approveTask(device!.id, task.id, agree: agree);
   Future<void> joinDecrypt(Task<Decrypt> task, {required bool agree}) =>
       _decryptRepository.approveTask(device!.id, task.id, agree: agree);
+
+  Future<Uri> accessFile(File file) => _fileRepository.accessFile(file.id);
 }
