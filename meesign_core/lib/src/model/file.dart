@@ -5,10 +5,9 @@ import 'group.dart';
 
 @immutable
 class File {
+  final String name;
   final String path;
   final Group group;
 
-  const File(this.path, this.group);
-
-  String get basename => path_pkg.basename(path);
+  const File(this.name, this.path, this.group);
 }

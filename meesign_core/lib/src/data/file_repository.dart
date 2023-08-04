@@ -95,7 +95,7 @@ class FileRepository extends TaskRepository<File> {
       final path = _fileStore.getFilePath(
           did, Uuid.take(ft.task.id), ft.file.name,
           work: ft.task.state != TaskState.finished);
-      final file = File(path, group);
+      final file = File(ft.file.name, path, group);
       return TaskConversion.fromEntity(
           ft.task, group.protocol.signRounds, file);
     }

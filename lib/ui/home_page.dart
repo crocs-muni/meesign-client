@@ -218,7 +218,7 @@ class SigningSubPage extends StatelessWidget {
           ];
 
           return SignTile(
-            name: task.info.basename,
+            name: task.info.name,
             group: task.info.group.name,
             desc: statusMessage(task),
             trailing: TaskStateIndicator(task.state, task.round / task.nRounds),
@@ -236,7 +236,7 @@ class SigningSubPage extends StatelessWidget {
           return Deletable(
             dismissibleKey: ObjectKey(file),
             child: SignTile(
-              name: file.basename,
+              name: file.name,
               group: file.group.name,
               trailing: const TaskStateIndicator(TaskState.finished, 1),
               actions: <Widget>[
@@ -246,7 +246,7 @@ class SigningSubPage extends StatelessWidget {
                 ),
               ],
             ),
-            confirmTitle: 'Do you really want to delete ${file.basename}?',
+            confirmTitle: 'Do you really want to delete ${file.name}?',
             onDeleted: (_) {
               // FIXME: remove the actual file
               model.files.remove(file);
