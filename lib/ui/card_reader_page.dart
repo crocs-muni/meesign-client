@@ -135,12 +135,3 @@ class _CardReaderPageState extends State<CardReaderPage> {
     );
   }
 }
-
-class AddCardPage extends StatelessWidget {
-  const AddCardPage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const CardReaderPage();
-  }
-}

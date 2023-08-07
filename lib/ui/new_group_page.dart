@@ -230,12 +230,6 @@ class _NewGroupPageState extends State<NewGroupPage> {
                               onPressed: () => _selectPeer(Routes.newGroupQr),
                             ),
                             SheetActionButton(
-                              icon: const Icon(Icons.contactless_outlined),
-                              title: const Text('Card'),
-                              enabled: false,
-                              onPressed: () => _selectPeer(Routes.newGroupCard),
-                            ),
-                            SheetActionButton(
                               icon: const Icon(Icons.search),
                               title: const Text('Search'),
                               onPressed: () =>
