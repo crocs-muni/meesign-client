@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart' hide Card;
 
 import '../card/card.dart';
-import '../card/jobs.dart';
 
-class CardReaderPage<T> extends StatefulWidget {
-  final CardJob<T> job;
-
-  const CardReaderPage({Key? key, required this.job}) : super(key: key);
+class CardReaderPage extends StatefulWidget {
+  const CardReaderPage({Key? key}) : super(key: key);
 
   @override
   State<CardReaderPage> createState() => _CardReaderPageState();
@@ -29,7 +26,7 @@ class ReaderErrStatus extends ReaderStatus {
   static const initError = ReaderErrStatus._('Cannot connect to card manager');
 }
 
-class _CardReaderPageState<T> extends State<CardReaderPage<T>> {
+class _CardReaderPageState extends State<CardReaderPage> {
   final _manager = CardManager();
   ReaderStatus _status = ReaderOkStatus.waiting;
 
@@ -77,8 +74,7 @@ class _CardReaderPageState<T> extends State<CardReaderPage<T>> {
       setStatus(ReaderOkStatus.working);
 
       try {
-        final result = await widget.job.work(card);
-        Navigator.pop(context, result);
+        Navigator.pop(context);
       } finally {
         await card.disconnect();
         setStatus(ReaderOkStatus.waiting);
@@ -145,6 +141,6 @@ class AddCardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const CardReaderPage(job: AddCardJob());
+    return const CardReaderPage();
   }
 }

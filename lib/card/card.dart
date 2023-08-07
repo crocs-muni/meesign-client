@@ -44,10 +44,6 @@ abstract class Card {
   Future<void> disconnect();
 }
 
-abstract class CardJob<T> {
-  Future<T> work(Card card);
-}
-
 abstract class CardManager {
   Future<void> connect();
   Future<void> disconnect();
