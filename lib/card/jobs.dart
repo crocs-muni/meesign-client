@@ -16,6 +16,6 @@ class AddCardJob implements CardJob<Device> {
     await Future.delayed(const Duration(seconds: 1));
 
     // TODO: this should be done in mpc_model.dart
-    return Device.random('card', DeviceType.card);
+    return Device.random('card');
   }
 }
