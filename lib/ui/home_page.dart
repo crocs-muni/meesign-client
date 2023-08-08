@@ -375,8 +375,8 @@ class GroupsSubPage extends StatelessWidget {
   }
 }
 
-class LogInSubPage extends StatelessWidget {
-  const LogInSubPage({Key? key}) : super(key: key);
+class ChallengeSubPage extends StatelessWidget {
+  const ChallengeSubPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -652,7 +652,7 @@ class _HomePageViewState extends State<HomePageView> {
   Widget build(BuildContext context) {
     const pages = [
       SigningSubPage(),
-      LogInSubPage(),
+      ChallengeSubPage(),
       DecryptSubPage(),
       GroupsSubPage(),
     ];
