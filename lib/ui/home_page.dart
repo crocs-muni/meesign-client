@@ -83,8 +83,7 @@ Widget buildTaskListView<T>(
   List<Task<T>> tasks, {
   required String finishedTitle,
   required Widget emptyView,
-  required Widget Function(BuildContext, Task<T>) unfinishedBuilder,
-  required Widget Function(BuildContext, Task<T>) finishedBuilder,
+  required Widget Function(BuildContext, Task<T>, bool) taskBuilder,
 }) {
   final groups = tasks.groupListsBy((task) => task.state == TaskState.finished);
   final unfinished = groups[false] ?? [];
@@ -118,9 +117,9 @@ Widget buildTaskListView<T>(
         );
       }
       if (i <= unfinished.length) {
-        return unfinishedBuilder(context, unfinished[i - 1]);
+        return taskBuilder(context, unfinished[i - 1], false);
       } else {
-        return finishedBuilder(context, finished[i - unfinished.length - 2]);
+        return taskBuilder(context, finished[i - unfinished.length - 2], true);
       }
     },
   );
@@ -208,7 +207,7 @@ class SigningSubPage extends StatelessWidget {
         model.signTasks,
         finishedTitle: 'Signed files',
         emptyView: const EmptyList(hint: 'Add new group first.'),
-        unfinishedBuilder: (context, task) {
+        taskBuilder: (context, task, finished) {
           final approveActions = <Widget>[
             FilledButton.tonal(
               child: const Text('Sign'),
@@ -225,7 +224,7 @@ class SigningSubPage extends StatelessWidget {
             group: task.info.group.name,
             desc: statusMessage(task),
             trailing: TaskStateIndicator(task),
-            initiallyExpanded: true,
+            initiallyExpanded: !finished,
             actions: <Widget>[
                   FilledButton.tonal(
                     child: const Text('View'),
@@ -233,20 +232,6 @@ class SigningSubPage extends StatelessWidget {
                   ),
                 ] +
                 (task.approvable ? approveActions : []),
-          );
-        },
-        finishedBuilder: (context, task) {
-          final file = task.info;
-          return SignTile(
-            name: file.basename,
-            group: file.group.name,
-            trailing: TaskStateIndicator(task),
-            actions: <Widget>[
-              OutlinedButton(
-                child: const Text('View'),
-                onPressed: () => _openFile(file.path),
-              ),
-            ],
           );
         },
       );
@@ -356,9 +341,8 @@ class GroupsSubPage extends StatelessWidget {
         emptyView: const EmptyList(
           hint: 'Try creating a new group.',
         ),
-        unfinishedBuilder: (context, task) {
+        taskBuilder: (context, task, finished) {
           final group = task.info;
-
           return GroupTile(
             name: group.name,
             desc: statusMessage(task),
@@ -366,7 +350,7 @@ class GroupsSubPage extends StatelessWidget {
             threshold: group.threshold,
             keyType: group.keyType,
             trailing: TaskStateIndicator(task),
-            initiallyExpanded: true,
+            initiallyExpanded: !finished,
             showActions: task.approvable,
             actions: [
               FilledButton.tonal(
@@ -386,16 +370,6 @@ class GroupsSubPage extends StatelessWidget {
             ],
           );
         },
-        finishedBuilder: (context, task) {
-          final group = task.info;
-          return GroupTile(
-            name: group.name,
-            members: group.members.map((m) => m.name).toList(),
-            threshold: group.threshold,
-            keyType: group.keyType,
-            trailing: TaskStateIndicator(task),
-          );
-        },
       );
     });
   }
@@ -413,13 +387,13 @@ class LogInSubPage extends StatelessWidget {
         emptyView: const EmptyList(
           hint: 'Challenge signing requests.',
         ),
-        unfinishedBuilder: (context, task) {
+        taskBuilder: (context, task, finished) {
           return SignTile(
             name: task.info.name,
             group: task.info.group.name,
             desc: statusMessage(task),
             trailing: TaskStateIndicator(task),
-            initiallyExpanded: true,
+            initiallyExpanded: !finished,
             showActions: task.approvable,
             actions: [
               FilledButton.tonal(
@@ -431,13 +405,6 @@ class LogInSubPage extends StatelessWidget {
                 onPressed: () => model.joinChallenge(task, agree: false),
               )
             ],
-          );
-        },
-        finishedBuilder: (context, task) {
-          return SignTile(
-            name: task.info.name,
-            group: task.info.group.name,
-            trailing: TaskStateIndicator(task),
           );
         },
       );
@@ -457,11 +424,14 @@ class DecryptSubPage extends StatelessWidget {
         emptyView: const EmptyList(
           hint: 'Requests for decryptions.',
         ),
-        unfinishedBuilder: (context, task) {
+        taskBuilder: (context, task, finished) {
+          final desc = finished
+              ? utf8.decode(task.info.data, allowMalformed: true)
+              : statusMessage(task);
           return SignTile(
             name: task.info.name,
             group: task.info.group.name,
-            desc: statusMessage(task),
+            desc: desc,
             trailing: TaskStateIndicator(task),
             initiallyExpanded: true,
             showActions: task.approvable,
@@ -475,14 +445,6 @@ class DecryptSubPage extends StatelessWidget {
                 onPressed: () => model.joinDecrypt(task, agree: false),
               )
             ],
-          );
-        },
-        finishedBuilder: (context, task) {
-          return SignTile(
-            name: task.info.name,
-            group: task.info.group.name,
-            trailing: TaskStateIndicator(task),
-            desc: utf8.decode(task.info.data, allowMalformed: true),
           );
         },
       );
