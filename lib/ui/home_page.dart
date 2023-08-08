@@ -22,15 +22,13 @@ import '../widget/empty_list.dart';
 import 'home_state.dart';
 
 class TaskStateIndicator extends StatelessWidget {
-  final TaskState state;
-  final double progress;
+  final Task task;
 
-  const TaskStateIndicator(this.state, this.progress, {Key? key})
-      : super(key: key);
+  const TaskStateIndicator(this.task, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    switch (state) {
+    switch (task.state) {
       case TaskState.created:
         return const Icon(Icons.arrow_drop_down);
       case TaskState.running:
@@ -39,7 +37,7 @@ class TaskStateIndicator extends StatelessWidget {
           width: 24,
           // TODO: add animation
           child: CircularProgressIndicator(
-            value: progress,
+            value: task.round / task.nRounds,
             strokeWidth: 2.0,
           ),
         );
@@ -227,7 +225,7 @@ class SigningSubPage extends StatelessWidget {
             name: task.info.basename,
             group: task.info.group.name,
             desc: statusMessage(task),
-            trailing: TaskStateIndicator(task.state, task.round / task.nRounds),
+            trailing: TaskStateIndicator(task),
             initiallyExpanded: true,
             actions: <Widget>[
                   FilledButton.tonal(
@@ -245,7 +243,7 @@ class SigningSubPage extends StatelessWidget {
             child: SignTile(
               name: file.basename,
               group: file.group.name,
-              trailing: const TaskStateIndicator(TaskState.finished, 1),
+              trailing: TaskStateIndicator(task),
               actions: <Widget>[
                 OutlinedButton(
                   child: const Text('View'),
@@ -375,7 +373,7 @@ class GroupsSubPage extends StatelessWidget {
             members: group.members.map((m) => m.name).toList(),
             threshold: group.threshold,
             keyType: group.keyType,
-            trailing: TaskStateIndicator(task.state, task.round / task.nRounds),
+            trailing: TaskStateIndicator(task),
             initiallyExpanded: true,
             showActions: task.approvable,
             actions: [
@@ -403,7 +401,7 @@ class GroupsSubPage extends StatelessWidget {
             members: group.members.map((m) => m.name).toList(),
             threshold: group.threshold,
             keyType: group.keyType,
-            trailing: const Icon(Icons.check, color: Colors.green),
+            trailing: TaskStateIndicator(task),
           );
         },
       );
@@ -428,7 +426,7 @@ class LogInSubPage extends StatelessWidget {
             name: task.info.name,
             group: task.info.group.name,
             desc: statusMessage(task),
-            trailing: TaskStateIndicator(task.state, task.round / task.nRounds),
+            trailing: TaskStateIndicator(task),
             initiallyExpanded: true,
             showActions: task.approvable,
             actions: [
@@ -447,7 +445,7 @@ class LogInSubPage extends StatelessWidget {
           return SignTile(
             name: task.info.name,
             group: task.info.group.name,
-            trailing: const TaskStateIndicator(TaskState.finished, 1),
+            trailing: TaskStateIndicator(task),
           );
         },
       );
@@ -472,7 +470,7 @@ class DecryptSubPage extends StatelessWidget {
             name: task.info.name,
             group: task.info.group.name,
             desc: statusMessage(task),
-            trailing: TaskStateIndicator(task.state, task.round / task.nRounds),
+            trailing: TaskStateIndicator(task),
             initiallyExpanded: true,
             showActions: task.approvable,
             actions: [
@@ -491,7 +489,7 @@ class DecryptSubPage extends StatelessWidget {
           return SignTile(
             name: task.info.name,
             group: task.info.group.name,
-            trailing: const TaskStateIndicator(TaskState.finished, 1),
+            trailing: TaskStateIndicator(task),
             desc: utf8.decode(task.info.data, allowMalformed: true),
           );
         },
