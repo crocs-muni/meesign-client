@@ -41,6 +41,7 @@ class Groups extends Table {
   IntColumn get threshold => integer()();
   TextColumn get protocol => textEnum<Protocol>()();
   TextColumn get keyType => textEnum<KeyType>()();
+  BoolColumn get withCard => boolean().withDefault(const Constant(false))();
   BlobColumn get context => blob()();
 
   @override

@@ -792,6 +792,19 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
       GeneratedColumn<String>('key_type', aliasedName, false,
               type: DriftSqlType.string, requiredDuringInsert: true)
           .withConverter<KeyType>($GroupsTable.$converterkeyType);
+  static const VerificationMeta _withCardMeta =
+      const VerificationMeta('withCard');
+  @override
+  late final GeneratedColumn<bool> withCard =
+      GeneratedColumn<bool>('with_card', aliasedName, false,
+          type: DriftSqlType.bool,
+          requiredDuringInsert: false,
+          defaultConstraints: GeneratedColumn.constraintsDependsOnDialect({
+            SqlDialect.sqlite: 'CHECK ("with_card" IN (0, 1))',
+            SqlDialect.mysql: '',
+            SqlDialect.postgres: '',
+          }),
+          defaultValue: const Constant(false));
   static const VerificationMeta _contextMeta =
       const VerificationMeta('context');
   @override
@@ -800,7 +813,7 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
       type: DriftSqlType.blob, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, tid, did, name, threshold, protocol, keyType, context];
+      [id, tid, did, name, threshold, protocol, keyType, withCard, context];
   @override
   String get aliasedName => _alias ?? 'groups';
   @override
@@ -839,6 +852,10 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
     }
     context.handle(_protocolMeta, const VerificationResult.success());
     context.handle(_keyTypeMeta, const VerificationResult.success());
+    if (data.containsKey('with_card')) {
+      context.handle(_withCardMeta,
+          withCard.isAcceptableOrUnknown(data['with_card']!, _withCardMeta));
+    }
     if (data.containsKey('context')) {
       context.handle(_contextMeta,
           this.context.isAcceptableOrUnknown(data['context']!, _contextMeta));
@@ -870,6 +887,8 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
       keyType: $GroupsTable.$converterkeyType.fromSql(attachedDatabase
           .typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}key_type'])!),
+      withCard: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}with_card'])!,
       context: attachedDatabase.typeMapping
           .read(DriftSqlType.blob, data['${effectivePrefix}context'])!,
     );
@@ -894,6 +913,7 @@ class Group extends DataClass implements Insertable<Group> {
   final int threshold;
   final Protocol protocol;
   final KeyType keyType;
+  final bool withCard;
   final Uint8List context;
   const Group(
       {this.id,
@@ -903,6 +923,7 @@ class Group extends DataClass implements Insertable<Group> {
       required this.threshold,
       required this.protocol,
       required this.keyType,
+      required this.withCard,
       required this.context});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -922,6 +943,7 @@ class Group extends DataClass implements Insertable<Group> {
       final converter = $GroupsTable.$converterkeyType;
       map['key_type'] = Variable<String>(converter.toSql(keyType));
     }
+    map['with_card'] = Variable<bool>(withCard);
     map['context'] = Variable<Uint8List>(context);
     return map;
   }
@@ -935,6 +957,7 @@ class Group extends DataClass implements Insertable<Group> {
       threshold: Value(threshold),
       protocol: Value(protocol),
       keyType: Value(keyType),
+      withCard: Value(withCard),
       context: Value(context),
     );
   }
@@ -952,6 +975,7 @@ class Group extends DataClass implements Insertable<Group> {
           .fromJson(serializer.fromJson<String>(json['protocol'])),
       keyType: $GroupsTable.$converterkeyType
           .fromJson(serializer.fromJson<String>(json['keyType'])),
+      withCard: serializer.fromJson<bool>(json['withCard']),
       context: serializer.fromJson<Uint8List>(json['context']),
     );
   }
@@ -968,6 +992,7 @@ class Group extends DataClass implements Insertable<Group> {
           .toJson<String>($GroupsTable.$converterprotocol.toJson(protocol)),
       'keyType': serializer
           .toJson<String>($GroupsTable.$converterkeyType.toJson(keyType)),
+      'withCard': serializer.toJson<bool>(withCard),
       'context': serializer.toJson<Uint8List>(context),
     };
   }
@@ -980,6 +1005,7 @@ class Group extends DataClass implements Insertable<Group> {
           int? threshold,
           Protocol? protocol,
           KeyType? keyType,
+          bool? withCard,
           Uint8List? context}) =>
       Group(
         id: id.present ? id.value : this.id,
@@ -989,6 +1015,7 @@ class Group extends DataClass implements Insertable<Group> {
         threshold: threshold ?? this.threshold,
         protocol: protocol ?? this.protocol,
         keyType: keyType ?? this.keyType,
+        withCard: withCard ?? this.withCard,
         context: context ?? this.context,
       );
   @override
@@ -1001,6 +1028,7 @@ class Group extends DataClass implements Insertable<Group> {
           ..write('threshold: $threshold, ')
           ..write('protocol: $protocol, ')
           ..write('keyType: $keyType, ')
+          ..write('withCard: $withCard, ')
           ..write('context: $context')
           ..write(')'))
         .toString();
@@ -1015,6 +1043,7 @@ class Group extends DataClass implements Insertable<Group> {
       threshold,
       protocol,
       keyType,
+      withCard,
       $driftBlobEquality.hash(context));
   @override
   bool operator ==(Object other) =>
@@ -1027,6 +1056,7 @@ class Group extends DataClass implements Insertable<Group> {
           other.threshold == this.threshold &&
           other.protocol == this.protocol &&
           other.keyType == this.keyType &&
+          other.withCard == this.withCard &&
           $driftBlobEquality.equals(other.context, this.context));
 }
 
@@ -1038,6 +1068,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
   final Value<int> threshold;
   final Value<Protocol> protocol;
   final Value<KeyType> keyType;
+  final Value<bool> withCard;
   final Value<Uint8List> context;
   final Value<int> rowid;
   const GroupsCompanion({
@@ -1048,6 +1079,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
     this.threshold = const Value.absent(),
     this.protocol = const Value.absent(),
     this.keyType = const Value.absent(),
+    this.withCard = const Value.absent(),
     this.context = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -1059,6 +1091,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
     required int threshold,
     required Protocol protocol,
     required KeyType keyType,
+    this.withCard = const Value.absent(),
     required Uint8List context,
     this.rowid = const Value.absent(),
   })  : tid = Value(tid),
@@ -1076,6 +1109,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
     Expression<int>? threshold,
     Expression<String>? protocol,
     Expression<String>? keyType,
+    Expression<bool>? withCard,
     Expression<Uint8List>? context,
     Expression<int>? rowid,
   }) {
@@ -1087,6 +1121,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
       if (threshold != null) 'threshold': threshold,
       if (protocol != null) 'protocol': protocol,
       if (keyType != null) 'key_type': keyType,
+      if (withCard != null) 'with_card': withCard,
       if (context != null) 'context': context,
       if (rowid != null) 'rowid': rowid,
     });
@@ -1100,6 +1135,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
       Value<int>? threshold,
       Value<Protocol>? protocol,
       Value<KeyType>? keyType,
+      Value<bool>? withCard,
       Value<Uint8List>? context,
       Value<int>? rowid}) {
     return GroupsCompanion(
@@ -1110,6 +1146,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
       threshold: threshold ?? this.threshold,
       protocol: protocol ?? this.protocol,
       keyType: keyType ?? this.keyType,
+      withCard: withCard ?? this.withCard,
       context: context ?? this.context,
       rowid: rowid ?? this.rowid,
     );
@@ -1141,6 +1178,9 @@ class GroupsCompanion extends UpdateCompanion<Group> {
       final converter = $GroupsTable.$converterkeyType;
       map['key_type'] = Variable<String>(converter.toSql(keyType.value));
     }
+    if (withCard.present) {
+      map['with_card'] = Variable<bool>(withCard.value);
+    }
     if (context.present) {
       map['context'] = Variable<Uint8List>(context.value);
     }
@@ -1160,6 +1200,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
           ..write('threshold: $threshold, ')
           ..write('protocol: $protocol, ')
           ..write('keyType: $keyType, ')
+          ..write('withCard: $withCard, ')
           ..write('context: $context, ')
           ..write('rowid: $rowid')
           ..write(')'))
