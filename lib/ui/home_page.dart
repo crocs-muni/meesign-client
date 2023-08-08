@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../app_container.dart';
+import '../card/card.dart';
 import '../routes.dart';
 import '../sync.dart';
 import '../util/chars.dart';
@@ -325,6 +326,8 @@ class GroupTile extends StatelessWidget {
           alignment: Alignment.topRight,
           child: Wrap(
             spacing: 8,
+            runSpacing: 8,
+            alignment: WrapAlignment.end,
             children: actions,
           ),
         ),
@@ -382,6 +385,12 @@ class GroupsSubPage extends StatelessWidget {
                 child: const Text('Join'),
                 onPressed: () => model.joinGroup(task, agree: true),
               ),
+              if (CardManager.platformSupported && group.protocol.cardSupport)
+                FilledButton.tonal(
+                  onPressed: () =>
+                      model.joinGroup(task, agree: true, withCard: true),
+                  child: const Text('Join with card'),
+                ),
               OutlinedButton(
                 child: const Text('Decline'),
                 onPressed: () => model.joinGroup(task, agree: false),

@@ -112,8 +112,10 @@ class HomeState with ChangeNotifier {
   Future<void> encrypt(String description, String message, Group group) =>
       _decryptRepository.encrypt(description, utf8.encode(message), group.id);
 
-  Future<void> joinGroup(Task<Group> task, {required bool agree}) =>
-      _groupRepository.approveTask(device!.id, task.id, agree: agree);
+  Future<void> joinGroup(Task<Group> task,
+          {required bool agree, bool withCard = false}) =>
+      _groupRepository.approveTask(device!.id, task.id,
+          agree: agree, withCard: withCard);
   Future<void> joinSign(Task<File> task, {required bool agree}) =>
       _fileRepository.approveTask(device!.id, task.id, agree: agree);
   Future<void> joinChallenge(Task<Challenge> task, {required bool agree}) =>
