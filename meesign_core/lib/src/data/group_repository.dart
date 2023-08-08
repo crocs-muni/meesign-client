@@ -107,6 +107,20 @@ class GroupRepository extends TaskRepository<Group> {
   }
 
   @override
+  Future<void> approveTask(Uuid did, Uuid tid,
+          {required bool agree, bool withCard = false}) =>
+      taskLocks[did][tid].synchronized(() async {
+        await approveTaskUnsafe(did, tid, agree);
+        await _taskDao.updateGroup(
+          db.GroupsCompanion(
+            did: Value(did.bytes),
+            tid: Value(tid.bytes),
+            withCard: Value(withCard),
+          ),
+        );
+      });
+
+  @override
   Stream<List<Task<Group>>> observeTasks(Uuid did) {
     Task<Group> toModel(GroupTask gt) {
       final group = gt.group.toModel();

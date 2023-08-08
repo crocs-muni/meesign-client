@@ -82,7 +82,8 @@ abstract class TaskRepository<T> {
   final TaskSource _taskSource;
   final TaskDao _taskDao;
 
-  final DefaultMap<Uuid, DefaultMap<Uuid, Lock>> _taskLocks =
+  @protected
+  final DefaultMap<Uuid, DefaultMap<Uuid, Lock>> taskLocks =
       DefaultMap(HashMap(), () => DefaultMap(HashMap(), () => Lock()));
 
   final Map<Uuid, StreamSubscription<rpc.Task>> _subscriptions = HashMap();
@@ -214,7 +215,7 @@ abstract class TaskRepository<T> {
 
   Future<void> _syncTask(Uuid did, rpc.Task rpcTask) async {
     final tid = Uuid(rpcTask.id);
-    await _taskLocks[did][tid].synchronized(
+    await taskLocks[did][tid].synchronized(
       () => _syncTaskUnsafe(did, tid, rpcTask),
     );
     // FIXME: when to remove task lock?
@@ -254,7 +255,8 @@ abstract class TaskRepository<T> {
   Future<void> unsubscribe(Uuid did) async =>
       _subscriptions.remove(did)?.cancel();
 
-  Future<void> _approveTaskUnsafe(Uuid did, Uuid tid, bool agree) async {
+  @protected
+  Future<void> approveTaskUnsafe(Uuid did, Uuid tid, bool agree) async {
     final task = await _taskDao.getTask(did.bytes, tid.bytes);
     if (task == null) throw StateException();
     if (task.approved) return;
@@ -264,8 +266,8 @@ abstract class TaskRepository<T> {
   }
 
   Future<void> approveTask(Uuid did, Uuid tid, {required bool agree}) =>
-      _taskLocks[did][tid].synchronized(
-        () => _approveTaskUnsafe(did, tid, agree),
+      taskLocks[did][tid].synchronized(
+        () => approveTaskUnsafe(did, tid, agree),
       );
 
   Stream<List<Task<T>>> observeTasks(Uuid did);
