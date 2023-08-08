@@ -8,8 +8,15 @@ enum Protocol {
 
   final int keygenRounds;
   final int signRounds;
+  final String? aid;
 
-  const Protocol(this.keygenRounds, this.signRounds);
+  const Protocol(
+    this.keygenRounds,
+    this.signRounds, {
+    this.aid,
+  });
+
+  bool get cardSupport => aid != null;
 }
 
 extension ProtocolConversion on Protocol {
