@@ -17,7 +17,6 @@ import '../routes.dart';
 import '../sync.dart';
 import '../util/chars.dart';
 import '../widget/counter_badge.dart';
-import '../widget/dismissible.dart';
 import '../widget/empty_list.dart';
 import 'home_state.dart';
 
@@ -238,23 +237,16 @@ class SigningSubPage extends StatelessWidget {
         },
         finishedBuilder: (context, task) {
           final file = task.info;
-          return Deletable(
-            dismissibleKey: ObjectKey(file),
-            child: SignTile(
-              name: file.basename,
-              group: file.group.name,
-              trailing: TaskStateIndicator(task),
-              actions: <Widget>[
-                OutlinedButton(
-                  child: const Text('View'),
-                  onPressed: () => _openFile(file.path),
-                ),
-              ],
-            ),
-            confirmTitle: 'Do you really want to delete ${file.basename}?',
-            onDeleted: (_) {
-              // FIXME: remove the actual file
-            },
+          return SignTile(
+            name: file.basename,
+            group: file.group.name,
+            trailing: TaskStateIndicator(task),
+            actions: <Widget>[
+              OutlinedButton(
+                child: const Text('View'),
+                onPressed: () => _openFile(file.path),
+              ),
+            ],
           );
         },
       );
