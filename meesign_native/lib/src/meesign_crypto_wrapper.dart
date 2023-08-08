@@ -59,12 +59,13 @@ class Error {
 class ProtocolWrapper {
   static Uint8List keygen(int protoId) {
     return using((Arena alloc) {
-      final res = alloc.using(
-        _lib.protocol_keygen(protoId),
-        _lib.protocol_result_free,
+      final proto = _lib.protocol_keygen(protoId);
+      final context = alloc.using(
+        _lib.protocol_serialize(proto),
+        _lib.buffer_free,
       );
 
-      return res.context.dupToDart();
+      return context.dupToDart();
     });
   }
 
@@ -72,12 +73,13 @@ class ProtocolWrapper {
     return using((Arena alloc) {
       final groupBuf = group.dupToNative(alloc);
 
-      final res = alloc.using(
-        _lib.protocol_init(protoId, groupBuf, group.length),
-        _lib.protocol_result_free,
+      final proto = _lib.protocol_init(protoId, groupBuf, group.length);
+      final context = alloc.using(
+        _lib.protocol_serialize(proto),
+        _lib.buffer_free,
       );
 
-      return res.context.dupToDart();
+      return context.dupToDart();
     });
   }
 
@@ -87,21 +89,25 @@ class ProtocolWrapper {
       final dataBuf = data.dupToNative(alloc);
       final error = alloc.using(Error(), Error.free);
 
-      final res = alloc.using(
+      final proto = _lib.protocol_deserialize(ctxBuf, context.length);
+      final dataOut = alloc.using(
         _lib.protocol_advance(
-          ctxBuf,
-          context.length,
+          proto,
           dataBuf,
           data.length,
           error.ptr,
         ),
-        _lib.protocol_result_free,
+        _lib.buffer_free,
+      );
+      final contextOut = alloc.using(
+        _lib.protocol_serialize(proto),
+        _lib.buffer_free,
       );
 
       if (error.occured) throw ProtocolException(error.message);
       return ProtocolData(
-        res.context.dupToDart(),
-        res.data.dupToDart(),
+        contextOut.dupToDart(),
+        dataOut.dupToDart(),
       );
     });
   }
@@ -115,13 +121,14 @@ class ProtocolWrapper {
       final ctxBuf = context.dupToNative(alloc);
       final error = alloc.using(Error(), Error.free);
 
-      final res = alloc.using(
-        _lib.protocol_finish(ctxBuf, context.length, error.ptr),
-        _lib.protocol_result_free,
+      final proto = _lib.protocol_deserialize(ctxBuf, context.length);
+      final data = alloc.using(
+        _lib.protocol_finish(proto, error.ptr),
+        _lib.buffer_free,
       );
 
       if (error.occured) throw ProtocolException(error.message);
-      return res.data.dupToDart();
+      return data.dupToDart();
     });
   }
 }
