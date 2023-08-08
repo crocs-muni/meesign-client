@@ -17,8 +17,6 @@ class HomeState with ChangeNotifier {
   // TODO: migrate from ChangeNotifier to streams
 
   List<Group> groups = [];
-  List<File> files = [];
-  List<Decrypt> decrypts = [];
 
   Device? device;
 
@@ -89,14 +87,6 @@ class HomeState with ChangeNotifier {
 
     _groupRepository.observeGroups(did).listen((groups) {
       this.groups = groups;
-      notifyListeners();
-    });
-    _fileRepository.observeFiles(did).listen((files) {
-      this.files = files;
-      notifyListeners();
-    });
-    _decryptRepository.observeDecrypts(did).listen((decrypts) {
-      this.decrypts = decrypts;
       notifyListeners();
     });
   }

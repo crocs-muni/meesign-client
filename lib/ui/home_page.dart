@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:animations/animations.dart';
+import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
@@ -81,16 +82,17 @@ String? statusMessage(Task task) {
   }
 }
 
-Widget buildTaskListView<T, U>(
-  List<Task<T>> tasks,
-  List<U> finished, {
+Widget buildTaskListView<T>(
+  List<Task<T>> tasks, {
   required String finishedTitle,
   required Widget emptyView,
   required Widget Function(BuildContext, Task<T>) unfinishedBuilder,
-  required Widget Function(BuildContext, U) finishedBuilder,
+  required Widget Function(BuildContext, Task<T>) finishedBuilder,
 }) {
-  final unfinished =
-      tasks.where((task) => task.state != TaskState.finished).toList();
+  final groups = tasks.groupListsBy((task) => task.state == TaskState.finished);
+  final unfinished = groups[false] ?? [];
+  final finished = groups[true] ?? [];
+
   // TODO: unfinished.sort((a, b) => b.timeCreated.compareTo(a.timeCreated));
 
   int length = finished.length + unfinished.length;
@@ -205,9 +207,8 @@ class SigningSubPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<HomeState>(builder: (context, model, child) {
-      return buildTaskListView<File, File>(
+      return buildTaskListView<File>(
         model.signTasks,
-        model.files,
         finishedTitle: 'Signed files',
         emptyView: const EmptyList(hint: 'Add new group first.'),
         unfinishedBuilder: (context, task) {
@@ -237,7 +238,8 @@ class SigningSubPage extends StatelessWidget {
                 (task.approvable ? approveActions : []),
           );
         },
-        finishedBuilder: (context, file) {
+        finishedBuilder: (context, task) {
+          final file = task.info;
           return Deletable(
             dismissibleKey: ObjectKey(file),
             child: SignTile(
@@ -254,7 +256,6 @@ class SigningSubPage extends StatelessWidget {
             confirmTitle: 'Do you really want to delete ${file.basename}?',
             onDeleted: (_) {
               // FIXME: remove the actual file
-              model.files.remove(file);
             },
           );
         },
@@ -359,11 +360,8 @@ class GroupsSubPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<HomeState>(builder: (context, model, child) {
-      // FIXME: finished tasks should be removed at some time
-
-      return buildTaskListView<Group, Group>(
+      return buildTaskListView<Group>(
         model.groupTasks,
-        model.groups,
         finishedTitle: 'Groups',
         emptyView: const EmptyList(
           hint: 'Try creating a new group.',
@@ -398,7 +396,8 @@ class GroupsSubPage extends StatelessWidget {
             ],
           );
         },
-        finishedBuilder: (context, group) {
+        finishedBuilder: (context, task) {
+          final group = task.info;
           return GroupTile(
             name: group.name,
             members: group.members.map((m) => m.name).toList(),
@@ -418,12 +417,8 @@ class LogInSubPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<HomeState>(builder: (context, model, child) {
-      return buildTaskListView<Challenge, Challenge>(
+      return buildTaskListView<Challenge>(
         model.challengeTasks,
-        model.challengeTasks
-            .where((task) => task.state == TaskState.finished)
-            .map((task) => task.info)
-            .toList(),
         finishedTitle: 'Finished',
         emptyView: const EmptyList(
           hint: 'Challenge signing requests.',
@@ -448,10 +443,10 @@ class LogInSubPage extends StatelessWidget {
             ],
           );
         },
-        finishedBuilder: (context, info) {
+        finishedBuilder: (context, task) {
           return SignTile(
-            name: info.name,
-            group: info.group.name,
+            name: task.info.name,
+            group: task.info.group.name,
             trailing: const TaskStateIndicator(TaskState.finished, 1),
           );
         },
@@ -466,12 +461,8 @@ class DecryptSubPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<HomeState>(builder: (context, model, child) {
-      return buildTaskListView<Decrypt, Decrypt>(
+      return buildTaskListView<Decrypt>(
         model.decryptTasks,
-        model.decryptTasks
-            .where((task) => task.state == TaskState.finished)
-            .map((task) => task.info)
-            .toList(),
         finishedTitle: 'Finished',
         emptyView: const EmptyList(
           hint: 'Requests for decryptions.',
@@ -496,12 +487,12 @@ class DecryptSubPage extends StatelessWidget {
             ],
           );
         },
-        finishedBuilder: (context, info) {
+        finishedBuilder: (context, task) {
           return SignTile(
-            name: info.name,
-            group: info.group.name,
+            name: task.info.name,
+            group: task.info.group.name,
             trailing: const TaskStateIndicator(TaskState.finished, 1),
-            desc: utf8.decode(info.data, allowMalformed: true),
+            desc: utf8.decode(task.info.data, allowMalformed: true),
           );
         },
       );
