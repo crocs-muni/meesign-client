@@ -135,6 +135,25 @@ void _openFile(String path) {
   }
 }
 
+class EntityChip extends StatelessWidget {
+  final String name;
+
+  const EntityChip({required this.name, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Chip(
+      avatar: CircleAvatar(
+        child: Text(
+          name.initials,
+          style: Theme.of(context).textTheme.labelLarge,
+        ),
+      ),
+      label: Text(name),
+    );
+  }
+}
+
 // FIXME: this is more or less copy of GroupTile below,
 // this probably needs a rewrite
 class SignTile extends StatelessWidget {
@@ -172,15 +191,7 @@ class SignTile extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Chip(
-              avatar: CircleAvatar(
-                child: Text(
-                  group.initials,
-                  style: Theme.of(context).textTheme.labelLarge,
-                ),
-              ),
-              label: Text(group),
-            ),
+            EntityChip(name: group),
             const SizedBox(width: 8),
             Expanded(
               child: Wrap(
@@ -280,20 +291,9 @@ class GroupTile extends StatelessWidget {
       Container(
         alignment: Alignment.topLeft,
         child: Wrap(
-          spacing: 8,
-          runSpacing: 4,
-          children: members
-              .map((m) => Chip(
-                    avatar: CircleAvatar(
-                      child: Text(
-                        m.initials,
-                        style: Theme.of(context).textTheme.labelLarge,
-                      ),
-                    ),
-                    label: Text(m),
-                  ))
-              .toList(),
-        ),
+            spacing: 8,
+            runSpacing: 4,
+            children: [for (var m in members) EntityChip(name: m)]),
       ),
     ];
     if (showActions && actions.isNotEmpty) {
@@ -366,7 +366,7 @@ class GroupsSubPage extends StatelessWidget {
               OutlinedButton(
                 child: const Text('Decline'),
                 onPressed: () => model.joinGroup(task, agree: false),
-              )
+              ),
             ],
           );
         },
