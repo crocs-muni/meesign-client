@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
+import 'package:meesign_core/meesign_card.dart';
 
 import 'card.dart';
 
