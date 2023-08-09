@@ -160,7 +160,7 @@ class TaskTile<T> extends StatelessWidget {
   final String? desc;
   final Widget? leading, trailing;
   final Widget? actionChip;
-  final List<Widget> approveActions, actions;
+  final List<Widget> approveActions, cardActions, actions;
   final List<Widget> children;
 
   const TaskTile({
@@ -172,6 +172,7 @@ class TaskTile<T> extends StatelessWidget {
     this.trailing,
     this.actionChip,
     this.approveActions = const [],
+    this.cardActions = const [],
     this.actions = const [],
     this.children = const [],
   }) : super(key: key);
@@ -181,7 +182,9 @@ class TaskTile<T> extends StatelessWidget {
     final finished = task.state == TaskState.finished;
     final desc = this.desc ?? statusMessage(task);
     final trailing = this.trailing ?? TaskStateIndicator(task);
-    final allActions = actions + (task.approvable ? approveActions : []);
+    final allActions = actions +
+        (task.approvable ? approveActions : []) +
+        (task.state == TaskState.needsCard ? cardActions : []);
 
     final actionRow = allActions.isNotEmpty || actionChip != null
         ? Row(
@@ -297,6 +300,12 @@ class GroupsSubPage extends StatelessWidget {
                 onPressed: () => model.joinGroup(task, agree: false),
               ),
             ],
+            cardActions: [
+              FilledButton.tonal(
+                onPressed: () {},
+                child: const Text('Read card'),
+              ),
+            ],
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -351,6 +360,12 @@ class ChallengeSubPage extends StatelessWidget {
                 child: const Text('Decline'),
                 onPressed: () => model.joinChallenge(task, agree: false),
               )
+            ],
+            cardActions: [
+              FilledButton.tonal(
+                onPressed: () {},
+                child: const Text('Read card'),
+              ),
             ],
           );
         },
