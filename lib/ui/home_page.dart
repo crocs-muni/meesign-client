@@ -154,56 +154,70 @@ class EntityChip extends StatelessWidget {
   }
 }
 
-// FIXME: this is more or less copy of GroupTile below,
-// this probably needs a rewrite
-class SignTile extends StatelessWidget {
+class TaskTile<T> extends StatelessWidget {
+  final Task<T> task;
   final String name;
-  final String group;
   final String? desc;
-  final Widget? trailing;
-  final bool initiallyExpanded;
-  final bool showActions;
-  final List<Widget> actions;
+  final Widget? leading, trailing;
+  final Widget? actionChip;
+  final List<Widget> approveActions, actions;
+  final List<Widget> children;
 
-  const SignTile({
+  const TaskTile({
     Key? key,
+    required this.task,
     required this.name,
-    required this.group,
     this.desc,
+    this.leading,
     this.trailing,
-    this.initiallyExpanded = false,
-    this.showActions = true,
+    this.actionChip,
+    this.approveActions = const [],
     this.actions = const [],
+    this.children = const [],
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final finished = task.state == TaskState.finished;
+    final desc = this.desc ?? statusMessage(task);
+    final trailing = this.trailing ?? TaskStateIndicator(task);
+    final allActions = actions + (task.approvable ? approveActions : []);
+
+    final actionRow = allActions.isNotEmpty || actionChip != null
+        ? Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (actionChip != null) actionChip!,
+              Expanded(
+                child: Wrap(
+                  alignment: WrapAlignment.end,
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: allActions,
+                ),
+              ),
+            ].intersperse(
+              const SizedBox(width: 8),
+            ),
+          )
+        : null;
+
     return ExpansionTile(
       title: Text(name),
-      subtitle: desc != null ? Text(desc!) : null,
-      initiallyExpanded: initiallyExpanded,
+      subtitle: desc != null ? Text(desc) : null,
+      initiallyExpanded: !finished,
+      leading: leading,
       trailing: trailing,
       childrenPadding: const EdgeInsets.symmetric(
         horizontal: 16,
         vertical: 8,
       ),
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            EntityChip(name: group),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Wrap(
-                alignment: WrapAlignment.end,
-                spacing: 8,
-                runSpacing: 8,
-                children: showActions ? actions : [],
-              ),
-            ),
-          ],
-        )
-      ],
+        ...children,
+        if (actionRow != null) actionRow,
+      ].intersperse(
+        const SizedBox(height: 8),
+      ),
     );
   }
 }
@@ -219,113 +233,30 @@ class SigningSubPage extends StatelessWidget {
         finishedTitle: 'Signed files',
         emptyView: const EmptyList(hint: 'Add new group first.'),
         taskBuilder: (context, task, finished) {
-          final approveActions = <Widget>[
-            FilledButton.tonal(
-              child: const Text('Sign'),
-              onPressed: () => model.joinSign(task, agree: true),
-            ),
-            OutlinedButton(
-              child: const Text('Decline'),
-              onPressed: () => model.joinSign(task, agree: false),
-            ),
-          ];
-
-          return SignTile(
+          return TaskTile(
+            task: task,
             name: task.info.basename,
-            group: task.info.group.name,
-            desc: statusMessage(task),
-            trailing: TaskStateIndicator(task),
-            initiallyExpanded: !finished,
+            actionChip: EntityChip(name: task.info.group.name),
             actions: <Widget>[
-                  FilledButton.tonal(
-                    child: const Text('View'),
-                    onPressed: () => _openFile(task.info.path),
-                  ),
-                ] +
-                (task.approvable ? approveActions : []),
+              FilledButton.tonal(
+                child: const Text('View'),
+                onPressed: () => _openFile(task.info.path),
+              ),
+            ],
+            approveActions: [
+              FilledButton.tonal(
+                child: const Text('Sign'),
+                onPressed: () => model.joinSign(task, agree: true),
+              ),
+              OutlinedButton(
+                child: const Text('Decline'),
+                onPressed: () => model.joinSign(task, agree: false),
+              ),
+            ],
           );
         },
       );
     });
-  }
-}
-
-class GroupTile extends StatelessWidget {
-  final String name;
-  final String? desc;
-  final List<String> members;
-  final int threshold;
-  final KeyType keyType;
-  final Widget? trailing;
-  final bool initiallyExpanded;
-  final bool showActions;
-  final List<Widget> actions;
-
-  const GroupTile({
-    Key? key,
-    required this.name,
-    this.desc,
-    required this.members,
-    required this.threshold,
-    required this.keyType,
-    this.trailing,
-    this.initiallyExpanded = false,
-    this.showActions = true,
-    this.actions = const [],
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final children = <Widget>[
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text('Threshold: $threshold / ${members.length}'),
-          Text('Purpose: ${[
-            'Sign PDF',
-            'Challenge',
-            'Decrypt'
-          ][keyType.index]}'),
-        ],
-      ),
-      Container(
-        alignment: Alignment.topLeft,
-        child: Wrap(
-            spacing: 8,
-            runSpacing: 4,
-            children: [for (var m in members) EntityChip(name: m)]),
-      ),
-    ];
-    if (showActions && actions.isNotEmpty) {
-      children.add(
-        Container(
-          alignment: Alignment.topRight,
-          child: Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            alignment: WrapAlignment.end,
-            children: actions,
-          ),
-        ),
-      );
-    }
-
-    return ExpansionTile(
-      title: Text(name),
-      subtitle: desc != null ? Text(desc!) : null,
-      leading: CircleAvatar(
-        child: Text(name.initials),
-      ),
-      initiallyExpanded: initiallyExpanded,
-      trailing: trailing,
-      childrenPadding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 8,
-      ),
-      children: children.intersperse(
-        const SizedBox(height: 16),
-      ),
-    );
   }
 }
 
@@ -343,16 +274,14 @@ class GroupsSubPage extends StatelessWidget {
         ),
         taskBuilder: (context, task, finished) {
           final group = task.info;
-          return GroupTile(
+          final members = group.members;
+          return TaskTile(
+            task: task,
             name: group.name,
-            desc: statusMessage(task),
-            members: group.members.map((m) => m.name).toList(),
-            threshold: group.threshold,
-            keyType: group.keyType,
-            trailing: TaskStateIndicator(task),
-            initiallyExpanded: !finished,
-            showActions: task.approvable,
-            actions: [
+            leading: CircleAvatar(
+              child: Text(group.name.initials),
+            ),
+            approveActions: [
               FilledButton.tonal(
                 child: const Text('Join'),
                 onPressed: () => model.joinGroup(task, agree: true),
@@ -366,6 +295,27 @@ class GroupsSubPage extends StatelessWidget {
               OutlinedButton(
                 child: const Text('Decline'),
                 onPressed: () => model.joinGroup(task, agree: false),
+              ),
+            ],
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text('Threshold: ${group.threshold} / ${members.length}'),
+                  Text('Purpose: ${[
+                    'Sign PDF',
+                    'Challenge',
+                    'Decrypt'
+                  ][group.keyType.index]}'),
+                ],
+              ),
+              Container(
+                alignment: Alignment.topLeft,
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  children: [for (var m in members) EntityChip(name: m.name)],
+                ),
               ),
             ],
           );
@@ -388,14 +338,11 @@ class ChallengeSubPage extends StatelessWidget {
           hint: 'Challenge signing requests.',
         ),
         taskBuilder: (context, task, finished) {
-          return SignTile(
+          return TaskTile(
+            task: task,
             name: task.info.name,
-            group: task.info.group.name,
-            desc: statusMessage(task),
-            trailing: TaskStateIndicator(task),
-            initiallyExpanded: !finished,
-            showActions: task.approvable,
-            actions: [
+            actionChip: EntityChip(name: task.info.group.name),
+            approveActions: [
               FilledButton.tonal(
                 child: const Text('Sign'),
                 onPressed: () => model.joinChallenge(task, agree: true),
@@ -428,14 +375,12 @@ class DecryptSubPage extends StatelessWidget {
           final desc = finished
               ? utf8.decode(task.info.data, allowMalformed: true)
               : statusMessage(task);
-          return SignTile(
+          return TaskTile(
+            task: task,
             name: task.info.name,
-            group: task.info.group.name,
             desc: desc,
-            trailing: TaskStateIndicator(task),
-            initiallyExpanded: true,
-            showActions: task.approvable,
-            actions: [
+            actionChip: EntityChip(name: task.info.group.name),
+            approveActions: [
               FilledButton.tonal(
                 child: const Text('Decrypt'),
                 onPressed: () => model.joinDecrypt(task, agree: true),
