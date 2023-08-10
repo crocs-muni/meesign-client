@@ -57,8 +57,9 @@ class HomeState with ChangeNotifier {
     final challengeTasksStream = _challengeRepository.observeTasks(did);
     final decryptTasksStream = _decryptRepository.observeTasks(did);
 
-    int pending(List<Task<dynamic>> tasks) =>
-        tasks.where((task) => task.approvable).length;
+    int pending(List<Task<dynamic>> tasks) => tasks
+        .where((task) => task.approvable || task.state == TaskState.needsCard)
+        .length;
     nGroupReqs = groupTasksStream.map(pending).shareValue();
     nSignReqs = signTasksStream.map(pending).shareValue();
     nChallengeReqs = challengeTasksStream.map(pending).shareValue();
