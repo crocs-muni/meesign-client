@@ -80,17 +80,20 @@ class MeeSignCryptoLib {
 
   ffi.Pointer<Protocol> protocol_keygen(
     int proto_id,
+    int with_card,
   ) {
     return _protocol_keygen(
       proto_id,
+      with_card,
     );
   }
 
-  late final _protocol_keygenPtr =
-      _lookup<ffi.NativeFunction<ffi.Pointer<Protocol> Function(ffi.Int32)>>(
-          'protocol_keygen');
-  late final _protocol_keygen =
-      _protocol_keygenPtr.asFunction<ffi.Pointer<Protocol> Function(int)>();
+  late final _protocol_keygenPtr = _lookup<
+          ffi
+          .NativeFunction<ffi.Pointer<Protocol> Function(ffi.Int32, ffi.Int)>>(
+      'protocol_keygen');
+  late final _protocol_keygen = _protocol_keygenPtr
+      .asFunction<ffi.Pointer<Protocol> Function(int, int)>();
 
   Buffer protocol_advance(
     ffi.Pointer<Protocol> proto_ptr,

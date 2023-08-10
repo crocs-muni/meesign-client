@@ -58,9 +58,9 @@ class Error {
 }
 
 class ProtocolWrapper {
-  static Uint8List keygen(int protoId) {
+  static Uint8List keygen(int protoId, {bool withCard = false}) {
     return using((Arena alloc) {
-      final proto = _lib.protocol_keygen(protoId);
+      final proto = _lib.protocol_keygen(protoId, withCard ? 1 : 0);
       final context = alloc.using(
         _lib.protocol_serialize(proto),
         _lib.buffer_free,
