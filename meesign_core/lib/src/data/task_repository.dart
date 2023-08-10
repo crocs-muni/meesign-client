@@ -10,6 +10,7 @@ import 'package:meesign_network/grpc.dart' as rpc;
 import 'package:meta/meta.dart';
 import 'package:synchronized/synchronized.dart';
 
+import '../card/card.dart';
 import '../database/database.dart' as db;
 import '../model/task.dart';
 import '../util/default_map.dart';
@@ -279,4 +280,8 @@ abstract class TaskRepository<T> {
           .toList());
 
   // TODO: provide finer control? expose just list of task ids?
+
+  Future<void> advanceTaskWithCard(Uuid did, Uuid tid, Card card) async {
+    throw UnimplementedError();
+  }
 }
