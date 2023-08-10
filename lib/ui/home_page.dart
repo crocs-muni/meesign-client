@@ -5,7 +5,8 @@ import 'package:animations/animations.dart';
 import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:file_selector/file_selector.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Card;
+import 'package:meesign_core/meesign_card.dart';
 import 'package:meesign_core/meesign_data.dart';
 import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +19,7 @@ import '../sync.dart';
 import '../util/chars.dart';
 import '../widget/counter_badge.dart';
 import '../widget/empty_list.dart';
+import 'card_reader_page.dart';
 import 'home_state.dart';
 
 class TaskStateIndicator extends StatelessWidget {
@@ -133,6 +135,20 @@ void _openFile(String path) {
     // it seems to be of low quality
     OpenFile.open(path);
   }
+}
+
+void _launchCardReader(
+  BuildContext context,
+  Future<void> Function(Card) onCard,
+) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => CardReaderPage(
+        onCard: onCard,
+      ),
+    ),
+  );
 }
 
 class EntityChip extends StatelessWidget {
@@ -302,7 +318,8 @@ class GroupsSubPage extends StatelessWidget {
             ],
             cardActions: [
               FilledButton.tonal(
-                onPressed: () {},
+                onPressed: () => _launchCardReader(
+                    context, (card) => model.advanceGroupWithCard(task, card)),
                 child: const Text('Read card'),
               ),
             ],
@@ -363,7 +380,8 @@ class ChallengeSubPage extends StatelessWidget {
             ],
             cardActions: [
               FilledButton.tonal(
-                onPressed: () {},
+                onPressed: () => _launchCardReader(context,
+                    (card) => model.advanceChallengeWithCard(task, card)),
                 child: const Text('Read card'),
               ),
             ],

@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/foundation.dart';
+import 'package:meesign_core/meesign_card.dart';
 import 'package:meesign_core/meesign_data.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -112,4 +113,9 @@ class HomeState with ChangeNotifier {
       _challengeRepository.approveTask(device!.id, task.id, agree: agree);
   Future<void> joinDecrypt(Task<Decrypt> task, {required bool agree}) =>
       _decryptRepository.approveTask(device!.id, task.id, agree: agree);
+  // FIXME: avoid this repetition
+  Future<void> advanceGroupWithCard<T>(Task<T> task, Card card) =>
+      _groupRepository.advanceTaskWithCard(device!.id, task.id, card);
+  Future<void> advanceChallengeWithCard<T>(Task<T> task, Card card) =>
+      _challengeRepository.advanceTaskWithCard(device!.id, task.id, card);
 }
