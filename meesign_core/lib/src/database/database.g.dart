@@ -421,9 +421,14 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
   late final GeneratedColumn<Uint8List> context = GeneratedColumn<Uint8List>(
       'context', aliasedName, true,
       type: DriftSqlType.blob, requiredDuringInsert: false);
+  static const VerificationMeta _dataMeta = const VerificationMeta('data');
+  @override
+  late final GeneratedColumn<Uint8List> data = GeneratedColumn<Uint8List>(
+      'data', aliasedName, true,
+      type: DriftSqlType.blob, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, did, state, approved, round, attempt, context];
+      [id, did, state, approved, round, attempt, context, data];
   @override
   String get aliasedName => _alias ?? 'tasks';
   @override
@@ -461,6 +466,10 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
       context.handle(_contextMeta,
           this.context.isAcceptableOrUnknown(data['context']!, _contextMeta));
     }
+    if (data.containsKey('data')) {
+      context.handle(
+          _dataMeta, this.data.isAcceptableOrUnknown(data['data']!, _dataMeta));
+    }
     return context;
   }
 
@@ -484,6 +493,8 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
           .read(DriftSqlType.int, data['${effectivePrefix}attempt'])!,
       context: attachedDatabase.typeMapping
           .read(DriftSqlType.blob, data['${effectivePrefix}context']),
+      data: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}data']),
     );
   }
 
@@ -504,6 +515,7 @@ class Task extends DataClass implements Insertable<Task> {
   final int round;
   final int attempt;
   final Uint8List? context;
+  final Uint8List? data;
   const Task(
       {required this.id,
       required this.did,
@@ -511,7 +523,8 @@ class Task extends DataClass implements Insertable<Task> {
       required this.approved,
       required this.round,
       required this.attempt,
-      this.context});
+      this.context,
+      this.data});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -527,6 +540,9 @@ class Task extends DataClass implements Insertable<Task> {
     if (!nullToAbsent || context != null) {
       map['context'] = Variable<Uint8List>(context);
     }
+    if (!nullToAbsent || data != null) {
+      map['data'] = Variable<Uint8List>(data);
+    }
     return map;
   }
 
@@ -541,6 +557,7 @@ class Task extends DataClass implements Insertable<Task> {
       context: context == null && nullToAbsent
           ? const Value.absent()
           : Value(context),
+      data: data == null && nullToAbsent ? const Value.absent() : Value(data),
     );
   }
 
@@ -556,6 +573,7 @@ class Task extends DataClass implements Insertable<Task> {
       round: serializer.fromJson<int>(json['round']),
       attempt: serializer.fromJson<int>(json['attempt']),
       context: serializer.fromJson<Uint8List?>(json['context']),
+      data: serializer.fromJson<Uint8List?>(json['data']),
     );
   }
   @override
@@ -570,6 +588,7 @@ class Task extends DataClass implements Insertable<Task> {
       'round': serializer.toJson<int>(round),
       'attempt': serializer.toJson<int>(attempt),
       'context': serializer.toJson<Uint8List?>(context),
+      'data': serializer.toJson<Uint8List?>(data),
     };
   }
 
@@ -580,7 +599,8 @@ class Task extends DataClass implements Insertable<Task> {
           bool? approved,
           int? round,
           int? attempt,
-          Value<Uint8List?> context = const Value.absent()}) =>
+          Value<Uint8List?> context = const Value.absent(),
+          Value<Uint8List?> data = const Value.absent()}) =>
       Task(
         id: id ?? this.id,
         did: did ?? this.did,
@@ -589,6 +609,7 @@ class Task extends DataClass implements Insertable<Task> {
         round: round ?? this.round,
         attempt: attempt ?? this.attempt,
         context: context.present ? context.value : this.context,
+        data: data.present ? data.value : this.data,
       );
   @override
   String toString() {
@@ -599,7 +620,8 @@ class Task extends DataClass implements Insertable<Task> {
           ..write('approved: $approved, ')
           ..write('round: $round, ')
           ..write('attempt: $attempt, ')
-          ..write('context: $context')
+          ..write('context: $context, ')
+          ..write('data: $data')
           ..write(')'))
         .toString();
   }
@@ -612,7 +634,8 @@ class Task extends DataClass implements Insertable<Task> {
       approved,
       round,
       attempt,
-      $driftBlobEquality.hash(context));
+      $driftBlobEquality.hash(context),
+      $driftBlobEquality.hash(data));
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -623,7 +646,8 @@ class Task extends DataClass implements Insertable<Task> {
           other.approved == this.approved &&
           other.round == this.round &&
           other.attempt == this.attempt &&
-          $driftBlobEquality.equals(other.context, this.context));
+          $driftBlobEquality.equals(other.context, this.context) &&
+          $driftBlobEquality.equals(other.data, this.data));
 }
 
 class TasksCompanion extends UpdateCompanion<Task> {
@@ -634,6 +658,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
   final Value<int> round;
   final Value<int> attempt;
   final Value<Uint8List?> context;
+  final Value<Uint8List?> data;
   final Value<int> rowid;
   const TasksCompanion({
     this.id = const Value.absent(),
@@ -643,6 +668,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.round = const Value.absent(),
     this.attempt = const Value.absent(),
     this.context = const Value.absent(),
+    this.data = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   TasksCompanion.insert({
@@ -653,6 +679,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.round = const Value.absent(),
     this.attempt = const Value.absent(),
     this.context = const Value.absent(),
+    this.data = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : id = Value(id),
         did = Value(did),
@@ -665,6 +692,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     Expression<int>? round,
     Expression<int>? attempt,
     Expression<Uint8List>? context,
+    Expression<Uint8List>? data,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -675,6 +703,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       if (round != null) 'round': round,
       if (attempt != null) 'attempt': attempt,
       if (context != null) 'context': context,
+      if (data != null) 'data': data,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -687,6 +716,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       Value<int>? round,
       Value<int>? attempt,
       Value<Uint8List?>? context,
+      Value<Uint8List?>? data,
       Value<int>? rowid}) {
     return TasksCompanion(
       id: id ?? this.id,
@@ -696,6 +726,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       round: round ?? this.round,
       attempt: attempt ?? this.attempt,
       context: context ?? this.context,
+      data: data ?? this.data,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -725,6 +756,9 @@ class TasksCompanion extends UpdateCompanion<Task> {
     if (context.present) {
       map['context'] = Variable<Uint8List>(context.value);
     }
+    if (data.present) {
+      map['data'] = Variable<Uint8List>(data.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -741,6 +775,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
           ..write('round: $round, ')
           ..write('attempt: $attempt, ')
           ..write('context: $context, ')
+          ..write('data: $data, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
