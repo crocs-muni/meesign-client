@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart' hide Card;
+import 'package:meesign_core/meesign_card.dart';
 
 import '../card/card.dart';
 
 class CardReaderPage extends StatefulWidget {
-  const CardReaderPage({Key? key}) : super(key: key);
+  final Future<void> Function(Card) onCard;
+
+  const CardReaderPage({required this.onCard, Key? key}) : super(key: key);
 
   @override
   State<CardReaderPage> createState() => _CardReaderPageState();
@@ -74,6 +77,7 @@ class _CardReaderPageState extends State<CardReaderPage> {
       setStatus(ReaderOkStatus.working);
 
       try {
+        await widget.onCard(card);
         Navigator.pop(context);
       } finally {
         await card.disconnect();
