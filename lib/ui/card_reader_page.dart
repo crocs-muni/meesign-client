@@ -12,7 +12,7 @@ class CardReaderPage extends StatefulWidget {
   State<CardReaderPage> createState() => _CardReaderPageState();
 }
 
-abstract class ReaderStatus {
+sealed class ReaderStatus {
   final String message;
   const ReaderStatus._(this.message);
 }
