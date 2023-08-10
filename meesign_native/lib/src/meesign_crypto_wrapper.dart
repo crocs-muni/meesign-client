@@ -35,7 +35,8 @@ class ProtocolException implements Exception {
 
 class ProtocolData {
   final Uint8List context, data;
-  ProtocolData(this.context, this.data);
+  final int recipient;
+  ProtocolData(this.context, this.data, this.recipient);
 }
 
 final MeeSignCryptoLib _lib = MeeSignCryptoLib(dlOpen('meesign_crypto'));
@@ -108,6 +109,7 @@ class ProtocolWrapper {
       return ProtocolData(
         contextOut.dupToDart(),
         dataOut.dupToDart(),
+        dataOut.rec,
       );
     });
   }

@@ -248,6 +248,12 @@ abstract class ProtocolId {
   static const int Frost = 2;
 }
 
+abstract class Recipient {
+  static const int Unknown = 0;
+  static const int Card = 1;
+  static const int Server = 2;
+}
+
 class Protocol extends ffi.Opaque {}
 
 class Buffer extends ffi.Struct {
@@ -255,6 +261,9 @@ class Buffer extends ffi.Struct {
 
   @ffi.UintPtr()
   external int len;
+
+  @ffi.Int32()
+  external int rec;
 }
 
 class AuthKey extends ffi.Struct {
