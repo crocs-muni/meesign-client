@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:convert/convert.dart';
 import 'package:drift/drift.dart';
 import 'package:meesign_core/src/database/daos.dart';
 import 'package:meesign_native/meesign_native.dart';
@@ -10,7 +11,9 @@ import 'package:meesign_network/grpc.dart' as rpc;
 import 'package:meta/meta.dart';
 import 'package:synchronized/synchronized.dart';
 
+import '../card/apdu.dart';
 import '../card/card.dart';
+import '../card/iso7816.dart';
 import '../database/database.dart' as db;
 import '../model/task.dart';
 import '../util/default_map.dart';
@@ -145,18 +148,22 @@ abstract class TaskRepository<T> {
       rpcTask.data as Uint8List,
     );
     // TODO: rollback if we fail to deliver the update
-    try {
-      await _taskSource.update(did, task.id, res.data, task.attempt);
-    } on GrpcError catch (e) {
-      // FIXME: avoid matching error strings
-      if (e.message == 'Stale update') return task;
-      rethrow;
+    bool forCard = res.recipient == Recipient.Card;
+    if (!forCard) {
+      try {
+        await _taskSource.update(did, task.id, res.data, task.attempt);
+      } on GrpcError catch (e) {
+        // FIXME: avoid matching error strings
+        if (e.message == 'Stale update') return task;
+        rethrow;
+      }
     }
 
     return task.copyWith(
-      state: TaskState.running,
+      state: forCard ? TaskState.needsCard : TaskState.running,
       round: task.round + 1,
       context: Value(res.context),
+      data: Value(forCard ? res.data : null),
     );
   }
 
@@ -281,7 +288,58 @@ abstract class TaskRepository<T> {
 
   // TODO: provide finer control? expose just list of task ids?
 
-  Future<void> advanceTaskWithCard(Uuid did, Uuid tid, Card card) async {
-    throw UnimplementedError();
+  Future<void> _advanceTaskWithCardUnsafe(Uuid did, Uuid tid, Card card) async {
+    final task = await _taskDao.getTask(did.bytes, tid.bytes);
+    if (task == null || task.state != TaskState.needsCard) {
+      throw StateException();
+    }
+    final group = await (task.gid != null
+        ? _taskDao.getGroup(did.bytes, gid: task.gid)
+        // applies for unfinished group tasks
+        : _taskDao.getGroup(did.bytes, tid: tid.bytes));
+
+    final aid = hex.decode(group.protocol.aid!);
+    final resp = await card.send(CommandApdu(
+      Iso7816.claIso7816,
+      Iso7816.insSelect,
+      p1: 0x04,
+      data: aid,
+    ));
+    if (resp.status != Iso7816.swNoError) throw SelectException();
+
+    try {
+      Uint8List context = task.context!, data = task.data!;
+      int recipient;
+      do {
+        final resp = await card.transceive(data);
+        final res = await ProtocolWrapper.advance(context, resp);
+        // TODO: save intermediate res to db?
+        context = res.context;
+        data = res.data;
+        recipient = res.recipient;
+      } while (recipient != Recipient.Server);
+
+      await _taskSource.update(did, task.id, data, task.attempt);
+
+      final newTask = task.copyWith(
+        state: TaskState.running,
+        context: Value(context),
+        data: Value(null),
+      );
+      await _taskDao.upsertTask(newTask.toCompanion(true));
+    } on Exception {
+      final newTask = task.copyWith(
+        state: TaskState.failed,
+        context: Value(null),
+        data: Value(null),
+      );
+      await _taskDao.upsertTask(newTask.toCompanion(true));
+      rethrow;
+    }
   }
+
+  Future<void> advanceTaskWithCard(Uuid did, Uuid tid, Card card) =>
+      taskLocks[did][tid].synchronized(
+        () => _advanceTaskWithCardUnsafe(did, tid, card),
+      );
 }

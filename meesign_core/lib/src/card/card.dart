@@ -11,3 +11,5 @@ abstract class Card {
 
   Future<void> disconnect();
 }
+
+class SelectException implements Exception {}
