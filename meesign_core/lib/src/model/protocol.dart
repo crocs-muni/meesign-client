@@ -4,7 +4,7 @@ import 'package:meesign_network/grpc.dart';
 enum Protocol {
   gg18(6, 10),
   elgamal(4, 2),
-  frost(3, 3);
+  frost(3, 3, aid: '6a6366726f7374617070');
 
   final int keygenRounds;
   final int signRounds;
