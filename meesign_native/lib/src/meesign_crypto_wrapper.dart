@@ -31,6 +31,11 @@ extension BufferConversion on Buffer {
 class ProtocolException implements Exception {
   final String message;
   ProtocolException(this.message);
+
+  @override
+  String toString() {
+    return 'ProtocolException: $message';
+  }
 }
 
 class ProtocolData {
