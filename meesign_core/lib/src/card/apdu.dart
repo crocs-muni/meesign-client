@@ -11,10 +11,12 @@ class CommandApdu {
     List<int>? data,
   ]) {
     _builder.add([cla, ins, p1, p2]);
-    if (data != null) _builder.add(data);
+    if (data != null) {
+      if (data.isEmpty) return;
+      _builder.addByte(data.length);
+      _builder.add(data);
+    }
   }
-
-  void add(List<int> data) => _builder.add(data);
 
   Uint8List takeBytes() => _builder.takeBytes();
 }
