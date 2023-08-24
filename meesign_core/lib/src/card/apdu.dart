@@ -5,11 +5,11 @@ class CommandApdu {
 
   CommandApdu(
     int cla,
-    int ins, [
+    int ins, {
     int p1 = 0,
     int p2 = 0,
     List<int>? data,
-  ]) {
+  }) {
     _builder.add([cla, ins, p1, p2]);
     if (data != null) {
       if (data.isEmpty) return;
