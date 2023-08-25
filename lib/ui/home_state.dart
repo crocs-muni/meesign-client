@@ -101,6 +101,9 @@ class HomeState with ChangeNotifier {
     await _fileRepository.sign(file.name, await file.readAsBytes(), group.id);
   }
 
+  Future<void> challenge(String name, String message, Group group) =>
+      _challengeRepository.sign(name, utf8.encode(message), group.id);
+
   Future<void> encrypt(String description, String message, Group group) =>
       _decryptRepository.encrypt(description, utf8.encode(message), group.id);
 

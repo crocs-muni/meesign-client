@@ -568,6 +568,9 @@ class _HomePageViewState extends State<HomePageView> {
         },
       );
 
+  // TODO: reduce repetition across request methods
+  // (_sign, _challenge, _group, _encrypt)
+
   Future<void> _sign() async {
     final file = await _pickPdfFile();
     if (file == null) return;
@@ -588,6 +591,26 @@ class _HomePageViewState extends State<HomePageView> {
     } catch (e) {
       showErrorDialog(
         title: 'Sign request failed',
+        desc: 'Please try again.',
+      );
+      rethrow;
+    }
+  }
+
+  Future<void> _challenge() async {
+    final result = await _inputMessage();
+    if (result == null) return;
+
+    final group = await _selectGroup(KeyType.signChallenge);
+    if (group == null) return;
+
+    try {
+      await context
+          .read<HomeState>()
+          .challenge(result.description, result.message, group);
+    } catch (e) {
+      showErrorDialog(
+        title: 'Challenge request failed',
         desc: 'Please try again.',
       );
       rethrow;
@@ -646,7 +669,12 @@ class _HomePageViewState extends State<HomePageView> {
         label: const Text('Sign'),
         icon: const Icon(Icons.add),
       ),
-      null,
+      FloatingActionButton.extended(
+        key: const ValueKey('ChallengeFab'),
+        onPressed: _challenge,
+        label: const Text('Challenge'),
+        icon: const Icon(Icons.add),
+      ),
       FloatingActionButton.extended(
         key: const ValueKey('EncryptFab'),
         onPressed: _encrypt,
