@@ -13,7 +13,7 @@ class NfcCard extends Card {
 
   @override
   Future<Uint8List> transceive(Uint8List data) =>
-      FlutterNfcKit.transceive(data);
+      FlutterNfcKit.transceive(data, timeout: const Duration(seconds: 8));
 
   @override
   Future<void> disconnect() => FlutterNfcKit.finish();
