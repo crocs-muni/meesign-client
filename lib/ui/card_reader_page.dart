@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart' hide Card;
 import 'package:meesign_core/meesign_card.dart';
 
@@ -19,7 +21,12 @@ sealed class ReaderStatus {
 
 class ReaderOkStatus extends ReaderStatus {
   const ReaderOkStatus._(String message) : super._(message);
-  static const waiting = ReaderOkStatus._('Hold a card near the reader');
+
+  static final waiting = ReaderOkStatus._(
+    Platform.isAndroid || Platform.isIOS
+        ? 'Hold a card near the device'
+        : 'Insert a card into the reader',
+  );
   static const working = ReaderOkStatus._('Do not remove the card');
 }
 
