@@ -481,45 +481,47 @@ class _HomePageViewState extends State<HomePageView> {
     );
   }
 
-  Future<List<String>?> _inputMessage() async {
-    return showDialog<List<String>?>(
+  Future<({String description, String message})?> _inputMessage() async {
+    return showDialog<({String description, String message})?>(
       context: context,
       builder: (context) {
         var description = TextEditingController();
         var message = TextEditingController();
 
-        return SimpleDialog(title: const Text('Input message'), children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: TextField(
-              controller: description,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Description',
-              ),
+        return AlertDialog(
+          title: const Text('Enter message'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: message,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Message',
+            TextButton(
+              onPressed: () => Navigator.pop(context,
+                  (description: description.text, message: message.text)),
+              child: const Text('Next'),
+            )
+          ],
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: description,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Description',
+                ),
               ),
-            ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: message,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Message',
+                ),
+              ),
+            ],
           ),
-          Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ElevatedButton(
-                  onPressed: () {
-                    var result = List<String>.empty(growable: true);
-                    result.add(description.text);
-                    result.add(message.text);
-                    Navigator.pop(context, result);
-                  },
-                  child: const Text("Next"))),
-        ]);
+        );
       },
     );
   }
@@ -609,14 +611,16 @@ class _HomePageViewState extends State<HomePageView> {
   }
 
   Future<void> _encrypt() async {
-    final message = await _inputMessage();
-    if (message == null) return;
+    final result = await _inputMessage();
+    if (result == null) return;
 
     final group = await _selectGroup(KeyType.decrypt); // TODO change
     if (group == null) return;
 
     try {
-      await context.read<HomeState>().encrypt(message[0], message[1], group);
+      await context
+          .read<HomeState>()
+          .encrypt(result.description, result.message, group);
     } catch (e) {
       showErrorDialog(
         title: 'Decryption request failed',
