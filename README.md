@@ -49,3 +49,11 @@ To learn more about MeeSign, visit [our website](https://meesign.crocs.fi.muni.c
 The build can be customized by passing `--dart-define=OPTION=VALUE` to `flutter run` or `flutter build`, see `flutter run --help` for more details. The following definitions are considered:
 
 * `ALLOW_BAD_CERTS`: If `true`, certificate checks are skipped and any server certificate is accepted.
+
+## Card Support
+
+For increased security, the app can optionally transfer the user's private key share in the given group to a smart card. To use this feature, install a supported applet on your card and select the appropriate protocol when creating a new group.
+
+Supported applets:
+
+* [JCFROST](https://github.com/crocs-muni/JCFROST)
