@@ -23,6 +23,7 @@ class Users extends Table {
 class Tasks extends Table {
   BlobColumn get id => blob()();
   BlobColumn get did => blob()();
+  BlobColumn get gid => blob().nullable().references(Groups, #id)();
   TextColumn get state => textEnum<TaskState>()();
   BoolColumn get approved => boolean().withDefault(const Constant(false))();
   IntColumn get round => integer().withDefault(const Constant(0))();
@@ -64,7 +65,6 @@ class GroupMembers extends Table {
 class Files extends Table {
   BlobColumn get tid => blob()();
   BlobColumn get did => blob()();
-  BlobColumn get gid => blob().references(Groups, #id)();
   TextColumn get name => text()();
 
   @override
@@ -74,7 +74,6 @@ class Files extends Table {
 class Challenges extends Table {
   BlobColumn get tid => blob()();
   BlobColumn get did => blob()();
-  BlobColumn get gid => blob().references(Groups, #id)();
   TextColumn get name => text()();
   BlobColumn get data => blob()();
 
@@ -85,7 +84,6 @@ class Challenges extends Table {
 class Decrypts extends Table {
   BlobColumn get tid => blob()();
   BlobColumn get did => blob()();
-  BlobColumn get gid => blob().references(Groups, #id)();
   TextColumn get name => text()();
   BlobColumn get data => blob()();
 

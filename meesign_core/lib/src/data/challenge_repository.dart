@@ -44,6 +44,7 @@ class ChallengeRepository extends TaskRepository<Challenge> {
         db.TasksCompanion.insert(
           id: tid,
           did: did.bytes,
+          gid: Value(req.groupId as Uint8List),
           state: TaskState.created,
         ),
       );
@@ -52,7 +53,6 @@ class ChallengeRepository extends TaskRepository<Challenge> {
         db.ChallengesCompanion.insert(
           tid: tid,
           did: did.bytes,
-          gid: req.groupId as Uint8List,
           name: req.name,
           data: req.data as Uint8List,
         ),
@@ -62,8 +62,7 @@ class ChallengeRepository extends TaskRepository<Challenge> {
 
   @override
   Future<db.Task> initTask(Uuid did, db.Task task) async {
-    final challenge = await _taskDao.getChallenge(did.bytes, task.id);
-    final group = await _taskDao.getGroup(did.bytes, gid: challenge.gid);
+    final group = await _taskDao.getGroup(did.bytes, gid: task.gid);
     return task.copyWith(
       context: Value(ProtocolWrapper.init(
         group.protocol.toNative(),

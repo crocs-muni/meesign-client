@@ -11,8 +11,8 @@ mixin _$UserDaoMixin on DatabaseAccessor<Database> {
   $UsersTable get users => attachedDatabase.users;
 }
 mixin _$TaskDaoMixin on DatabaseAccessor<Database> {
-  $TasksTable get tasks => attachedDatabase.tasks;
   $GroupsTable get groups => attachedDatabase.groups;
+  $TasksTable get tasks => attachedDatabase.tasks;
   $DevicesTable get devices => attachedDatabase.devices;
   $GroupMembersTable get groupMembers => attachedDatabase.groupMembers;
   $FilesTable get files => attachedDatabase.files;
