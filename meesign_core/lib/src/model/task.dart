@@ -3,7 +3,7 @@ import 'package:meta/meta.dart';
 import '../database/database.dart' as db;
 import '../util/uuid.dart';
 
-enum TaskState { created, running, finished, failed }
+enum TaskState { created, running, needsCard, finished, failed }
 
 // TODO: use freezed package?
 @immutable

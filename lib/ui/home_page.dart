@@ -41,6 +41,8 @@ class TaskStateIndicator extends StatelessWidget {
             strokeWidth: 2.0,
           ),
         );
+      case TaskState.needsCard:
+        return const Icon(Icons.payment);
       case TaskState.finished:
         return const Icon(Icons.check, color: Colors.green);
       case TaskState.failed:
@@ -69,6 +71,8 @@ String? statusMessage(Task task) {
           '${task.approved ? 'by others' : ''}';
     case TaskState.running:
       return 'Working on task';
+    case TaskState.needsCard:
+      return 'Needs card to continue';
     case TaskState.finished:
       return null;
     case TaskState.failed:
