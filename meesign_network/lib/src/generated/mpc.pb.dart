@@ -739,6 +739,7 @@ class DecryptRequest extends $pb.GeneratedMessage {
         2, _omitFieldNames ? '' : 'groupId', $pb.PbFieldType.OY)
     ..a<$core.List<$core.int>>(
         3, _omitFieldNames ? '' : 'data', $pb.PbFieldType.OY)
+    ..aOS(4, _omitFieldNames ? '' : 'dataType')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('Using this can add significant overhead to your binary. '
@@ -799,6 +800,18 @@ class DecryptRequest extends $pb.GeneratedMessage {
   $core.bool hasData() => $_has(2);
   @$pb.TagNumber(3)
   void clearData() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get dataType => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set dataType($core.String v) {
+    $_setString(3, v);
+  }
+
+  @$pb.TagNumber(4)
+  $core.bool hasDataType() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearDataType() => clearField(4);
 }
 
 class TaskRequest extends $pb.GeneratedMessage {

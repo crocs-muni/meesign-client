@@ -240,13 +240,15 @@ const DecryptRequest$json = {
     {'1': 'name', '3': 1, '4': 1, '5': 9, '10': 'name'},
     {'1': 'group_id', '3': 2, '4': 1, '5': 12, '10': 'groupId'},
     {'1': 'data', '3': 3, '4': 1, '5': 12, '10': 'data'},
+    {'1': 'data_type', '3': 4, '4': 1, '5': 9, '10': 'dataType'},
   ],
 };
 
 /// Descriptor for `DecryptRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List decryptRequestDescriptor = $convert.base64Decode(
     'Cg5EZWNyeXB0UmVxdWVzdBISCgRuYW1lGAEgASgJUgRuYW1lEhkKCGdyb3VwX2lkGAIgASgMUg'
-    'dncm91cElkEhIKBGRhdGEYAyABKAxSBGRhdGE=');
+    'dncm91cElkEhIKBGRhdGEYAyABKAxSBGRhdGESGwoJZGF0YV90eXBlGAQgASgJUghkYXRhVHlw'
+    'ZQ==');
 
 @$core.Deprecated('Use taskRequestDescriptor instead')
 const TaskRequest$json = {
