@@ -12,6 +12,7 @@ import 'package:meesign_core/meesign_card.dart';
 import 'package:meesign_core/meesign_data.dart';
 import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../app_container.dart';
@@ -397,11 +398,34 @@ class ChallengeSubPage extends StatelessWidget {
 class DecryptSubPage extends StatelessWidget {
   const DecryptSubPage({Key? key}) : super(key: key);
 
-  void showDecryptDialog(BuildContext context, Decrypt decrypt) {
-    showDialog(
+  Future<void> showDecryptDialog(BuildContext context, Decrypt decrypt) async {
+    const duration = Duration(seconds: 5);
+    const refreshInterval = Duration(milliseconds: 20);
+    int steps = duration.inMilliseconds ~/ refreshInterval.inMilliseconds;
+    final countdown =
+        RangeStream(steps, 0).interval(refreshInterval).shareValue();
+    final sub = countdown.listen((value) {
+      if (value == 0) Navigator.pop(context);
+    });
+
+    await showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
+          icon: StreamBuilder(
+            stream: countdown,
+            builder: (context, snapshot) {
+              return Center(
+                child: SizedBox.square(
+                  dimension: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    value: (snapshot.data ?? steps) / steps,
+                  ),
+                ),
+              );
+            },
+          ),
           title: Text(decrypt.name),
           content: switch (decrypt.dataType) {
             MimeType.textUtf8 =>
@@ -419,6 +443,8 @@ class DecryptSubPage extends StatelessWidget {
         );
       },
     );
+
+    sub.cancel();
   }
 
   @override
