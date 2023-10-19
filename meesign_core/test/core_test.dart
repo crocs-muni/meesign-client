@@ -156,7 +156,8 @@ void main() {
       n: n,
       t: t,
       createTask: (_, Group g) async {
-        await decryptRepository.encrypt('test secret', message, g.id);
+        await decryptRepository.encrypt(
+            'test secret', MimeType.octetStream, message, g.id);
       },
     );
     final results = [for (var d in decrypts) d.data];

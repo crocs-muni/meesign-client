@@ -405,9 +405,15 @@ class DecryptSubPage extends StatelessWidget {
           hint: 'Requests for decryptions.',
         ),
         taskBuilder: (context, task, finished) {
-          final desc = finished
-              ? utf8.decode(task.info.data, allowMalformed: true)
-              : statusMessage(task);
+          String? desc;
+          if (finished) {
+            desc = task.info.dataType == MimeType.textUtf8
+                ? desc = utf8.decode(task.info.data, allowMalformed: true)
+                : 'Unknown data type';
+          } else {
+            desc = statusMessage(task);
+          }
+
           return TaskTile(
             task: task,
             name: task.info.name,

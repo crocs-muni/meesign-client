@@ -10,4 +10,5 @@ export 'src/model/protocol.dart' show Protocol;
 export 'src/model/key_type.dart' show KeyType;
 export 'src/model/user.dart';
 
+export 'src/util/mime_type.dart';
 export 'src/util/uuid.dart';

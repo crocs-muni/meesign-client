@@ -8,6 +8,7 @@ import '../model/decrypt.dart';
 import '../model/group.dart';
 import '../model/protocol.dart';
 import '../model/task.dart';
+import '../util/mime_type.dart';
 import '../util/uuid.dart';
 import 'task_repository.dart';
 import 'network_dispatcher.dart';
@@ -22,18 +23,20 @@ class DecryptRepository extends TaskRepository<Decrypt> {
     this._taskDao,
   ) : super(rpc.TaskType.DECRYPT, taskSource, _taskDao);
 
-  /// Encrypt a message for the given group.
+  /// Encrypt data for the given group.
   Future<void> encrypt(
     String description,
-    List<int> message,
+    MimeType dataType,
+    List<int> data,
     List<int> gid,
   ) async {
-    final data = ElGamalWrapper.encrypt(message, gid);
+    final enc = ElGamalWrapper.encrypt(data, gid);
     await _dispatcher.unauth.decrypt(
       rpc.DecryptRequest()
         ..groupId = gid
         ..name = description
-        ..data = data,
+        ..dataType = dataType.value
+        ..data = enc,
     );
   }
 
@@ -92,7 +95,12 @@ class DecryptRepository extends TaskRepository<Decrypt> {
   Stream<List<Task<Decrypt>>> observeTasks(Uuid did) {
     Task<Decrypt> toModel(DecryptTask dt) {
       final group = dt.group.toModel();
-      final decrypt = Decrypt(dt.decrypt.name, group, dt.decrypt.data);
+      final decrypt = Decrypt(
+        dt.decrypt.name,
+        group,
+        MimeType(dt.decrypt.dataType),
+        dt.decrypt.data,
+      );
       return TaskConversion.fromEntity(
           dt.task, group.protocol.signRounds, decrypt);
     }

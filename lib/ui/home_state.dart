@@ -105,7 +105,12 @@ class HomeState with ChangeNotifier {
       _challengeRepository.sign(name, utf8.encode(message), group.id);
 
   Future<void> encrypt(String description, String message, Group group) =>
-      _decryptRepository.encrypt(description, utf8.encode(message), group.id);
+      _decryptRepository.encrypt(
+        description,
+        MimeType.textUtf8,
+        utf8.encode(message),
+        group.id,
+      );
 
   Future<void> joinGroup(Task<Group> task,
           {required bool agree, bool withCard = false}) =>
