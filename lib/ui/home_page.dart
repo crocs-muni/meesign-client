@@ -395,6 +395,28 @@ class ChallengeSubPage extends StatelessWidget {
 class DecryptSubPage extends StatelessWidget {
   const DecryptSubPage({Key? key}) : super(key: key);
 
+  void showDecryptDialog(BuildContext context, Decrypt decrypt) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(decrypt.name),
+          content: switch (decrypt.dataType) {
+            MimeType.textUtf8 =>
+              Text(utf8.decode(decrypt.data, allowMalformed: true)),
+            _ => const Text('Error: Unknown data type'),
+          },
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Hide'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<HomeState>(builder: (context, model, child) {
@@ -405,19 +427,10 @@ class DecryptSubPage extends StatelessWidget {
           hint: 'Requests for decryptions.',
         ),
         taskBuilder: (context, task, finished) {
-          String? desc;
-          if (finished) {
-            desc = task.info.dataType == MimeType.textUtf8
-                ? desc = utf8.decode(task.info.data, allowMalformed: true)
-                : 'Unknown data type';
-          } else {
-            desc = statusMessage(task);
-          }
-
           return TaskTile(
             task: task,
             name: task.info.name,
-            desc: desc,
+            desc: statusMessage(task),
             actionChip: EntityChip(name: task.info.group.name),
             approveActions: [
               FilledButton.tonal(
@@ -428,6 +441,13 @@ class DecryptSubPage extends StatelessWidget {
                 child: const Text('Decline'),
                 onPressed: () => model.joinDecrypt(task, agree: false),
               )
+            ],
+            actions: [
+              if (finished)
+                FilledButton.tonal(
+                  onPressed: () => showDecryptDialog(context, task.info),
+                  child: const Text('View'),
+                )
             ],
           );
         },
