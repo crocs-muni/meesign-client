@@ -1964,13 +1964,19 @@ class $DecryptsTable extends Decrypts with TableInfo<$DecryptsTable, Decrypt> {
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
       'name', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _dataTypeMeta =
+      const VerificationMeta('dataType');
+  @override
+  late final GeneratedColumn<String> dataType = GeneratedColumn<String>(
+      'data_type', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _dataMeta = const VerificationMeta('data');
   @override
   late final GeneratedColumn<Uint8List> data = GeneratedColumn<Uint8List>(
       'data', aliasedName, false,
       type: DriftSqlType.blob, requiredDuringInsert: true);
   @override
-  List<GeneratedColumn> get $columns => [tid, did, name, data];
+  List<GeneratedColumn> get $columns => [tid, did, name, dataType, data];
   @override
   String get aliasedName => _alias ?? 'decrypts';
   @override
@@ -1998,6 +2004,12 @@ class $DecryptsTable extends Decrypts with TableInfo<$DecryptsTable, Decrypt> {
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
+    if (data.containsKey('data_type')) {
+      context.handle(_dataTypeMeta,
+          dataType.isAcceptableOrUnknown(data['data_type']!, _dataTypeMeta));
+    } else if (isInserting) {
+      context.missing(_dataTypeMeta);
+    }
     if (data.containsKey('data')) {
       context.handle(
           _dataMeta, this.data.isAcceptableOrUnknown(data['data']!, _dataMeta));
@@ -2019,6 +2031,8 @@ class $DecryptsTable extends Decrypts with TableInfo<$DecryptsTable, Decrypt> {
           .read(DriftSqlType.blob, data['${effectivePrefix}did'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      dataType: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}data_type'])!,
       data: attachedDatabase.typeMapping
           .read(DriftSqlType.blob, data['${effectivePrefix}data'])!,
     );
@@ -2034,11 +2048,13 @@ class Decrypt extends DataClass implements Insertable<Decrypt> {
   final Uint8List tid;
   final Uint8List did;
   final String name;
+  final String dataType;
   final Uint8List data;
   const Decrypt(
       {required this.tid,
       required this.did,
       required this.name,
+      required this.dataType,
       required this.data});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2046,6 +2062,7 @@ class Decrypt extends DataClass implements Insertable<Decrypt> {
     map['tid'] = Variable<Uint8List>(tid);
     map['did'] = Variable<Uint8List>(did);
     map['name'] = Variable<String>(name);
+    map['data_type'] = Variable<String>(dataType);
     map['data'] = Variable<Uint8List>(data);
     return map;
   }
@@ -2055,6 +2072,7 @@ class Decrypt extends DataClass implements Insertable<Decrypt> {
       tid: Value(tid),
       did: Value(did),
       name: Value(name),
+      dataType: Value(dataType),
       data: Value(data),
     );
   }
@@ -2066,6 +2084,7 @@ class Decrypt extends DataClass implements Insertable<Decrypt> {
       tid: serializer.fromJson<Uint8List>(json['tid']),
       did: serializer.fromJson<Uint8List>(json['did']),
       name: serializer.fromJson<String>(json['name']),
+      dataType: serializer.fromJson<String>(json['dataType']),
       data: serializer.fromJson<Uint8List>(json['data']),
     );
   }
@@ -2076,16 +2095,22 @@ class Decrypt extends DataClass implements Insertable<Decrypt> {
       'tid': serializer.toJson<Uint8List>(tid),
       'did': serializer.toJson<Uint8List>(did),
       'name': serializer.toJson<String>(name),
+      'dataType': serializer.toJson<String>(dataType),
       'data': serializer.toJson<Uint8List>(data),
     };
   }
 
   Decrypt copyWith(
-          {Uint8List? tid, Uint8List? did, String? name, Uint8List? data}) =>
+          {Uint8List? tid,
+          Uint8List? did,
+          String? name,
+          String? dataType,
+          Uint8List? data}) =>
       Decrypt(
         tid: tid ?? this.tid,
         did: did ?? this.did,
         name: name ?? this.name,
+        dataType: dataType ?? this.dataType,
         data: data ?? this.data,
       );
   @override
@@ -2094,14 +2119,19 @@ class Decrypt extends DataClass implements Insertable<Decrypt> {
           ..write('tid: $tid, ')
           ..write('did: $did, ')
           ..write('name: $name, ')
+          ..write('dataType: $dataType, ')
           ..write('data: $data')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash($driftBlobEquality.hash(tid),
-      $driftBlobEquality.hash(did), name, $driftBlobEquality.hash(data));
+  int get hashCode => Object.hash(
+      $driftBlobEquality.hash(tid),
+      $driftBlobEquality.hash(did),
+      name,
+      dataType,
+      $driftBlobEquality.hash(data));
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2109,6 +2139,7 @@ class Decrypt extends DataClass implements Insertable<Decrypt> {
           $driftBlobEquality.equals(other.tid, this.tid) &&
           $driftBlobEquality.equals(other.did, this.did) &&
           other.name == this.name &&
+          other.dataType == this.dataType &&
           $driftBlobEquality.equals(other.data, this.data));
 }
 
@@ -2116,12 +2147,14 @@ class DecryptsCompanion extends UpdateCompanion<Decrypt> {
   final Value<Uint8List> tid;
   final Value<Uint8List> did;
   final Value<String> name;
+  final Value<String> dataType;
   final Value<Uint8List> data;
   final Value<int> rowid;
   const DecryptsCompanion({
     this.tid = const Value.absent(),
     this.did = const Value.absent(),
     this.name = const Value.absent(),
+    this.dataType = const Value.absent(),
     this.data = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -2129,16 +2162,19 @@ class DecryptsCompanion extends UpdateCompanion<Decrypt> {
     required Uint8List tid,
     required Uint8List did,
     required String name,
+    required String dataType,
     required Uint8List data,
     this.rowid = const Value.absent(),
   })  : tid = Value(tid),
         did = Value(did),
         name = Value(name),
+        dataType = Value(dataType),
         data = Value(data);
   static Insertable<Decrypt> custom({
     Expression<Uint8List>? tid,
     Expression<Uint8List>? did,
     Expression<String>? name,
+    Expression<String>? dataType,
     Expression<Uint8List>? data,
     Expression<int>? rowid,
   }) {
@@ -2146,6 +2182,7 @@ class DecryptsCompanion extends UpdateCompanion<Decrypt> {
       if (tid != null) 'tid': tid,
       if (did != null) 'did': did,
       if (name != null) 'name': name,
+      if (dataType != null) 'data_type': dataType,
       if (data != null) 'data': data,
       if (rowid != null) 'rowid': rowid,
     });
@@ -2155,12 +2192,14 @@ class DecryptsCompanion extends UpdateCompanion<Decrypt> {
       {Value<Uint8List>? tid,
       Value<Uint8List>? did,
       Value<String>? name,
+      Value<String>? dataType,
       Value<Uint8List>? data,
       Value<int>? rowid}) {
     return DecryptsCompanion(
       tid: tid ?? this.tid,
       did: did ?? this.did,
       name: name ?? this.name,
+      dataType: dataType ?? this.dataType,
       data: data ?? this.data,
       rowid: rowid ?? this.rowid,
     );
@@ -2178,6 +2217,9 @@ class DecryptsCompanion extends UpdateCompanion<Decrypt> {
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
+    if (dataType.present) {
+      map['data_type'] = Variable<String>(dataType.value);
+    }
     if (data.present) {
       map['data'] = Variable<Uint8List>(data.value);
     }
@@ -2193,6 +2235,7 @@ class DecryptsCompanion extends UpdateCompanion<Decrypt> {
           ..write('tid: $tid, ')
           ..write('did: $did, ')
           ..write('name: $name, ')
+          ..write('dataType: $dataType, ')
           ..write('data: $data, ')
           ..write('rowid: $rowid')
           ..write(')'))

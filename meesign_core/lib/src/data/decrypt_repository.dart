@@ -60,6 +60,7 @@ class DecryptRepository extends TaskRepository<Decrypt> {
           did: did.bytes,
           name: req.name,
           data: req.data as Uint8List,
+          dataType: req.dataType,
         ),
       );
     });

@@ -85,6 +85,7 @@ class Decrypts extends Table {
   BlobColumn get tid => blob()();
   BlobColumn get did => blob()();
   TextColumn get name => text()();
+  TextColumn get dataType => text()();
   BlobColumn get data => blob()();
 
   @override
