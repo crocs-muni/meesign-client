@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:animations/animations.dart';
 import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart' hide Card;
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:meesign_core/meesign_card.dart';
 import 'package:meesign_core/meesign_data.dart';
 import 'package:open_file/open_file.dart';
@@ -404,6 +406,8 @@ class DecryptSubPage extends StatelessWidget {
           content: switch (decrypt.dataType) {
             MimeType.textUtf8 =>
               Text(utf8.decode(decrypt.data, allowMalformed: true)),
+            MimeType.imageSvg => SvgPicture.memory(decrypt.data as Uint8List),
+            var t when t.isImage => Image.memory(decrypt.data as Uint8List),
             _ => const Text('Error: Unknown data type'),
           },
           actions: [
