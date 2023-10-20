@@ -428,11 +428,16 @@ class DecryptSubPage extends StatelessWidget {
           ),
           title: Text(decrypt.name),
           content: switch (decrypt.dataType) {
-            MimeType.textUtf8 =>
-              Text(utf8.decode(decrypt.data, allowMalformed: true)),
+            MimeType.textUtf8 => Text(
+                utf8.decode(decrypt.data, allowMalformed: true),
+                textAlign: TextAlign.center,
+              ),
             MimeType.imageSvg => SvgPicture.memory(decrypt.data as Uint8List),
             var t when t.isImage => Image.memory(decrypt.data as Uint8List),
-            _ => const Text('Error: Unknown data type'),
+            _ => const Text(
+                'Error: Unknown data type',
+                textAlign: TextAlign.center,
+              ),
           },
           actions: [
             TextButton(
