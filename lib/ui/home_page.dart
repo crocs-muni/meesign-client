@@ -7,6 +7,7 @@ import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart' hide Card;
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:meesign_core/meesign_card.dart';
 import 'package:meesign_core/meesign_data.dart';
@@ -408,6 +409,10 @@ class DecryptSubPage extends StatelessWidget {
       if (value == 0) Navigator.pop(context);
     });
 
+    final text = decrypt.dataType == MimeType.textUtf8
+        ? utf8.decode(decrypt.data, allowMalformed: true)
+        : null;
+
     await showDialog(
       context: context,
       builder: (context) {
@@ -428,9 +433,22 @@ class DecryptSubPage extends StatelessWidget {
           ),
           title: Text(decrypt.name),
           content: switch (decrypt.dataType) {
-            MimeType.textUtf8 => Text(
-                utf8.decode(decrypt.data, allowMalformed: true),
-                textAlign: TextAlign.center,
+            MimeType.textUtf8 => Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(text!, textAlign: TextAlign.center),
+                  const SizedBox(height: 4),
+                  IconButton(
+                    onPressed: () {
+                      Clipboard.setData(ClipboardData(text: text));
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Copied!')),
+                      );
+                    },
+                    icon: const Icon(Icons.copy),
+                  )
+                ],
               ),
             MimeType.imageSvg => SvgPicture.memory(decrypt.data as Uint8List),
             var t when t.isImage => Image.memory(decrypt.data as Uint8List),
