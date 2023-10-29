@@ -1,9 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart' hide Card;
 import 'package:meesign_core/meesign_card.dart';
 
 import '../card/card.dart';
+import '../util/platform.dart';
 
 class CardReaderPage extends StatefulWidget {
   final Future<void> Function(Card) onCard;
@@ -23,7 +22,7 @@ class ReaderOkStatus extends ReaderStatus {
   const ReaderOkStatus._(String message) : super._(message);
 
   static final waiting = ReaderOkStatus._(
-    Platform.isAndroid || Platform.isIOS
+    PlatformGroup.isMobile
         ? 'Hold a card near the device'
         : 'Insert a card into the reader',
   );

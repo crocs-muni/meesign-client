@@ -19,6 +19,7 @@ import 'ui/new_group_page.dart';
 import 'ui/qr_identity_page.dart';
 import 'ui/qr_reader_page.dart';
 import 'ui/search_peer_page.dart';
+import 'util/platform.dart';
 
 void printUsage(ArgParser parser, IOSink sink) {
   sink.writeln('Usage:');
@@ -26,7 +27,7 @@ void printUsage(ArgParser parser, IOSink sink) {
 }
 
 Future<Directory> getAppDir() async {
-  if (Platform.isAndroid || Platform.isIOS) {
+  if (PlatformGroup.isMobile) {
     return getApplicationSupportDirectory();
   }
   final path = path_pkg.join(
