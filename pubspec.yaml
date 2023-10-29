@@ -57,6 +57,8 @@ dependencies:
   logging: ^1.2.0
   file_selector: ^1.0.0
   collection: ^1.17.1
+  mime: ^1.0.4
+  share_plus: ^7.2.1
 
 dev_dependencies:
   flutter_test:

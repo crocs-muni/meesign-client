@@ -12,9 +12,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:meesign_core/meesign_card.dart';
 import 'package:meesign_core/meesign_data.dart';
+import 'package:mime/mime.dart';
 import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../app_container.dart';
@@ -22,6 +24,7 @@ import '../card/card.dart';
 import '../routes.dart';
 import '../sync.dart';
 import '../util/chars.dart';
+import '../util/platform.dart';
 import '../widget/counter_badge.dart';
 import '../widget/empty_list.dart';
 import 'card_reader_page.dart';
@@ -400,6 +403,27 @@ class ChallengeSubPage extends StatelessWidget {
 class DecryptSubPage extends StatelessWidget {
   const DecryptSubPage({Key? key}) : super(key: key);
 
+  static Future<void> _shareDecrypt(Decrypt decrypt) async {
+    final file = XFile.fromData(
+      decrypt.data as Uint8List,
+      name: decrypt.name,
+      mimeType: decrypt.dataType.value,
+    );
+
+    if (PlatformGroup.isDesktop) {
+      final ext = extensionFromMime(decrypt.dataType.value);
+      final loc = await getSaveLocation(
+        suggestedName: '${decrypt.name}.$ext',
+      );
+      if (loc != null) {
+        file.saveTo(loc.path);
+      }
+    }
+    if (PlatformGroup.isMobile) {
+      await Share.shareXFiles([file], text: decrypt.name);
+    }
+  }
+
   Future<void> showDecryptDialog(BuildContext context, Decrypt decrypt) async {
     const duration = Duration(seconds: 5);
     const refreshInterval = Duration(milliseconds: 20);
@@ -456,6 +480,16 @@ class DecryptSubPage extends StatelessWidget {
                     );
                   },
                   icon: const Icon(Icons.copy),
+                ),
+              var t when t.isImage => IconButton(
+                  onPressed: () async {
+                    sub.pause();
+                    await _shareDecrypt(decrypt);
+                    sub.resume();
+                  },
+                  icon: Icon(PlatformGroup.isMobile
+                      ? Icons.share_outlined
+                      : Icons.save_alt),
                 ),
               _ => const SizedBox(),
             },
