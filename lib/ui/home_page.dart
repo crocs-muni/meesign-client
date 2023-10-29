@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:animations/animations.dart';
@@ -404,8 +405,10 @@ class DecryptSubPage extends StatelessWidget {
     const refreshInterval = Duration(milliseconds: 20);
     int steps = duration.inMilliseconds ~/ refreshInterval.inMilliseconds;
     final countdown =
-        RangeStream(steps, 0).interval(refreshInterval).shareValue();
+        Stream.periodic(refreshInterval, (i) => max(0, steps - i));
+    final countdownSubject = BehaviorSubject<int>();
     final sub = countdown.listen((value) {
+      countdownSubject.add(value);
       if (value == 0) Navigator.pop(context);
     });
 
@@ -418,7 +421,7 @@ class DecryptSubPage extends StatelessWidget {
       builder: (context) {
         return AlertDialog(
           icon: StreamBuilder(
-            stream: countdown,
+            stream: countdownSubject.stream,
             builder: (context, snapshot) {
               return Center(
                 child: SizedBox.square(
