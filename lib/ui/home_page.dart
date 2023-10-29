@@ -436,23 +436,7 @@ class DecryptSubPage extends StatelessWidget {
           ),
           title: Text(decrypt.name),
           content: switch (decrypt.dataType) {
-            MimeType.textUtf8 => Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(text!, textAlign: TextAlign.center),
-                  const SizedBox(height: 4),
-                  IconButton(
-                    onPressed: () {
-                      Clipboard.setData(ClipboardData(text: text));
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Copied!')),
-                      );
-                    },
-                    icon: const Icon(Icons.copy),
-                  )
-                ],
-              ),
+            MimeType.textUtf8 => Text(text!, textAlign: TextAlign.center),
             MimeType.imageSvg => SvgPicture.memory(decrypt.data as Uint8List),
             var t when t.isImage => Image.memory(decrypt.data as Uint8List),
             _ => const Text(
@@ -460,7 +444,21 @@ class DecryptSubPage extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
           },
+          actionsAlignment: MainAxisAlignment.spaceBetween,
           actions: [
+            switch (decrypt.dataType) {
+              MimeType.textUtf8 => IconButton(
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: text!));
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Copied!')),
+                    );
+                  },
+                  icon: const Icon(Icons.copy),
+                ),
+              _ => const SizedBox(),
+            },
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: const Text('Hide'),
