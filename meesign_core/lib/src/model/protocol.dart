@@ -4,7 +4,7 @@ import 'package:meesign_network/grpc.dart';
 enum Protocol {
   gg18(6, 10),
   elgamal(4, 2),
-  frost(3, 3);
+  frost(3, 3),
   // TODO those numbers are a guess work
   ptsrsap1(2, 2);
 
@@ -37,7 +37,7 @@ extension ProtocolConversion on Protocol {
       case Protocol.frost:
         return ProtocolType.FROST;
       case Protocol.ptsrsap1:
-        return ProtocolId.PTSRSAP1;
+        return ProtocolType.PTSRSAP1;
     }
   }
 
@@ -49,8 +49,8 @@ extension ProtocolConversion on Protocol {
         return Protocol.elgamal;
       case ProtocolType.FROST:
         return Protocol.frost;
-      case Protocol.ptsrsap1:
-        return ProtocolId.PtSRSAP1;
+      case ProtocolType.PTSRSAP1:
+        return Protocol.ptsrsap1;
       default:
         throw ArgumentError('Unknown protocol');
     }
