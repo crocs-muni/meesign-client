@@ -4,7 +4,7 @@
 //
 // @dart = 2.12
 
-// ignore_for_file: annotate_overrides, camel_case_types
+// ignore_for_file: annotate_overrides, camel_case_types, comment_references
 // ignore_for_file: constant_identifier_names, library_prefixes
 // ignore_for_file: non_constant_identifier_names, prefer_final_fields
 // ignore_for_file: unnecessary_import, unnecessary_this, unused_import
@@ -20,12 +20,14 @@ const ProtocolType$json = {
     {'1': 'GG18', '2': 0},
     {'1': 'ELGAMAL', '2': 1},
     {'1': 'FROST', '2': 2},
+    {'1': 'PTSRSAP1', '2': 3},
   ],
 };
 
 /// Descriptor for `ProtocolType`. Decode as a `google.protobuf.EnumDescriptorProto`.
 final $typed_data.Uint8List protocolTypeDescriptor = $convert.base64Decode(
-    'CgxQcm90b2NvbFR5cGUSCAoER0cxOBAAEgsKB0VMR0FNQUwQARIJCgVGUk9TVBAC');
+    'CgxQcm90b2NvbFR5cGUSCAoER0cxOBAAEgsKB0VMR0FNQUwQARIJCgVGUk9TVBACEgwKCFBUU1'
+    'JTQVAxEAM=');
 
 @$core.Deprecated('Use keyTypeDescriptor instead')
 const KeyType$json = {
