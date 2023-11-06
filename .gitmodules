@@ -1,3 +1,4 @@
 [submodule "meesign_native/native/meesign-crypto"]
 	path = meesign_native/native/meesign-crypto
-	url = https://github.com/crocs-muni/meesign-crypto
+    url = https://github.com/quapka/meesign-crypto.git
+    branch = add-ptsrsap1
