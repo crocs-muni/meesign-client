@@ -1,25 +1,32 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart' hide Card;
+import 'package:meesign_core/meesign_card.dart';
 
 import '../card/card.dart';
-import '../card/jobs.dart';
 
-class CardReaderPage<T> extends StatefulWidget {
-  final CardJob<T> job;
+class CardReaderPage extends StatefulWidget {
+  final Future<void> Function(Card) onCard;
 
-  const CardReaderPage({Key? key, required this.job}) : super(key: key);
+  const CardReaderPage({required this.onCard, Key? key}) : super(key: key);
 
   @override
   State<CardReaderPage> createState() => _CardReaderPageState();
 }
 
-abstract class ReaderStatus {
+sealed class ReaderStatus {
   final String message;
   const ReaderStatus._(this.message);
 }
 
 class ReaderOkStatus extends ReaderStatus {
   const ReaderOkStatus._(String message) : super._(message);
-  static const waiting = ReaderOkStatus._('Hold a card near the reader');
+
+  static final waiting = ReaderOkStatus._(
+    Platform.isAndroid || Platform.isIOS
+        ? 'Hold a card near the device'
+        : 'Insert a card into the reader',
+  );
   static const working = ReaderOkStatus._('Do not remove the card');
 }
 
@@ -29,7 +36,7 @@ class ReaderErrStatus extends ReaderStatus {
   static const initError = ReaderErrStatus._('Cannot connect to card manager');
 }
 
-class _CardReaderPageState<T> extends State<CardReaderPage<T>> {
+class _CardReaderPageState extends State<CardReaderPage> {
   final _manager = CardManager();
   ReaderStatus _status = ReaderOkStatus.waiting;
 
@@ -77,8 +84,8 @@ class _CardReaderPageState<T> extends State<CardReaderPage<T>> {
       setStatus(ReaderOkStatus.working);
 
       try {
-        final result = await widget.job.work(card);
-        Navigator.pop(context, result);
+        await widget.onCard(card);
+        Navigator.pop(context);
       } finally {
         await card.disconnect();
         setStatus(ReaderOkStatus.waiting);
@@ -137,14 +144,5 @@ class _CardReaderPageState<T> extends State<CardReaderPage<T>> {
         ],
       ),
     );
-  }
-}
-
-class AddCardPage extends StatelessWidget {
-  const AddCardPage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const CardReaderPage(job: AddCardJob());
   }
 }

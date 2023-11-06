@@ -23,11 +23,13 @@ class Users extends Table {
 class Tasks extends Table {
   BlobColumn get id => blob()();
   BlobColumn get did => blob()();
+  BlobColumn get gid => blob().nullable().references(Groups, #id)();
   TextColumn get state => textEnum<TaskState>()();
   BoolColumn get approved => boolean().withDefault(const Constant(false))();
   IntColumn get round => integer().withDefault(const Constant(0))();
   IntColumn get attempt => integer().withDefault(const Constant(0))();
   BlobColumn get context => blob().nullable()();
+  BlobColumn get data => blob().nullable()();
 
   @override
   Set<Column> get primaryKey => {id, did};
@@ -41,6 +43,7 @@ class Groups extends Table {
   IntColumn get threshold => integer()();
   TextColumn get protocol => textEnum<Protocol>()();
   TextColumn get keyType => textEnum<KeyType>()();
+  BoolColumn get withCard => boolean().withDefault(const Constant(false))();
   BlobColumn get context => blob()();
 
   @override
@@ -62,7 +65,6 @@ class GroupMembers extends Table {
 class Files extends Table {
   BlobColumn get tid => blob()();
   BlobColumn get did => blob()();
-  BlobColumn get gid => blob().references(Groups, #id)();
   TextColumn get name => text()();
 
   @override
@@ -72,7 +74,6 @@ class Files extends Table {
 class Challenges extends Table {
   BlobColumn get tid => blob()();
   BlobColumn get did => blob()();
-  BlobColumn get gid => blob().references(Groups, #id)();
   TextColumn get name => text()();
   BlobColumn get data => blob()();
 
@@ -83,7 +84,6 @@ class Challenges extends Table {
 class Decrypts extends Table {
   BlobColumn get tid => blob()();
   BlobColumn get did => blob()();
-  BlobColumn get gid => blob().references(Groups, #id)();
   TextColumn get name => text()();
   BlobColumn get data => blob()();
 

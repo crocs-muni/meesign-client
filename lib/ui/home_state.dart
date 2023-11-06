@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/foundation.dart';
+import 'package:meesign_core/meesign_card.dart';
 import 'package:meesign_core/meesign_data.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -17,8 +18,6 @@ class HomeState with ChangeNotifier {
   // TODO: migrate from ChangeNotifier to streams
 
   List<Group> groups = [];
-  List<File> files = [];
-  List<Decrypt> decrypts = [];
 
   Device? device;
 
@@ -58,8 +57,9 @@ class HomeState with ChangeNotifier {
     final challengeTasksStream = _challengeRepository.observeTasks(did);
     final decryptTasksStream = _decryptRepository.observeTasks(did);
 
-    int pending(List<Task<dynamic>> tasks) =>
-        tasks.where((task) => task.approvable).length;
+    int pending(List<Task<dynamic>> tasks) => tasks
+        .where((task) => task.approvable || task.state == TaskState.needsCard)
+        .length;
     nGroupReqs = groupTasksStream.map(pending).shareValue();
     nSignReqs = signTasksStream.map(pending).shareValue();
     nChallengeReqs = challengeTasksStream.map(pending).shareValue();
@@ -91,14 +91,6 @@ class HomeState with ChangeNotifier {
       this.groups = groups;
       notifyListeners();
     });
-    _fileRepository.observeFiles(did).listen((files) {
-      this.files = files;
-      notifyListeners();
-    });
-    _decryptRepository.observeDecrypts(did).listen((decrypts) {
-      this.decrypts = decrypts;
-      notifyListeners();
-    });
   }
 
   Future<void> addGroup(String name, List<Device> members, int threshold,
@@ -109,15 +101,25 @@ class HomeState with ChangeNotifier {
     await _fileRepository.sign(file.name, await file.readAsBytes(), group.id);
   }
 
+  Future<void> challenge(String name, String message, Group group) =>
+      _challengeRepository.sign(name, utf8.encode(message), group.id);
+
   Future<void> encrypt(String description, String message, Group group) =>
       _decryptRepository.encrypt(description, utf8.encode(message), group.id);
 
-  Future<void> joinGroup(Task<Group> task, {required bool agree}) =>
-      _groupRepository.approveTask(device!.id, task.id, agree: agree);
+  Future<void> joinGroup(Task<Group> task,
+          {required bool agree, bool withCard = false}) =>
+      _groupRepository.approveTask(device!.id, task.id,
+          agree: agree, withCard: withCard);
   Future<void> joinSign(Task<File> task, {required bool agree}) =>
       _fileRepository.approveTask(device!.id, task.id, agree: agree);
   Future<void> joinChallenge(Task<Challenge> task, {required bool agree}) =>
       _challengeRepository.approveTask(device!.id, task.id, agree: agree);
   Future<void> joinDecrypt(Task<Decrypt> task, {required bool agree}) =>
       _decryptRepository.approveTask(device!.id, task.id, agree: agree);
+  // FIXME: avoid this repetition
+  Future<void> advanceGroupWithCard<T>(Task<T> task, Card card) =>
+      _groupRepository.advanceTaskWithCard(device!.id, task.id, card);
+  Future<void> advanceChallengeWithCard<T>(Task<T> task, Card card) =>
+      _challengeRepository.advanceTaskWithCard(device!.id, task.id, card);
 }

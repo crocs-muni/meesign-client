@@ -366,387 +366,6 @@ class UsersCompanion extends UpdateCompanion<User> {
   }
 }
 
-class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $TasksTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<Uint8List> id = GeneratedColumn<Uint8List>(
-      'id', aliasedName, false,
-      type: DriftSqlType.blob, requiredDuringInsert: true);
-  static const VerificationMeta _didMeta = const VerificationMeta('did');
-  @override
-  late final GeneratedColumn<Uint8List> did = GeneratedColumn<Uint8List>(
-      'did', aliasedName, false,
-      type: DriftSqlType.blob, requiredDuringInsert: true);
-  static const VerificationMeta _stateMeta = const VerificationMeta('state');
-  @override
-  late final GeneratedColumnWithTypeConverter<TaskState, String> state =
-      GeneratedColumn<String>('state', aliasedName, false,
-              type: DriftSqlType.string, requiredDuringInsert: true)
-          .withConverter<TaskState>($TasksTable.$converterstate);
-  static const VerificationMeta _approvedMeta =
-      const VerificationMeta('approved');
-  @override
-  late final GeneratedColumn<bool> approved =
-      GeneratedColumn<bool>('approved', aliasedName, false,
-          type: DriftSqlType.bool,
-          requiredDuringInsert: false,
-          defaultConstraints: GeneratedColumn.constraintsDependsOnDialect({
-            SqlDialect.sqlite: 'CHECK ("approved" IN (0, 1))',
-            SqlDialect.mysql: '',
-            SqlDialect.postgres: '',
-          }),
-          defaultValue: const Constant(false));
-  static const VerificationMeta _roundMeta = const VerificationMeta('round');
-  @override
-  late final GeneratedColumn<int> round = GeneratedColumn<int>(
-      'round', aliasedName, false,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultValue: const Constant(0));
-  static const VerificationMeta _attemptMeta =
-      const VerificationMeta('attempt');
-  @override
-  late final GeneratedColumn<int> attempt = GeneratedColumn<int>(
-      'attempt', aliasedName, false,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultValue: const Constant(0));
-  static const VerificationMeta _contextMeta =
-      const VerificationMeta('context');
-  @override
-  late final GeneratedColumn<Uint8List> context = GeneratedColumn<Uint8List>(
-      'context', aliasedName, true,
-      type: DriftSqlType.blob, requiredDuringInsert: false);
-  @override
-  List<GeneratedColumn> get $columns =>
-      [id, did, state, approved, round, attempt, context];
-  @override
-  String get aliasedName => _alias ?? 'tasks';
-  @override
-  String get actualTableName => 'tasks';
-  @override
-  VerificationContext validateIntegrity(Insertable<Task> instance,
-      {bool isInserting = false}) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    } else if (isInserting) {
-      context.missing(_idMeta);
-    }
-    if (data.containsKey('did')) {
-      context.handle(
-          _didMeta, did.isAcceptableOrUnknown(data['did']!, _didMeta));
-    } else if (isInserting) {
-      context.missing(_didMeta);
-    }
-    context.handle(_stateMeta, const VerificationResult.success());
-    if (data.containsKey('approved')) {
-      context.handle(_approvedMeta,
-          approved.isAcceptableOrUnknown(data['approved']!, _approvedMeta));
-    }
-    if (data.containsKey('round')) {
-      context.handle(
-          _roundMeta, round.isAcceptableOrUnknown(data['round']!, _roundMeta));
-    }
-    if (data.containsKey('attempt')) {
-      context.handle(_attemptMeta,
-          attempt.isAcceptableOrUnknown(data['attempt']!, _attemptMeta));
-    }
-    if (data.containsKey('context')) {
-      context.handle(_contextMeta,
-          this.context.isAcceptableOrUnknown(data['context']!, _contextMeta));
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id, did};
-  @override
-  Task map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Task(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.blob, data['${effectivePrefix}id'])!,
-      did: attachedDatabase.typeMapping
-          .read(DriftSqlType.blob, data['${effectivePrefix}did'])!,
-      state: $TasksTable.$converterstate.fromSql(attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}state'])!),
-      approved: attachedDatabase.typeMapping
-          .read(DriftSqlType.bool, data['${effectivePrefix}approved'])!,
-      round: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}round'])!,
-      attempt: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}attempt'])!,
-      context: attachedDatabase.typeMapping
-          .read(DriftSqlType.blob, data['${effectivePrefix}context']),
-    );
-  }
-
-  @override
-  $TasksTable createAlias(String alias) {
-    return $TasksTable(attachedDatabase, alias);
-  }
-
-  static JsonTypeConverter2<TaskState, String, String> $converterstate =
-      const EnumNameConverter<TaskState>(TaskState.values);
-}
-
-class Task extends DataClass implements Insertable<Task> {
-  final Uint8List id;
-  final Uint8List did;
-  final TaskState state;
-  final bool approved;
-  final int round;
-  final int attempt;
-  final Uint8List? context;
-  const Task(
-      {required this.id,
-      required this.did,
-      required this.state,
-      required this.approved,
-      required this.round,
-      required this.attempt,
-      this.context});
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<Uint8List>(id);
-    map['did'] = Variable<Uint8List>(did);
-    {
-      final converter = $TasksTable.$converterstate;
-      map['state'] = Variable<String>(converter.toSql(state));
-    }
-    map['approved'] = Variable<bool>(approved);
-    map['round'] = Variable<int>(round);
-    map['attempt'] = Variable<int>(attempt);
-    if (!nullToAbsent || context != null) {
-      map['context'] = Variable<Uint8List>(context);
-    }
-    return map;
-  }
-
-  TasksCompanion toCompanion(bool nullToAbsent) {
-    return TasksCompanion(
-      id: Value(id),
-      did: Value(did),
-      state: Value(state),
-      approved: Value(approved),
-      round: Value(round),
-      attempt: Value(attempt),
-      context: context == null && nullToAbsent
-          ? const Value.absent()
-          : Value(context),
-    );
-  }
-
-  factory Task.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Task(
-      id: serializer.fromJson<Uint8List>(json['id']),
-      did: serializer.fromJson<Uint8List>(json['did']),
-      state: $TasksTable.$converterstate
-          .fromJson(serializer.fromJson<String>(json['state'])),
-      approved: serializer.fromJson<bool>(json['approved']),
-      round: serializer.fromJson<int>(json['round']),
-      attempt: serializer.fromJson<int>(json['attempt']),
-      context: serializer.fromJson<Uint8List?>(json['context']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<Uint8List>(id),
-      'did': serializer.toJson<Uint8List>(did),
-      'state':
-          serializer.toJson<String>($TasksTable.$converterstate.toJson(state)),
-      'approved': serializer.toJson<bool>(approved),
-      'round': serializer.toJson<int>(round),
-      'attempt': serializer.toJson<int>(attempt),
-      'context': serializer.toJson<Uint8List?>(context),
-    };
-  }
-
-  Task copyWith(
-          {Uint8List? id,
-          Uint8List? did,
-          TaskState? state,
-          bool? approved,
-          int? round,
-          int? attempt,
-          Value<Uint8List?> context = const Value.absent()}) =>
-      Task(
-        id: id ?? this.id,
-        did: did ?? this.did,
-        state: state ?? this.state,
-        approved: approved ?? this.approved,
-        round: round ?? this.round,
-        attempt: attempt ?? this.attempt,
-        context: context.present ? context.value : this.context,
-      );
-  @override
-  String toString() {
-    return (StringBuffer('Task(')
-          ..write('id: $id, ')
-          ..write('did: $did, ')
-          ..write('state: $state, ')
-          ..write('approved: $approved, ')
-          ..write('round: $round, ')
-          ..write('attempt: $attempt, ')
-          ..write('context: $context')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(
-      $driftBlobEquality.hash(id),
-      $driftBlobEquality.hash(did),
-      state,
-      approved,
-      round,
-      attempt,
-      $driftBlobEquality.hash(context));
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is Task &&
-          $driftBlobEquality.equals(other.id, this.id) &&
-          $driftBlobEquality.equals(other.did, this.did) &&
-          other.state == this.state &&
-          other.approved == this.approved &&
-          other.round == this.round &&
-          other.attempt == this.attempt &&
-          $driftBlobEquality.equals(other.context, this.context));
-}
-
-class TasksCompanion extends UpdateCompanion<Task> {
-  final Value<Uint8List> id;
-  final Value<Uint8List> did;
-  final Value<TaskState> state;
-  final Value<bool> approved;
-  final Value<int> round;
-  final Value<int> attempt;
-  final Value<Uint8List?> context;
-  final Value<int> rowid;
-  const TasksCompanion({
-    this.id = const Value.absent(),
-    this.did = const Value.absent(),
-    this.state = const Value.absent(),
-    this.approved = const Value.absent(),
-    this.round = const Value.absent(),
-    this.attempt = const Value.absent(),
-    this.context = const Value.absent(),
-    this.rowid = const Value.absent(),
-  });
-  TasksCompanion.insert({
-    required Uint8List id,
-    required Uint8List did,
-    required TaskState state,
-    this.approved = const Value.absent(),
-    this.round = const Value.absent(),
-    this.attempt = const Value.absent(),
-    this.context = const Value.absent(),
-    this.rowid = const Value.absent(),
-  })  : id = Value(id),
-        did = Value(did),
-        state = Value(state);
-  static Insertable<Task> custom({
-    Expression<Uint8List>? id,
-    Expression<Uint8List>? did,
-    Expression<String>? state,
-    Expression<bool>? approved,
-    Expression<int>? round,
-    Expression<int>? attempt,
-    Expression<Uint8List>? context,
-    Expression<int>? rowid,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (did != null) 'did': did,
-      if (state != null) 'state': state,
-      if (approved != null) 'approved': approved,
-      if (round != null) 'round': round,
-      if (attempt != null) 'attempt': attempt,
-      if (context != null) 'context': context,
-      if (rowid != null) 'rowid': rowid,
-    });
-  }
-
-  TasksCompanion copyWith(
-      {Value<Uint8List>? id,
-      Value<Uint8List>? did,
-      Value<TaskState>? state,
-      Value<bool>? approved,
-      Value<int>? round,
-      Value<int>? attempt,
-      Value<Uint8List?>? context,
-      Value<int>? rowid}) {
-    return TasksCompanion(
-      id: id ?? this.id,
-      did: did ?? this.did,
-      state: state ?? this.state,
-      approved: approved ?? this.approved,
-      round: round ?? this.round,
-      attempt: attempt ?? this.attempt,
-      context: context ?? this.context,
-      rowid: rowid ?? this.rowid,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<Uint8List>(id.value);
-    }
-    if (did.present) {
-      map['did'] = Variable<Uint8List>(did.value);
-    }
-    if (state.present) {
-      final converter = $TasksTable.$converterstate;
-      map['state'] = Variable<String>(converter.toSql(state.value));
-    }
-    if (approved.present) {
-      map['approved'] = Variable<bool>(approved.value);
-    }
-    if (round.present) {
-      map['round'] = Variable<int>(round.value);
-    }
-    if (attempt.present) {
-      map['attempt'] = Variable<int>(attempt.value);
-    }
-    if (context.present) {
-      map['context'] = Variable<Uint8List>(context.value);
-    }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('TasksCompanion(')
-          ..write('id: $id, ')
-          ..write('did: $did, ')
-          ..write('state: $state, ')
-          ..write('approved: $approved, ')
-          ..write('round: $round, ')
-          ..write('attempt: $attempt, ')
-          ..write('context: $context, ')
-          ..write('rowid: $rowid')
-          ..write(')'))
-        .toString();
-  }
-}
-
 class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -792,6 +411,19 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
       GeneratedColumn<String>('key_type', aliasedName, false,
               type: DriftSqlType.string, requiredDuringInsert: true)
           .withConverter<KeyType>($GroupsTable.$converterkeyType);
+  static const VerificationMeta _withCardMeta =
+      const VerificationMeta('withCard');
+  @override
+  late final GeneratedColumn<bool> withCard =
+      GeneratedColumn<bool>('with_card', aliasedName, false,
+          type: DriftSqlType.bool,
+          requiredDuringInsert: false,
+          defaultConstraints: GeneratedColumn.constraintsDependsOnDialect({
+            SqlDialect.sqlite: 'CHECK ("with_card" IN (0, 1))',
+            SqlDialect.mysql: '',
+            SqlDialect.postgres: '',
+          }),
+          defaultValue: const Constant(false));
   static const VerificationMeta _contextMeta =
       const VerificationMeta('context');
   @override
@@ -800,7 +432,7 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
       type: DriftSqlType.blob, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, tid, did, name, threshold, protocol, keyType, context];
+      [id, tid, did, name, threshold, protocol, keyType, withCard, context];
   @override
   String get aliasedName => _alias ?? 'groups';
   @override
@@ -839,6 +471,10 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
     }
     context.handle(_protocolMeta, const VerificationResult.success());
     context.handle(_keyTypeMeta, const VerificationResult.success());
+    if (data.containsKey('with_card')) {
+      context.handle(_withCardMeta,
+          withCard.isAcceptableOrUnknown(data['with_card']!, _withCardMeta));
+    }
     if (data.containsKey('context')) {
       context.handle(_contextMeta,
           this.context.isAcceptableOrUnknown(data['context']!, _contextMeta));
@@ -870,6 +506,8 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
       keyType: $GroupsTable.$converterkeyType.fromSql(attachedDatabase
           .typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}key_type'])!),
+      withCard: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}with_card'])!,
       context: attachedDatabase.typeMapping
           .read(DriftSqlType.blob, data['${effectivePrefix}context'])!,
     );
@@ -894,6 +532,7 @@ class Group extends DataClass implements Insertable<Group> {
   final int threshold;
   final Protocol protocol;
   final KeyType keyType;
+  final bool withCard;
   final Uint8List context;
   const Group(
       {this.id,
@@ -903,6 +542,7 @@ class Group extends DataClass implements Insertable<Group> {
       required this.threshold,
       required this.protocol,
       required this.keyType,
+      required this.withCard,
       required this.context});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -922,6 +562,7 @@ class Group extends DataClass implements Insertable<Group> {
       final converter = $GroupsTable.$converterkeyType;
       map['key_type'] = Variable<String>(converter.toSql(keyType));
     }
+    map['with_card'] = Variable<bool>(withCard);
     map['context'] = Variable<Uint8List>(context);
     return map;
   }
@@ -935,6 +576,7 @@ class Group extends DataClass implements Insertable<Group> {
       threshold: Value(threshold),
       protocol: Value(protocol),
       keyType: Value(keyType),
+      withCard: Value(withCard),
       context: Value(context),
     );
   }
@@ -952,6 +594,7 @@ class Group extends DataClass implements Insertable<Group> {
           .fromJson(serializer.fromJson<String>(json['protocol'])),
       keyType: $GroupsTable.$converterkeyType
           .fromJson(serializer.fromJson<String>(json['keyType'])),
+      withCard: serializer.fromJson<bool>(json['withCard']),
       context: serializer.fromJson<Uint8List>(json['context']),
     );
   }
@@ -968,6 +611,7 @@ class Group extends DataClass implements Insertable<Group> {
           .toJson<String>($GroupsTable.$converterprotocol.toJson(protocol)),
       'keyType': serializer
           .toJson<String>($GroupsTable.$converterkeyType.toJson(keyType)),
+      'withCard': serializer.toJson<bool>(withCard),
       'context': serializer.toJson<Uint8List>(context),
     };
   }
@@ -980,6 +624,7 @@ class Group extends DataClass implements Insertable<Group> {
           int? threshold,
           Protocol? protocol,
           KeyType? keyType,
+          bool? withCard,
           Uint8List? context}) =>
       Group(
         id: id.present ? id.value : this.id,
@@ -989,6 +634,7 @@ class Group extends DataClass implements Insertable<Group> {
         threshold: threshold ?? this.threshold,
         protocol: protocol ?? this.protocol,
         keyType: keyType ?? this.keyType,
+        withCard: withCard ?? this.withCard,
         context: context ?? this.context,
       );
   @override
@@ -1001,6 +647,7 @@ class Group extends DataClass implements Insertable<Group> {
           ..write('threshold: $threshold, ')
           ..write('protocol: $protocol, ')
           ..write('keyType: $keyType, ')
+          ..write('withCard: $withCard, ')
           ..write('context: $context')
           ..write(')'))
         .toString();
@@ -1015,6 +662,7 @@ class Group extends DataClass implements Insertable<Group> {
       threshold,
       protocol,
       keyType,
+      withCard,
       $driftBlobEquality.hash(context));
   @override
   bool operator ==(Object other) =>
@@ -1027,6 +675,7 @@ class Group extends DataClass implements Insertable<Group> {
           other.threshold == this.threshold &&
           other.protocol == this.protocol &&
           other.keyType == this.keyType &&
+          other.withCard == this.withCard &&
           $driftBlobEquality.equals(other.context, this.context));
 }
 
@@ -1038,6 +687,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
   final Value<int> threshold;
   final Value<Protocol> protocol;
   final Value<KeyType> keyType;
+  final Value<bool> withCard;
   final Value<Uint8List> context;
   final Value<int> rowid;
   const GroupsCompanion({
@@ -1048,6 +698,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
     this.threshold = const Value.absent(),
     this.protocol = const Value.absent(),
     this.keyType = const Value.absent(),
+    this.withCard = const Value.absent(),
     this.context = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -1059,6 +710,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
     required int threshold,
     required Protocol protocol,
     required KeyType keyType,
+    this.withCard = const Value.absent(),
     required Uint8List context,
     this.rowid = const Value.absent(),
   })  : tid = Value(tid),
@@ -1076,6 +728,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
     Expression<int>? threshold,
     Expression<String>? protocol,
     Expression<String>? keyType,
+    Expression<bool>? withCard,
     Expression<Uint8List>? context,
     Expression<int>? rowid,
   }) {
@@ -1087,6 +740,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
       if (threshold != null) 'threshold': threshold,
       if (protocol != null) 'protocol': protocol,
       if (keyType != null) 'key_type': keyType,
+      if (withCard != null) 'with_card': withCard,
       if (context != null) 'context': context,
       if (rowid != null) 'rowid': rowid,
     });
@@ -1100,6 +754,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
       Value<int>? threshold,
       Value<Protocol>? protocol,
       Value<KeyType>? keyType,
+      Value<bool>? withCard,
       Value<Uint8List>? context,
       Value<int>? rowid}) {
     return GroupsCompanion(
@@ -1110,6 +765,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
       threshold: threshold ?? this.threshold,
       protocol: protocol ?? this.protocol,
       keyType: keyType ?? this.keyType,
+      withCard: withCard ?? this.withCard,
       context: context ?? this.context,
       rowid: rowid ?? this.rowid,
     );
@@ -1141,6 +797,9 @@ class GroupsCompanion extends UpdateCompanion<Group> {
       final converter = $GroupsTable.$converterkeyType;
       map['key_type'] = Variable<String>(converter.toSql(keyType.value));
     }
+    if (withCard.present) {
+      map['with_card'] = Variable<bool>(withCard.value);
+    }
     if (context.present) {
       map['context'] = Variable<Uint8List>(context.value);
     }
@@ -1160,7 +819,462 @@ class GroupsCompanion extends UpdateCompanion<Group> {
           ..write('threshold: $threshold, ')
           ..write('protocol: $protocol, ')
           ..write('keyType: $keyType, ')
+          ..write('withCard: $withCard, ')
           ..write('context: $context, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TasksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<Uint8List> id = GeneratedColumn<Uint8List>(
+      'id', aliasedName, false,
+      type: DriftSqlType.blob, requiredDuringInsert: true);
+  static const VerificationMeta _didMeta = const VerificationMeta('did');
+  @override
+  late final GeneratedColumn<Uint8List> did = GeneratedColumn<Uint8List>(
+      'did', aliasedName, false,
+      type: DriftSqlType.blob, requiredDuringInsert: true);
+  static const VerificationMeta _gidMeta = const VerificationMeta('gid');
+  @override
+  late final GeneratedColumn<Uint8List> gid = GeneratedColumn<Uint8List>(
+      'gid', aliasedName, true,
+      type: DriftSqlType.blob,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('REFERENCES "groups" (id)'));
+  static const VerificationMeta _stateMeta = const VerificationMeta('state');
+  @override
+  late final GeneratedColumnWithTypeConverter<TaskState, String> state =
+      GeneratedColumn<String>('state', aliasedName, false,
+              type: DriftSqlType.string, requiredDuringInsert: true)
+          .withConverter<TaskState>($TasksTable.$converterstate);
+  static const VerificationMeta _approvedMeta =
+      const VerificationMeta('approved');
+  @override
+  late final GeneratedColumn<bool> approved =
+      GeneratedColumn<bool>('approved', aliasedName, false,
+          type: DriftSqlType.bool,
+          requiredDuringInsert: false,
+          defaultConstraints: GeneratedColumn.constraintsDependsOnDialect({
+            SqlDialect.sqlite: 'CHECK ("approved" IN (0, 1))',
+            SqlDialect.mysql: '',
+            SqlDialect.postgres: '',
+          }),
+          defaultValue: const Constant(false));
+  static const VerificationMeta _roundMeta = const VerificationMeta('round');
+  @override
+  late final GeneratedColumn<int> round = GeneratedColumn<int>(
+      'round', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _attemptMeta =
+      const VerificationMeta('attempt');
+  @override
+  late final GeneratedColumn<int> attempt = GeneratedColumn<int>(
+      'attempt', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _contextMeta =
+      const VerificationMeta('context');
+  @override
+  late final GeneratedColumn<Uint8List> context = GeneratedColumn<Uint8List>(
+      'context', aliasedName, true,
+      type: DriftSqlType.blob, requiredDuringInsert: false);
+  static const VerificationMeta _dataMeta = const VerificationMeta('data');
+  @override
+  late final GeneratedColumn<Uint8List> data = GeneratedColumn<Uint8List>(
+      'data', aliasedName, true,
+      type: DriftSqlType.blob, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, did, gid, state, approved, round, attempt, context, data];
+  @override
+  String get aliasedName => _alias ?? 'tasks';
+  @override
+  String get actualTableName => 'tasks';
+  @override
+  VerificationContext validateIntegrity(Insertable<Task> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('did')) {
+      context.handle(
+          _didMeta, did.isAcceptableOrUnknown(data['did']!, _didMeta));
+    } else if (isInserting) {
+      context.missing(_didMeta);
+    }
+    if (data.containsKey('gid')) {
+      context.handle(
+          _gidMeta, gid.isAcceptableOrUnknown(data['gid']!, _gidMeta));
+    }
+    context.handle(_stateMeta, const VerificationResult.success());
+    if (data.containsKey('approved')) {
+      context.handle(_approvedMeta,
+          approved.isAcceptableOrUnknown(data['approved']!, _approvedMeta));
+    }
+    if (data.containsKey('round')) {
+      context.handle(
+          _roundMeta, round.isAcceptableOrUnknown(data['round']!, _roundMeta));
+    }
+    if (data.containsKey('attempt')) {
+      context.handle(_attemptMeta,
+          attempt.isAcceptableOrUnknown(data['attempt']!, _attemptMeta));
+    }
+    if (data.containsKey('context')) {
+      context.handle(_contextMeta,
+          this.context.isAcceptableOrUnknown(data['context']!, _contextMeta));
+    }
+    if (data.containsKey('data')) {
+      context.handle(
+          _dataMeta, this.data.isAcceptableOrUnknown(data['data']!, _dataMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id, did};
+  @override
+  Task map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Task(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}id'])!,
+      did: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}did'])!,
+      gid: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}gid']),
+      state: $TasksTable.$converterstate.fromSql(attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}state'])!),
+      approved: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}approved'])!,
+      round: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}round'])!,
+      attempt: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}attempt'])!,
+      context: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}context']),
+      data: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}data']),
+    );
+  }
+
+  @override
+  $TasksTable createAlias(String alias) {
+    return $TasksTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<TaskState, String, String> $converterstate =
+      const EnumNameConverter<TaskState>(TaskState.values);
+}
+
+class Task extends DataClass implements Insertable<Task> {
+  final Uint8List id;
+  final Uint8List did;
+  final Uint8List? gid;
+  final TaskState state;
+  final bool approved;
+  final int round;
+  final int attempt;
+  final Uint8List? context;
+  final Uint8List? data;
+  const Task(
+      {required this.id,
+      required this.did,
+      this.gid,
+      required this.state,
+      required this.approved,
+      required this.round,
+      required this.attempt,
+      this.context,
+      this.data});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<Uint8List>(id);
+    map['did'] = Variable<Uint8List>(did);
+    if (!nullToAbsent || gid != null) {
+      map['gid'] = Variable<Uint8List>(gid);
+    }
+    {
+      final converter = $TasksTable.$converterstate;
+      map['state'] = Variable<String>(converter.toSql(state));
+    }
+    map['approved'] = Variable<bool>(approved);
+    map['round'] = Variable<int>(round);
+    map['attempt'] = Variable<int>(attempt);
+    if (!nullToAbsent || context != null) {
+      map['context'] = Variable<Uint8List>(context);
+    }
+    if (!nullToAbsent || data != null) {
+      map['data'] = Variable<Uint8List>(data);
+    }
+    return map;
+  }
+
+  TasksCompanion toCompanion(bool nullToAbsent) {
+    return TasksCompanion(
+      id: Value(id),
+      did: Value(did),
+      gid: gid == null && nullToAbsent ? const Value.absent() : Value(gid),
+      state: Value(state),
+      approved: Value(approved),
+      round: Value(round),
+      attempt: Value(attempt),
+      context: context == null && nullToAbsent
+          ? const Value.absent()
+          : Value(context),
+      data: data == null && nullToAbsent ? const Value.absent() : Value(data),
+    );
+  }
+
+  factory Task.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Task(
+      id: serializer.fromJson<Uint8List>(json['id']),
+      did: serializer.fromJson<Uint8List>(json['did']),
+      gid: serializer.fromJson<Uint8List?>(json['gid']),
+      state: $TasksTable.$converterstate
+          .fromJson(serializer.fromJson<String>(json['state'])),
+      approved: serializer.fromJson<bool>(json['approved']),
+      round: serializer.fromJson<int>(json['round']),
+      attempt: serializer.fromJson<int>(json['attempt']),
+      context: serializer.fromJson<Uint8List?>(json['context']),
+      data: serializer.fromJson<Uint8List?>(json['data']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<Uint8List>(id),
+      'did': serializer.toJson<Uint8List>(did),
+      'gid': serializer.toJson<Uint8List?>(gid),
+      'state':
+          serializer.toJson<String>($TasksTable.$converterstate.toJson(state)),
+      'approved': serializer.toJson<bool>(approved),
+      'round': serializer.toJson<int>(round),
+      'attempt': serializer.toJson<int>(attempt),
+      'context': serializer.toJson<Uint8List?>(context),
+      'data': serializer.toJson<Uint8List?>(data),
+    };
+  }
+
+  Task copyWith(
+          {Uint8List? id,
+          Uint8List? did,
+          Value<Uint8List?> gid = const Value.absent(),
+          TaskState? state,
+          bool? approved,
+          int? round,
+          int? attempt,
+          Value<Uint8List?> context = const Value.absent(),
+          Value<Uint8List?> data = const Value.absent()}) =>
+      Task(
+        id: id ?? this.id,
+        did: did ?? this.did,
+        gid: gid.present ? gid.value : this.gid,
+        state: state ?? this.state,
+        approved: approved ?? this.approved,
+        round: round ?? this.round,
+        attempt: attempt ?? this.attempt,
+        context: context.present ? context.value : this.context,
+        data: data.present ? data.value : this.data,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('Task(')
+          ..write('id: $id, ')
+          ..write('did: $did, ')
+          ..write('gid: $gid, ')
+          ..write('state: $state, ')
+          ..write('approved: $approved, ')
+          ..write('round: $round, ')
+          ..write('attempt: $attempt, ')
+          ..write('context: $context, ')
+          ..write('data: $data')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      $driftBlobEquality.hash(id),
+      $driftBlobEquality.hash(did),
+      $driftBlobEquality.hash(gid),
+      state,
+      approved,
+      round,
+      attempt,
+      $driftBlobEquality.hash(context),
+      $driftBlobEquality.hash(data));
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Task &&
+          $driftBlobEquality.equals(other.id, this.id) &&
+          $driftBlobEquality.equals(other.did, this.did) &&
+          $driftBlobEquality.equals(other.gid, this.gid) &&
+          other.state == this.state &&
+          other.approved == this.approved &&
+          other.round == this.round &&
+          other.attempt == this.attempt &&
+          $driftBlobEquality.equals(other.context, this.context) &&
+          $driftBlobEquality.equals(other.data, this.data));
+}
+
+class TasksCompanion extends UpdateCompanion<Task> {
+  final Value<Uint8List> id;
+  final Value<Uint8List> did;
+  final Value<Uint8List?> gid;
+  final Value<TaskState> state;
+  final Value<bool> approved;
+  final Value<int> round;
+  final Value<int> attempt;
+  final Value<Uint8List?> context;
+  final Value<Uint8List?> data;
+  final Value<int> rowid;
+  const TasksCompanion({
+    this.id = const Value.absent(),
+    this.did = const Value.absent(),
+    this.gid = const Value.absent(),
+    this.state = const Value.absent(),
+    this.approved = const Value.absent(),
+    this.round = const Value.absent(),
+    this.attempt = const Value.absent(),
+    this.context = const Value.absent(),
+    this.data = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TasksCompanion.insert({
+    required Uint8List id,
+    required Uint8List did,
+    this.gid = const Value.absent(),
+    required TaskState state,
+    this.approved = const Value.absent(),
+    this.round = const Value.absent(),
+    this.attempt = const Value.absent(),
+    this.context = const Value.absent(),
+    this.data = const Value.absent(),
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        did = Value(did),
+        state = Value(state);
+  static Insertable<Task> custom({
+    Expression<Uint8List>? id,
+    Expression<Uint8List>? did,
+    Expression<Uint8List>? gid,
+    Expression<String>? state,
+    Expression<bool>? approved,
+    Expression<int>? round,
+    Expression<int>? attempt,
+    Expression<Uint8List>? context,
+    Expression<Uint8List>? data,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (did != null) 'did': did,
+      if (gid != null) 'gid': gid,
+      if (state != null) 'state': state,
+      if (approved != null) 'approved': approved,
+      if (round != null) 'round': round,
+      if (attempt != null) 'attempt': attempt,
+      if (context != null) 'context': context,
+      if (data != null) 'data': data,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TasksCompanion copyWith(
+      {Value<Uint8List>? id,
+      Value<Uint8List>? did,
+      Value<Uint8List?>? gid,
+      Value<TaskState>? state,
+      Value<bool>? approved,
+      Value<int>? round,
+      Value<int>? attempt,
+      Value<Uint8List?>? context,
+      Value<Uint8List?>? data,
+      Value<int>? rowid}) {
+    return TasksCompanion(
+      id: id ?? this.id,
+      did: did ?? this.did,
+      gid: gid ?? this.gid,
+      state: state ?? this.state,
+      approved: approved ?? this.approved,
+      round: round ?? this.round,
+      attempt: attempt ?? this.attempt,
+      context: context ?? this.context,
+      data: data ?? this.data,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<Uint8List>(id.value);
+    }
+    if (did.present) {
+      map['did'] = Variable<Uint8List>(did.value);
+    }
+    if (gid.present) {
+      map['gid'] = Variable<Uint8List>(gid.value);
+    }
+    if (state.present) {
+      final converter = $TasksTable.$converterstate;
+      map['state'] = Variable<String>(converter.toSql(state.value));
+    }
+    if (approved.present) {
+      map['approved'] = Variable<bool>(approved.value);
+    }
+    if (round.present) {
+      map['round'] = Variable<int>(round.value);
+    }
+    if (attempt.present) {
+      map['attempt'] = Variable<int>(attempt.value);
+    }
+    if (context.present) {
+      map['context'] = Variable<Uint8List>(context.value);
+    }
+    if (data.present) {
+      map['data'] = Variable<Uint8List>(data.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TasksCompanion(')
+          ..write('id: $id, ')
+          ..write('did: $did, ')
+          ..write('gid: $gid, ')
+          ..write('state: $state, ')
+          ..write('approved: $approved, ')
+          ..write('round: $round, ')
+          ..write('attempt: $attempt, ')
+          ..write('context: $context, ')
+          ..write('data: $data, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1371,21 +1485,13 @@ class $FilesTable extends Files with TableInfo<$FilesTable, File> {
   late final GeneratedColumn<Uint8List> did = GeneratedColumn<Uint8List>(
       'did', aliasedName, false,
       type: DriftSqlType.blob, requiredDuringInsert: true);
-  static const VerificationMeta _gidMeta = const VerificationMeta('gid');
-  @override
-  late final GeneratedColumn<Uint8List> gid = GeneratedColumn<Uint8List>(
-      'gid', aliasedName, false,
-      type: DriftSqlType.blob,
-      requiredDuringInsert: true,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('REFERENCES "groups" (id)'));
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
       'name', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
   @override
-  List<GeneratedColumn> get $columns => [tid, did, gid, name];
+  List<GeneratedColumn> get $columns => [tid, did, name];
   @override
   String get aliasedName => _alias ?? 'files';
   @override
@@ -1407,12 +1513,6 @@ class $FilesTable extends Files with TableInfo<$FilesTable, File> {
     } else if (isInserting) {
       context.missing(_didMeta);
     }
-    if (data.containsKey('gid')) {
-      context.handle(
-          _gidMeta, gid.isAcceptableOrUnknown(data['gid']!, _gidMeta));
-    } else if (isInserting) {
-      context.missing(_gidMeta);
-    }
     if (data.containsKey('name')) {
       context.handle(
           _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
@@ -1432,8 +1532,6 @@ class $FilesTable extends Files with TableInfo<$FilesTable, File> {
           .read(DriftSqlType.blob, data['${effectivePrefix}tid'])!,
       did: attachedDatabase.typeMapping
           .read(DriftSqlType.blob, data['${effectivePrefix}did'])!,
-      gid: attachedDatabase.typeMapping
-          .read(DriftSqlType.blob, data['${effectivePrefix}gid'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
     );
@@ -1448,19 +1546,13 @@ class $FilesTable extends Files with TableInfo<$FilesTable, File> {
 class File extends DataClass implements Insertable<File> {
   final Uint8List tid;
   final Uint8List did;
-  final Uint8List gid;
   final String name;
-  const File(
-      {required this.tid,
-      required this.did,
-      required this.gid,
-      required this.name});
+  const File({required this.tid, required this.did, required this.name});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['tid'] = Variable<Uint8List>(tid);
     map['did'] = Variable<Uint8List>(did);
-    map['gid'] = Variable<Uint8List>(gid);
     map['name'] = Variable<String>(name);
     return map;
   }
@@ -1469,7 +1561,6 @@ class File extends DataClass implements Insertable<File> {
     return FilesCompanion(
       tid: Value(tid),
       did: Value(did),
-      gid: Value(gid),
       name: Value(name),
     );
   }
@@ -1480,7 +1571,6 @@ class File extends DataClass implements Insertable<File> {
     return File(
       tid: serializer.fromJson<Uint8List>(json['tid']),
       did: serializer.fromJson<Uint8List>(json['did']),
-      gid: serializer.fromJson<Uint8List>(json['gid']),
       name: serializer.fromJson<String>(json['name']),
     );
   }
@@ -1490,17 +1580,13 @@ class File extends DataClass implements Insertable<File> {
     return <String, dynamic>{
       'tid': serializer.toJson<Uint8List>(tid),
       'did': serializer.toJson<Uint8List>(did),
-      'gid': serializer.toJson<Uint8List>(gid),
       'name': serializer.toJson<String>(name),
     };
   }
 
-  File copyWith(
-          {Uint8List? tid, Uint8List? did, Uint8List? gid, String? name}) =>
-      File(
+  File copyWith({Uint8List? tid, Uint8List? did, String? name}) => File(
         tid: tid ?? this.tid,
         did: did ?? this.did,
-        gid: gid ?? this.gid,
         name: name ?? this.name,
       );
   @override
@@ -1508,59 +1594,51 @@ class File extends DataClass implements Insertable<File> {
     return (StringBuffer('File(')
           ..write('tid: $tid, ')
           ..write('did: $did, ')
-          ..write('gid: $gid, ')
           ..write('name: $name')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash($driftBlobEquality.hash(tid),
-      $driftBlobEquality.hash(did), $driftBlobEquality.hash(gid), name);
+  int get hashCode => Object.hash(
+      $driftBlobEquality.hash(tid), $driftBlobEquality.hash(did), name);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is File &&
           $driftBlobEquality.equals(other.tid, this.tid) &&
           $driftBlobEquality.equals(other.did, this.did) &&
-          $driftBlobEquality.equals(other.gid, this.gid) &&
           other.name == this.name);
 }
 
 class FilesCompanion extends UpdateCompanion<File> {
   final Value<Uint8List> tid;
   final Value<Uint8List> did;
-  final Value<Uint8List> gid;
   final Value<String> name;
   final Value<int> rowid;
   const FilesCompanion({
     this.tid = const Value.absent(),
     this.did = const Value.absent(),
-    this.gid = const Value.absent(),
     this.name = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   FilesCompanion.insert({
     required Uint8List tid,
     required Uint8List did,
-    required Uint8List gid,
     required String name,
     this.rowid = const Value.absent(),
   })  : tid = Value(tid),
         did = Value(did),
-        gid = Value(gid),
         name = Value(name);
   static Insertable<File> custom({
     Expression<Uint8List>? tid,
     Expression<Uint8List>? did,
-    Expression<Uint8List>? gid,
     Expression<String>? name,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (tid != null) 'tid': tid,
       if (did != null) 'did': did,
-      if (gid != null) 'gid': gid,
       if (name != null) 'name': name,
       if (rowid != null) 'rowid': rowid,
     });
@@ -1569,13 +1647,11 @@ class FilesCompanion extends UpdateCompanion<File> {
   FilesCompanion copyWith(
       {Value<Uint8List>? tid,
       Value<Uint8List>? did,
-      Value<Uint8List>? gid,
       Value<String>? name,
       Value<int>? rowid}) {
     return FilesCompanion(
       tid: tid ?? this.tid,
       did: did ?? this.did,
-      gid: gid ?? this.gid,
       name: name ?? this.name,
       rowid: rowid ?? this.rowid,
     );
@@ -1589,9 +1665,6 @@ class FilesCompanion extends UpdateCompanion<File> {
     }
     if (did.present) {
       map['did'] = Variable<Uint8List>(did.value);
-    }
-    if (gid.present) {
-      map['gid'] = Variable<Uint8List>(gid.value);
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
@@ -1607,7 +1680,6 @@ class FilesCompanion extends UpdateCompanion<File> {
     return (StringBuffer('FilesCompanion(')
           ..write('tid: $tid, ')
           ..write('did: $did, ')
-          ..write('gid: $gid, ')
           ..write('name: $name, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -1631,14 +1703,6 @@ class $ChallengesTable extends Challenges
   late final GeneratedColumn<Uint8List> did = GeneratedColumn<Uint8List>(
       'did', aliasedName, false,
       type: DriftSqlType.blob, requiredDuringInsert: true);
-  static const VerificationMeta _gidMeta = const VerificationMeta('gid');
-  @override
-  late final GeneratedColumn<Uint8List> gid = GeneratedColumn<Uint8List>(
-      'gid', aliasedName, false,
-      type: DriftSqlType.blob,
-      requiredDuringInsert: true,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('REFERENCES "groups" (id)'));
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
@@ -1650,7 +1714,7 @@ class $ChallengesTable extends Challenges
       'data', aliasedName, false,
       type: DriftSqlType.blob, requiredDuringInsert: true);
   @override
-  List<GeneratedColumn> get $columns => [tid, did, gid, name, data];
+  List<GeneratedColumn> get $columns => [tid, did, name, data];
   @override
   String get aliasedName => _alias ?? 'challenges';
   @override
@@ -1671,12 +1735,6 @@ class $ChallengesTable extends Challenges
           _didMeta, did.isAcceptableOrUnknown(data['did']!, _didMeta));
     } else if (isInserting) {
       context.missing(_didMeta);
-    }
-    if (data.containsKey('gid')) {
-      context.handle(
-          _gidMeta, gid.isAcceptableOrUnknown(data['gid']!, _gidMeta));
-    } else if (isInserting) {
-      context.missing(_gidMeta);
     }
     if (data.containsKey('name')) {
       context.handle(
@@ -1703,8 +1761,6 @@ class $ChallengesTable extends Challenges
           .read(DriftSqlType.blob, data['${effectivePrefix}tid'])!,
       did: attachedDatabase.typeMapping
           .read(DriftSqlType.blob, data['${effectivePrefix}did'])!,
-      gid: attachedDatabase.typeMapping
-          .read(DriftSqlType.blob, data['${effectivePrefix}gid'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       data: attachedDatabase.typeMapping
@@ -1721,13 +1777,11 @@ class $ChallengesTable extends Challenges
 class Challenge extends DataClass implements Insertable<Challenge> {
   final Uint8List tid;
   final Uint8List did;
-  final Uint8List gid;
   final String name;
   final Uint8List data;
   const Challenge(
       {required this.tid,
       required this.did,
-      required this.gid,
       required this.name,
       required this.data});
   @override
@@ -1735,7 +1789,6 @@ class Challenge extends DataClass implements Insertable<Challenge> {
     final map = <String, Expression>{};
     map['tid'] = Variable<Uint8List>(tid);
     map['did'] = Variable<Uint8List>(did);
-    map['gid'] = Variable<Uint8List>(gid);
     map['name'] = Variable<String>(name);
     map['data'] = Variable<Uint8List>(data);
     return map;
@@ -1745,7 +1798,6 @@ class Challenge extends DataClass implements Insertable<Challenge> {
     return ChallengesCompanion(
       tid: Value(tid),
       did: Value(did),
-      gid: Value(gid),
       name: Value(name),
       data: Value(data),
     );
@@ -1757,7 +1809,6 @@ class Challenge extends DataClass implements Insertable<Challenge> {
     return Challenge(
       tid: serializer.fromJson<Uint8List>(json['tid']),
       did: serializer.fromJson<Uint8List>(json['did']),
-      gid: serializer.fromJson<Uint8List>(json['gid']),
       name: serializer.fromJson<String>(json['name']),
       data: serializer.fromJson<Uint8List>(json['data']),
     );
@@ -1768,22 +1819,16 @@ class Challenge extends DataClass implements Insertable<Challenge> {
     return <String, dynamic>{
       'tid': serializer.toJson<Uint8List>(tid),
       'did': serializer.toJson<Uint8List>(did),
-      'gid': serializer.toJson<Uint8List>(gid),
       'name': serializer.toJson<String>(name),
       'data': serializer.toJson<Uint8List>(data),
     };
   }
 
   Challenge copyWith(
-          {Uint8List? tid,
-          Uint8List? did,
-          Uint8List? gid,
-          String? name,
-          Uint8List? data}) =>
+          {Uint8List? tid, Uint8List? did, String? name, Uint8List? data}) =>
       Challenge(
         tid: tid ?? this.tid,
         did: did ?? this.did,
-        gid: gid ?? this.gid,
         name: name ?? this.name,
         data: data ?? this.data,
       );
@@ -1792,7 +1837,6 @@ class Challenge extends DataClass implements Insertable<Challenge> {
     return (StringBuffer('Challenge(')
           ..write('tid: $tid, ')
           ..write('did: $did, ')
-          ..write('gid: $gid, ')
           ..write('name: $name, ')
           ..write('data: $data')
           ..write(')'))
@@ -1800,19 +1844,14 @@ class Challenge extends DataClass implements Insertable<Challenge> {
   }
 
   @override
-  int get hashCode => Object.hash(
-      $driftBlobEquality.hash(tid),
-      $driftBlobEquality.hash(did),
-      $driftBlobEquality.hash(gid),
-      name,
-      $driftBlobEquality.hash(data));
+  int get hashCode => Object.hash($driftBlobEquality.hash(tid),
+      $driftBlobEquality.hash(did), name, $driftBlobEquality.hash(data));
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Challenge &&
           $driftBlobEquality.equals(other.tid, this.tid) &&
           $driftBlobEquality.equals(other.did, this.did) &&
-          $driftBlobEquality.equals(other.gid, this.gid) &&
           other.name == this.name &&
           $driftBlobEquality.equals(other.data, this.data));
 }
@@ -1820,14 +1859,12 @@ class Challenge extends DataClass implements Insertable<Challenge> {
 class ChallengesCompanion extends UpdateCompanion<Challenge> {
   final Value<Uint8List> tid;
   final Value<Uint8List> did;
-  final Value<Uint8List> gid;
   final Value<String> name;
   final Value<Uint8List> data;
   final Value<int> rowid;
   const ChallengesCompanion({
     this.tid = const Value.absent(),
     this.did = const Value.absent(),
-    this.gid = const Value.absent(),
     this.name = const Value.absent(),
     this.data = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -1835,19 +1872,16 @@ class ChallengesCompanion extends UpdateCompanion<Challenge> {
   ChallengesCompanion.insert({
     required Uint8List tid,
     required Uint8List did,
-    required Uint8List gid,
     required String name,
     required Uint8List data,
     this.rowid = const Value.absent(),
   })  : tid = Value(tid),
         did = Value(did),
-        gid = Value(gid),
         name = Value(name),
         data = Value(data);
   static Insertable<Challenge> custom({
     Expression<Uint8List>? tid,
     Expression<Uint8List>? did,
-    Expression<Uint8List>? gid,
     Expression<String>? name,
     Expression<Uint8List>? data,
     Expression<int>? rowid,
@@ -1855,7 +1889,6 @@ class ChallengesCompanion extends UpdateCompanion<Challenge> {
     return RawValuesInsertable({
       if (tid != null) 'tid': tid,
       if (did != null) 'did': did,
-      if (gid != null) 'gid': gid,
       if (name != null) 'name': name,
       if (data != null) 'data': data,
       if (rowid != null) 'rowid': rowid,
@@ -1865,14 +1898,12 @@ class ChallengesCompanion extends UpdateCompanion<Challenge> {
   ChallengesCompanion copyWith(
       {Value<Uint8List>? tid,
       Value<Uint8List>? did,
-      Value<Uint8List>? gid,
       Value<String>? name,
       Value<Uint8List>? data,
       Value<int>? rowid}) {
     return ChallengesCompanion(
       tid: tid ?? this.tid,
       did: did ?? this.did,
-      gid: gid ?? this.gid,
       name: name ?? this.name,
       data: data ?? this.data,
       rowid: rowid ?? this.rowid,
@@ -1887,9 +1918,6 @@ class ChallengesCompanion extends UpdateCompanion<Challenge> {
     }
     if (did.present) {
       map['did'] = Variable<Uint8List>(did.value);
-    }
-    if (gid.present) {
-      map['gid'] = Variable<Uint8List>(gid.value);
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
@@ -1908,7 +1936,6 @@ class ChallengesCompanion extends UpdateCompanion<Challenge> {
     return (StringBuffer('ChallengesCompanion(')
           ..write('tid: $tid, ')
           ..write('did: $did, ')
-          ..write('gid: $gid, ')
           ..write('name: $name, ')
           ..write('data: $data, ')
           ..write('rowid: $rowid')
@@ -1932,14 +1959,6 @@ class $DecryptsTable extends Decrypts with TableInfo<$DecryptsTable, Decrypt> {
   late final GeneratedColumn<Uint8List> did = GeneratedColumn<Uint8List>(
       'did', aliasedName, false,
       type: DriftSqlType.blob, requiredDuringInsert: true);
-  static const VerificationMeta _gidMeta = const VerificationMeta('gid');
-  @override
-  late final GeneratedColumn<Uint8List> gid = GeneratedColumn<Uint8List>(
-      'gid', aliasedName, false,
-      type: DriftSqlType.blob,
-      requiredDuringInsert: true,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('REFERENCES "groups" (id)'));
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
@@ -1951,7 +1970,7 @@ class $DecryptsTable extends Decrypts with TableInfo<$DecryptsTable, Decrypt> {
       'data', aliasedName, false,
       type: DriftSqlType.blob, requiredDuringInsert: true);
   @override
-  List<GeneratedColumn> get $columns => [tid, did, gid, name, data];
+  List<GeneratedColumn> get $columns => [tid, did, name, data];
   @override
   String get aliasedName => _alias ?? 'decrypts';
   @override
@@ -1972,12 +1991,6 @@ class $DecryptsTable extends Decrypts with TableInfo<$DecryptsTable, Decrypt> {
           _didMeta, did.isAcceptableOrUnknown(data['did']!, _didMeta));
     } else if (isInserting) {
       context.missing(_didMeta);
-    }
-    if (data.containsKey('gid')) {
-      context.handle(
-          _gidMeta, gid.isAcceptableOrUnknown(data['gid']!, _gidMeta));
-    } else if (isInserting) {
-      context.missing(_gidMeta);
     }
     if (data.containsKey('name')) {
       context.handle(
@@ -2004,8 +2017,6 @@ class $DecryptsTable extends Decrypts with TableInfo<$DecryptsTable, Decrypt> {
           .read(DriftSqlType.blob, data['${effectivePrefix}tid'])!,
       did: attachedDatabase.typeMapping
           .read(DriftSqlType.blob, data['${effectivePrefix}did'])!,
-      gid: attachedDatabase.typeMapping
-          .read(DriftSqlType.blob, data['${effectivePrefix}gid'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       data: attachedDatabase.typeMapping
@@ -2022,13 +2033,11 @@ class $DecryptsTable extends Decrypts with TableInfo<$DecryptsTable, Decrypt> {
 class Decrypt extends DataClass implements Insertable<Decrypt> {
   final Uint8List tid;
   final Uint8List did;
-  final Uint8List gid;
   final String name;
   final Uint8List data;
   const Decrypt(
       {required this.tid,
       required this.did,
-      required this.gid,
       required this.name,
       required this.data});
   @override
@@ -2036,7 +2045,6 @@ class Decrypt extends DataClass implements Insertable<Decrypt> {
     final map = <String, Expression>{};
     map['tid'] = Variable<Uint8List>(tid);
     map['did'] = Variable<Uint8List>(did);
-    map['gid'] = Variable<Uint8List>(gid);
     map['name'] = Variable<String>(name);
     map['data'] = Variable<Uint8List>(data);
     return map;
@@ -2046,7 +2054,6 @@ class Decrypt extends DataClass implements Insertable<Decrypt> {
     return DecryptsCompanion(
       tid: Value(tid),
       did: Value(did),
-      gid: Value(gid),
       name: Value(name),
       data: Value(data),
     );
@@ -2058,7 +2065,6 @@ class Decrypt extends DataClass implements Insertable<Decrypt> {
     return Decrypt(
       tid: serializer.fromJson<Uint8List>(json['tid']),
       did: serializer.fromJson<Uint8List>(json['did']),
-      gid: serializer.fromJson<Uint8List>(json['gid']),
       name: serializer.fromJson<String>(json['name']),
       data: serializer.fromJson<Uint8List>(json['data']),
     );
@@ -2069,22 +2075,16 @@ class Decrypt extends DataClass implements Insertable<Decrypt> {
     return <String, dynamic>{
       'tid': serializer.toJson<Uint8List>(tid),
       'did': serializer.toJson<Uint8List>(did),
-      'gid': serializer.toJson<Uint8List>(gid),
       'name': serializer.toJson<String>(name),
       'data': serializer.toJson<Uint8List>(data),
     };
   }
 
   Decrypt copyWith(
-          {Uint8List? tid,
-          Uint8List? did,
-          Uint8List? gid,
-          String? name,
-          Uint8List? data}) =>
+          {Uint8List? tid, Uint8List? did, String? name, Uint8List? data}) =>
       Decrypt(
         tid: tid ?? this.tid,
         did: did ?? this.did,
-        gid: gid ?? this.gid,
         name: name ?? this.name,
         data: data ?? this.data,
       );
@@ -2093,7 +2093,6 @@ class Decrypt extends DataClass implements Insertable<Decrypt> {
     return (StringBuffer('Decrypt(')
           ..write('tid: $tid, ')
           ..write('did: $did, ')
-          ..write('gid: $gid, ')
           ..write('name: $name, ')
           ..write('data: $data')
           ..write(')'))
@@ -2101,19 +2100,14 @@ class Decrypt extends DataClass implements Insertable<Decrypt> {
   }
 
   @override
-  int get hashCode => Object.hash(
-      $driftBlobEquality.hash(tid),
-      $driftBlobEquality.hash(did),
-      $driftBlobEquality.hash(gid),
-      name,
-      $driftBlobEquality.hash(data));
+  int get hashCode => Object.hash($driftBlobEquality.hash(tid),
+      $driftBlobEquality.hash(did), name, $driftBlobEquality.hash(data));
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Decrypt &&
           $driftBlobEquality.equals(other.tid, this.tid) &&
           $driftBlobEquality.equals(other.did, this.did) &&
-          $driftBlobEquality.equals(other.gid, this.gid) &&
           other.name == this.name &&
           $driftBlobEquality.equals(other.data, this.data));
 }
@@ -2121,14 +2115,12 @@ class Decrypt extends DataClass implements Insertable<Decrypt> {
 class DecryptsCompanion extends UpdateCompanion<Decrypt> {
   final Value<Uint8List> tid;
   final Value<Uint8List> did;
-  final Value<Uint8List> gid;
   final Value<String> name;
   final Value<Uint8List> data;
   final Value<int> rowid;
   const DecryptsCompanion({
     this.tid = const Value.absent(),
     this.did = const Value.absent(),
-    this.gid = const Value.absent(),
     this.name = const Value.absent(),
     this.data = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -2136,19 +2128,16 @@ class DecryptsCompanion extends UpdateCompanion<Decrypt> {
   DecryptsCompanion.insert({
     required Uint8List tid,
     required Uint8List did,
-    required Uint8List gid,
     required String name,
     required Uint8List data,
     this.rowid = const Value.absent(),
   })  : tid = Value(tid),
         did = Value(did),
-        gid = Value(gid),
         name = Value(name),
         data = Value(data);
   static Insertable<Decrypt> custom({
     Expression<Uint8List>? tid,
     Expression<Uint8List>? did,
-    Expression<Uint8List>? gid,
     Expression<String>? name,
     Expression<Uint8List>? data,
     Expression<int>? rowid,
@@ -2156,7 +2145,6 @@ class DecryptsCompanion extends UpdateCompanion<Decrypt> {
     return RawValuesInsertable({
       if (tid != null) 'tid': tid,
       if (did != null) 'did': did,
-      if (gid != null) 'gid': gid,
       if (name != null) 'name': name,
       if (data != null) 'data': data,
       if (rowid != null) 'rowid': rowid,
@@ -2166,14 +2154,12 @@ class DecryptsCompanion extends UpdateCompanion<Decrypt> {
   DecryptsCompanion copyWith(
       {Value<Uint8List>? tid,
       Value<Uint8List>? did,
-      Value<Uint8List>? gid,
       Value<String>? name,
       Value<Uint8List>? data,
       Value<int>? rowid}) {
     return DecryptsCompanion(
       tid: tid ?? this.tid,
       did: did ?? this.did,
-      gid: gid ?? this.gid,
       name: name ?? this.name,
       data: data ?? this.data,
       rowid: rowid ?? this.rowid,
@@ -2188,9 +2174,6 @@ class DecryptsCompanion extends UpdateCompanion<Decrypt> {
     }
     if (did.present) {
       map['did'] = Variable<Uint8List>(did.value);
-    }
-    if (gid.present) {
-      map['gid'] = Variable<Uint8List>(gid.value);
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
@@ -2209,7 +2192,6 @@ class DecryptsCompanion extends UpdateCompanion<Decrypt> {
     return (StringBuffer('DecryptsCompanion(')
           ..write('tid: $tid, ')
           ..write('did: $did, ')
-          ..write('gid: $gid, ')
           ..write('name: $name, ')
           ..write('data: $data, ')
           ..write('rowid: $rowid')
@@ -2222,8 +2204,8 @@ abstract class _$Database extends GeneratedDatabase {
   _$Database(QueryExecutor e) : super(e);
   late final $DevicesTable devices = $DevicesTable(this);
   late final $UsersTable users = $UsersTable(this);
-  late final $TasksTable tasks = $TasksTable(this);
   late final $GroupsTable groups = $GroupsTable(this);
+  late final $TasksTable tasks = $TasksTable(this);
   late final $GroupMembersTable groupMembers = $GroupMembersTable(this);
   late final $FilesTable files = $FilesTable(this);
   late final $ChallengesTable challenges = $ChallengesTable(this);
@@ -2238,8 +2220,8 @@ abstract class _$Database extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [
         devices,
         users,
-        tasks,
         groups,
+        tasks,
         groupMembers,
         files,
         challenges,

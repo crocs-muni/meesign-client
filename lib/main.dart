@@ -13,7 +13,6 @@ import 'app_container.dart';
 import 'routes.dart';
 import 'sync.dart';
 import 'theme.dart';
-import 'ui/card_reader_page.dart';
 import 'ui/home_page.dart';
 import 'ui/init_page.dart';
 import 'ui/new_group_page.dart';
@@ -125,7 +124,6 @@ class MyApp extends StatelessWidget {
         Routes.home: (_) => const HomePage(),
         Routes.newGroup: (_) => const NewGroupPage(),
         Routes.newGroupSearch: (_) => const SearchPeerPage(),
-        Routes.newGroupCard: (_) => const AddCardPage(),
         Routes.newGroupQr: (_) => const QrReaderPage(),
         Routes.qrIdentity: (_) => const QrIdentityPage(),
         Routes.init: (_) => InitPage(

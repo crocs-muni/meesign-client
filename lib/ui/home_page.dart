@@ -2,33 +2,34 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:animations/animations.dart';
+import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:file_selector/file_selector.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Card;
+import 'package:meesign_core/meesign_card.dart';
 import 'package:meesign_core/meesign_data.dart';
 import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../app_container.dart';
+import '../card/card.dart';
 import '../routes.dart';
 import '../sync.dart';
 import '../util/chars.dart';
 import '../widget/counter_badge.dart';
-import '../widget/dismissible.dart';
 import '../widget/empty_list.dart';
+import 'card_reader_page.dart';
 import 'home_state.dart';
 
 class TaskStateIndicator extends StatelessWidget {
-  final TaskState state;
-  final double progress;
+  final Task task;
 
-  const TaskStateIndicator(this.state, this.progress, {Key? key})
-      : super(key: key);
+  const TaskStateIndicator(this.task, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    switch (state) {
+    switch (task.state) {
       case TaskState.created:
         return const Icon(Icons.arrow_drop_down);
       case TaskState.running:
@@ -37,10 +38,12 @@ class TaskStateIndicator extends StatelessWidget {
           width: 24,
           // TODO: add animation
           child: CircularProgressIndicator(
-            value: progress,
+            value: task.round / task.nRounds,
             strokeWidth: 2.0,
           ),
         );
+      case TaskState.needsCard:
+        return const Icon(Icons.payment);
       case TaskState.finished:
         return const Icon(Icons.check, color: Colors.green);
       case TaskState.failed:
@@ -69,6 +72,8 @@ String? statusMessage(Task task) {
           '${task.approved ? 'by others' : ''}';
     case TaskState.running:
       return 'Working on task';
+    case TaskState.needsCard:
+      return 'Needs card to continue';
     case TaskState.finished:
       return null;
     case TaskState.failed:
@@ -76,16 +81,16 @@ String? statusMessage(Task task) {
   }
 }
 
-Widget buildTaskListView<T, U>(
-  List<Task<T>> tasks,
-  List<U> finished, {
+Widget buildTaskListView<T>(
+  List<Task<T>> tasks, {
   required String finishedTitle,
   required Widget emptyView,
-  required Widget Function(BuildContext, Task<T>) unfinishedBuilder,
-  required Widget Function(BuildContext, U) finishedBuilder,
+  required Widget Function(BuildContext, Task<T>, bool) taskBuilder,
 }) {
-  final unfinished =
-      tasks.where((task) => task.state != TaskState.finished).toList();
+  final groups = tasks.groupListsBy((task) => task.state == TaskState.finished);
+  final unfinished = groups[false] ?? [];
+  final finished = groups[true] ?? [];
+
   // TODO: unfinished.sort((a, b) => b.timeCreated.compareTo(a.timeCreated));
 
   int length = finished.length + unfinished.length;
@@ -114,9 +119,9 @@ Widget buildTaskListView<T, U>(
         );
       }
       if (i <= unfinished.length) {
-        return unfinishedBuilder(context, unfinished[i - 1]);
+        return taskBuilder(context, unfinished[i - 1], false);
       } else {
-        return finishedBuilder(context, finished[i - unfinished.length - 2]);
+        return taskBuilder(context, finished[i - unfinished.length - 2], true);
       }
     },
   );
@@ -132,64 +137,106 @@ void _openFile(String path) {
   }
 }
 
-// FIXME: this is more or less copy of GroupTile below,
-// this probably needs a rewrite
-class SignTile extends StatelessWidget {
-  final String name;
-  final String group;
-  final String? desc;
-  final Widget? trailing;
-  final bool initiallyExpanded;
-  final bool showActions;
-  final List<Widget> actions;
+void _launchCardReader(
+  BuildContext context,
+  Future<void> Function(Card) onCard,
+) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => CardReaderPage(
+        onCard: onCard,
+      ),
+    ),
+  );
+}
 
-  const SignTile({
+class EntityChip extends StatelessWidget {
+  final String name;
+
+  const EntityChip({required this.name, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Chip(
+      avatar: CircleAvatar(
+        child: Text(
+          name.initials,
+          style: Theme.of(context).textTheme.labelLarge,
+        ),
+      ),
+      label: Text(name),
+    );
+  }
+}
+
+class TaskTile<T> extends StatelessWidget {
+  final Task<T> task;
+  final String name;
+  final String? desc;
+  final Widget? leading, trailing;
+  final Widget? actionChip;
+  final List<Widget> approveActions, cardActions, actions;
+  final List<Widget> children;
+
+  const TaskTile({
     Key? key,
+    required this.task,
     required this.name,
-    required this.group,
     this.desc,
+    this.leading,
     this.trailing,
-    this.initiallyExpanded = false,
-    this.showActions = true,
+    this.actionChip,
+    this.approveActions = const [],
+    this.cardActions = const [],
     this.actions = const [],
+    this.children = const [],
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final finished = task.state == TaskState.finished;
+    final desc = this.desc ?? statusMessage(task);
+    final trailing = this.trailing ?? TaskStateIndicator(task);
+    final allActions = actions +
+        (task.approvable ? approveActions : []) +
+        (task.state == TaskState.needsCard ? cardActions : []);
+
+    final actionRow = allActions.isNotEmpty || actionChip != null
+        ? Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (actionChip != null) actionChip!,
+              Expanded(
+                child: Wrap(
+                  alignment: WrapAlignment.end,
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: allActions,
+                ),
+              ),
+            ].intersperse(
+              const SizedBox(width: 8),
+            ),
+          )
+        : null;
+
     return ExpansionTile(
       title: Text(name),
-      subtitle: desc != null ? Text(desc!) : null,
-      initiallyExpanded: initiallyExpanded,
+      subtitle: desc != null ? Text(desc) : null,
+      initiallyExpanded: !finished,
+      leading: leading,
       trailing: trailing,
       childrenPadding: const EdgeInsets.symmetric(
         horizontal: 16,
         vertical: 8,
       ),
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Chip(
-              avatar: CircleAvatar(
-                child: Text(
-                  group.initials,
-                  style: Theme.of(context).textTheme.labelLarge,
-                ),
-              ),
-              label: Text(group),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Wrap(
-                alignment: WrapAlignment.end,
-                spacing: 8,
-                runSpacing: 8,
-                children: showActions ? actions : [],
-              ),
-            ),
-          ],
-        )
-      ],
+        ...children,
+        if (actionRow != null) actionRow,
+      ].intersperse(
+        const SizedBox(height: 8),
+      ),
     );
   }
 }
@@ -200,149 +247,35 @@ class SigningSubPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<HomeState>(builder: (context, model, child) {
-      return buildTaskListView<File, File>(
+      return buildTaskListView<File>(
         model.signTasks,
-        model.files,
         finishedTitle: 'Signed files',
         emptyView: const EmptyList(hint: 'Add new group first.'),
-        unfinishedBuilder: (context, task) {
-          final approveActions = <Widget>[
-            FilledButton.tonal(
-              child: const Text('Sign'),
-              onPressed: () => model.joinSign(task, agree: true),
-            ),
-            OutlinedButton(
-              child: const Text('Decline'),
-              onPressed: () => model.joinSign(task, agree: false),
-            ),
-          ];
-
-          return SignTile(
+        taskBuilder: (context, task, finished) {
+          return TaskTile(
+            task: task,
             name: task.info.basename,
-            group: task.info.group.name,
-            desc: statusMessage(task),
-            trailing: TaskStateIndicator(task.state, task.round / task.nRounds),
-            initiallyExpanded: true,
+            actionChip: EntityChip(name: task.info.group.name),
             actions: <Widget>[
-                  FilledButton.tonal(
-                    child: const Text('View'),
-                    onPressed: () => _openFile(task.info.path),
-                  ),
-                ] +
-                (task.approvable ? approveActions : []),
-          );
-        },
-        finishedBuilder: (context, file) {
-          return Deletable(
-            dismissibleKey: ObjectKey(file),
-            child: SignTile(
-              name: file.basename,
-              group: file.group.name,
-              trailing: const TaskStateIndicator(TaskState.finished, 1),
-              actions: <Widget>[
-                OutlinedButton(
-                  child: const Text('View'),
-                  onPressed: () => _openFile(file.path),
-                ),
-              ],
-            ),
-            confirmTitle: 'Do you really want to delete ${file.basename}?',
-            onDeleted: (_) {
-              // FIXME: remove the actual file
-              model.files.remove(file);
-            },
+              FilledButton.tonal(
+                child: const Text('View'),
+                onPressed: () => _openFile(task.info.path),
+              ),
+            ],
+            approveActions: [
+              FilledButton.tonal(
+                child: const Text('Sign'),
+                onPressed: () => model.joinSign(task, agree: true),
+              ),
+              OutlinedButton(
+                child: const Text('Decline'),
+                onPressed: () => model.joinSign(task, agree: false),
+              ),
+            ],
           );
         },
       );
     });
-  }
-}
-
-class GroupTile extends StatelessWidget {
-  final String name;
-  final String? desc;
-  final List<String> members;
-  final int threshold;
-  final KeyType keyType;
-  final Widget? trailing;
-  final bool initiallyExpanded;
-  final bool showActions;
-  final List<Widget> actions;
-
-  const GroupTile({
-    Key? key,
-    required this.name,
-    this.desc,
-    required this.members,
-    required this.threshold,
-    required this.keyType,
-    this.trailing,
-    this.initiallyExpanded = false,
-    this.showActions = true,
-    this.actions = const [],
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final children = <Widget>[
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text('Threshold: $threshold / ${members.length}'),
-          Text('Purpose: ${[
-            'Sign PDF',
-            'Challenge',
-            'Decrypt'
-          ][keyType.index]}'),
-        ],
-      ),
-      Container(
-        alignment: Alignment.topLeft,
-        child: Wrap(
-          spacing: 8,
-          runSpacing: 4,
-          children: members
-              .map((m) => Chip(
-                    avatar: CircleAvatar(
-                      child: Text(
-                        m.initials,
-                        style: Theme.of(context).textTheme.labelLarge,
-                      ),
-                    ),
-                    label: Text(m),
-                  ))
-              .toList(),
-        ),
-      ),
-    ];
-    if (showActions && actions.isNotEmpty) {
-      children.add(
-        Container(
-          alignment: Alignment.topRight,
-          child: Wrap(
-            spacing: 8,
-            children: actions,
-          ),
-        ),
-      );
-    }
-
-    return ExpansionTile(
-      title: Text(name),
-      subtitle: desc != null ? Text(desc!) : null,
-      leading: CircleAvatar(
-        child: Text(name.initials),
-      ),
-      initiallyExpanded: initiallyExpanded,
-      trailing: trailing,
-      childrenPadding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 8,
-      ),
-      children: children.intersperse(
-        const SizedBox(height: 16),
-      ),
-    );
   }
 }
 
@@ -352,46 +285,65 @@ class GroupsSubPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<HomeState>(builder: (context, model, child) {
-      // FIXME: finished tasks should be removed at some time
-
-      return buildTaskListView<Group, Group>(
+      return buildTaskListView<Group>(
         model.groupTasks,
-        model.groups,
         finishedTitle: 'Groups',
         emptyView: const EmptyList(
           hint: 'Try creating a new group.',
         ),
-        unfinishedBuilder: (context, task) {
+        taskBuilder: (context, task, finished) {
           final group = task.info;
-
-          return GroupTile(
+          final members = group.members;
+          return TaskTile(
+            task: task,
             name: group.name,
-            desc: statusMessage(task),
-            members: group.members.map((m) => m.name).toList(),
-            threshold: group.threshold,
-            keyType: group.keyType,
-            trailing: TaskStateIndicator(task.state, task.round / task.nRounds),
-            initiallyExpanded: true,
-            showActions: task.approvable,
-            actions: [
+            leading: CircleAvatar(
+              child: Text(group.name.initials),
+            ),
+            approveActions: [
               FilledButton.tonal(
                 child: const Text('Join'),
                 onPressed: () => model.joinGroup(task, agree: true),
               ),
+              if (CardManager.platformSupported && group.protocol.cardSupport)
+                FilledButton.tonal(
+                  onPressed: () =>
+                      model.joinGroup(task, agree: true, withCard: true),
+                  child: const Text('Join with card'),
+                ),
               OutlinedButton(
                 child: const Text('Decline'),
                 onPressed: () => model.joinGroup(task, agree: false),
-              )
+              ),
             ],
-          );
-        },
-        finishedBuilder: (context, group) {
-          return GroupTile(
-            name: group.name,
-            members: group.members.map((m) => m.name).toList(),
-            threshold: group.threshold,
-            keyType: group.keyType,
-            trailing: const Icon(Icons.check, color: Colors.green),
+            cardActions: [
+              FilledButton.tonal(
+                onPressed: () => _launchCardReader(
+                    context, (card) => model.advanceGroupWithCard(task, card)),
+                child: const Text('Read card'),
+              ),
+            ],
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text('Threshold: ${group.threshold} / ${members.length}'),
+                  Text('Purpose: ${[
+                    'Sign PDF',
+                    'Challenge',
+                    'Decrypt'
+                  ][group.keyType.index]}'),
+                ],
+              ),
+              Container(
+                alignment: Alignment.topLeft,
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  children: [for (var m in members) EntityChip(name: m.name)],
+                ),
+              ),
+            ],
           );
         },
       );
@@ -399,31 +351,24 @@ class GroupsSubPage extends StatelessWidget {
   }
 }
 
-class LogInSubPage extends StatelessWidget {
-  const LogInSubPage({Key? key}) : super(key: key);
+class ChallengeSubPage extends StatelessWidget {
+  const ChallengeSubPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Consumer<HomeState>(builder: (context, model, child) {
-      return buildTaskListView<Challenge, Challenge>(
+      return buildTaskListView<Challenge>(
         model.challengeTasks,
-        model.challengeTasks
-            .where((task) => task.state == TaskState.finished)
-            .map((task) => task.info)
-            .toList(),
         finishedTitle: 'Finished',
         emptyView: const EmptyList(
           hint: 'Challenge signing requests.',
         ),
-        unfinishedBuilder: (context, task) {
-          return SignTile(
+        taskBuilder: (context, task, finished) {
+          return TaskTile(
+            task: task,
             name: task.info.name,
-            group: task.info.group.name,
-            desc: statusMessage(task),
-            trailing: TaskStateIndicator(task.state, task.round / task.nRounds),
-            initiallyExpanded: true,
-            showActions: task.approvable,
-            actions: [
+            actionChip: EntityChip(name: task.info.group.name),
+            approveActions: [
               FilledButton.tonal(
                 child: const Text('Sign'),
                 onPressed: () => model.joinChallenge(task, agree: true),
@@ -433,13 +378,13 @@ class LogInSubPage extends StatelessWidget {
                 onPressed: () => model.joinChallenge(task, agree: false),
               )
             ],
-          );
-        },
-        finishedBuilder: (context, info) {
-          return SignTile(
-            name: info.name,
-            group: info.group.name,
-            trailing: const TaskStateIndicator(TaskState.finished, 1),
+            cardActions: [
+              FilledButton.tonal(
+                onPressed: () => _launchCardReader(context,
+                    (card) => model.advanceChallengeWithCard(task, card)),
+                child: const Text('Read card'),
+              ),
+            ],
           );
         },
       );
@@ -453,25 +398,22 @@ class DecryptSubPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<HomeState>(builder: (context, model, child) {
-      return buildTaskListView<Decrypt, Decrypt>(
+      return buildTaskListView<Decrypt>(
         model.decryptTasks,
-        model.decryptTasks
-            .where((task) => task.state == TaskState.finished)
-            .map((task) => task.info)
-            .toList(),
         finishedTitle: 'Finished',
         emptyView: const EmptyList(
           hint: 'Requests for decryptions.',
         ),
-        unfinishedBuilder: (context, task) {
-          return SignTile(
+        taskBuilder: (context, task, finished) {
+          final desc = finished
+              ? utf8.decode(task.info.data, allowMalformed: true)
+              : statusMessage(task);
+          return TaskTile(
+            task: task,
             name: task.info.name,
-            group: task.info.group.name,
-            desc: statusMessage(task),
-            trailing: TaskStateIndicator(task.state, task.round / task.nRounds),
-            initiallyExpanded: true,
-            showActions: task.approvable,
-            actions: [
+            desc: desc,
+            actionChip: EntityChip(name: task.info.group.name),
+            approveActions: [
               FilledButton.tonal(
                 child: const Text('Decrypt'),
                 onPressed: () => model.joinDecrypt(task, agree: true),
@@ -481,14 +423,6 @@ class DecryptSubPage extends StatelessWidget {
                 onPressed: () => model.joinDecrypt(task, agree: false),
               )
             ],
-          );
-        },
-        finishedBuilder: (context, info) {
-          return SignTile(
-            name: info.name,
-            group: info.group.name,
-            trailing: const TaskStateIndicator(TaskState.finished, 1),
-            desc: utf8.decode(info.data, allowMalformed: true),
           );
         },
       );
@@ -547,45 +481,47 @@ class _HomePageViewState extends State<HomePageView> {
     );
   }
 
-  Future<List<String>?> _inputMessage() async {
-    return showDialog<List<String>?>(
+  Future<({String description, String message})?> _inputMessage() async {
+    return showDialog<({String description, String message})?>(
       context: context,
       builder: (context) {
         var description = TextEditingController();
         var message = TextEditingController();
 
-        return SimpleDialog(title: const Text('Input message'), children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: TextField(
-              controller: description,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Description',
-              ),
+        return AlertDialog(
+          title: const Text('Enter message'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: message,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Message',
+            TextButton(
+              onPressed: () => Navigator.pop(context,
+                  (description: description.text, message: message.text)),
+              child: const Text('Next'),
+            )
+          ],
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: description,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Description',
+                ),
               ),
-            ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: message,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Message',
+                ),
+              ),
+            ],
           ),
-          Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ElevatedButton(
-                  onPressed: () {
-                    var result = List<String>.empty(growable: true);
-                    result.add(description.text);
-                    result.add(message.text);
-                    Navigator.pop(context, result);
-                  },
-                  child: const Text("Next"))),
-        ]);
+        );
       },
     );
   }
@@ -632,6 +568,9 @@ class _HomePageViewState extends State<HomePageView> {
         },
       );
 
+  // TODO: reduce repetition across request methods
+  // (_sign, _challenge, _group, _encrypt)
+
   Future<void> _sign() async {
     final file = await _pickPdfFile();
     if (file == null) return;
@@ -658,6 +597,26 @@ class _HomePageViewState extends State<HomePageView> {
     }
   }
 
+  Future<void> _challenge() async {
+    final result = await _inputMessage();
+    if (result == null) return;
+
+    final group = await _selectGroup(KeyType.signChallenge);
+    if (group == null) return;
+
+    try {
+      await context
+          .read<HomeState>()
+          .challenge(result.description, result.message, group);
+    } catch (e) {
+      showErrorDialog(
+        title: 'Challenge request failed',
+        desc: 'Please try again.',
+      );
+      rethrow;
+    }
+  }
+
   Future<void> _group() async {
     final res = await Navigator.pushNamed(context, Routes.newGroup) as Group?;
     if (res == null) return;
@@ -675,14 +634,16 @@ class _HomePageViewState extends State<HomePageView> {
   }
 
   Future<void> _encrypt() async {
-    final message = await _inputMessage();
-    if (message == null) return;
+    final result = await _inputMessage();
+    if (result == null) return;
 
     final group = await _selectGroup(KeyType.decrypt); // TODO change
     if (group == null) return;
 
     try {
-      await context.read<HomeState>().encrypt(message[0], message[1], group);
+      await context
+          .read<HomeState>()
+          .encrypt(result.description, result.message, group);
     } catch (e) {
       showErrorDialog(
         title: 'Decryption request failed',
@@ -696,7 +657,7 @@ class _HomePageViewState extends State<HomePageView> {
   Widget build(BuildContext context) {
     const pages = [
       SigningSubPage(),
-      LogInSubPage(),
+      ChallengeSubPage(),
       DecryptSubPage(),
       GroupsSubPage(),
     ];
@@ -708,7 +669,12 @@ class _HomePageViewState extends State<HomePageView> {
         label: const Text('Sign'),
         icon: const Icon(Icons.add),
       ),
-      null,
+      FloatingActionButton.extended(
+        key: const ValueKey('ChallengeFab'),
+        onPressed: _challenge,
+        label: const Text('Challenge'),
+        icon: const Icon(Icons.add),
+      ),
       FloatingActionButton.extended(
         key: const ValueKey('EncryptFab'),
         onPressed: _encrypt,

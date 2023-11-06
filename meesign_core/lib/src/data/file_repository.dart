@@ -52,6 +52,7 @@ class FileRepository extends TaskRepository<File> {
         db.TasksCompanion.insert(
           id: tid,
           did: did.bytes,
+          gid: Value(req.groupId as Uint8List),
           state: TaskState.created,
         ),
       );
@@ -60,7 +61,6 @@ class FileRepository extends TaskRepository<File> {
         db.FilesCompanion.insert(
           tid: tid,
           did: did.bytes,
-          gid: req.groupId as Uint8List,
           name: req.name,
         ),
       );
@@ -69,8 +69,7 @@ class FileRepository extends TaskRepository<File> {
 
   @override
   Future<db.Task> initTask(Uuid did, db.Task task) async {
-    final file = await _taskDao.getFile(did.bytes, task.id);
-    final group = await _taskDao.getGroup(did.bytes, gid: file.gid);
+    final group = await _taskDao.getGroup(did.bytes, gid: task.gid);
     return task.copyWith(
       context: Value(ProtocolWrapper.init(
         group.protocol.toNative(),

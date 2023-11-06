@@ -86,7 +86,10 @@ class GroupRepository extends TaskRepository<Group> {
   Future<db.Task> initTask(Uuid did, db.Task task) async {
     final group = await _taskDao.getGroup(did.bytes, tid: task.id);
     return task.copyWith(
-      context: Value(ProtocolWrapper.keygen(group.protocol.toNative())),
+      context: Value(ProtocolWrapper.keygen(
+        group.protocol.toNative(),
+        withCard: group.withCard,
+      )),
     );
   }
 
@@ -105,6 +108,20 @@ class GroupRepository extends TaskRepository<Group> {
       ),
     );
   }
+
+  @override
+  Future<void> approveTask(Uuid did, Uuid tid,
+          {required bool agree, bool withCard = false}) =>
+      taskLocks[did][tid].synchronized(() async {
+        await approveTaskUnsafe(did, tid, agree);
+        await _taskDao.updateGroup(
+          db.GroupsCompanion(
+            did: Value(did.bytes),
+            tid: Value(tid.bytes),
+            withCard: Value(withCard),
+          ),
+        );
+      });
 
   @override
   Stream<List<Task<Group>>> observeTasks(Uuid did) {

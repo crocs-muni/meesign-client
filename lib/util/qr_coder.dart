@@ -25,6 +25,6 @@ class QrCoder {
     final id = _base64decoder.convert(args.substring(0, i));
     final name = args.substring(i + 1);
 
-    return Device(name, Uuid(id), DeviceType.app, DateTime.now());
+    return Device(name, Uuid(id), DateTime.now());
   }
 }

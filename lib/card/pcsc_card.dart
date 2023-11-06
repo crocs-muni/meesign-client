@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:dart_pcsc/dart_pcsc.dart';
+import 'package:meesign_core/meesign_card.dart';
 
 import 'card.dart';
 

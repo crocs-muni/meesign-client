@@ -118,7 +118,7 @@ class TaskDao extends DatabaseAccessor<Database> with _$TaskDaoMixin {
     final query = select(files)..where((file) => file.did.equals(did));
     final onTask =
         tasks.id.equalsExp(files.tid) & tasks.did.equalsExp(files.did);
-    final onGroup = groups.id.equalsExp(files.gid);
+    final onGroup = groups.id.equalsExp(tasks.gid);
     return query
         .join([
           innerJoin(tasks, onTask),
@@ -147,7 +147,7 @@ class TaskDao extends DatabaseAccessor<Database> with _$TaskDaoMixin {
     final query = select(challenges)..where((file) => file.did.equals(did));
     final onTask = tasks.id.equalsExp(challenges.tid) &
         tasks.did.equalsExp(challenges.did);
-    final onGroup = groups.id.equalsExp(challenges.gid);
+    final onGroup = groups.id.equalsExp(tasks.gid);
     return query
         .join([
           innerJoin(tasks, onTask),
@@ -178,7 +178,7 @@ class TaskDao extends DatabaseAccessor<Database> with _$TaskDaoMixin {
     final query = select(decrypts)..where((file) => file.did.equals(did));
     final onTask =
         tasks.id.equalsExp(decrypts.tid) & tasks.did.equalsExp(decrypts.did);
-    final onGroup = groups.id.equalsExp(decrypts.gid);
+    final onGroup = groups.id.equalsExp(tasks.gid);
     return query
         .join([
           innerJoin(tasks, onTask),

@@ -5,22 +5,16 @@ import 'package:meta/meta.dart';
 import '../database/database.dart' as db;
 import '../util/uuid.dart';
 
-enum DeviceType {
-  app,
-  card,
-}
-
 @immutable
 class Device {
   final String name;
   final Uuid id;
-  final DeviceType type;
   final DateTime lastActive;
 
   static const int idLen = 16;
 
-  const Device(this.name, this.id, this.type, this.lastActive);
-  Device.random(this.name, this.type)
+  const Device(this.name, this.id, this.lastActive);
+  Device.random(this.name)
       : id = _randomId(),
         lastActive = DateTime.now();
 
@@ -32,6 +26,5 @@ class Device {
 }
 
 extension DeviceConversion on db.Device {
-  Device toModel() =>
-      Device(name, Uuid.take(id), DeviceType.app, DateTime.now());
+  Device toModel() => Device(name, Uuid.take(id), DateTime.now());
 }

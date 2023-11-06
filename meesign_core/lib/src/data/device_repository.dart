@@ -31,7 +31,7 @@ class DeviceRepository {
     await _deviceDao.insertDevice(
       db.DevicesCompanion.insert(id: did.bytes, name: name),
     );
-    return Device(name, did, DeviceType.app, DateTime.now());
+    return Device(name, did, DateTime.now());
   }
 
   Future<Iterable<Device>> _fetchAll() async {
@@ -41,7 +41,6 @@ class DeviceRepository {
       (device) => Device(
         device.name,
         Uuid(device.identifier),
-        DeviceType.app,
         DateTime.fromMillisecondsSinceEpoch(
           device.lastActive.toInt() * 1000,
         ),
