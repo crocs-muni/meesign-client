@@ -5,6 +5,8 @@ enum Protocol {
   gg18(6, 10),
   elgamal(4, 2),
   frost(3, 3);
+  // TODO those numbers are a guess work
+  ptsrsap1(2, 2);
 
   final int keygenRounds;
   final int signRounds;
@@ -21,6 +23,8 @@ extension ProtocolConversion on Protocol {
         return ProtocolId.Elgamal;
       case Protocol.frost:
         return ProtocolId.Frost;
+      case Protocol.ptsrsap1:
+        return ProtocolId.Ptsrsap1;
     }
   }
 
@@ -32,6 +36,8 @@ extension ProtocolConversion on Protocol {
         return ProtocolType.ELGAMAL;
       case Protocol.frost:
         return ProtocolType.FROST;
+      case Protocol.ptsrsap1:
+        return ProtocolId.PTSRSAP1;
     }
   }
 
@@ -43,6 +49,8 @@ extension ProtocolConversion on Protocol {
         return Protocol.elgamal;
       case ProtocolType.FROST:
         return Protocol.frost;
+      case Protocol.ptsrsap1:
+        return ProtocolId.PtSRSAP1;
       default:
         throw ArgumentError('Unknown protocol');
     }
