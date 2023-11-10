@@ -184,6 +184,13 @@ void main() {
       test('15-20', () => testSignChallenge(Protocol.frost, n: 20, t: 15),
           tags: 'large');
     });
+    group('ptsrsap1', () {
+      test('2-2', () => testSignChallenge(Protocol.ptsrsap1, n: 2, t: 2));
+      test('2-3', () => testSignChallenge(Protocol.ptsrsap1, n: 3, t: 2));
+      test('3-3', () => testSignChallenge(Protocol.ptsrsap1, n: 3, t: 3));
+      test('15-20', () => testSignChallenge(Protocol.ptsrsap1, n: 20, t: 15),
+          tags: 'large', timeout: Timeout(Duration(minutes: 10)));
+    });
   });
 
   group('decrypt', () {
