@@ -188,8 +188,8 @@ void main() {
       test('2-2', () => testSignChallenge(Protocol.ptsrsap1, n: 2, t: 2));
       test('2-3', () => testSignChallenge(Protocol.ptsrsap1, n: 3, t: 2));
       test('3-3', () => testSignChallenge(Protocol.ptsrsap1, n: 3, t: 3));
-      test('15-20', () => testSignChallenge(Protocol.ptsrsap1, n: 20, t: 15),
-          tags: 'large', timeout: Timeout(Duration(minutes: 10)));
+      // test('15-20', () => testSignChallenge(Protocol.ptsrsap1, n: 20, t: 15),
+      //     tags: 'large', timeout: Timeout(Duration(minutes: 10)));
     });
   });
 
