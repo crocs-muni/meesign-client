@@ -123,8 +123,8 @@ class HomeState with ChangeNotifier {
   Future<void> joinDecrypt(Task<Decrypt> task, {required bool agree}) =>
       _decryptRepository.approveTask(device!.id, task.id, agree: agree);
   // FIXME: avoid this repetition
-  Future<void> advanceGroupWithCard<T>(Task<T> task, Card card) =>
+  Future<void> advanceGroupWithCard(Task<Group> task, Card card) =>
       _groupRepository.advanceTaskWithCard(device!.id, task.id, card);
-  Future<void> advanceChallengeWithCard<T>(Task<T> task, Card card) =>
+  Future<void> advanceChallengeWithCard(Task<Challenge> task, Card card) =>
       _challengeRepository.advanceTaskWithCard(device!.id, task.id, card);
 }
