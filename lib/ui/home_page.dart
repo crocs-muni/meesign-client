@@ -23,6 +23,7 @@ import '../app_container.dart';
 import '../card/card.dart';
 import '../routes.dart';
 import '../sync.dart';
+import '../theme.dart';
 import '../util/chars.dart';
 import '../util/platform.dart';
 import '../widget/counter_badge.dart';
@@ -54,7 +55,8 @@ class TaskStateIndicator extends StatelessWidget {
       case TaskState.needsCard:
         return const Icon(Icons.payment);
       case TaskState.finished:
-        return const Icon(Icons.check, color: Colors.green);
+        return Icon(Icons.check,
+            color: Theme.of(context).extension<CustomColors>()!.success);
       case TaskState.failed:
         return Icon(Icons.error_outline,
             color: Theme.of(context).colorScheme.error);
@@ -255,7 +257,7 @@ class TaskTile<T> extends StatelessWidget {
       icon: task.archived ? Icons.unarchive_outlined : Icons.archive_outlined,
       color: task.archived
           ? Theme.of(context).colorScheme.surfaceVariant
-          : Colors.green,
+          : Theme.of(context).extension<CustomColors>()!.successContainer!,
       onDeleted: (_) {
         if (onArchiveChange != null) onArchiveChange!(!task.archived);
       },
@@ -865,8 +867,10 @@ class _HomePageViewState extends State<HomePageView> {
                     builder: (context, child) {
                       return Badge(
                         backgroundColor: context.read<Sync>().subscribed.value
-                            ? Colors.green
-                            : Colors.orange,
+                            ? Theme.of(context)
+                                .extension<CustomColors>()!
+                                .success
+                            : Theme.of(context).colorScheme.error,
                         smallSize: 8,
                         child: CircleAvatar(
                           child: Text(name.initials),

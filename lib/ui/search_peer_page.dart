@@ -3,6 +3,7 @@ import 'package:meesign_core/meesign_model.dart';
 import 'package:provider/provider.dart';
 
 import '../app_container.dart';
+import '../theme.dart';
 import '../util/chars.dart';
 
 class SearchPeerPage extends StatefulWidget {
@@ -81,7 +82,9 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
             trailing: Container(
               width: 8,
               decoration: ShapeDecoration(
-                color: _isActive(device) ? Colors.green : Colors.orange,
+                color: _isActive(device)
+                    ? Theme.of(context).extension<CustomColors>()!.success
+                    : Theme.of(context).colorScheme.error,
                 shape: const CircleBorder(),
               ),
             ),
