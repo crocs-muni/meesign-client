@@ -18,8 +18,8 @@ class DismissibleBackground extends StatelessWidget {
       color: color,
       child: Align(
         alignment: alignment,
-        child: AspectRatio(
-          aspectRatio: 1,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Icon(icon),
         ),
       ),
@@ -56,16 +56,18 @@ Future<bool?> showConfirmationDialog({
 class Deletable extends StatelessWidget {
   final Key dismissibleKey;
   final Widget child;
-  final String confirmTitle;
-  final String? confirmDescription;
+  final Color color;
+  final IconData icon;
+  final Future<bool?> Function(DismissDirection)? confirmDismiss;
   final void Function(DismissDirection)? onDeleted;
 
   const Deletable({
     Key? key,
     required this.dismissibleKey,
     required this.child,
-    this.confirmTitle = "Do you really want to delete this item?",
-    this.confirmDescription,
+    this.color = Colors.red,
+    this.icon = Icons.delete,
+    this.confirmDismiss,
     this.onDeleted,
   }) : super(key: key);
 
@@ -73,23 +75,19 @@ class Deletable extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dismissible(
       key: dismissibleKey,
-      child: child,
       background: DismissibleBackground(
         alignment: Alignment.centerLeft,
-        color: Theme.of(context).colorScheme.errorContainer,
-        icon: Icons.delete,
+        color: color,
+        icon: icon,
       ),
       secondaryBackground: DismissibleBackground(
         alignment: Alignment.centerRight,
-        color: Theme.of(context).colorScheme.errorContainer,
-        icon: Icons.delete,
+        color: color,
+        icon: icon,
       ),
-      confirmDismiss: (_) => showConfirmationDialog(
-        context: context,
-        title: confirmTitle,
-        description: confirmDescription,
-      ),
+      confirmDismiss: confirmDismiss,
       onDismissed: onDeleted,
+      child: child,
     );
   }
 }
