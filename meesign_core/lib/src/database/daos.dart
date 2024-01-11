@@ -53,6 +53,9 @@ class TaskDao extends DatabaseAccessor<Database> with _$TaskDaoMixin {
     return into(tasks).insertOnConflictUpdate(entity);
   }
 
+  Future<void> updateTask(TasksCompanion entity) =>
+      (update(tasks)..whereSamePrimaryKey(entity)).write(entity);
+
   Future<void> insertGroup(GroupsCompanion entity) =>
       into(groups).insert(entity);
 

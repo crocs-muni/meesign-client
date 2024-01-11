@@ -278,6 +278,15 @@ abstract class TaskRepository<T> {
         () => approveTaskUnsafe(did, tid, agree),
       );
 
+  Future<void> archiveTask(Uuid did, Uuid tid, {required bool archive}) =>
+      taskLocks[did][tid].synchronized(
+        () => _taskDao.updateTask(db.TasksCompanion(
+          id: Value(tid.bytes),
+          did: Value(did.bytes),
+          archived: Value(archive),
+        )),
+      );
+
   Stream<List<Task<T>>> observeTasks(Uuid did);
 
   Stream<List<T>> observeResults(Uuid did) =>

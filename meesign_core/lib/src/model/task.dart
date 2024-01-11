@@ -11,6 +11,7 @@ class Task<T> {
   final Uuid id;
   final TaskState state;
   final bool approved;
+  final bool archived;
   final int round;
   final int nRounds;
   final int attempt;
@@ -20,6 +21,7 @@ class Task<T> {
     required this.id,
     this.state = TaskState.created,
     this.approved = false,
+    this.archived = false,
     this.round = 0,
     required this.nRounds,
     this.attempt = 0,
@@ -34,6 +36,7 @@ class TaskConversion {
         id: Uuid.take(entity.id),
         state: entity.state,
         approved: entity.approved,
+        archived: entity.archived,
         round: entity.round,
         nRounds: nRounds,
         attempt: entity.attempt,

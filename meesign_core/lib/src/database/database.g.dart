@@ -869,6 +869,19 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
             SqlDialect.postgres: '',
           }),
           defaultValue: const Constant(false));
+  static const VerificationMeta _archivedMeta =
+      const VerificationMeta('archived');
+  @override
+  late final GeneratedColumn<bool> archived =
+      GeneratedColumn<bool>('archived', aliasedName, false,
+          type: DriftSqlType.bool,
+          requiredDuringInsert: false,
+          defaultConstraints: GeneratedColumn.constraintsDependsOnDialect({
+            SqlDialect.sqlite: 'CHECK ("archived" IN (0, 1))',
+            SqlDialect.mysql: '',
+            SqlDialect.postgres: '',
+          }),
+          defaultValue: const Constant(false));
   static const VerificationMeta _roundMeta = const VerificationMeta('round');
   @override
   late final GeneratedColumn<int> round = GeneratedColumn<int>(
@@ -897,7 +910,7 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
       type: DriftSqlType.blob, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, did, gid, state, approved, round, attempt, context, data];
+      [id, did, gid, state, approved, archived, round, attempt, context, data];
   @override
   String get aliasedName => _alias ?? 'tasks';
   @override
@@ -926,6 +939,10 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
     if (data.containsKey('approved')) {
       context.handle(_approvedMeta,
           approved.isAcceptableOrUnknown(data['approved']!, _approvedMeta));
+    }
+    if (data.containsKey('archived')) {
+      context.handle(_archivedMeta,
+          archived.isAcceptableOrUnknown(data['archived']!, _archivedMeta));
     }
     if (data.containsKey('round')) {
       context.handle(
@@ -962,6 +979,8 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
           .read(DriftSqlType.string, data['${effectivePrefix}state'])!),
       approved: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}approved'])!,
+      archived: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}archived'])!,
       round: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}round'])!,
       attempt: attachedDatabase.typeMapping
@@ -988,6 +1007,7 @@ class Task extends DataClass implements Insertable<Task> {
   final Uint8List? gid;
   final TaskState state;
   final bool approved;
+  final bool archived;
   final int round;
   final int attempt;
   final Uint8List? context;
@@ -998,6 +1018,7 @@ class Task extends DataClass implements Insertable<Task> {
       this.gid,
       required this.state,
       required this.approved,
+      required this.archived,
       required this.round,
       required this.attempt,
       this.context,
@@ -1015,6 +1036,7 @@ class Task extends DataClass implements Insertable<Task> {
       map['state'] = Variable<String>(converter.toSql(state));
     }
     map['approved'] = Variable<bool>(approved);
+    map['archived'] = Variable<bool>(archived);
     map['round'] = Variable<int>(round);
     map['attempt'] = Variable<int>(attempt);
     if (!nullToAbsent || context != null) {
@@ -1033,6 +1055,7 @@ class Task extends DataClass implements Insertable<Task> {
       gid: gid == null && nullToAbsent ? const Value.absent() : Value(gid),
       state: Value(state),
       approved: Value(approved),
+      archived: Value(archived),
       round: Value(round),
       attempt: Value(attempt),
       context: context == null && nullToAbsent
@@ -1052,6 +1075,7 @@ class Task extends DataClass implements Insertable<Task> {
       state: $TasksTable.$converterstate
           .fromJson(serializer.fromJson<String>(json['state'])),
       approved: serializer.fromJson<bool>(json['approved']),
+      archived: serializer.fromJson<bool>(json['archived']),
       round: serializer.fromJson<int>(json['round']),
       attempt: serializer.fromJson<int>(json['attempt']),
       context: serializer.fromJson<Uint8List?>(json['context']),
@@ -1068,6 +1092,7 @@ class Task extends DataClass implements Insertable<Task> {
       'state':
           serializer.toJson<String>($TasksTable.$converterstate.toJson(state)),
       'approved': serializer.toJson<bool>(approved),
+      'archived': serializer.toJson<bool>(archived),
       'round': serializer.toJson<int>(round),
       'attempt': serializer.toJson<int>(attempt),
       'context': serializer.toJson<Uint8List?>(context),
@@ -1081,6 +1106,7 @@ class Task extends DataClass implements Insertable<Task> {
           Value<Uint8List?> gid = const Value.absent(),
           TaskState? state,
           bool? approved,
+          bool? archived,
           int? round,
           int? attempt,
           Value<Uint8List?> context = const Value.absent(),
@@ -1091,6 +1117,7 @@ class Task extends DataClass implements Insertable<Task> {
         gid: gid.present ? gid.value : this.gid,
         state: state ?? this.state,
         approved: approved ?? this.approved,
+        archived: archived ?? this.archived,
         round: round ?? this.round,
         attempt: attempt ?? this.attempt,
         context: context.present ? context.value : this.context,
@@ -1104,6 +1131,7 @@ class Task extends DataClass implements Insertable<Task> {
           ..write('gid: $gid, ')
           ..write('state: $state, ')
           ..write('approved: $approved, ')
+          ..write('archived: $archived, ')
           ..write('round: $round, ')
           ..write('attempt: $attempt, ')
           ..write('context: $context, ')
@@ -1119,6 +1147,7 @@ class Task extends DataClass implements Insertable<Task> {
       $driftBlobEquality.hash(gid),
       state,
       approved,
+      archived,
       round,
       attempt,
       $driftBlobEquality.hash(context),
@@ -1132,6 +1161,7 @@ class Task extends DataClass implements Insertable<Task> {
           $driftBlobEquality.equals(other.gid, this.gid) &&
           other.state == this.state &&
           other.approved == this.approved &&
+          other.archived == this.archived &&
           other.round == this.round &&
           other.attempt == this.attempt &&
           $driftBlobEquality.equals(other.context, this.context) &&
@@ -1144,6 +1174,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
   final Value<Uint8List?> gid;
   final Value<TaskState> state;
   final Value<bool> approved;
+  final Value<bool> archived;
   final Value<int> round;
   final Value<int> attempt;
   final Value<Uint8List?> context;
@@ -1155,6 +1186,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.gid = const Value.absent(),
     this.state = const Value.absent(),
     this.approved = const Value.absent(),
+    this.archived = const Value.absent(),
     this.round = const Value.absent(),
     this.attempt = const Value.absent(),
     this.context = const Value.absent(),
@@ -1167,6 +1199,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.gid = const Value.absent(),
     required TaskState state,
     this.approved = const Value.absent(),
+    this.archived = const Value.absent(),
     this.round = const Value.absent(),
     this.attempt = const Value.absent(),
     this.context = const Value.absent(),
@@ -1181,6 +1214,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     Expression<Uint8List>? gid,
     Expression<String>? state,
     Expression<bool>? approved,
+    Expression<bool>? archived,
     Expression<int>? round,
     Expression<int>? attempt,
     Expression<Uint8List>? context,
@@ -1193,6 +1227,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       if (gid != null) 'gid': gid,
       if (state != null) 'state': state,
       if (approved != null) 'approved': approved,
+      if (archived != null) 'archived': archived,
       if (round != null) 'round': round,
       if (attempt != null) 'attempt': attempt,
       if (context != null) 'context': context,
@@ -1207,6 +1242,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       Value<Uint8List?>? gid,
       Value<TaskState>? state,
       Value<bool>? approved,
+      Value<bool>? archived,
       Value<int>? round,
       Value<int>? attempt,
       Value<Uint8List?>? context,
@@ -1218,6 +1254,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       gid: gid ?? this.gid,
       state: state ?? this.state,
       approved: approved ?? this.approved,
+      archived: archived ?? this.archived,
       round: round ?? this.round,
       attempt: attempt ?? this.attempt,
       context: context ?? this.context,
@@ -1245,6 +1282,9 @@ class TasksCompanion extends UpdateCompanion<Task> {
     if (approved.present) {
       map['approved'] = Variable<bool>(approved.value);
     }
+    if (archived.present) {
+      map['archived'] = Variable<bool>(archived.value);
+    }
     if (round.present) {
       map['round'] = Variable<int>(round.value);
     }
@@ -1271,6 +1311,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
           ..write('gid: $gid, ')
           ..write('state: $state, ')
           ..write('approved: $approved, ')
+          ..write('archived: $archived, ')
           ..write('round: $round, ')
           ..write('attempt: $attempt, ')
           ..write('context: $context, ')

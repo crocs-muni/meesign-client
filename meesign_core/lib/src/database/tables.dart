@@ -26,6 +26,7 @@ class Tasks extends Table {
   BlobColumn get gid => blob().nullable().references(Groups, #id)();
   TextColumn get state => textEnum<TaskState>()();
   BoolColumn get approved => boolean().withDefault(const Constant(false))();
+  BoolColumn get archived => boolean().withDefault(const Constant(false))();
   IntColumn get round => integer().withDefault(const Constant(0))();
   IntColumn get attempt => integer().withDefault(const Constant(0))();
   BlobColumn get context => blob().nullable()();
