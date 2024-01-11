@@ -26,6 +26,7 @@ import '../sync.dart';
 import '../util/chars.dart';
 import '../util/platform.dart';
 import '../widget/counter_badge.dart';
+import '../widget/dismissible.dart';
 import '../widget/empty_list.dart';
 import 'card_reader_page.dart';
 import 'home_state.dart';
@@ -94,19 +95,25 @@ Widget buildTaskListView<T>(
   required String finishedTitle,
   required Widget emptyView,
   required Widget Function(BuildContext, Task<T>, bool) taskBuilder,
+  bool showArchived = false,
 }) {
-  final groups = tasks.groupListsBy((task) => task.state == TaskState.finished);
-  final unfinished = groups[false] ?? [];
-  final finished = groups[true] ?? [];
+  // TODO: possibly filter in database
+  final archivedGroups = tasks.groupListsBy((task) => task.archived);
+  final finishedGroups = (archivedGroups[false] ?? [])
+      .groupListsBy((task) => task.state == TaskState.finished);
+  final unfinished = finishedGroups[false] ?? [];
+  final finished = finishedGroups[true] ?? [];
+  final archived = archivedGroups[true] ?? [];
 
   // TODO: unfinished.sort((a, b) => b.timeCreated.compareTo(a.timeCreated));
 
   int length = finished.length + unfinished.length;
+  if (showArchived) length += archived.length;
 
   if (length == 0) return emptyView;
 
   return ListView.builder(
-    itemCount: length + 2,
+    itemCount: length + 2 + (showArchived ? 1 : 0),
     itemBuilder: (context, i) {
       if (i == 0) {
         return const ListTile(
@@ -126,10 +133,22 @@ Widget buildTaskListView<T>(
           dense: true,
         );
       }
+      if (i == 2 + unfinished.length + finished.length) {
+        return const ListTile(
+          title: Text(
+            'Archive',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          dense: true,
+        );
+      }
       if (i <= unfinished.length) {
         return taskBuilder(context, unfinished[i - 1], false);
-      } else {
+      } else if (i <= 1 + unfinished.length + finished.length) {
         return taskBuilder(context, finished[i - unfinished.length - 2], true);
+      } else {
+        final task = archived[i - unfinished.length - finished.length - 3];
+        return taskBuilder(context, task, task.state == TaskState.finished);
       }
     },
   );
@@ -186,6 +205,7 @@ class TaskTile<T> extends StatelessWidget {
   final Widget? actionChip;
   final List<Widget> approveActions, cardActions, actions;
   final List<Widget> children;
+  final void Function(bool)? onArchiveChange;
 
   const TaskTile({
     Key? key,
@@ -199,6 +219,7 @@ class TaskTile<T> extends StatelessWidget {
     this.cardActions = const [],
     this.actions = const [],
     this.children = const [],
+    this.onArchiveChange,
   }) : super(key: key);
 
   @override
@@ -229,21 +250,31 @@ class TaskTile<T> extends StatelessWidget {
           )
         : null;
 
-    return ExpansionTile(
-      title: Text(name),
-      subtitle: desc != null ? Text(desc) : null,
-      initiallyExpanded: !finished,
-      leading: leading,
-      trailing: trailing,
-      childrenPadding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 8,
-      ),
-      children: [
-        ...children,
-        if (actionRow != null) actionRow,
-      ].intersperse(
-        const SizedBox(height: 8),
+    return Deletable(
+      dismissibleKey: ObjectKey(task),
+      icon: task.archived ? Icons.unarchive_outlined : Icons.archive_outlined,
+      color: task.archived
+          ? Theme.of(context).colorScheme.surfaceVariant
+          : Colors.green,
+      onDeleted: (_) {
+        if (onArchiveChange != null) onArchiveChange!(!task.archived);
+      },
+      child: ExpansionTile(
+        title: Text(name),
+        subtitle: desc != null ? Text(desc) : null,
+        initiallyExpanded: !finished,
+        leading: leading,
+        trailing: trailing,
+        childrenPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 8,
+        ),
+        children: [
+          ...children,
+          if (actionRow != null) actionRow,
+        ].intersperse(
+          const SizedBox(height: 8),
+        ),
       ),
     );
   }
@@ -259,6 +290,7 @@ class SigningSubPage extends StatelessWidget {
         model.signTasks,
         finishedTitle: 'Signed files',
         emptyView: const EmptyList(hint: 'Add new group first.'),
+        showArchived: model.showArchived,
         taskBuilder: (context, task, finished) {
           return TaskTile(
             task: task,
@@ -280,6 +312,8 @@ class SigningSubPage extends StatelessWidget {
                 onPressed: () => model.joinSign(task, agree: false),
               ),
             ],
+            onArchiveChange: (archive) =>
+                model.archiveTask(task, archive: archive),
           );
         },
       );
@@ -299,6 +333,7 @@ class GroupsSubPage extends StatelessWidget {
         emptyView: const EmptyList(
           hint: 'Try creating a new group.',
         ),
+        showArchived: model.showArchived,
         taskBuilder: (context, task, finished) {
           final group = task.info;
           final members = group.members;
@@ -352,6 +387,8 @@ class GroupsSubPage extends StatelessWidget {
                 ),
               ),
             ],
+            onArchiveChange: (archive) =>
+                model.archiveTask(task, archive: archive),
           );
         },
       );
@@ -371,6 +408,7 @@ class ChallengeSubPage extends StatelessWidget {
         emptyView: const EmptyList(
           hint: 'Challenge signing requests.',
         ),
+        showArchived: model.showArchived,
         taskBuilder: (context, task, finished) {
           return TaskTile(
             task: task,
@@ -393,6 +431,8 @@ class ChallengeSubPage extends StatelessWidget {
                 child: const Text('Read card'),
               ),
             ],
+            onArchiveChange: (archive) =>
+                model.archiveTask(task, archive: archive),
           );
         },
       );
@@ -514,6 +554,7 @@ class DecryptSubPage extends StatelessWidget {
         emptyView: const EmptyList(
           hint: 'Requests for decryptions.',
         ),
+        showArchived: model.showArchived,
         taskBuilder: (context, task, finished) {
           return TaskTile(
             task: task,
@@ -537,6 +578,8 @@ class DecryptSubPage extends StatelessWidget {
                   child: const Text('View'),
                 )
             ],
+            onArchiveChange: (archive) =>
+                model.archiveTask(task, archive: archive),
           );
         },
       );
@@ -841,6 +884,18 @@ class _HomePageViewState extends State<HomePageView> {
               Navigator.pushNamed(context, Routes.qrIdentity);
             },
           ),
+          // TODO: migrate to MenuAnchor?
+          Consumer<HomeState>(builder: (context, model, child) {
+            return PopupMenuButton(
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<void>>[
+                CheckedPopupMenuItem<void>(
+                  checked: model.showArchived,
+                  onTap: () => model.showArchived = !model.showArchived,
+                  child: const Text('Archived'),
+                ),
+              ],
+            );
+          }),
         ],
       ),
       body: PageTransitionSwitcher(

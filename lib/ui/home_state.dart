@@ -36,6 +36,13 @@ class HomeState with ChangeNotifier {
   List<Task<Challenge>> challengeTasks = [];
   List<Task<Decrypt>> decryptTasks = [];
 
+  bool _showArchived = false;
+  bool get showArchived => _showArchived;
+  set showArchived(bool value) {
+    _showArchived = value;
+    notifyListeners();
+  }
+
   HomeState(
     UserRepository userRepository,
     DeviceRepository deviceRepository,
@@ -58,7 +65,9 @@ class HomeState with ChangeNotifier {
     final decryptTasksStream = _decryptRepository.observeTasks(did);
 
     int pending(List<Task<dynamic>> tasks) => tasks
-        .where((task) => task.approvable || task.state == TaskState.needsCard)
+        .where((task) =>
+            (task.approvable || task.state == TaskState.needsCard) &&
+            !task.archived)
         .length;
     nGroupReqs = groupTasksStream.map(pending).shareValue();
     nSignReqs = signTasksStream.map(pending).shareValue();
@@ -127,4 +136,18 @@ class HomeState with ChangeNotifier {
       _groupRepository.advanceTaskWithCard(device!.id, task.id, card);
   Future<void> advanceChallengeWithCard(Task<Challenge> task, Card card) =>
       _challengeRepository.advanceTaskWithCard(device!.id, task.id, card);
+
+  TaskRepository<T> _selectRepository<T>() {
+    return switch (T) {
+      const (Group) => _groupRepository,
+      const (File) => _fileRepository,
+      const (Challenge) => _challengeRepository,
+      const (Decrypt) => _decryptRepository,
+      _ => throw TypeError(),
+    } as TaskRepository<T>;
+  }
+
+  Future<void> archiveTask<T>(Task<T> task, {required bool archive}) async {
+    _selectRepository<T>().archiveTask(device!.id, task.id, archive: archive);
+  }
 }
