@@ -288,10 +288,10 @@ class _NewGroupPageState extends State<NewGroupPage> {
               SegmentedButton<KeyType>(
                 selected: {_keyType},
                 onSelectionChanged: (value) {
-                  setState(() => {
-                        _protocol = value.first.supportedProtocols.first,
-                        _keyType = value.first
-                      });
+                  setState(() {
+                    _protocol = value.first.supportedProtocols.first;
+                    _keyType = value.first;
+                  });
                 },
                 segments: const [
                   ButtonSegment<KeyType>(
