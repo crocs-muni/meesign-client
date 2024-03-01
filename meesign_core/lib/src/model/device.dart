@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:meta/meta.dart';
 
 import '../database/database.dart' as db;
@@ -11,18 +9,7 @@ class Device {
   final Uuid id;
   final DateTime lastActive;
 
-  static const int idLen = 16;
-
   const Device(this.name, this.id, this.lastActive);
-  Device.random(this.name)
-      : id = _randomId(),
-        lastActive = DateTime.now();
-
-  static Uuid _randomId() {
-    final rnd = Random.secure();
-    final bytes = List.generate(idLen, (i) => rnd.nextInt(256));
-    return Uuid(bytes);
-  }
 }
 
 extension DeviceConversion on db.Device {
