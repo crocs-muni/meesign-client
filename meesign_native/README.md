@@ -1,8 +1,27 @@
 # MeeSign Native
 
-## Regenerate Dart-C bindings
+This is a Dart package providing bindings to the following native libraries (see [native](native/)):
 
-If you modify native libraries in [lib-native](lib-native), update Dart bindings by running:
+* [meesign_crypto](native/meesign-crypto/)
+* [pdf_sig](native/pdf-sig/) (not used, not maintained)
+
+## Compiling native libraries
+
+When building [meesign_client](..), the compilation and bundling of the native libraries are integrated into the Flutter build proccess using [native/CMakeLists.txt](native/CMakeLists.txt).
+
+If you wish to use [meesign_native](./) as a stand-alone Dart package, independently of [meesign_client](..) and Flutter, e.g., when testing [meesign_core](../meesign_core/):
+
+1. Compile the native libraries manually.
+
+   __Note:__ [meesign_crypto](native/meesign-crypto/) must be built with the `bindings` feature enabled.
+
+2. Ensure that the Dart application depending on [meesign_native](./) can find the built libraries.
+
+   On Linux, this can be achieved by setting the `LD_LIBRARY_PATH` environment variable, for example.
+
+## Regenerating Dart-C bindings
+
+If you modify any native library, update the Dart bindings by running:
 
 ```bash
 dart run ffigen --config ffigen/changed-lib.yaml
