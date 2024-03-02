@@ -89,6 +89,15 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
               ),
             ),
             title: Text(device.name),
+            subtitle: Text(
+              device.id.encode().splitByLength(4).join(' '),
+              softWrap: false,
+              overflow: TextOverflow.fade,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(.26),
+                fontFamily: 'RobotoMono',
+              ),
+            ),
             onTap: () {
               Navigator.pop(context, device);
             },
