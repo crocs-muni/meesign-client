@@ -29,6 +29,7 @@ import '../util/platform.dart';
 import '../widget/counter_badge.dart';
 import '../widget/dismissible.dart';
 import '../widget/empty_list.dart';
+import '../widget/entity_chip.dart';
 import 'card_reader_page.dart';
 import 'device_page.dart';
 import 'home_state.dart';
@@ -179,25 +180,6 @@ void _launchCardReader(
       ),
     ),
   );
-}
-
-class EntityChip extends StatelessWidget {
-  final String name;
-
-  const EntityChip({required this.name, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Chip(
-      avatar: CircleAvatar(
-        child: Text(
-          name.initials,
-          style: Theme.of(context).textTheme.labelLarge,
-        ),
-      ),
-      label: Text(name),
-    );
-  }
 }
 
 class TaskTile<T> extends StatelessWidget {
