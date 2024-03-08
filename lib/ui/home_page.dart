@@ -368,7 +368,7 @@ class GroupsSubPage extends StatelessWidget {
                 child: Wrap(
                   spacing: 8,
                   runSpacing: 4,
-                  children: [for (var m in members) EntityChip(name: m.name)],
+                  children: [for (var m in members) DeviceChip(device: m)],
                 ),
               ),
             ],

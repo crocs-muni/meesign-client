@@ -8,6 +8,7 @@ import 'dart:io';
 
 import '../routes.dart';
 import '../util/chars.dart';
+import '../widget/entity_chip.dart';
 
 class OptionTile extends StatelessWidget {
   final String title;
@@ -81,14 +82,8 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
   Iterable<Widget> get _memberChips sync* {
     for (final Device member in _members) {
-      yield InputChip(
-        label: Text(member.name),
-        avatar: CircleAvatar(
-          child: Text(
-            member.name.initials,
-            style: Theme.of(context).textTheme.labelLarge,
-          ),
-        ),
+      yield DeviceChip(
+        device: member,
         onDeleted: () {
           setState(() {
             _members.remove(member);
