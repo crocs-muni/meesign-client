@@ -45,22 +45,28 @@ class HexTable extends StatelessWidget {
 
 class DeviceAvatar extends StatelessWidget {
   final Device device;
+  final double? avatarSize;
 
-  const DeviceAvatar({super.key, required this.device});
+  const DeviceAvatar({
+    super.key,
+    required this.device,
+    this.avatarSize,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        AspectRatio(
-          aspectRatio: 1,
+        SizedBox.square(
+          dimension: avatarSize,
           child: FittedBox(
             child: CircleAvatar(
               child: Text(device.name.initials),
             ),
           ),
         ),
+        const SizedBox(height: 8),
         Text(
           device.name,
           textAlign: TextAlign.center,
@@ -115,35 +121,20 @@ class DevicePage extends StatelessWidget {
       appBar: AppBar(),
       body: ListView(
         children: [
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final wide = constraints.maxWidth > 600;
-              final children = <Widget>[
-                Center(
-                  child: SizedBox(
-                    width: 128,
-                    child: DeviceAvatar(device: device),
-                  ),
-                ),
-                const SizedBox(height: 16, width: 64),
-                Center(
-                  child: SizedBox(
-                    width: 256,
-                    child: DeviceIdentityWidget(device: device),
-                  ),
-                ),
-              ];
-
-              return wide
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: children,
-                    )
-                  : Column(
-                      children: children,
-                    );
-            },
+          Center(
+            child: DeviceAvatar(
+              device: device,
+              avatarSize: 112,
+            ),
           ),
+          const SizedBox(height: 16),
+          Center(
+            child: SizedBox(
+              width: 256,
+              child: DeviceIdentityWidget(device: device),
+            ),
+          ),
+          const SizedBox(height: 16),
         ],
       ),
     );
