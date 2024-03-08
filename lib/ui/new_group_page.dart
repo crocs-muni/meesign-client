@@ -9,37 +9,6 @@ import 'dart:io';
 import '../routes.dart';
 import '../util/chars.dart';
 
-class SheetActionButton extends StatelessWidget {
-  final Widget icon;
-  final Widget title;
-  final Function() onPressed;
-  final bool enabled;
-
-  const SheetActionButton({
-    Key? key,
-    required this.icon,
-    required this.title,
-    required this.onPressed,
-    this.enabled = true,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        children: [
-          IconButton(
-            onPressed: enabled ? onPressed : null,
-            icon: icon,
-          ),
-          title,
-        ],
-      ),
-    );
-  }
-}
-
 class OptionTile extends StatelessWidget {
   final String title;
   final EdgeInsets padding;
@@ -174,6 +143,11 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final membersButtonStyle = _memberErr != null
+        ? FilledButton.styleFrom(
+            backgroundColor: Theme.of(context).colorScheme.errorContainer)
+        : null;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('New Group'),
@@ -211,43 +185,27 @@ class _NewGroupPageState extends State<NewGroupPage> {
           OptionTile(
             title: 'Members',
             children: [
-              FilledButton.tonalIcon(
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    // TODO: https://github.com/flutter/flutter/issues/118619
-                    constraints: const BoxConstraints(maxWidth: 640),
-                    builder: (context) {
-                      return SizedBox(
-                        height: 150,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SheetActionButton(
-                              icon: const Icon(Icons.qr_code),
-                              title: const Text('Scan'),
-                              enabled: Platform.isAndroid || Platform.isIOS,
-                              onPressed: () => _selectPeer(Routes.newGroupQr),
-                            ),
-                            SheetActionButton(
-                              icon: const Icon(Icons.search),
-                              title: const Text('Search'),
-                              onPressed: () =>
-                                  _selectPeer(Routes.newGroupSearch),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-                label: const Text('Add'),
-                icon: const Icon(Icons.add),
-                style: _memberErr != null
-                    ? FilledButton.styleFrom(
-                        backgroundColor:
-                            Theme.of(context).colorScheme.errorContainer)
-                    : null,
+              Row(
+                children: [
+                  Expanded(
+                    child: FilledButton.tonalIcon(
+                      icon: const Icon(Icons.search),
+                      label: const Text('Search'),
+                      style: membersButtonStyle,
+                      onPressed: () => _selectPeer(Routes.newGroupSearch),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  if (Platform.isAndroid || Platform.isIOS)
+                    Expanded(
+                      child: FilledButton.tonalIcon(
+                        icon: const Icon(Icons.qr_code),
+                        label: const Text('Scan'),
+                        style: membersButtonStyle,
+                        onPressed: () => _selectPeer(Routes.newGroupQr),
+                      ),
+                    ),
+                ],
               ),
               const SizedBox(height: 8),
               Wrap(
