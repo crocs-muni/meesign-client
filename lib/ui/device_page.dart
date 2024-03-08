@@ -43,34 +43,37 @@ class HexTable extends StatelessWidget {
   }
 }
 
-class DeviceAvatar extends StatelessWidget {
-  final Device device;
-  final double? avatarSize;
+class FlexibleAvatarAppBar extends StatelessWidget {
+  final String name;
 
-  const DeviceAvatar({
+  const FlexibleAvatarAppBar({
     super.key,
-    required this.device,
-    this.avatarSize,
+    required this.name,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox.square(
-          dimension: avatarSize,
-          child: FittedBox(
-            child: CircleAvatar(
-              child: Text(device.name.initials),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 32),
+            child: FittedBox(
+              child: CircleAvatar(
+                child: Text(name.initials),
+              ),
             ),
           ),
         ),
-        const SizedBox(height: 8),
-        Text(
-          device.name,
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.headlineMedium,
+        SizedBox(
+          height: kToolbarHeight,
+          child: Center(
+            child: Text(
+              name,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+          ),
         ),
       ],
     );
@@ -100,7 +103,7 @@ class DeviceIdentityWidget extends StatelessWidget {
           ),
           data: QrCoder().encode(device),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
         HexTable(hex: device.id.encode()),
       ],
     );
@@ -118,23 +121,24 @@ class DevicePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: ListView(
-        children: [
-          Center(
-            child: DeviceAvatar(
-              device: device,
-              avatarSize: 112,
-            ),
+      body: CustomScrollView(
+        slivers: <Widget>[
+          SliverAppBar(
+            expandedHeight: 192,
+            pinned: true,
+            flexibleSpace: FlexibleAvatarAppBar(name: device.name),
           ),
-          const SizedBox(height: 16),
-          Center(
-            child: SizedBox(
-              width: 256,
-              child: DeviceIdentityWidget(device: device),
-            ),
+          SliverList.list(
+            children: [
+              Center(
+                child: SizedBox(
+                  width: 256,
+                  child: DeviceIdentityWidget(device: device),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
           ),
-          const SizedBox(height: 16),
         ],
       ),
     );
