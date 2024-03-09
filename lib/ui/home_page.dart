@@ -7,11 +7,14 @@ import 'package:animations/animations.dart';
 import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:file_selector/file_selector.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Card;
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:meesign_core/meesign_card.dart';
 import 'package:meesign_core/meesign_data.dart';
+import 'package:meesign_core/meesign_model.dart';
 import 'package:mime/mime.dart';
 import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
@@ -572,6 +575,172 @@ class DecryptSubPage extends StatelessWidget {
   }
 }
 
+enum DataInputType { image, text }
+
+class DataInputDialog extends StatefulWidget {
+  final String title;
+  final Set<DataInputType> dataInputTypes;
+  final DataInputType? defaultDataInputType;
+
+  DataInputDialog({
+    super.key,
+    this.title = 'Enter input',
+    required this.dataInputTypes,
+    this.defaultDataInputType,
+  }) {
+    assert(dataInputTypes.isNotEmpty);
+    if (defaultDataInputType != null) {
+      assert(dataInputTypes.contains(defaultDataInputType));
+    }
+  }
+
+  @override
+  State<DataInputDialog> createState() => _DataInputDialogState();
+}
+
+class _DataInputDialogState extends State<DataInputDialog> {
+  final _description = TextEditingController();
+  late DataInputType _dataInputType;
+
+  final _message = TextEditingController();
+
+  Uint8List? _image;
+  MimeType? _imageMimeType;
+
+  Future<void> _selectImage() async {
+    final file = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (file == null) return;
+
+    final bytes = await file.readAsBytes();
+
+    final header =
+        bytes.sublist(0, min(defaultMagicNumbersMaxLength, bytes.length));
+    final mimeTypeStr = lookupMimeType(file.path, headerBytes: header);
+
+    setState(() {
+      _image = bytes;
+      _imageMimeType = mimeTypeStr != null ? MimeType(mimeTypeStr) : null;
+    });
+  }
+
+  void _handleCancel() {
+    Navigator.pop(context);
+  }
+
+  void _handleOk() {
+    final (mimeType, data) = switch (_dataInputType) {
+      DataInputType.text => (MimeType.textUtf8, utf8.encode(_message.text)),
+      DataInputType.image => (_imageMimeType, _image),
+    };
+    final description = _description.text;
+
+    // TODO: disable ok button instead
+    if (description.isEmpty || mimeType == null || data == null) return;
+
+    Navigator.pop(context, (description, mimeType, data));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _dataInputType = widget.defaultDataInputType ?? widget.dataInputTypes.first;
+  }
+
+  @override
+  void didUpdateWidget(covariant DataInputDialog oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _dataInputType = widget.defaultDataInputType ?? widget.dataInputTypes.first;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final image = _image;
+
+    return AlertDialog(
+      title: Text(widget.title),
+      actions: [
+        TextButton(
+          onPressed: _handleCancel,
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: _handleOk,
+          child: const Text('OK'),
+        )
+      ],
+      scrollable: true,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          TextField(
+            controller: _description,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Description',
+            ),
+          ),
+          const SizedBox(height: 16),
+          SegmentedButton<DataInputType>(
+            selected: {_dataInputType},
+            showSelectedIcon: false,
+            onSelectionChanged: (values) {
+              setState(() {
+                _dataInputType = values.first;
+              });
+            },
+            segments: [
+              if (widget.dataInputTypes.contains(DataInputType.text))
+                const ButtonSegment<DataInputType>(
+                  value: DataInputType.text,
+                  icon: Icon(Icons.description),
+                  label: Text('Text'),
+                ),
+              if (widget.dataInputTypes.contains(DataInputType.image))
+                const ButtonSegment<DataInputType>(
+                  value: DataInputType.image,
+                  icon: Icon(Icons.image),
+                  label: Text('Image'),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          switch (_dataInputType) {
+            DataInputType.text => TextField(
+                controller: _message,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Message',
+                ),
+              ),
+            DataInputType.image => image == null
+                ? OutlinedButton(
+                    onPressed: _selectImage,
+                    child: const Text('Select'),
+                  )
+                : Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      _imageMimeType == MimeType.imageSvg
+                          ? SvgPicture.memory(image)
+                          : Image.memory(image),
+                      Positioned.fill(
+                        child: Material(
+                          type: MaterialType.transparency,
+                          child: InkWell(
+                            onTap: _selectImage,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+          },
+        ],
+      ),
+    );
+  }
+}
+
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -618,51 +787,6 @@ class _HomePageViewState extends State<HomePageView> {
                     },
                   ))
               .toList(),
-        );
-      },
-    );
-  }
-
-  Future<({String description, String message})?> _inputMessage() async {
-    return showDialog<({String description, String message})?>(
-      context: context,
-      builder: (context) {
-        var description = TextEditingController();
-        var message = TextEditingController();
-
-        return AlertDialog(
-          title: const Text('Enter message'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context,
-                  (description: description.text, message: message.text)),
-              child: const Text('Next'),
-            )
-          ],
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: description,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Description',
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: message,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Message',
-                ),
-              ),
-            ],
-          ),
         );
       },
     );
@@ -740,16 +864,23 @@ class _HomePageViewState extends State<HomePageView> {
   }
 
   Future<void> _challenge() async {
-    final result = await _inputMessage();
+    final result = await showDialog<(String, MimeType, Uint8List)?>(
+      context: context,
+      builder: (context) {
+        return DataInputDialog(
+          title: 'Enter challenge',
+          dataInputTypes: const {DataInputType.text},
+        );
+      },
+    );
     if (result == null) return;
 
     final group = await _selectGroup(KeyType.signChallenge);
     if (group == null) return;
 
     try {
-      await context
-          .read<HomeState>()
-          .challenge(result.description, result.message, group);
+      final (description, _, data) = result;
+      await context.read<HomeState>().challenge(description, data, group);
     } catch (e) {
       showErrorDialog(
         title: 'Challenge request failed',
@@ -776,16 +907,26 @@ class _HomePageViewState extends State<HomePageView> {
   }
 
   Future<void> _encrypt() async {
-    final result = await _inputMessage();
+    final result = await showDialog<(String, MimeType, Uint8List)?>(
+      context: context,
+      builder: (context) {
+        return DataInputDialog(
+          title: 'Enter message',
+          dataInputTypes: const {DataInputType.text, DataInputType.image},
+          defaultDataInputType: DataInputType.text,
+        );
+      },
+    );
     if (result == null) return;
 
     final group = await _selectGroup(KeyType.decrypt); // TODO change
     if (group == null) return;
 
     try {
+      final (description, mimeType, data) = result;
       await context
           .read<HomeState>()
-          .encrypt(result.description, result.message, group);
+          .encrypt(description, mimeType, data, group);
     } catch (e) {
       showErrorDialog(
         title: 'Decryption request failed',

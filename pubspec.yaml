@@ -58,6 +58,7 @@ dependencies:
   collection: ^1.17.1
   mime: ^1.0.4
   share_plus: ^7.2.1
+  image_picker: ^1.0.7
 
 dev_dependencies:
   flutter_test:

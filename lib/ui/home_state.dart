@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/foundation.dart';
@@ -110,16 +109,12 @@ class HomeState with ChangeNotifier {
     await _fileRepository.sign(file.name, await file.readAsBytes(), group.id);
   }
 
-  Future<void> challenge(String name, String message, Group group) =>
-      _challengeRepository.sign(name, utf8.encode(message), group.id);
+  Future<void> challenge(String name, Uint8List data, Group group) =>
+      _challengeRepository.sign(name, data, group.id);
 
-  Future<void> encrypt(String description, String message, Group group) =>
-      _decryptRepository.encrypt(
-        description,
-        MimeType.textUtf8,
-        utf8.encode(message),
-        group.id,
-      );
+  Future<void> encrypt(
+          String description, MimeType mimeType, Uint8List data, Group group) =>
+      _decryptRepository.encrypt(description, mimeType, data, group.id);
 
   Future<void> joinGroup(Task<Group> task,
           {required bool agree, bool withCard = false}) =>
