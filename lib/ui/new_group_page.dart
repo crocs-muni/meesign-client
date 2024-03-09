@@ -94,20 +94,21 @@ class _NewGroupPageState extends State<NewGroupPage> {
     }
   }
 
-  void _addMember(Object? member) {
-    if (member is! Device) return;
-    for (final m in _members) {
-      if (m.id == member.id) return;
-    }
+  void _addMembers(Object? devices) {
+    if (devices is! List<Device>) return;
     setState(() {
-      _members.add(member);
-      _memberErr = null;
+      for (final device in devices) {
+        if (_members.any((member) => member.id == device.id)) continue;
+        _members.add(device);
+      }
+      if (_members.length >= 2) _memberErr = null;
     });
   }
 
   void _selectPeer(String route) async {
-    final peer = await Navigator.pushNamed(context, route);
-    _addMember(peer);
+    // TODO: pass the current selection to the search page?
+    final devices = await Navigator.pushNamed(context, route);
+    _addMembers(devices);
   }
 
   void _tryCreate() {

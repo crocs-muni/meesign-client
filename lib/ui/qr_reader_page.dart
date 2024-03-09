@@ -35,7 +35,7 @@ class _QrReaderPageState extends State<QrReaderPage> {
     try {
       final device = _coder.decode(barcodes.first.rawValue);
       controller.dispose();
-      Navigator.pop(context, device);
+      Navigator.pop(context, [device]);
     } catch (e) {
       setState(() {
         _recentError = true;
