@@ -16,8 +16,6 @@ class HomeState with ChangeNotifier {
 
   // TODO: migrate from ChangeNotifier to streams
 
-  List<Group> groups = [];
-
   Device? device;
 
   final GroupRepository _groupRepository;
@@ -88,15 +86,6 @@ class HomeState with ChangeNotifier {
     });
     decryptTasksStream.listen((tasks) {
       decryptTasks = tasks;
-      notifyListeners();
-    });
-
-    // FIXME: there is no link between tasks and their results (groups, files)
-    // this can lead to inconsistencies in the ui when one stream gets updated
-    // and the other one does not
-
-    _groupRepository.observeGroups(did).listen((groups) {
-      this.groups = groups;
       notifyListeners();
     });
   }

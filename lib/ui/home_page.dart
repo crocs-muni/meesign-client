@@ -772,14 +772,19 @@ class _HomePageViewState extends State<HomePageView> {
   int _index = 0;
 
   Future<Group?> _selectGroup(keyType) async {
-    final groups = context.read<HomeState>().groups;
+    final state = context.read<HomeState>();
+    final groups = state.groupTasks
+        .where((task) =>
+            task.info.keyType == keyType &&
+            (state.showArchived || !task.archived))
+        .map((task) => task.info);
+
     return showDialog<Group?>(
       context: context,
       builder: (context) {
         return SimpleDialog(
           title: const Text('Select group'),
           children: groups
-              .where((group) => group.keyType == keyType)
               .map((group) => SimpleDialogOption(
                     child: Text(group.name),
                     onPressed: () {
