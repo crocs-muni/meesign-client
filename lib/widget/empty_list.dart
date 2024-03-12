@@ -4,9 +4,9 @@ class EmptyList extends StatelessWidget {
   final String hint;
 
   const EmptyList({
-    Key? key,
+    super.key,
     this.hint = '',
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

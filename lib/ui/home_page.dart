@@ -40,7 +40,7 @@ import 'home_state.dart';
 class TaskStateIndicator extends StatelessWidget {
   final Task task;
 
-  const TaskStateIndicator(this.task, {Key? key}) : super(key: key);
+  const TaskStateIndicator(this.task, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -196,7 +196,7 @@ class TaskTile<T> extends StatelessWidget {
   final void Function(bool)? onArchiveChange;
 
   const TaskTile({
-    Key? key,
+    super.key,
     required this.task,
     required this.name,
     this.desc,
@@ -208,7 +208,7 @@ class TaskTile<T> extends StatelessWidget {
     this.actions = const [],
     this.children = const [],
     this.onArchiveChange,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -269,7 +269,7 @@ class TaskTile<T> extends StatelessWidget {
 }
 
 class SigningSubPage extends StatelessWidget {
-  const SigningSubPage({Key? key}) : super(key: key);
+  const SigningSubPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -310,7 +310,7 @@ class SigningSubPage extends StatelessWidget {
 }
 
 class GroupsSubPage extends StatelessWidget {
-  const GroupsSubPage({Key? key}) : super(key: key);
+  const GroupsSubPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -385,7 +385,7 @@ class GroupsSubPage extends StatelessWidget {
 }
 
 class ChallengeSubPage extends StatelessWidget {
-  const ChallengeSubPage({Key? key}) : super(key: key);
+  const ChallengeSubPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -429,7 +429,7 @@ class ChallengeSubPage extends StatelessWidget {
 }
 
 class DecryptSubPage extends StatelessWidget {
-  const DecryptSubPage({Key? key}) : super(key: key);
+  const DecryptSubPage({super.key});
 
   static Future<void> _shareDecrypt(Decrypt decrypt) async {
     final file = XFile.fromData(
@@ -742,7 +742,7 @@ class _DataInputDialogState extends State<DataInputDialog> {
 }
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -762,7 +762,7 @@ class HomePage extends StatelessWidget {
 }
 
 class HomePageView extends StatefulWidget {
-  const HomePageView({Key? key}) : super(key: key);
+  const HomePageView({super.key});
 
   @override
   State<HomePageView> createState() => _HomePageViewState();

@@ -6,7 +6,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import '../util/qr_coder.dart';
 
 class QrReaderPage extends StatefulWidget {
-  const QrReaderPage({Key? key}) : super(key: key);
+  const QrReaderPage({super.key});
 
   @override
   State<QrReaderPage> createState() => _QrReaderPageState();

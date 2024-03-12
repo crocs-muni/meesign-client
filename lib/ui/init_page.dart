@@ -14,10 +14,10 @@ class InitPage extends StatefulWidget {
   final String prefillHost;
 
   const InitPage({
-    Key? key,
+    super.key,
     this.prefillHost = '',
     this.prefillName = '',
-  }) : super(key: key);
+  });
 
   @override
   State<InitPage> createState() => InitPageState();
@@ -111,11 +111,11 @@ class RegistrationForm extends StatefulWidget {
   final void Function(User) onRegistered;
 
   const RegistrationForm({
-    Key? key,
+    super.key,
     this.prefillHost = '',
     this.prefillName = '',
     required this.onRegistered,
-  }) : super(key: key);
+  });
 
   @override
   State<RegistrationForm> createState() => _RegistrationFormState();

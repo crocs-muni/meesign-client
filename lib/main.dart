@@ -99,10 +99,10 @@ class MyApp extends StatelessWidget {
   final String? prefillName;
 
   const MyApp({
-    Key? key,
+    super.key,
     this.prefillHost,
     this.prefillName,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

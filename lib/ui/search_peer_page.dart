@@ -99,7 +99,7 @@ class DeviceSuggestionTile extends StatelessWidget {
 }
 
 class SearchPeerPage extends StatefulWidget {
-  const SearchPeerPage({Key? key}) : super(key: key);
+  const SearchPeerPage({super.key});
 
   @override
   State<SearchPeerPage> createState() => _SearchPeerPageState();

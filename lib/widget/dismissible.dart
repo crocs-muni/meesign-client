@@ -6,11 +6,11 @@ class DismissibleBackground extends StatelessWidget {
   final IconData? icon;
 
   const DismissibleBackground({
-    Key? key,
+    super.key,
     required this.alignment,
     this.color,
     this.icon,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -62,14 +62,14 @@ class Deletable extends StatelessWidget {
   final void Function(DismissDirection)? onDeleted;
 
   const Deletable({
-    Key? key,
+    super.key,
     required this.dismissibleKey,
     required this.child,
     this.color = Colors.red,
     this.icon = Icons.delete,
     this.confirmDismiss,
     this.onDeleted,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

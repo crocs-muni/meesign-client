@@ -5,10 +5,10 @@ class CounterBadge extends StatelessWidget {
   final Widget? child;
 
   const CounterBadge({
-    Key? key,
+    super.key,
     required this.stream,
     this.child,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

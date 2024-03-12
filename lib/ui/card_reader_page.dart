@@ -7,7 +7,7 @@ import '../util/platform.dart';
 class CardReaderPage extends StatefulWidget {
   final Future<void> Function(Card) onCard;
 
-  const CardReaderPage({required this.onCard, Key? key}) : super(key: key);
+  const CardReaderPage({required this.onCard, super.key});
 
   @override
   State<CardReaderPage> createState() => _CardReaderPageState();
@@ -19,7 +19,7 @@ sealed class ReaderStatus {
 }
 
 class ReaderOkStatus extends ReaderStatus {
-  const ReaderOkStatus._(String message) : super._(message);
+  const ReaderOkStatus._(super.message) : super._();
 
   static final waiting = ReaderOkStatus._(
     PlatformGroup.isMobile
@@ -30,7 +30,7 @@ class ReaderOkStatus extends ReaderStatus {
 }
 
 class ReaderErrStatus extends ReaderStatus {
-  const ReaderErrStatus._(String message) : super._(message);
+  const ReaderErrStatus._(super.message) : super._();
   static const noReader = ReaderErrStatus._('No reader available');
   static const initError = ReaderErrStatus._('Cannot connect to card manager');
 }

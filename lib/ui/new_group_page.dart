@@ -42,7 +42,7 @@ class OptionTile extends StatelessWidget {
 }
 
 class NewGroupPage extends StatefulWidget {
-  const NewGroupPage({Key? key}) : super(key: key);
+  const NewGroupPage({super.key});
 
   @override
   State<NewGroupPage> createState() => _NewGroupPageState();
