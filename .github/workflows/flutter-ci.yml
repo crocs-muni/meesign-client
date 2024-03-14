@@ -186,6 +186,14 @@ jobs:
         --release
         --dart-define=ALLOW_BAD_CERTS=true
 
+    - name: Build native libs for macOS
+      if: matrix.target == 'macOS'
+      run: |
+        cd meesign_native/native/meesign-crypto/
+        cargo build --release
+        cp target/release/libmeesign_crypto.dylib ../../../build/macos/Build/Products/Release/meesign_client.app/Contents/Frameworks/
+
+
     # Package the build.
     - name: Copy VC redistributables to release directory for Windows
       if: matrix.target == 'Windows'
