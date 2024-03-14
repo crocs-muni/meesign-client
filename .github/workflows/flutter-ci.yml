@@ -70,7 +70,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        target: [Windows, Linux, Android]
+        target: [Windows, Linux, macOS, Android]
         include:
         - os: windows-latest
           target: Windows
@@ -84,6 +84,12 @@ jobs:
           build_path: build/linux/x64/release/bundle
           asset_extension: .tar.gz
           asset_content_type: application/gzip
+        - os: macos-14
+          target: macOS
+          build_target: macos
+          build_path: build/macos/Build/Products/Release
+          asset_extension: .zip
+          asset_content_type: application/zip
         - os: ubuntu-latest
           target: Android
           build_target: apk
@@ -134,6 +140,13 @@ jobs:
         bash ./tool/cargo-config-gen-android.sh >> ~/.cargo/config.toml
         cat ~/.cargo/config.toml
 
+    - name: Set up Rust for macOS
+      if: matrix.target == 'macOS'
+      run: |
+        rustup target add \
+          x86_64-apple-darwin \
+          aarch64-apple-darwin
+
     - name: Install Linux dependencies
       if: matrix.target == 'Linux'
       run: |
@@ -147,6 +160,7 @@ jobs:
       run: |
         flutter config --enable-linux-desktop
         flutter config --enable-windows-desktop
+        flutter config --enable-macos-desktop
 
     # Fetch dart packages
     - run: flutter pub get
@@ -156,6 +170,17 @@ jobs:
         flutter build -v ${{ matrix.build_target }}
         --release
         --dart-define=ALLOW_BAD_CERTS=true
+
+    - name: Build native libs for macOS
+      if: matrix.target == 'macOS'
+      run: |
+        cd meesign_native/native/meesign-crypto/
+        cargo build --release --target x86_64-apple-darwin
+        cargo build --release --target aarch64-apple-darwin
+        lipo -create -output libmeesign_crypto.dylib \
+          target/x86_64-apple-darwin/release/libmeesign_crypto.dylib \
+          target/aarch64-apple-darwin/release/libmeesign_crypto.dylib
+        cp libmeesign_crypto.dylib ../../../build/macos/Build/Products/Release/meesign_client.app/Contents/Frameworks/
 
     # Package the build.
     - name: Copy VC redistributables to release directory for Windows
@@ -176,6 +201,10 @@ jobs:
     - name: Compress build for Windows
       if: matrix.target == 'Windows'
       run: compress-archive -Path * -DestinationPath ${env:GITHUB_WORKSPACE}\meesign_client_${{ matrix.target }}.zip
+      working-directory: ${{ matrix.build_path }}
+    - name: Compress build for macOS
+      if: matrix.target == 'macOS'
+      run: ditto -c -k --sequesterRsrc --keepParent meesign_client.app $GITHUB_WORKSPACE/meesign_client_${{ matrix.target }}.zip
       working-directory: ${{ matrix.build_path }}
 
     # Upload the build.
