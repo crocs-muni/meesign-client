@@ -4,7 +4,7 @@ import 'dart:io';
 String dlPlatformName(String name) {
   if (Platform.isAndroid || Platform.isLinux) return 'lib$name.so';
   if (Platform.isWindows) return '$name.dll';
-  if (Platform.isMacOS) return '$name.dylib';
+  if (Platform.isMacOS) return 'lib$name.dylib';
   throw Exception('Platform unsupported');
 }
 
