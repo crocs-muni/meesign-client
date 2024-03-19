@@ -188,6 +188,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
         _working = false;
         _errorField = _hostController;
       });
+      rethrow;
     }
 
     widget.onRegistered(User(device.id, host));
