@@ -141,6 +141,13 @@ jobs:
         bash ./tool/cargo-config-gen-android.sh >> ~/.cargo/config.toml
         cat ~/.cargo/config.toml
 
+    - name: Set up Rust for macOS
+      if: matrix.target == 'macOS'
+      run: |
+        rustup target add \
+          x86_64-apple-darwin \
+          aarch64-apple-darwin
+
     - name: Install Linux dependencies
       if: matrix.target == 'Linux'
       run: |
@@ -190,9 +197,12 @@ jobs:
       if: matrix.target == 'macOS'
       run: |
         cd meesign_native/native/meesign-crypto/
-        cargo build --release
-        cp target/release/libmeesign_crypto.dylib ../../../build/macos/Build/Products/Release/meesign_client.app/Contents/Frameworks/
-
+        cargo build --release --target x86_64-apple-darwin
+        cargo build --release --target aarch64-apple-darwin
+        lipo -create -output libmeesign_crypto.dylib \
+          target/x86_64-apple-darwin/release/libmeesign_crypto.dylib \
+          target/aarch64-apple-darwin/release/libmeesign_crypto.dylib
+        cp libmeesign_crypto.dylib ../../../build/macos/Build/Products/Release/meesign_client.app/Contents/Frameworks/
 
     # Package the build.
     - name: Copy VC redistributables to release directory for Windows
