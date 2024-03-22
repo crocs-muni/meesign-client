@@ -6,6 +6,8 @@
 build/
 
 example/*.exe
+bin/*.exe
+bin/app/
 
 test/output
 
