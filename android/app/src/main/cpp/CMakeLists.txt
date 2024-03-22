@@ -19,7 +19,6 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../../../../../meesign_native/nati
 add_library(meesign_crypto_lib SHARED IMPORTED)
 set_property(TARGET meesign_crypto_lib PROPERTY IMPORTED_LOCATION ${MEESIGN_CRYPTO_LIB})
 add_dependencies(meesign_crypto_lib meesign_crypto)
-target_link_libraries(meesign_crypto_lib INTERFACE ${MEESIGN_CRYPTO_DEPS})
 
 # FIXME: how to get rid of this dummy?
 add_library(dummy SHARED dummy.cpp)
