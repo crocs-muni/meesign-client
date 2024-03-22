@@ -78,7 +78,6 @@ jobs:
           build_path: build\windows\x64\runner\Release
           asset_extension: .zip
           asset_content_type: application/zip
-          toolchain_file: C:\vcpkg\scripts\buildsystems\vcpkg.cmake
         - os: ubuntu-latest
           target: Linux
           build_target: linux
@@ -143,20 +142,6 @@ jobs:
           libgtk-3-dev libx11-dev libblkid-dev \
           pkg-config cmake ninja-build
 
-    - name: Cache Vcpkg packages
-      uses: actions/cache@v3
-      if: matrix.target == 'Windows'
-      with:
-        path: C:\vcpkg
-        key: vcpkg-root
-
-    - name: Install Windows dependencies
-      if: matrix.target == 'Windows'
-      env:
-        VCPKG_DEFAULT_TRIPLET: x64-windows-static-md
-      run: |
-        vcpkg install openssl
-
     - name: Enable desktop support
       if: matrix.target != 'Android'
       run: |
@@ -167,10 +152,6 @@ jobs:
     - run: flutter pub get
 
     - name: Build app
-      env:
-        CMAKE_TOOLCHAIN_FILE: ${{ matrix.toolchain_file }}
-        # env vars used by rust openssl
-        VCPKG_ROOT: C:\vcpkg
       run: >
         flutter build -v ${{ matrix.build_target }}
         --release
