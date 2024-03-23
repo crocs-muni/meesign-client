@@ -182,6 +182,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
           DeviceRepository(dispatcher, di.keyStore, di.database.deviceDao);
       device = await deviceRepository.register(
         _nameController.text,
+        DeviceKind.user,
       );
     } catch (e) {
       setState(() {

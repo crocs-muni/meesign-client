@@ -4,6 +4,7 @@ import 'package:meesign_network/grpc.dart' as rpc;
 import '../database/daos.dart';
 import '../database/database.dart' as db;
 import '../model/device.dart';
+import '../model/device_kind.dart';
 import '../util/uuid.dart';
 import 'key_store.dart';
 import 'network_dispatcher.dart';
@@ -15,13 +16,14 @@ class DeviceRepository {
 
   DeviceRepository(this._dispatcher, this._keyStore, this._deviceDao);
 
-  Future<Device> register(String name) async {
+  Future<Device> register(String name, DeviceKind kind) async {
     final key = AuthWrapper.keygen(name);
 
     final resp = await _dispatcher.unauth.register(
       rpc.RegistrationRequest()
         ..name = name
-        ..csr = key.csr,
+        ..kind = kind.toNetwork()
+        ..csr = key.csr
     );
 
     final did = Uuid(resp.deviceId);

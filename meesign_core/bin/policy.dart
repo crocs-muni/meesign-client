@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:meesign_core/meesign_core.dart';
+import 'package:meesign_core/meesign_model.dart';
 
 extension Approval<T> on TaskRepository<T> {
   StreamSubscription<Task<T>> approveAll(Uuid did,
@@ -65,7 +66,7 @@ void main(List<String> args) async {
     return;
   }
 
-  final appDir = Directory('src/app/');
+  final appDir = Directory('bin/app/');
 
   final database = Database(appDir);
   final userDao = database.userDao;
@@ -89,7 +90,7 @@ void main(List<String> args) async {
   var user = await userRepository.getUser();
   Device device;
   if (user == null) {
-    device = await deviceRepository.register(options['name']);
+    device = await deviceRepository.register(options['name'], DeviceKind.bot);
     userRepository.setUser(User(device.id, options['host']));
     print('No credentials found, registering as ${device.name}');
   } else {
