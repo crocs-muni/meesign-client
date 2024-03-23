@@ -14,14 +14,14 @@ class NetworkDispatcher {
   final bool allowBadCerts;
 
   // TODO: shutdown?
-  final Map<Uuid, rpc.MPCClient> _clients = HashMap();
+  final Map<Uuid, rpc.MeeSignClient> _clients = HashMap();
 
   late final unauth = _createClient(certKey: null);
 
   NetworkDispatcher(this.host, this._keyStore,
       {this.serverCerts, this.allowBadCerts = false, this.port = 1337});
 
-  rpc.MPCClient _createClient({List<int>? certKey}) => ClientFactory.create(
+  rpc.MeeSignClient _createClient({List<int>? certKey}) => ClientFactory.create(
         host,
         key: certKey,
         password: '',
@@ -32,7 +32,7 @@ class NetworkDispatcher {
         connectTimeout: const Duration(seconds: 8),
       );
 
-  rpc.MPCClient operator [](Uuid did) {
+  rpc.MeeSignClient operator [](Uuid did) {
     _clients[did] ??= _createClient(certKey: _keyStore.load(did));
     return _clients[did]!;
   }

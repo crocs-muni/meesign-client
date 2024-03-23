@@ -1,10 +1,10 @@
 //
 //  Generated code. Do not modify.
-//  source: mpc.proto
+//  source: meesign.proto
 //
 // @dart = 2.12
 
-// ignore_for_file: annotate_overrides, camel_case_types
+// ignore_for_file: annotate_overrides, camel_case_types, comment_references
 // ignore_for_file: constant_identifier_names, library_prefixes
 // ignore_for_file: non_constant_identifier_names, prefer_final_fields
 // ignore_for_file: unnecessary_import, unnecessary_this, unused_import
@@ -57,6 +57,19 @@ final $typed_data.Uint8List taskTypeDescriptor = $convert.base64Decode(
     'CghUYXNrVHlwZRIJCgVHUk9VUBAAEgwKCFNJR05fUERGEAESEgoOU0lHTl9DSEFMTEVOR0UQAh'
     'ILCgdERUNSWVBUEAM=');
 
+@$core.Deprecated('Use deviceKindDescriptor instead')
+const DeviceKind$json = {
+  '1': 'DeviceKind',
+  '2': [
+    {'1': 'USER', '2': 0},
+    {'1': 'BOT', '2': 1},
+  ],
+};
+
+/// Descriptor for `DeviceKind`. Decode as a `google.protobuf.EnumDescriptorProto`.
+final $typed_data.Uint8List deviceKindDescriptor =
+    $convert.base64Decode('CgpEZXZpY2VLaW5kEggKBFVTRVIQABIHCgNCT1QQAQ==');
+
 @$core.Deprecated('Use serverInfoRequestDescriptor instead')
 const ServerInfoRequest$json = {
   '1': 'ServerInfoRequest',
@@ -83,14 +96,22 @@ const RegistrationRequest$json = {
   '1': 'RegistrationRequest',
   '2': [
     {'1': 'name', '3': 1, '4': 1, '5': 9, '10': 'name'},
-    {'1': 'csr', '3': 2, '4': 1, '5': 12, '10': 'csr'},
+    {
+      '1': 'kind',
+      '3': 2,
+      '4': 1,
+      '5': 14,
+      '6': '.meesign.DeviceKind',
+      '10': 'kind'
+    },
+    {'1': 'csr', '3': 3, '4': 1, '5': 12, '10': 'csr'},
   ],
 };
 
 /// Descriptor for `RegistrationRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List registrationRequestDescriptor = $convert.base64Decode(
-    'ChNSZWdpc3RyYXRpb25SZXF1ZXN0EhIKBG5hbWUYASABKAlSBG5hbWUSEAoDY3NyGAIgASgMUg'
-    'Njc3I=');
+    'ChNSZWdpc3RyYXRpb25SZXF1ZXN0EhIKBG5hbWUYASABKAlSBG5hbWUSJwoEa2luZBgCIAEoDj'
+    'ITLm1lZXNpZ24uRGV2aWNlS2luZFIEa2luZBIQCgNjc3IYAyABKAxSA2Nzcg==');
 
 @$core.Deprecated('Use registrationResponseDescriptor instead')
 const RegistrationResponse$json = {
@@ -207,16 +228,25 @@ const Device$json = {
   '2': [
     {'1': 'identifier', '3': 1, '4': 1, '5': 12, '10': 'identifier'},
     {'1': 'name', '3': 2, '4': 1, '5': 9, '10': 'name'},
-    {'1': 'certificate', '3': 3, '4': 1, '5': 12, '10': 'certificate'},
-    {'1': 'last_active', '3': 4, '4': 1, '5': 4, '10': 'lastActive'},
+    {
+      '1': 'kind',
+      '3': 3,
+      '4': 1,
+      '5': 14,
+      '6': '.meesign.DeviceKind',
+      '10': 'kind'
+    },
+    {'1': 'certificate', '3': 4, '4': 1, '5': 12, '10': 'certificate'},
+    {'1': 'last_active', '3': 5, '4': 1, '5': 4, '10': 'lastActive'},
   ],
 };
 
 /// Descriptor for `Device`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List deviceDescriptor = $convert.base64Decode(
     'CgZEZXZpY2USHgoKaWRlbnRpZmllchgBIAEoDFIKaWRlbnRpZmllchISCgRuYW1lGAIgASgJUg'
-    'RuYW1lEiAKC2NlcnRpZmljYXRlGAMgASgMUgtjZXJ0aWZpY2F0ZRIfCgtsYXN0X2FjdGl2ZRgE'
-    'IAEoBFIKbGFzdEFjdGl2ZQ==');
+    'RuYW1lEicKBGtpbmQYAyABKA4yEy5tZWVzaWduLkRldmljZUtpbmRSBGtpbmQSIAoLY2VydGlm'
+    'aWNhdGUYBCABKAxSC2NlcnRpZmljYXRlEh8KC2xhc3RfYWN0aXZlGAUgASgEUgpsYXN0QWN0aX'
+    'Zl');
 
 @$core.Deprecated('Use signRequestDescriptor instead')
 const SignRequest$json = {

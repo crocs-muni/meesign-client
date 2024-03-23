@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:grpc/grpc.dart';
 
-import 'generated/mpc.pbgrpc.dart';
+import 'generated/meesign.pbgrpc.dart';
 
 class ClientChannelCredentials extends ChannelCredentials {
   final List<int>? _key;
@@ -39,7 +39,7 @@ class ClientChannelCredentials extends ChannelCredentials {
 }
 
 class ClientFactory {
-  static MPCClient create(
+  static MeeSignClient create(
     String host, {
     List<int>? key,
     String? password,
@@ -49,7 +49,7 @@ class ClientFactory {
     int port = 1337,
     Duration? connectTimeout,
   }) =>
-      MPCClient(
+      MeeSignClient(
         ClientChannel(
           host,
           port: port,
