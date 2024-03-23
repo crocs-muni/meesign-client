@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:args/args.dart';
-import 'package:meesign_core/meesign_core.dart';
-import 'package:meesign_core/meesign_model.dart';
+import 'package:meesign_core/meesign_core.dart' hide File;
+import 'package:meesign_core/meesign_model.dart' hide File;
 
 extension Approval<T> on TaskRepository<T> {
   StreamSubscription<Task<T>> approveAll(Uuid did,
@@ -33,6 +34,11 @@ void printUsage(ArgParser parser, IOSink sink) {
   sink.writeln(parser.usage);
 }
 
+bool Function(Task<T>) constructPolicy<T>(Map<String, dynamic> policy) {
+  final approve = policy["deny"] != true;
+  return (Task _) => approve;
+}
+
 void main(List<String> args) async {
   final parser = ArgParser()
     ..addFlag(
@@ -50,6 +56,10 @@ void main(List<String> args) async {
       'name',
       help: 'name of the user',
       defaultsTo: 'PolicyBot',
+    )
+    ..addOption(
+      'policy',
+      help: 'path to the policy file',
     );
 
   late final ArgResults options;
@@ -65,6 +75,18 @@ void main(List<String> args) async {
     printUsage(parser, stdout);
     return;
   }
+
+  var policyData = <String, dynamic>{};
+  if (options['policy'] != null) {
+    try {
+      policyData = jsonDecode(File(options['policy']).readAsStringSync());
+    } on Exception catch (e) {
+      stderr.writeln('Failed to read policy file: $e');
+      return;
+    }
+  }
+
+  final policy = constructPolicy(policyData);
 
   final appDir = Directory('bin/app/');
 
@@ -96,7 +118,8 @@ void main(List<String> args) async {
   } else {
     device = await deviceRepository.getDevice(user.did);
   }
-  print('Logged in as ${device.name}#${device.id.encode().substring(0, 8)}');
+  print('Logged in as ${device.name}#${device.id.encode().substring(0, 4)}');
+  print('Enforcing policy: $policyData');
 
   await groupRepository.subscribe(device.id);
   await fileRepository.subscribe(device.id);
@@ -104,9 +127,9 @@ void main(List<String> args) async {
   await decryptRepository.subscribe(device.id);
 
   groupRepository.approveAll(device.id, agree: (_) => true);
-  fileRepository.approveAll(device.id, agree: (_) => true);
-  challengeRepository.approveAll(device.id, agree: (_) => true);
-  decryptRepository.approveAll(device.id, agree: (_) => true);
+  fileRepository.approveAll(device.id, agree: policy);
+  challengeRepository.approveAll(device.id, agree: policy);
+  decryptRepository.approveAll(device.id, agree: policy);
 
   ProcessSignal.sigint.watch().listen((signal) {
     database.close();
