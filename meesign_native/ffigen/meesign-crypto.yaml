@@ -1,18 +1,10 @@
 name: 'MeeSignCryptoLib'
 description: 'Bindings to meesign-crypto C API'
-output: 'lib/src/generated/meesign_crypto_lib.dart'
+output: '../lib/src/generated/meesign_crypto_lib.dart'
 headers:
   entry-points:
-    - 'native/meesign-crypto/include/bindings.h'
+    - '../native/meesign-crypto/include/bindings.h'
   # by default, code is generated recursively for all included headers,
   # so specify only the headers we need (most notably avoid system headers)
   include-directives:
     - '**bindings.h'
-preamble: |
-  // ignore_for_file: camel_case_types, non_constant_identifier_names
-type-map:
-  typedefs:
-    'uintptr_t':
-      lib: 'ffi'
-      c-type: 'UintPtr'
-      dart-type: 'int'

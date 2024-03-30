@@ -4,12 +4,12 @@ version: 0.3.0
 publish_to: none
 
 environment:
-  sdk: '>=2.19.0 <3.0.0'
+  sdk: ^3.0.0
 
 dependencies:
   ffi: ^2.0.2
 
 dev_dependencies:
-  ffigen: ^6.0.0
-  lints: ^2.0.0
+  ffigen: ^11.0.0
+  lints: ^3.0.0
   test: ^1.16.0
