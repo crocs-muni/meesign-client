@@ -4,8 +4,7 @@ import 'dart:typed_data';
 
 import 'package:ffi/ffi.dart';
 
-import 'dl_util.dart';
-import 'generated/meesign_crypto_lib.dart';
+import 'generated/meesign_crypto_lib.dart' as lib;
 
 // TODO: profile the functions in this file
 // many chunks of data are copied, can it be avoided?
@@ -22,7 +21,7 @@ extension IntIterConversion on Iterable<int> {
   }
 }
 
-extension BufferConversion on Buffer {
+extension BufferConversion on lib.Buffer {
   Uint8List asTypedList() => ptr.asTypedList(len);
 
   Uint8List dupToDart() => Uint8List.fromList(asTypedList());
@@ -44,8 +43,6 @@ class ProtocolData {
   ProtocolData(this.context, this.data, this.recipient);
 }
 
-final MeeSignCryptoLib _lib = MeeSignCryptoLib(dlOpen('meesign_crypto'));
-
 class Error {
   Pointer<Pointer<Char>> ptr;
 
@@ -56,7 +53,7 @@ class Error {
   Error() : ptr = calloc();
 
   static void free(Error error) {
-    _lib.error_free(error.ptr.value);
+    lib.error_free(error.ptr.value);
     calloc.free(error.ptr);
     error.ptr = nullptr;
   }
@@ -65,10 +62,10 @@ class Error {
 class ProtocolWrapper {
   static Uint8List keygen(int protoId, {bool withCard = false}) {
     return using((Arena alloc) {
-      final proto = _lib.protocol_keygen(protoId, withCard);
+      final proto = lib.protocol_keygen(protoId, withCard);
       final context = alloc.using(
-        _lib.protocol_serialize(proto),
-        _lib.buffer_free,
+        lib.protocol_serialize(proto),
+        lib.buffer_free,
       );
 
       return context.dupToDart();
@@ -79,10 +76,10 @@ class ProtocolWrapper {
     return using((Arena alloc) {
       final groupBuf = group.dupToNative(alloc);
 
-      final proto = _lib.protocol_init(protoId, groupBuf, group.length);
+      final proto = lib.protocol_init(protoId, groupBuf, group.length);
       final context = alloc.using(
-        _lib.protocol_serialize(proto),
-        _lib.buffer_free,
+        lib.protocol_serialize(proto),
+        lib.buffer_free,
       );
 
       return context.dupToDart();
@@ -95,19 +92,19 @@ class ProtocolWrapper {
       final dataBuf = data.dupToNative(alloc);
       final error = alloc.using(Error(), Error.free);
 
-      final proto = _lib.protocol_deserialize(ctxBuf, context.length);
+      final proto = lib.protocol_deserialize(ctxBuf, context.length);
       final dataOut = alloc.using(
-        _lib.protocol_advance(
+        lib.protocol_advance(
           proto,
           dataBuf,
           data.length,
           error.ptr,
         ),
-        _lib.buffer_free,
+        lib.buffer_free,
       );
       final contextOut = alloc.using(
-        _lib.protocol_serialize(proto),
-        _lib.buffer_free,
+        lib.protocol_serialize(proto),
+        lib.buffer_free,
       );
 
       if (error.occured) throw ProtocolException(error.message);
@@ -128,10 +125,10 @@ class ProtocolWrapper {
       final ctxBuf = context.dupToNative(alloc);
       final error = alloc.using(Error(), Error.free);
 
-      final proto = _lib.protocol_deserialize(ctxBuf, context.length);
+      final proto = lib.protocol_deserialize(ctxBuf, context.length);
       final data = alloc.using(
-        _lib.protocol_finish(proto, error.ptr),
-        _lib.buffer_free,
+        lib.protocol_finish(proto, error.ptr),
+        lib.buffer_free,
       );
 
       if (error.occured) throw ProtocolException(error.message);
@@ -152,8 +149,8 @@ class AuthWrapper {
       final error = alloc.using(Error(), Error.free);
 
       final res = alloc.using(
-        _lib.auth_keygen(namePtr.cast(), error.ptr),
-        _lib.auth_key_free,
+        lib.auth_keygen(namePtr.cast(), error.ptr),
+        lib.auth_key_free,
       );
 
       if (error.occured) throw Exception(error.message);
@@ -169,9 +166,9 @@ class AuthWrapper {
       final error = alloc.using(Error(), Error.free);
 
       final res = alloc.using(
-        _lib.auth_cert_key_to_pkcs12(
+        lib.auth_cert_key_to_pkcs12(
             keyPtr, key.length, certPtr, cert.length, error.ptr),
-        _lib.buffer_free,
+        lib.buffer_free,
       );
 
       if (error.occured) throw Exception(error.message);
@@ -189,9 +186,9 @@ class ElGamalWrapper {
       final error = alloc.using(Error(), Error.free);
 
       final res = alloc.using(
-        _lib.encrypt(messagePtr.cast(), message.length, publicKeyPtr,
+        lib.encrypt(messagePtr.cast(), message.length, publicKeyPtr,
             publicKey.length, error.ptr),
-        _lib.buffer_free,
+        lib.buffer_free,
       );
 
       if (error.occured) throw Exception(error.message);

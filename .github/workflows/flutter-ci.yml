@@ -32,6 +32,8 @@ jobs:
 
     steps:
       - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: main
       - uses: actions/checkout@v3
         with:
           submodules: true
@@ -45,12 +47,6 @@ jobs:
       - name: Install pdfsig
         run: sudo apt-get install -y poppler-utils
 
-      - name: Install native
-        run: |
-          cargo build --release
-          echo "LD_LIBRARY_PATH=$(pwd)/target/release/" >> "$GITHUB_ENV"
-        working-directory: meesign_native/native/meesign-crypto
-
       - name: Setup server
         run: |
           wget https://raw.githubusercontent.com/crocs-muni/meesign-server/main/generate_keys.sh
@@ -61,8 +57,13 @@ jobs:
             --publish 1337:1337 --volume $(pwd)/keys/:/meesign/keys/:Z \
             crocsmuni/meesign:nightly
 
+      - run: |
+          for PKG in native network core; do
+            (cd meesign_$PKG; dart pub get)
+          done
+
       - name: Run tests
-        run: cd meesign_core; dart test
+        run: cd meesign_core; dart --enable-experiment=native-assets test
 
 
   build:
@@ -114,7 +115,7 @@ jobs:
     - name: Clone Flutter repository with stable channel
       uses: subosito/flutter-action@v2
       with:
-        channel: stable
+        channel: main
         cache: true
 
     - name: Install Android dependencies
@@ -162,6 +163,9 @@ jobs:
         flutter config --enable-windows-desktop
         flutter config --enable-macos-desktop
 
+    - name: Enable native assets
+      run: flutter config --enable-native-assets
+
     # Fetch dart packages
     - run: flutter pub get
 
@@ -170,17 +174,6 @@ jobs:
         flutter build -v ${{ matrix.build_target }}
         --release
         --dart-define=ALLOW_BAD_CERTS=true
-
-    - name: Build native libs for macOS
-      if: matrix.target == 'macOS'
-      run: |
-        cd meesign_native/native/meesign-crypto/
-        cargo build --release --target x86_64-apple-darwin
-        cargo build --release --target aarch64-apple-darwin
-        lipo -create -output libmeesign_crypto.dylib \
-          target/x86_64-apple-darwin/release/libmeesign_crypto.dylib \
-          target/aarch64-apple-darwin/release/libmeesign_crypto.dylib
-        cp libmeesign_crypto.dylib ../../../build/macos/Build/Products/Release/meesign_client.app/Contents/Frameworks/
 
     # Package the build.
     - name: Copy VC redistributables to release directory for Windows
