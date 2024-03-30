@@ -50,12 +50,6 @@ add_subdirectory("runner")
 # them to the application.
 include(flutter/generated_plugins.cmake)
 
-# Build native libs
-set(RUST_TARGET "x86_64-pc-windows-msvc")
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../meesign_native/native" native)
-
-target_link_libraries(${BINARY_NAME} PRIVATE meesign_crypto)
-
 # === Installation ===
 # Support files are copied into place next to the executable, so that it can
 # run in place. This is done instead of making a separate bundle (as on Linux)
@@ -84,9 +78,6 @@ if(PLUGIN_BUNDLED_LIBRARIES)
     DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
     COMPONENT Runtime)
 endif()
-
-install(FILES "${MEESIGN_CRYPTO_LIB}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
-  COMPONENT Runtime)
 
 # Fully re-copy the assets directory on each build to avoid having stale files
 # from a previous install.

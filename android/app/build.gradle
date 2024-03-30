@@ -42,12 +42,6 @@ android {
     }
 
     ndkVersion '25.2.9519653'
-    externalNativeBuild {
-        cmake {
-            path file('src/main/cpp/CMakeLists.txt')
-            version '3.22.1'
-        }
-    }
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
@@ -56,12 +50,6 @@ android {
         targetSdkVersion 33
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-
-        externalNativeBuild {
-            cmake {
-                arguments '-DANDROID_STL=c++_shared'
-            }
-        }
     }
 
     buildTypes {
