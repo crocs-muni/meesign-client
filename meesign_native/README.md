@@ -3,7 +3,6 @@
 This is a Dart package providing bindings to the following native libraries (see [native](native/)):
 
 * [meesign_crypto](native/meesign-crypto/)
-* [pdf_sig](native/pdf-sig/) (not used, not maintained)
 
 ## Compiling native libraries
 

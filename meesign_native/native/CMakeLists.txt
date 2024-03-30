@@ -24,8 +24,6 @@ if(WIN32)
   set(MEESIGN_CRYPTO_IMPLIB "${MEESIGN_CRYPTO_LIB}.lib")
 endif()
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
-
 set(CARGO_CMD cargo build --target ${RUST_TARGET} ${CARGO_BUILD_TYPE_OPT})
 
 if(WIN32)

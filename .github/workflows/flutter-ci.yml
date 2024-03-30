@@ -171,9 +171,6 @@ jobs:
         CMAKE_TOOLCHAIN_FILE: ${{ matrix.toolchain_file }}
         # env vars used by rust openssl
         VCPKG_ROOT: C:\vcpkg
-        # needed to fetch Android deps (podofo + freetype AARs)
-        USERNAME: ${{ github.actor }}
-        TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: >
         flutter build -v ${{ matrix.build_target }}
         --release

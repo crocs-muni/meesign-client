@@ -84,5 +84,4 @@ flutter {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "com.android.ndk.thirdparty:openssl:1.1.1q-beta-1"
-    implementation "com.android.ndk.thirdparty:podofo:0.9.7-SNAPSHOT"
 }
