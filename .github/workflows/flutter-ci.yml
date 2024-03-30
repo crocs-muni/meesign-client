@@ -71,7 +71,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        target: [Windows, Linux, macOS, Android]
+        target: [Windows, Linux, macOS, Android, iOS]
         include:
         - os: windows-latest
           target: Windows
@@ -97,6 +97,12 @@ jobs:
           build_path: build/app/outputs/flutter-apk
           asset_extension: .apk
           asset_content_type: application/vnd.android.package-archive
+        - os: macos-14
+          target: iOS
+          build_target: ios
+          build_path: build/ios
+          asset_extension: .zip
+          asset_content_type: application/zip
       # Disable fail-fast as we want results from all even if one fails.
       fail-fast: false
 
@@ -141,6 +147,10 @@ jobs:
         bash ./tool/cargo-config-gen-android.sh >> ~/.cargo/config.toml
         cat ~/.cargo/config.toml
 
+    - name: Set up Rust for iOS
+      if: matrix.target == 'iOS'
+      run: rustup target add aarch64-apple-ios
+
     - name: Set up Rust for macOS
       if: matrix.target == 'macOS'
       run: |
@@ -169,7 +179,18 @@ jobs:
     # Fetch dart packages
     - run: flutter pub get
 
+    - name: Build iOS
+      if: matrix.target == 'iOS'
+      run: |
+        flutter build ios --help
+        flutter build ipa --help
+        flutter build -v ios \
+          --release \
+          --no-codesign \
+          --dart-define=ALLOW_BAD_CERTS=true
+
     - name: Build app
+      if: matrix.target != 'iOS'
       run: >
         flutter build -v ${{ matrix.build_target }}
         --release
@@ -199,6 +220,13 @@ jobs:
       if: matrix.target == 'macOS'
       run: ditto -c -k --sequesterRsrc --keepParent meesign_client.app $GITHUB_WORKSPACE/meesign_client_${{ matrix.target }}.zip
       working-directory: ${{ matrix.build_path }}
+    - name: Compress build for iOS
+      if: matrix.target == 'iOS'
+      run: |
+        ls -l
+        ditto -c -k --sequesterRsrc --keepParent ipa $GITHUB_WORKSPACE/meesign_client_${{ matrix.target }}.zip
+      working-directory: ${{ matrix.build_path }}
+
 
     # Upload the build.
     - name: Upload build outputs
