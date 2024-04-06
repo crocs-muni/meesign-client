@@ -775,6 +775,7 @@ class _HomePageViewState extends State<HomePageView> {
     final state = context.read<HomeState>();
     final groups = state.groupTasks
         .where((task) =>
+            task.state == TaskState.finished &&
             task.info.keyType == keyType &&
             (state.showArchived || !task.archived))
         .map((task) => task.info);
