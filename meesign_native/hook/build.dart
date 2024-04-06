@@ -5,8 +5,8 @@ import 'package:native_assets_cli/native_assets_cli.dart';
 // should eventually be replaced by a Rust-focused package:
 // https://github.com/dart-lang/native/issues/883
 
-String selectTarget(OS os, Architecture architecture) {
-  return switch ((os, architecture)) {
+String selectTarget(BuildConfig config) {
+  return switch ((config.targetOS, config.targetArchitecture)) {
     (OS.linux, Architecture.x64) => 'x86_64-unknown-linux-gnu',
     (OS.windows, Architecture.x64) => 'x86_64-pc-windows-msvc',
     (OS.macOS, Architecture.x64) => 'x86_64-apple-darwin',
@@ -14,8 +14,11 @@ String selectTarget(OS os, Architecture architecture) {
     (OS.android, Architecture.x64) => 'x86_64-linux-android',
     (OS.android, Architecture.arm64) => 'aarch64-linux-android',
     (OS.android, Architecture.arm) => 'armv7-linux-androideabi',
-    (OS.iOS, Architecture.arm64) => 'aarch64-apple-ios',
-    _ => throw UnsupportedError('($os, $architecture) not supported'),
+    (OS.iOS, Architecture.arm64) => config.targetIOSSdk == IOSSdk.iPhoneOS
+        ? 'aarch64-apple-ios'
+        : 'aarch64-apple-ios-sim',
+    _ => throw UnsupportedError(
+        '(${config.targetOS}, ${config.targetArchitecture}) not supported'),
   };
 }
 
@@ -40,16 +43,14 @@ void main(List<String> args) async {
       );
     }
 
-    final target = selectTarget(
-      config.targetOS,
-      config.targetArchitecture ?? Architecture.current,
-    );
     String libName =
         '${libPrefix(config.targetOS)}meesign_crypto${libSuffix(config.targetOS)}';
     final assetPath = config.outputDirectory.resolve(libName);
     final cryptoDir = config.packageRoot.resolve('native/meesign-crypto/');
 
     if (!config.dryRun) {
+      final target = selectTarget(config);
+
       final result = await Process.run(
         'cargo',
         ['build', '--release', '--target', target],
