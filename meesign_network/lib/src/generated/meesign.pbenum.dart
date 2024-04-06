@@ -1,10 +1,10 @@
 //
 //  Generated code. Do not modify.
-//  source: mpc.proto
+//  source: meesign.proto
 //
 // @dart = 2.12
 
-// ignore_for_file: annotate_overrides, camel_case_types
+// ignore_for_file: annotate_overrides, camel_case_types, comment_references
 // ignore_for_file: constant_identifier_names, library_prefixes
 // ignore_for_file: non_constant_identifier_names, prefer_final_fields
 // ignore_for_file: unnecessary_import, unnecessary_this, unused_import
@@ -74,6 +74,22 @@ class TaskType extends $pb.ProtobufEnum {
   static TaskType? valueOf($core.int value) => _byValue[value];
 
   const TaskType._($core.int v, $core.String n) : super(v, n);
+}
+
+class DeviceKind extends $pb.ProtobufEnum {
+  static const DeviceKind USER = DeviceKind._(0, _omitEnumNames ? '' : 'USER');
+  static const DeviceKind BOT = DeviceKind._(1, _omitEnumNames ? '' : 'BOT');
+
+  static const $core.List<DeviceKind> values = <DeviceKind>[
+    USER,
+    BOT,
+  ];
+
+  static final $core.Map<$core.int, DeviceKind> _byValue =
+      $pb.ProtobufEnum.initByValue(values);
+  static DeviceKind? valueOf($core.int value) => _byValue[value];
+
+  const DeviceKind._($core.int v, $core.String n) : super(v, n);
 }
 
 class Task_TaskState extends $pb.ProtobufEnum {

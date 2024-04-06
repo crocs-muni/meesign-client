@@ -95,7 +95,7 @@ class GroupRepository extends TaskRepository<Group> {
 
   @override
   Future<void> finishTask(Uuid did, db.Task task, rpc.Task rpcTask) async {
-    final id = Uint8List.fromList(rpcTask.data);
+    final id = Uint8List.fromList(rpcTask.data.first);
     final context = ProtocolWrapper.finish(task.context!);
 
     // TODO: group with task update into a transaction?

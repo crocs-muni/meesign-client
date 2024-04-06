@@ -87,7 +87,7 @@ class DecryptRepository extends TaskRepository<Decrypt> {
     await _taskDao.updateDecrypt(db.DecryptsCompanion(
       tid: Value(task.id),
       did: Value(task.did),
-      data: Value(rpcTask.data as Uint8List),
+      data: Value(rpcTask.data.first as Uint8List),
     ));
   }
 

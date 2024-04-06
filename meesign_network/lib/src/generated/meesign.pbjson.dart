@@ -1,10 +1,10 @@
 //
 //  Generated code. Do not modify.
-//  source: mpc.proto
+//  source: meesign.proto
 //
 // @dart = 2.12
 
-// ignore_for_file: annotate_overrides, camel_case_types
+// ignore_for_file: annotate_overrides, camel_case_types, comment_references
 // ignore_for_file: constant_identifier_names, library_prefixes
 // ignore_for_file: non_constant_identifier_names, prefer_final_fields
 // ignore_for_file: unnecessary_import, unnecessary_this, unused_import
@@ -57,6 +57,19 @@ final $typed_data.Uint8List taskTypeDescriptor = $convert.base64Decode(
     'CghUYXNrVHlwZRIJCgVHUk9VUBAAEgwKCFNJR05fUERGEAESEgoOU0lHTl9DSEFMTEVOR0UQAh'
     'ILCgdERUNSWVBUEAM=');
 
+@$core.Deprecated('Use deviceKindDescriptor instead')
+const DeviceKind$json = {
+  '1': 'DeviceKind',
+  '2': [
+    {'1': 'USER', '2': 0},
+    {'1': 'BOT', '2': 1},
+  ],
+};
+
+/// Descriptor for `DeviceKind`. Decode as a `google.protobuf.EnumDescriptorProto`.
+final $typed_data.Uint8List deviceKindDescriptor =
+    $convert.base64Decode('CgpEZXZpY2VLaW5kEggKBFVTRVIQABIHCgNCT1QQAQ==');
+
 @$core.Deprecated('Use serverInfoRequestDescriptor instead')
 const ServerInfoRequest$json = {
   '1': 'ServerInfoRequest',
@@ -83,14 +96,22 @@ const RegistrationRequest$json = {
   '1': 'RegistrationRequest',
   '2': [
     {'1': 'name', '3': 1, '4': 1, '5': 9, '10': 'name'},
-    {'1': 'csr', '3': 2, '4': 1, '5': 12, '10': 'csr'},
+    {
+      '1': 'kind',
+      '3': 2,
+      '4': 1,
+      '5': 14,
+      '6': '.meesign.DeviceKind',
+      '10': 'kind'
+    },
+    {'1': 'csr', '3': 3, '4': 1, '5': 12, '10': 'csr'},
   ],
 };
 
 /// Descriptor for `RegistrationRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List registrationRequestDescriptor = $convert.base64Decode(
-    'ChNSZWdpc3RyYXRpb25SZXF1ZXN0EhIKBG5hbWUYASABKAlSBG5hbWUSEAoDY3NyGAIgASgMUg'
-    'Njc3I=');
+    'ChNSZWdpc3RyYXRpb25SZXF1ZXN0EhIKBG5hbWUYASABKAlSBG5hbWUSJwoEa2luZBgCIAEoDj'
+    'ITLm1lZXNpZ24uRGV2aWNlS2luZFIEa2luZBIQCgNjc3IYAyABKAxSA2Nzcg==');
 
 @$core.Deprecated('Use registrationResponseDescriptor instead')
 const RegistrationResponse$json = {
@@ -207,16 +228,25 @@ const Device$json = {
   '2': [
     {'1': 'identifier', '3': 1, '4': 1, '5': 12, '10': 'identifier'},
     {'1': 'name', '3': 2, '4': 1, '5': 9, '10': 'name'},
-    {'1': 'certificate', '3': 3, '4': 1, '5': 12, '10': 'certificate'},
-    {'1': 'last_active', '3': 4, '4': 1, '5': 4, '10': 'lastActive'},
+    {
+      '1': 'kind',
+      '3': 3,
+      '4': 1,
+      '5': 14,
+      '6': '.meesign.DeviceKind',
+      '10': 'kind'
+    },
+    {'1': 'certificate', '3': 4, '4': 1, '5': 12, '10': 'certificate'},
+    {'1': 'last_active', '3': 5, '4': 1, '5': 4, '10': 'lastActive'},
   ],
 };
 
 /// Descriptor for `Device`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List deviceDescriptor = $convert.base64Decode(
     'CgZEZXZpY2USHgoKaWRlbnRpZmllchgBIAEoDFIKaWRlbnRpZmllchISCgRuYW1lGAIgASgJUg'
-    'RuYW1lEiAKC2NlcnRpZmljYXRlGAMgASgMUgtjZXJ0aWZpY2F0ZRIfCgtsYXN0X2FjdGl2ZRgE'
-    'IAEoBFIKbGFzdEFjdGl2ZQ==');
+    'RuYW1lEicKBGtpbmQYAyABKA4yEy5tZWVzaWduLkRldmljZUtpbmRSBGtpbmQSIAoLY2VydGlm'
+    'aWNhdGUYBCABKAxSC2NlcnRpZmljYXRlEh8KC2xhc3RfYWN0aXZlGAUgASgEUgpsYXN0QWN0aX'
+    'Zl');
 
 @$core.Deprecated('Use signRequestDescriptor instead')
 const SignRequest$json = {
@@ -300,20 +330,19 @@ const Task$json = {
     {'1': 'attempt', '3': 5, '4': 1, '5': 13, '10': 'attempt'},
     {'1': 'accept', '3': 6, '4': 1, '5': 13, '10': 'accept'},
     {'1': 'reject', '3': 7, '4': 1, '5': 13, '10': 'reject'},
-    {'1': 'data', '3': 8, '4': 1, '5': 12, '9': 0, '10': 'data', '17': true},
+    {'1': 'data', '3': 8, '4': 3, '5': 12, '10': 'data'},
     {
       '1': 'request',
       '3': 9,
       '4': 1,
       '5': 12,
-      '9': 1,
+      '9': 0,
       '10': 'request',
       '17': true
     },
   ],
   '4': [Task_TaskState$json],
   '8': [
-    {'1': '_data'},
     {'1': '_request'},
   ],
 };
@@ -334,24 +363,23 @@ final $typed_data.Uint8List taskDescriptor = $convert.base64Decode(
     'CgRUYXNrEg4KAmlkGAEgASgMUgJpZBIlCgR0eXBlGAIgASgOMhEubWVlc2lnbi5UYXNrVHlwZV'
     'IEdHlwZRItCgVzdGF0ZRgDIAEoDjIXLm1lZXNpZ24uVGFzay5UYXNrU3RhdGVSBXN0YXRlEhQK'
     'BXJvdW5kGAQgASgNUgVyb3VuZBIYCgdhdHRlbXB0GAUgASgNUgdhdHRlbXB0EhYKBmFjY2VwdB'
-    'gGIAEoDVIGYWNjZXB0EhYKBnJlamVjdBgHIAEoDVIGcmVqZWN0EhcKBGRhdGEYCCABKAxIAFIE'
-    'ZGF0YYgBARIdCgdyZXF1ZXN0GAkgASgMSAFSB3JlcXVlc3SIAQEiPwoJVGFza1N0YXRlEgsKB0'
-    'NSRUFURUQQABILCgdSVU5OSU5HEAESDAoIRklOSVNIRUQQAhIKCgZGQUlMRUQQA0IHCgVfZGF0'
-    'YUIKCghfcmVxdWVzdA==');
+    'gGIAEoDVIGYWNjZXB0EhYKBnJlamVjdBgHIAEoDVIGcmVqZWN0EhIKBGRhdGEYCCADKAxSBGRh'
+    'dGESHQoHcmVxdWVzdBgJIAEoDEgAUgdyZXF1ZXN0iAEBIj8KCVRhc2tTdGF0ZRILCgdDUkVBVE'
+    'VEEAASCwoHUlVOTklORxABEgwKCEZJTklTSEVEEAISCgoGRkFJTEVEEANCCgoIX3JlcXVlc3Q=');
 
 @$core.Deprecated('Use taskUpdateDescriptor instead')
 const TaskUpdate$json = {
   '1': 'TaskUpdate',
   '2': [
     {'1': 'task', '3': 1, '4': 1, '5': 12, '10': 'task'},
-    {'1': 'data', '3': 2, '4': 1, '5': 12, '10': 'data'},
+    {'1': 'data', '3': 2, '4': 3, '5': 12, '10': 'data'},
     {'1': 'attempt', '3': 3, '4': 1, '5': 13, '10': 'attempt'},
   ],
 };
 
 /// Descriptor for `TaskUpdate`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List taskUpdateDescriptor = $convert.base64Decode(
-    'CgpUYXNrVXBkYXRlEhIKBHRhc2sYASABKAxSBHRhc2sSEgoEZGF0YRgCIAEoDFIEZGF0YRIYCg'
+    'CgpUYXNrVXBkYXRlEhIKBHRhc2sYASABKAxSBHRhc2sSEgoEZGF0YRgCIAMoDFIEZGF0YRIYCg'
     'dhdHRlbXB0GAMgASgNUgdhdHRlbXB0');
 
 @$core.Deprecated('Use tasksRequestDescriptor instead')

@@ -1,10 +1,10 @@
 //
 //  Generated code. Do not modify.
-//  source: mpc.proto
+//  source: meesign.proto
 //
 // @dart = 2.12
 
-// ignore_for_file: annotate_overrides, camel_case_types
+// ignore_for_file: annotate_overrides, camel_case_types, comment_references
 // ignore_for_file: constant_identifier_names, library_prefixes
 // ignore_for_file: non_constant_identifier_names, prefer_final_fields
 // ignore_for_file: unnecessary_import, unnecessary_this, unused_import
@@ -14,9 +14,9 @@ import 'dart:core' as $core;
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import 'mpc.pbenum.dart';
+import 'meesign.pbenum.dart';
 
-export 'mpc.pbenum.dart';
+export 'meesign.pbenum.dart';
 
 class ServerInfoRequest extends $pb.GeneratedMessage {
   factory ServerInfoRequest() => create();
@@ -59,7 +59,15 @@ class ServerInfoRequest extends $pb.GeneratedMessage {
 }
 
 class ServerInfo extends $pb.GeneratedMessage {
-  factory ServerInfo() => create();
+  factory ServerInfo({
+    $core.String? version,
+  }) {
+    final $result = create();
+    if (version != null) {
+      $result.version = version;
+    }
+    return $result;
+  }
   ServerInfo._() : super();
   factory ServerInfo.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
@@ -110,7 +118,23 @@ class ServerInfo extends $pb.GeneratedMessage {
 }
 
 class RegistrationRequest extends $pb.GeneratedMessage {
-  factory RegistrationRequest() => create();
+  factory RegistrationRequest({
+    $core.String? name,
+    DeviceKind? kind,
+    $core.List<$core.int>? csr,
+  }) {
+    final $result = create();
+    if (name != null) {
+      $result.name = name;
+    }
+    if (kind != null) {
+      $result.kind = kind;
+    }
+    if (csr != null) {
+      $result.csr = csr;
+    }
+    return $result;
+  }
   RegistrationRequest._() : super();
   factory RegistrationRequest.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
@@ -124,8 +148,12 @@ class RegistrationRequest extends $pb.GeneratedMessage {
       package: const $pb.PackageName(_omitMessageNames ? '' : 'meesign'),
       createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'name')
+    ..e<DeviceKind>(2, _omitFieldNames ? '' : 'kind', $pb.PbFieldType.OE,
+        defaultOrMaker: DeviceKind.USER,
+        valueOf: DeviceKind.valueOf,
+        enumValues: DeviceKind.values)
     ..a<$core.List<$core.int>>(
-        2, _omitFieldNames ? '' : 'csr', $pb.PbFieldType.OY)
+        3, _omitFieldNames ? '' : 'csr', $pb.PbFieldType.OY)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('Using this can add significant overhead to your binary. '
@@ -164,20 +192,44 @@ class RegistrationRequest extends $pb.GeneratedMessage {
   void clearName() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.List<$core.int> get csr => $_getN(1);
+  DeviceKind get kind => $_getN(1);
   @$pb.TagNumber(2)
-  set csr($core.List<$core.int> v) {
-    $_setBytes(1, v);
+  set kind(DeviceKind v) {
+    setField(2, v);
   }
 
   @$pb.TagNumber(2)
-  $core.bool hasCsr() => $_has(1);
+  $core.bool hasKind() => $_has(1);
   @$pb.TagNumber(2)
-  void clearCsr() => clearField(2);
+  void clearKind() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.List<$core.int> get csr => $_getN(2);
+  @$pb.TagNumber(3)
+  set csr($core.List<$core.int> v) {
+    $_setBytes(2, v);
+  }
+
+  @$pb.TagNumber(3)
+  $core.bool hasCsr() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearCsr() => clearField(3);
 }
 
 class RegistrationResponse extends $pb.GeneratedMessage {
-  factory RegistrationResponse() => create();
+  factory RegistrationResponse({
+    $core.List<$core.int>? deviceId,
+    $core.List<$core.int>? certificate,
+  }) {
+    final $result = create();
+    if (deviceId != null) {
+      $result.deviceId = deviceId;
+    }
+    if (certificate != null) {
+      $result.certificate = certificate;
+    }
+    return $result;
+  }
   RegistrationResponse._() : super();
   factory RegistrationResponse.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
@@ -246,7 +298,31 @@ class RegistrationResponse extends $pb.GeneratedMessage {
 }
 
 class GroupRequest extends $pb.GeneratedMessage {
-  factory GroupRequest() => create();
+  factory GroupRequest({
+    $core.String? name,
+    $core.Iterable<$core.List<$core.int>>? deviceIds,
+    $core.int? threshold,
+    ProtocolType? protocol,
+    KeyType? keyType,
+  }) {
+    final $result = create();
+    if (name != null) {
+      $result.name = name;
+    }
+    if (deviceIds != null) {
+      $result.deviceIds.addAll(deviceIds);
+    }
+    if (threshold != null) {
+      $result.threshold = threshold;
+    }
+    if (protocol != null) {
+      $result.protocol = protocol;
+    }
+    if (keyType != null) {
+      $result.keyType = keyType;
+    }
+    return $result;
+  }
   GroupRequest._() : super();
   factory GroupRequest.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
@@ -349,7 +425,35 @@ class GroupRequest extends $pb.GeneratedMessage {
 }
 
 class Group extends $pb.GeneratedMessage {
-  factory Group() => create();
+  factory Group({
+    $core.List<$core.int>? identifier,
+    $core.String? name,
+    $core.int? threshold,
+    ProtocolType? protocol,
+    KeyType? keyType,
+    $core.Iterable<$core.List<$core.int>>? deviceIds,
+  }) {
+    final $result = create();
+    if (identifier != null) {
+      $result.identifier = identifier;
+    }
+    if (name != null) {
+      $result.name = name;
+    }
+    if (threshold != null) {
+      $result.threshold = threshold;
+    }
+    if (protocol != null) {
+      $result.protocol = protocol;
+    }
+    if (keyType != null) {
+      $result.keyType = keyType;
+    }
+    if (deviceIds != null) {
+      $result.deviceIds.addAll(deviceIds);
+    }
+    return $result;
+  }
   Group._() : super();
   factory Group.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
@@ -504,7 +608,15 @@ class DevicesRequest extends $pb.GeneratedMessage {
 }
 
 class Devices extends $pb.GeneratedMessage {
-  factory Devices() => create();
+  factory Devices({
+    $core.Iterable<Device>? devices,
+  }) {
+    final $result = create();
+    if (devices != null) {
+      $result.devices.addAll(devices);
+    }
+    return $result;
+  }
   Devices._() : super();
   factory Devices.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
@@ -547,7 +659,31 @@ class Devices extends $pb.GeneratedMessage {
 }
 
 class Device extends $pb.GeneratedMessage {
-  factory Device() => create();
+  factory Device({
+    $core.List<$core.int>? identifier,
+    $core.String? name,
+    DeviceKind? kind,
+    $core.List<$core.int>? certificate,
+    $fixnum.Int64? lastActive,
+  }) {
+    final $result = create();
+    if (identifier != null) {
+      $result.identifier = identifier;
+    }
+    if (name != null) {
+      $result.name = name;
+    }
+    if (kind != null) {
+      $result.kind = kind;
+    }
+    if (certificate != null) {
+      $result.certificate = certificate;
+    }
+    if (lastActive != null) {
+      $result.lastActive = lastActive;
+    }
+    return $result;
+  }
   Device._() : super();
   factory Device.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
@@ -563,10 +699,14 @@ class Device extends $pb.GeneratedMessage {
     ..a<$core.List<$core.int>>(
         1, _omitFieldNames ? '' : 'identifier', $pb.PbFieldType.OY)
     ..aOS(2, _omitFieldNames ? '' : 'name')
+    ..e<DeviceKind>(3, _omitFieldNames ? '' : 'kind', $pb.PbFieldType.OE,
+        defaultOrMaker: DeviceKind.USER,
+        valueOf: DeviceKind.valueOf,
+        enumValues: DeviceKind.values)
     ..a<$core.List<$core.int>>(
-        3, _omitFieldNames ? '' : 'certificate', $pb.PbFieldType.OY)
+        4, _omitFieldNames ? '' : 'certificate', $pb.PbFieldType.OY)
     ..a<$fixnum.Int64>(
-        4, _omitFieldNames ? '' : 'lastActive', $pb.PbFieldType.OU6,
+        5, _omitFieldNames ? '' : 'lastActive', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
     ..hasRequiredFields = false;
 
@@ -616,32 +756,60 @@ class Device extends $pb.GeneratedMessage {
   void clearName() => clearField(2);
 
   @$pb.TagNumber(3)
-  $core.List<$core.int> get certificate => $_getN(2);
+  DeviceKind get kind => $_getN(2);
   @$pb.TagNumber(3)
+  set kind(DeviceKind v) {
+    setField(3, v);
+  }
+
+  @$pb.TagNumber(3)
+  $core.bool hasKind() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearKind() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.List<$core.int> get certificate => $_getN(3);
+  @$pb.TagNumber(4)
   set certificate($core.List<$core.int> v) {
-    $_setBytes(2, v);
+    $_setBytes(3, v);
   }
 
-  @$pb.TagNumber(3)
-  $core.bool hasCertificate() => $_has(2);
-  @$pb.TagNumber(3)
-  void clearCertificate() => clearField(3);
+  @$pb.TagNumber(4)
+  $core.bool hasCertificate() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearCertificate() => clearField(4);
 
-  @$pb.TagNumber(4)
-  $fixnum.Int64 get lastActive => $_getI64(3);
-  @$pb.TagNumber(4)
+  @$pb.TagNumber(5)
+  $fixnum.Int64 get lastActive => $_getI64(4);
+  @$pb.TagNumber(5)
   set lastActive($fixnum.Int64 v) {
-    $_setInt64(3, v);
+    $_setInt64(4, v);
   }
 
-  @$pb.TagNumber(4)
-  $core.bool hasLastActive() => $_has(3);
-  @$pb.TagNumber(4)
-  void clearLastActive() => clearField(4);
+  @$pb.TagNumber(5)
+  $core.bool hasLastActive() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearLastActive() => clearField(5);
 }
 
 class SignRequest extends $pb.GeneratedMessage {
-  factory SignRequest() => create();
+  factory SignRequest({
+    $core.String? name,
+    $core.List<$core.int>? groupId,
+    $core.List<$core.int>? data,
+  }) {
+    final $result = create();
+    if (name != null) {
+      $result.name = name;
+    }
+    if (groupId != null) {
+      $result.groupId = groupId;
+    }
+    if (data != null) {
+      $result.data = data;
+    }
+    return $result;
+  }
   SignRequest._() : super();
   factory SignRequest.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
@@ -721,7 +889,27 @@ class SignRequest extends $pb.GeneratedMessage {
 }
 
 class DecryptRequest extends $pb.GeneratedMessage {
-  factory DecryptRequest() => create();
+  factory DecryptRequest({
+    $core.String? name,
+    $core.List<$core.int>? groupId,
+    $core.List<$core.int>? data,
+    $core.String? dataType,
+  }) {
+    final $result = create();
+    if (name != null) {
+      $result.name = name;
+    }
+    if (groupId != null) {
+      $result.groupId = groupId;
+    }
+    if (data != null) {
+      $result.data = data;
+    }
+    if (dataType != null) {
+      $result.dataType = dataType;
+    }
+    return $result;
+  }
   DecryptRequest._() : super();
   factory DecryptRequest.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
@@ -815,7 +1003,19 @@ class DecryptRequest extends $pb.GeneratedMessage {
 }
 
 class TaskRequest extends $pb.GeneratedMessage {
-  factory TaskRequest() => create();
+  factory TaskRequest({
+    $core.List<$core.int>? taskId,
+    $core.List<$core.int>? deviceId,
+  }) {
+    final $result = create();
+    if (taskId != null) {
+      $result.taskId = taskId;
+    }
+    if (deviceId != null) {
+      $result.deviceId = deviceId;
+    }
+    return $result;
+  }
   TaskRequest._() : super();
   factory TaskRequest.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
@@ -882,7 +1082,47 @@ class TaskRequest extends $pb.GeneratedMessage {
 }
 
 class Task extends $pb.GeneratedMessage {
-  factory Task() => create();
+  factory Task({
+    $core.List<$core.int>? id,
+    TaskType? type,
+    Task_TaskState? state,
+    $core.int? round,
+    $core.int? attempt,
+    $core.int? accept,
+    $core.int? reject,
+    $core.Iterable<$core.List<$core.int>>? data,
+    $core.List<$core.int>? request,
+  }) {
+    final $result = create();
+    if (id != null) {
+      $result.id = id;
+    }
+    if (type != null) {
+      $result.type = type;
+    }
+    if (state != null) {
+      $result.state = state;
+    }
+    if (round != null) {
+      $result.round = round;
+    }
+    if (attempt != null) {
+      $result.attempt = attempt;
+    }
+    if (accept != null) {
+      $result.accept = accept;
+    }
+    if (reject != null) {
+      $result.reject = reject;
+    }
+    if (data != null) {
+      $result.data.addAll(data);
+    }
+    if (request != null) {
+      $result.request = request;
+    }
+    return $result;
+  }
   Task._() : super();
   factory Task.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
@@ -909,8 +1149,8 @@ class Task extends $pb.GeneratedMessage {
     ..a<$core.int>(5, _omitFieldNames ? '' : 'attempt', $pb.PbFieldType.OU3)
     ..a<$core.int>(6, _omitFieldNames ? '' : 'accept', $pb.PbFieldType.OU3)
     ..a<$core.int>(7, _omitFieldNames ? '' : 'reject', $pb.PbFieldType.OU3)
-    ..a<$core.List<$core.int>>(
-        8, _omitFieldNames ? '' : 'data', $pb.PbFieldType.OY)
+    ..p<$core.List<$core.int>>(
+        8, _omitFieldNames ? '' : 'data', $pb.PbFieldType.PY)
     ..a<$core.List<$core.int>>(
         9, _omitFieldNames ? '' : 'request', $pb.PbFieldType.OY)
     ..hasRequiredFields = false;
@@ -1021,16 +1261,7 @@ class Task extends $pb.GeneratedMessage {
   void clearReject() => clearField(7);
 
   @$pb.TagNumber(8)
-  $core.List<$core.int> get data => $_getN(7);
-  @$pb.TagNumber(8)
-  set data($core.List<$core.int> v) {
-    $_setBytes(7, v);
-  }
-
-  @$pb.TagNumber(8)
-  $core.bool hasData() => $_has(7);
-  @$pb.TagNumber(8)
-  void clearData() => clearField(8);
+  $core.List<$core.List<$core.int>> get data => $_getList(7);
 
   @$pb.TagNumber(9)
   $core.List<$core.int> get request => $_getN(8);
@@ -1046,7 +1277,23 @@ class Task extends $pb.GeneratedMessage {
 }
 
 class TaskUpdate extends $pb.GeneratedMessage {
-  factory TaskUpdate() => create();
+  factory TaskUpdate({
+    $core.List<$core.int>? task,
+    $core.Iterable<$core.List<$core.int>>? data,
+    $core.int? attempt,
+  }) {
+    final $result = create();
+    if (task != null) {
+      $result.task = task;
+    }
+    if (data != null) {
+      $result.data.addAll(data);
+    }
+    if (attempt != null) {
+      $result.attempt = attempt;
+    }
+    return $result;
+  }
   TaskUpdate._() : super();
   factory TaskUpdate.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
@@ -1061,8 +1308,8 @@ class TaskUpdate extends $pb.GeneratedMessage {
       createEmptyInstance: create)
     ..a<$core.List<$core.int>>(
         1, _omitFieldNames ? '' : 'task', $pb.PbFieldType.OY)
-    ..a<$core.List<$core.int>>(
-        2, _omitFieldNames ? '' : 'data', $pb.PbFieldType.OY)
+    ..p<$core.List<$core.int>>(
+        2, _omitFieldNames ? '' : 'data', $pb.PbFieldType.PY)
     ..a<$core.int>(3, _omitFieldNames ? '' : 'attempt', $pb.PbFieldType.OU3)
     ..hasRequiredFields = false;
 
@@ -1100,16 +1347,7 @@ class TaskUpdate extends $pb.GeneratedMessage {
   void clearTask() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.List<$core.int> get data => $_getN(1);
-  @$pb.TagNumber(2)
-  set data($core.List<$core.int> v) {
-    $_setBytes(1, v);
-  }
-
-  @$pb.TagNumber(2)
-  $core.bool hasData() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearData() => clearField(2);
+  $core.List<$core.List<$core.int>> get data => $_getList(1);
 
   @$pb.TagNumber(3)
   $core.int get attempt => $_getIZ(2);
@@ -1125,7 +1363,15 @@ class TaskUpdate extends $pb.GeneratedMessage {
 }
 
 class TasksRequest extends $pb.GeneratedMessage {
-  factory TasksRequest() => create();
+  factory TasksRequest({
+    $core.List<$core.int>? deviceId,
+  }) {
+    final $result = create();
+    if (deviceId != null) {
+      $result.deviceId = deviceId;
+    }
+    return $result;
+  }
   TasksRequest._() : super();
   factory TasksRequest.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
@@ -1179,7 +1425,15 @@ class TasksRequest extends $pb.GeneratedMessage {
 }
 
 class Tasks extends $pb.GeneratedMessage {
-  factory Tasks() => create();
+  factory Tasks({
+    $core.Iterable<Task>? tasks,
+  }) {
+    final $result = create();
+    if (tasks != null) {
+      $result.tasks.addAll(tasks);
+    }
+    return $result;
+  }
   Tasks._() : super();
   factory Tasks.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
@@ -1222,7 +1476,15 @@ class Tasks extends $pb.GeneratedMessage {
 }
 
 class GroupsRequest extends $pb.GeneratedMessage {
-  factory GroupsRequest() => create();
+  factory GroupsRequest({
+    $core.List<$core.int>? deviceId,
+  }) {
+    final $result = create();
+    if (deviceId != null) {
+      $result.deviceId = deviceId;
+    }
+    return $result;
+  }
   GroupsRequest._() : super();
   factory GroupsRequest.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
@@ -1276,7 +1538,15 @@ class GroupsRequest extends $pb.GeneratedMessage {
 }
 
 class Groups extends $pb.GeneratedMessage {
-  factory Groups() => create();
+  factory Groups({
+    $core.Iterable<Group>? groups,
+  }) {
+    final $result = create();
+    if (groups != null) {
+      $result.groups.addAll(groups);
+    }
+    return $result;
+  }
   Groups._() : super();
   factory Groups.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
@@ -1319,7 +1589,15 @@ class Groups extends $pb.GeneratedMessage {
 }
 
 class Resp extends $pb.GeneratedMessage {
-  factory Resp() => create();
+  factory Resp({
+    $core.String? message,
+  }) {
+    final $result = create();
+    if (message != null) {
+      $result.message = message;
+    }
+    return $result;
+  }
   Resp._() : super();
   factory Resp.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
@@ -1370,7 +1648,19 @@ class Resp extends $pb.GeneratedMessage {
 }
 
 class TaskDecision extends $pb.GeneratedMessage {
-  factory TaskDecision() => create();
+  factory TaskDecision({
+    $core.List<$core.int>? task,
+    $core.bool? accept,
+  }) {
+    final $result = create();
+    if (task != null) {
+      $result.task = task;
+    }
+    if (accept != null) {
+      $result.accept = accept;
+    }
+    return $result;
+  }
   TaskDecision._() : super();
   factory TaskDecision.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
@@ -1437,7 +1727,15 @@ class TaskDecision extends $pb.GeneratedMessage {
 }
 
 class TaskAcknowledgement extends $pb.GeneratedMessage {
-  factory TaskAcknowledgement() => create();
+  factory TaskAcknowledgement({
+    $core.List<$core.int>? taskId,
+  }) {
+    final $result = create();
+    if (taskId != null) {
+      $result.taskId = taskId;
+    }
+    return $result;
+  }
   TaskAcknowledgement._() : super();
   factory TaskAcknowledgement.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
@@ -1491,7 +1789,15 @@ class TaskAcknowledgement extends $pb.GeneratedMessage {
 }
 
 class LogRequest extends $pb.GeneratedMessage {
-  factory LogRequest() => create();
+  factory LogRequest({
+    $core.String? message,
+  }) {
+    final $result = create();
+    if (message != null) {
+      $result.message = message;
+    }
+    return $result;
+  }
   LogRequest._() : super();
   factory LogRequest.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>

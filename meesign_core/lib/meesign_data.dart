@@ -3,7 +3,7 @@ library meesign_data;
 export 'meesign_model.dart';
 
 export 'package:meesign_network/meesign_network.dart'
-    show ClientFactory, MPCClient;
+    show ClientFactory, MeeSignClient;
 
 export 'src/data/key_store.dart';
 export 'src/data/network_dispatcher.dart';

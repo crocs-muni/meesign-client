@@ -1,10 +1,10 @@
 //
 //  Generated code. Do not modify.
-//  source: mpc.proto
+//  source: meesign.proto
 //
 // @dart = 2.12
 
-// ignore_for_file: annotate_overrides, camel_case_types
+// ignore_for_file: annotate_overrides, camel_case_types, comment_references
 // ignore_for_file: constant_identifier_names, library_prefixes
 // ignore_for_file: non_constant_identifier_names, prefer_final_fields
 // ignore_for_file: unnecessary_import, unnecessary_this, unused_import
@@ -15,75 +15,75 @@ import 'dart:core' as $core;
 import 'package:grpc/service_api.dart' as $grpc;
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import 'mpc.pb.dart' as $0;
+import 'meesign.pb.dart' as $0;
 
-export 'mpc.pb.dart';
+export 'meesign.pb.dart';
 
-@$pb.GrpcServiceName('meesign.MPC')
-class MPCClient extends $grpc.Client {
+@$pb.GrpcServiceName('meesign.MeeSign')
+class MeeSignClient extends $grpc.Client {
   static final _$getServerInfo =
       $grpc.ClientMethod<$0.ServerInfoRequest, $0.ServerInfo>(
-          '/meesign.MPC/GetServerInfo',
+          '/meesign.MeeSign/GetServerInfo',
           ($0.ServerInfoRequest value) => value.writeToBuffer(),
           ($core.List<$core.int> value) => $0.ServerInfo.fromBuffer(value));
   static final _$register =
       $grpc.ClientMethod<$0.RegistrationRequest, $0.RegistrationResponse>(
-          '/meesign.MPC/Register',
+          '/meesign.MeeSign/Register',
           ($0.RegistrationRequest value) => value.writeToBuffer(),
           ($core.List<$core.int> value) =>
               $0.RegistrationResponse.fromBuffer(value));
   static final _$sign = $grpc.ClientMethod<$0.SignRequest, $0.Task>(
-      '/meesign.MPC/Sign',
+      '/meesign.MeeSign/Sign',
       ($0.SignRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.Task.fromBuffer(value));
   static final _$group = $grpc.ClientMethod<$0.GroupRequest, $0.Task>(
-      '/meesign.MPC/Group',
+      '/meesign.MeeSign/Group',
       ($0.GroupRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.Task.fromBuffer(value));
   static final _$decrypt = $grpc.ClientMethod<$0.DecryptRequest, $0.Task>(
-      '/meesign.MPC/Decrypt',
+      '/meesign.MeeSign/Decrypt',
       ($0.DecryptRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.Task.fromBuffer(value));
   static final _$getTask = $grpc.ClientMethod<$0.TaskRequest, $0.Task>(
-      '/meesign.MPC/GetTask',
+      '/meesign.MeeSign/GetTask',
       ($0.TaskRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.Task.fromBuffer(value));
   static final _$updateTask = $grpc.ClientMethod<$0.TaskUpdate, $0.Resp>(
-      '/meesign.MPC/UpdateTask',
+      '/meesign.MeeSign/UpdateTask',
       ($0.TaskUpdate value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.Resp.fromBuffer(value));
   static final _$decideTask = $grpc.ClientMethod<$0.TaskDecision, $0.Resp>(
-      '/meesign.MPC/DecideTask',
+      '/meesign.MeeSign/DecideTask',
       ($0.TaskDecision value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.Resp.fromBuffer(value));
   static final _$acknowledgeTask =
       $grpc.ClientMethod<$0.TaskAcknowledgement, $0.Resp>(
-          '/meesign.MPC/AcknowledgeTask',
+          '/meesign.MeeSign/AcknowledgeTask',
           ($0.TaskAcknowledgement value) => value.writeToBuffer(),
           ($core.List<$core.int> value) => $0.Resp.fromBuffer(value));
   static final _$getTasks = $grpc.ClientMethod<$0.TasksRequest, $0.Tasks>(
-      '/meesign.MPC/GetTasks',
+      '/meesign.MeeSign/GetTasks',
       ($0.TasksRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.Tasks.fromBuffer(value));
   static final _$getGroups = $grpc.ClientMethod<$0.GroupsRequest, $0.Groups>(
-      '/meesign.MPC/GetGroups',
+      '/meesign.MeeSign/GetGroups',
       ($0.GroupsRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.Groups.fromBuffer(value));
   static final _$getDevices = $grpc.ClientMethod<$0.DevicesRequest, $0.Devices>(
-      '/meesign.MPC/GetDevices',
+      '/meesign.MeeSign/GetDevices',
       ($0.DevicesRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.Devices.fromBuffer(value));
   static final _$log = $grpc.ClientMethod<$0.LogRequest, $0.Resp>(
-      '/meesign.MPC/Log',
+      '/meesign.MeeSign/Log',
       ($0.LogRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.Resp.fromBuffer(value));
   static final _$subscribeUpdates =
       $grpc.ClientMethod<$0.SubscribeRequest, $0.Task>(
-          '/meesign.MPC/SubscribeUpdates',
+          '/meesign.MeeSign/SubscribeUpdates',
           ($0.SubscribeRequest value) => value.writeToBuffer(),
           ($core.List<$core.int> value) => $0.Task.fromBuffer(value));
 
-  MPCClient($grpc.ClientChannel channel,
+  MeeSignClient($grpc.ClientChannel channel,
       {$grpc.CallOptions? options,
       $core.Iterable<$grpc.ClientInterceptor>? interceptors})
       : super(channel, options: options, interceptors: interceptors);
@@ -163,11 +163,11 @@ class MPCClient extends $grpc.Client {
   }
 }
 
-@$pb.GrpcServiceName('meesign.MPC')
-abstract class MPCServiceBase extends $grpc.Service {
-  $core.String get $name => 'meesign.MPC';
+@$pb.GrpcServiceName('meesign.MeeSign')
+abstract class MeeSignServiceBase extends $grpc.Service {
+  $core.String get $name => 'meesign.MeeSign';
 
-  MPCServiceBase() {
+  MeeSignServiceBase() {
     $addMethod($grpc.ServiceMethod<$0.ServerInfoRequest, $0.ServerInfo>(
         'GetServerInfo',
         getServerInfo_Pre,

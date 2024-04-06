@@ -84,7 +84,7 @@ class FileRepository extends TaskRepository<File> {
     if (context != null) ProtocolWrapper.finish(context);
     final file = await _taskDao.getFile(did.bytes, task.id);
     await _fileStore.storeFile(
-        did, Uuid.take(task.id), file.name, rpcTask.data);
+        did, Uuid.take(task.id), file.name, rpcTask.data.first);
   }
 
   @override

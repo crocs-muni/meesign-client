@@ -30,11 +30,10 @@ class TaskSource {
   TaskSource(this._dispatcher);
 
   Future<rpc.Resp> update(
-          Uuid did, Uint8List tid, List<int> data, int attempt) =>
+          Uuid did, Uint8List tid, List<List<int>> data, int attempt) =>
       _dispatcher[did].updateTask(
-        rpc.TaskUpdate()
+        rpc.TaskUpdate(data: data)
           ..task = tid
-          ..data = data
           ..attempt = attempt,
       );
 
@@ -129,7 +128,7 @@ abstract class TaskRepository<T> {
       return task;
     }
 
-    bool activeParticipant = task.context != null || rpcTask.hasData();
+    bool activeParticipant = task.context != null || rpcTask.data.isNotEmpty;
     if (!activeParticipant) {
       return task.copyWith(
         state: TaskState.running,
@@ -138,20 +137,20 @@ abstract class TaskRepository<T> {
     }
 
     if (!task.approved) throw StateException();
-    if (!rpcTask.hasData()) return task; // nothing to do
+    if (rpcTask.data.isEmpty) return task; // nothing to do
     if (rpcTask.round <= task.round) return task;
     if (rpcTask.round != task.round + 1) throw StateException();
 
     if (task.round == 0) task = await initTask(did, task);
     final res = await ProtocolWrapper.advance(
       task.context!,
-      rpcTask.data as Uint8List,
+      rpcTask.data.first as Uint8List,
     );
     // TODO: rollback if we fail to deliver the update
     bool forCard = res.recipient == Recipient.Card;
     if (!forCard) {
       try {
-        await _taskSource.update(did, task.id, res.data, task.attempt);
+        await _taskSource.update(did, task.id, [res.data], task.attempt);
       } on GrpcError catch (e) {
         // FIXME: avoid matching error strings
         if (e.message == 'Stale update') return task;
@@ -328,7 +327,7 @@ abstract class TaskRepository<T> {
         recipient = res.recipient;
       } while (recipient != Recipient.Server);
 
-      await _taskSource.update(did, task.id, data, task.attempt);
+      await _taskSource.update(did, task.id, [data], task.attempt);
 
       final newTask = task.copyWith(
         state: TaskState.running,
