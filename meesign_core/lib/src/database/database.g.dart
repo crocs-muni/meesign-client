@@ -1338,8 +1338,13 @@ class $GroupMembersTable extends GroupMembers
       requiredDuringInsert: true,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('REFERENCES devices (id)'));
+  static const VerificationMeta _sharesMeta = const VerificationMeta('shares');
   @override
-  List<GeneratedColumn> get $columns => [tid, did];
+  late final GeneratedColumn<int> shares = GeneratedColumn<int>(
+      'shares', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [tid, did, shares];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1362,6 +1367,12 @@ class $GroupMembersTable extends GroupMembers
     } else if (isInserting) {
       context.missing(_didMeta);
     }
+    if (data.containsKey('shares')) {
+      context.handle(_sharesMeta,
+          shares.isAcceptableOrUnknown(data['shares']!, _sharesMeta));
+    } else if (isInserting) {
+      context.missing(_sharesMeta);
+    }
     return context;
   }
 
@@ -1375,6 +1386,8 @@ class $GroupMembersTable extends GroupMembers
           .read(DriftSqlType.blob, data['${effectivePrefix}tid'])!,
       did: attachedDatabase.typeMapping
           .read(DriftSqlType.blob, data['${effectivePrefix}did'])!,
+      shares: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}shares'])!,
     );
   }
 
@@ -1387,12 +1400,15 @@ class $GroupMembersTable extends GroupMembers
 class GroupMember extends DataClass implements Insertable<GroupMember> {
   final Uint8List tid;
   final Uint8List did;
-  const GroupMember({required this.tid, required this.did});
+  final int shares;
+  const GroupMember(
+      {required this.tid, required this.did, required this.shares});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['tid'] = Variable<Uint8List>(tid);
     map['did'] = Variable<Uint8List>(did);
+    map['shares'] = Variable<int>(shares);
     return map;
   }
 
@@ -1400,6 +1416,7 @@ class GroupMember extends DataClass implements Insertable<GroupMember> {
     return GroupMembersCompanion(
       tid: Value(tid),
       did: Value(did),
+      shares: Value(shares),
     );
   }
 
@@ -1409,6 +1426,7 @@ class GroupMember extends DataClass implements Insertable<GroupMember> {
     return GroupMember(
       tid: serializer.fromJson<Uint8List>(json['tid']),
       did: serializer.fromJson<Uint8List>(json['did']),
+      shares: serializer.fromJson<int>(json['shares']),
     );
   }
   @override
@@ -1417,65 +1435,80 @@ class GroupMember extends DataClass implements Insertable<GroupMember> {
     return <String, dynamic>{
       'tid': serializer.toJson<Uint8List>(tid),
       'did': serializer.toJson<Uint8List>(did),
+      'shares': serializer.toJson<int>(shares),
     };
   }
 
-  GroupMember copyWith({Uint8List? tid, Uint8List? did}) => GroupMember(
+  GroupMember copyWith({Uint8List? tid, Uint8List? did, int? shares}) =>
+      GroupMember(
         tid: tid ?? this.tid,
         did: did ?? this.did,
+        shares: shares ?? this.shares,
       );
   @override
   String toString() {
     return (StringBuffer('GroupMember(')
           ..write('tid: $tid, ')
-          ..write('did: $did')
+          ..write('did: $did, ')
+          ..write('shares: $shares')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash($driftBlobEquality.hash(tid), $driftBlobEquality.hash(did));
+  int get hashCode => Object.hash(
+      $driftBlobEquality.hash(tid), $driftBlobEquality.hash(did), shares);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is GroupMember &&
           $driftBlobEquality.equals(other.tid, this.tid) &&
-          $driftBlobEquality.equals(other.did, this.did));
+          $driftBlobEquality.equals(other.did, this.did) &&
+          other.shares == this.shares);
 }
 
 class GroupMembersCompanion extends UpdateCompanion<GroupMember> {
   final Value<Uint8List> tid;
   final Value<Uint8List> did;
+  final Value<int> shares;
   final Value<int> rowid;
   const GroupMembersCompanion({
     this.tid = const Value.absent(),
     this.did = const Value.absent(),
+    this.shares = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   GroupMembersCompanion.insert({
     required Uint8List tid,
     required Uint8List did,
+    required int shares,
     this.rowid = const Value.absent(),
   })  : tid = Value(tid),
-        did = Value(did);
+        did = Value(did),
+        shares = Value(shares);
   static Insertable<GroupMember> custom({
     Expression<Uint8List>? tid,
     Expression<Uint8List>? did,
+    Expression<int>? shares,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (tid != null) 'tid': tid,
       if (did != null) 'did': did,
+      if (shares != null) 'shares': shares,
       if (rowid != null) 'rowid': rowid,
     });
   }
 
   GroupMembersCompanion copyWith(
-      {Value<Uint8List>? tid, Value<Uint8List>? did, Value<int>? rowid}) {
+      {Value<Uint8List>? tid,
+      Value<Uint8List>? did,
+      Value<int>? shares,
+      Value<int>? rowid}) {
     return GroupMembersCompanion(
       tid: tid ?? this.tid,
       did: did ?? this.did,
+      shares: shares ?? this.shares,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1489,6 +1522,9 @@ class GroupMembersCompanion extends UpdateCompanion<GroupMember> {
     if (did.present) {
       map['did'] = Variable<Uint8List>(did.value);
     }
+    if (shares.present) {
+      map['shares'] = Variable<int>(shares.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1500,6 +1536,7 @@ class GroupMembersCompanion extends UpdateCompanion<GroupMember> {
     return (StringBuffer('GroupMembersCompanion(')
           ..write('tid: $tid, ')
           ..write('did: $did, ')
+          ..write('shares: $shares, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();

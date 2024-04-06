@@ -90,7 +90,7 @@ class HomeState with ChangeNotifier {
     });
   }
 
-  Future<void> addGroup(String name, List<Device> members, int threshold,
+  Future<void> addGroup(String name, List<Member> members, int threshold,
           Protocol protocol, KeyType keyType) =>
       _groupRepository.group(name, members, threshold, protocol, keyType);
 

@@ -53,7 +53,7 @@ const int _minThreshold = 2;
 class _NewGroupPageState extends State<NewGroupPage> {
   // TODO: store this in a Group object?
   int _threshold = _minThreshold;
-  final List<Device> _members = [];
+  final List<Member> _members = [];
   final _nameController = TextEditingController();
   String? _nameErr, _memberErr;
   KeyType _keyType = KeyType.signPdf;
@@ -81,9 +81,9 @@ class _NewGroupPageState extends State<NewGroupPage> {
       _threshold = max(_minThreshold, min(value, _members.length));
 
   Iterable<Widget> get _memberChips sync* {
-    for (final Device member in _members) {
+    for (final member in _members) {
       yield DeviceChip(
-        device: member,
+        device: member.device,
         onDeleted: () {
           setState(() {
             _members.remove(member);
@@ -98,8 +98,8 @@ class _NewGroupPageState extends State<NewGroupPage> {
     if (devices is! List<Device>) return;
     setState(() {
       for (final device in devices) {
-        if (_members.any((member) => member.id == device.id)) continue;
-        _members.add(device);
+        if (_members.any((member) => member.device.id == device.id)) continue;
+        _members.add(Member(device, 1));
       }
       if (_members.length >= 2) _memberErr = null;
     });

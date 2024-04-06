@@ -325,6 +325,10 @@ class GroupsSubPage extends StatelessWidget {
         taskBuilder: (context, task, finished) {
           final group = task.info;
           final members = group.members;
+          final thisMember = members.firstWhere(
+            (m) => m.device.id == model.device?.id,
+          );
+
           return TaskTile(
             task: task,
             name: group.name,
@@ -336,7 +340,9 @@ class GroupsSubPage extends StatelessWidget {
                 child: const Text('Join'),
                 onPressed: () => model.joinGroup(task, agree: true),
               ),
-              if (CardManager.platformSupported && group.protocol.cardSupport)
+              if (CardManager.platformSupported &&
+                  group.protocol.cardSupport &&
+                  thisMember.shares == 1)
                 FilledButton.tonal(
                   onPressed: () =>
                       model.joinGroup(task, agree: true, withCard: true),
@@ -358,7 +364,7 @@ class GroupsSubPage extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text('Threshold: ${group.threshold} / ${members.length}'),
+                  Text('Threshold: ${group.threshold} / ${group.shares}'),
                   Text('Purpose: ${[
                     'Sign PDF',
                     'Challenge',
@@ -371,7 +377,9 @@ class GroupsSubPage extends StatelessWidget {
                 child: Wrap(
                   spacing: 8,
                   runSpacing: 4,
-                  children: [for (var m in members) DeviceChip(device: m)],
+                  children: [
+                    for (var m in members) DeviceChip(device: m.device)
+                  ],
                 ),
               ),
             ],

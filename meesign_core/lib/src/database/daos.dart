@@ -62,9 +62,14 @@ class TaskDao extends DatabaseAccessor<Database> with _$TaskDaoMixin {
   Future<void> updateGroup(GroupsCompanion entity) =>
       (update(groups)..whereSamePrimaryKey(entity)).write(entity);
 
-  Future<void> insertGroupMembers(Uint8List tid, List<Uint8List> dids) {
-    final entities = dids.map(
-      (did) => GroupMembersCompanion.insert(tid: tid, did: did),
+  Future<void> insertGroupMembers(
+      Uint8List tid, Iterable<({Uint8List did, int shares})> didShares) {
+    final entities = didShares.map(
+      (item) => GroupMembersCompanion.insert(
+        tid: tid,
+        did: item.did,
+        shares: item.shares,
+      ),
     );
     return batch((batch) => batch.insertAll(groupMembers, entities,
         mode: InsertMode.insertOrIgnore));
@@ -78,14 +83,22 @@ class TaskDao extends DatabaseAccessor<Database> with _$TaskDaoMixin {
     return query.getSingle();
   }
 
-  Future<List<Device>> getGroupMembers(Uint8List tid) {
-    final memberIds = selectOnly(groupMembers)
-      ..addColumns([groupMembers.did])
-      ..where(groupMembers.tid.equals(tid));
+  Future<List<({Device device, int shares})>> getGroupMembers(
+      Uint8List tid) async {
+    final membersQuery = select(groupMembers)
+      ..where((groupMembers) => groupMembers.tid.equals(tid));
 
-    final query = select(devices)
-      ..where((device) => device.id.isInQuery(memberIds));
-    return query.get();
+    return membersQuery
+        .join([
+          innerJoin(devices, groupMembers.did.equalsExp(devices.id)),
+        ])
+        .map(
+          (result) => (
+            device: result.readTable(devices),
+            shares: result.read(groupMembers.shares)!
+          ),
+        )
+        .get();
   }
 
   Stream<List<GroupTask>> watchGroupTasks(Uint8List did) {
@@ -200,7 +213,7 @@ class TaskDao extends DatabaseAccessor<Database> with _$TaskDaoMixin {
 
 class PopulatedGroup {
   final Group group;
-  final List<Device> members;
+  final List<({Device device, int shares})> members;
   const PopulatedGroup(this.group, this.members);
 }
 

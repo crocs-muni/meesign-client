@@ -1,10 +1,11 @@
+import 'dart:collection';
+
 import 'package:drift/drift.dart';
 import 'package:meesign_native/meesign_native.dart';
 import 'package:meesign_network/grpc.dart' as rpc;
 
 import '../database/daos.dart';
 import '../database/database.dart' as db;
-import '../model/device.dart';
 import '../model/group.dart';
 import '../model/key_type.dart';
 import '../model/protocol.dart';
@@ -28,14 +29,15 @@ class GroupRepository extends TaskRepository<Group> {
 
   Future<void> group(
     String name,
-    List<Device> members,
+    List<Member> members,
     int threshold,
     Protocol protocol,
     KeyType keyType,
   ) async {
     await _dispatcher.unauth.group(
       rpc.GroupRequest()
-        ..deviceIds.addAll(members.map((m) => m.id.bytes))
+        ..deviceIds.addAll(members.expand((member) =>
+            Iterable.generate(member.shares, (_) => member.device.id.bytes)))
         ..name = name
         ..threshold = threshold
         ..protocol = protocol.toNetwork()
@@ -48,8 +50,14 @@ class GroupRepository extends TaskRepository<Group> {
     final req = rpc.GroupRequest.fromBuffer(rpcTask.request);
 
     final tid = rpcTask.id as Uint8List;
+
     final ids = req.deviceIds.map((id) => Uuid(id)).toList();
-    await _deviceRepository.getDevices(ids);
+    final idShares = HashMap<Uuid, int>();
+    for (final id in ids) {
+      idShares.update(id, (value) => value + 1, ifAbsent: () => 1);
+    }
+    await _deviceRepository.getDevices(idShares.keys.toList());
+
     final protocol = ProtocolConversion.fromNetwork(req.protocol);
     final keyType = KeyTypeConversion.fromNetwork(req.keyType);
 
@@ -77,7 +85,9 @@ class GroupRepository extends TaskRepository<Group> {
 
       await _taskDao.insertGroupMembers(
         tid,
-        ids.map((id) => id.bytes).toList(),
+        idShares.entries.map(
+          (entry) => (did: entry.key.bytes, shares: entry.value),
+        ),
       );
     });
   }
@@ -115,6 +125,7 @@ class GroupRepository extends TaskRepository<Group> {
           {required bool agree, bool withCard = false}) =>
       taskLocks[did][tid].synchronized(() async {
         await approveTaskUnsafe(did, tid, agree);
+        // TODO: throw early if withCard == true && shares > 1
         await _taskDao.updateGroup(
           db.GroupsCompanion(
             did: Value(did.bytes),

@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
 import '../database/daos.dart';
@@ -8,10 +9,18 @@ import 'key_type.dart';
 import 'protocol.dart';
 
 @immutable
+class Member {
+  final Device device;
+  final int shares;
+
+  const Member(this.device, this.shares);
+}
+
+@immutable
 class Group {
   final List<int> id;
   final String name;
-  final List<Device> members;
+  final List<Member> members;
   final int threshold;
   final Protocol protocol;
   final KeyType keyType;
@@ -25,11 +34,13 @@ class Group {
     this.keyType,
   );
 
-  hasMember(Uuid id) => members.any((member) => member.id == id);
+  int get shares => members.map((m) => m.shares).sum;
+
+  hasMember(Uuid id) => members.any((member) => member.device.id == id);
 }
 
 extension GroupConversion on db.Group {
-  Group toModel({List<Device> members = const []}) => Group(
+  Group toModel({List<Member> members = const []}) => Group(
         id ?? [],
         name,
         members,
@@ -41,6 +52,10 @@ extension GroupConversion on db.Group {
 
 extension PopulatedGroupConversion on PopulatedGroup {
   Group toModel() => group.toModel(
-        members: members.map((m) => m.toModel()).toList(),
+        members: members
+            .map(
+              (m) => Member(m.device.toModel(), m.shares),
+            )
+            .toList(),
       );
 }

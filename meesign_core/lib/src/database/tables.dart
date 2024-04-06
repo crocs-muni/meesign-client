@@ -56,6 +56,7 @@ class GroupMembers extends Table {
   // group id is only assigned after the group is established
   BlobColumn get tid => blob().references(Groups, #id)();
   BlobColumn get did => blob().references(Devices, #id)();
+  IntColumn get shares => integer()();
 
   @override
   Set<Column> get primaryKey => {tid, did};
