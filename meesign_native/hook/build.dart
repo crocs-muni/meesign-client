@@ -51,6 +51,8 @@ void main(List<String> args) async {
     if (!config.dryRun) {
       final target = selectTarget(config);
 
+      print('linker!!!!!!!!!!!!! ${config.cCompiler.linker?.toFilePath()}');
+
       final result = await Process.run(
         'cargo',
         ['build', '--release', '--target', target],
@@ -60,6 +62,7 @@ void main(List<String> args) async {
         environment: {
           'CC': config.cCompiler.compiler?.toFilePath() ?? '',
           'AR': config.cCompiler.archiver?.toFilePath() ?? '',
+          'RUSTFLAGS': '-C linker=${config.cCompiler.linker?.toFilePath()}'
         },
       );
       stdout.write(result.stdout);
