@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:collection/collection.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:meesign_core/meesign_model.dart';
@@ -8,7 +10,6 @@ import 'dart:io';
 
 import '../routes.dart';
 import '../util/chars.dart';
-import '../widget/entity_chip.dart';
 
 class OptionTile extends StatelessWidget {
   final String title;
@@ -41,6 +42,91 @@ class OptionTile extends StatelessWidget {
   }
 }
 
+class NumberInput extends StatelessWidget {
+  final int value;
+  final void Function(int) onUpdate;
+
+  const NumberInput({
+    required this.value,
+    required this.onUpdate,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.chevron_left),
+          onPressed: () => onUpdate(value - 1),
+        ),
+        Container(
+          alignment: Alignment.center,
+          width: 20,
+          child: Text(
+            value.toString(),
+            style: Theme.of(context).textTheme.labelLarge,
+          ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.chevron_right),
+          onPressed: () => onUpdate(value + 1),
+        ),
+      ],
+    );
+  }
+}
+
+class WeightedAvatar extends StatelessWidget {
+  final int index;
+  final List<int> weights;
+  final Widget? child;
+
+  const WeightedAvatar({
+    super.key,
+    required this.index,
+    required this.weights,
+    this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: AlignmentDirectional.center,
+      children: [
+        SizedBox.square(
+          dimension: 32,
+          child: CircleAvatar(
+            child: child,
+          ),
+        ),
+        SizedBox.square(
+          dimension: 40,
+          child: PieChart(
+            PieChartData(
+              startDegreeOffset: -90,
+              sectionsSpace: 2,
+              sections: [
+                for (final (j, weight) in weights.indexed)
+                  PieChartSectionData(
+                    radius: 2,
+                    value: weight.toDouble(),
+                    showTitle: false,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withOpacity(j == index ? 1 : .2),
+                  )
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class NewGroupPage extends StatefulWidget {
   const NewGroupPage({super.key});
 
@@ -58,6 +144,8 @@ class _NewGroupPageState extends State<NewGroupPage> {
   String? _nameErr, _memberErr;
   KeyType _keyType = KeyType.signPdf;
   Protocol _protocol = KeyType.signPdf.supportedProtocols.first;
+
+  int get _shareCount => _members.map((m) => m.shares).sum;
 
   @override
   void initState() {
@@ -78,21 +166,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
   }
 
   void _setThreshold(int value) =>
-      _threshold = max(_minThreshold, min(value, _members.length));
-
-  Iterable<Widget> get _memberChips sync* {
-    for (final member in _members) {
-      yield DeviceChip(
-        device: member.device,
-        onDeleted: () {
-          setState(() {
-            _members.remove(member);
-            _setThreshold(_threshold);
-          });
-        },
-      );
-    }
-  }
+      _threshold = max(_minThreshold, min(value, _shareCount));
 
   void _addMembers(Object? devices) {
     if (devices is! List<Device>) return;
@@ -204,11 +278,44 @@ class _NewGroupPageState extends State<NewGroupPage> {
                 ],
               ),
               const SizedBox(height: 8),
-              Wrap(
-                spacing: 8.0,
-                runSpacing: 4.0,
-                children: _memberChips.toList(),
-              ),
+              for (final (i, member) in _members.indexed)
+                ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 0),
+                  leading: WeightedAvatar(
+                    index: i,
+                    weights: _members.map((m) => m.shares).toList(),
+                    child: Text(member.device.name.initials),
+                  ),
+                  title: Text(
+                    member.device.name,
+                    softWrap: false,
+                    overflow: TextOverflow.fade,
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      NumberInput(
+                        value: member.shares,
+                        onUpdate: (newWeight) {
+                          setState(() {
+                            if (newWeight > 0) {
+                              _members[i] = Member(member.device, newWeight);
+                            }
+                          });
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _members.removeAt(i);
+                          });
+                        },
+                        icon: const Icon(Icons.delete),
+                      )
+                    ],
+                  ),
+                ),
             ],
           ),
           OptionTile(
@@ -219,12 +326,12 @@ class _NewGroupPageState extends State<NewGroupPage> {
                   const Icon(Icons.person),
                   Expanded(
                     child: Slider(
-                      value: min(_threshold, _members.length).toDouble(),
+                      value: min(_threshold, _shareCount).toDouble(),
                       min: 0,
-                      max: _members.length.toDouble(),
-                      divisions: max(1, _members.length),
+                      max: _shareCount.toDouble(),
+                      divisions: max(1, _shareCount),
                       label: '$_threshold',
-                      onChanged: _members.length > _minThreshold
+                      onChanged: _shareCount > _minThreshold
                           ? (value) => setState(() {
                                 _setThreshold(value.round());
                               })
