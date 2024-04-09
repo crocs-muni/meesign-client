@@ -39,7 +39,8 @@ class ProtocolException implements Exception {
 }
 
 class ProtocolData {
-  final Uint8List context, data;
+  final Uint8List context;
+  final List<Uint8List> data;
   final int recipient;
   ProtocolData(this.context, this.data, this.recipient);
 }
@@ -63,9 +64,10 @@ class Error {
 }
 
 class ProtocolWrapper {
-  static Uint8List keygen(int protoId, {bool withCard = false}) {
+  static Uint8List keygen(int protoId,
+      {bool withCard = false, int shares = 1}) {
     return using((Arena alloc) {
-      final proto = _lib.protocol_keygen(protoId, withCard);
+      final proto = _lib.protocol_keygen(protoId, withCard, shares);
       final context = alloc.using(
         _lib.protocol_serialize(proto),
         _lib.buffer_free,
@@ -75,11 +77,11 @@ class ProtocolWrapper {
     });
   }
 
-  static Uint8List init(int protoId, Uint8List group) {
+  static Uint8List init(int protoId, Uint8List group, {int shares = 1}) {
     return using((Arena alloc) {
       final groupBuf = group.dupToNative(alloc);
 
-      final proto = _lib.protocol_init(protoId, groupBuf, group.length);
+      final proto = _lib.protocol_init(protoId, groupBuf, group.length, shares);
       final context = alloc.using(
         _lib.protocol_serialize(proto),
         _lib.buffer_free,
@@ -89,37 +91,47 @@ class ProtocolWrapper {
     });
   }
 
-  static ProtocolData _advanceWorker(Uint8List context, Uint8List data) {
+  static ProtocolData _advanceWorker(Uint8List context, List<List<int>> data) {
     return using((Arena alloc) {
       final ctxBuf = context.dupToNative(alloc);
-      final dataBuf = data.dupToNative(alloc);
       final error = alloc.using(Error(), Error.free);
 
       final proto = _lib.protocol_deserialize(ctxBuf, context.length);
-      final dataOut = alloc.using(
-        _lib.protocol_advance(
-          proto,
-          dataBuf,
-          data.length,
-          error.ptr,
-        ),
-        _lib.buffer_free,
-      );
+
+      final List<Uint8List> dartDataOut = [];
+      int recipient = Recipient.Unknown;
+
+      for (final (i, chunk) in data.indexed) {
+        final dataBuf = chunk.dupToNative(alloc);
+        final dataOut = alloc.using(
+          _lib.protocol_advance(
+            proto,
+            i,
+            dataBuf,
+            chunk.length,
+            error.ptr,
+          ),
+          _lib.buffer_free,
+        );
+        if (error.occured) throw ProtocolException(error.message);
+        dartDataOut.add(dataOut.dupToDart());
+        recipient = dataOut.rec;
+      }
+
       final contextOut = alloc.using(
         _lib.protocol_serialize(proto),
         _lib.buffer_free,
       );
 
-      if (error.occured) throw ProtocolException(error.message);
       return ProtocolData(
         contextOut.dupToDart(),
-        dataOut.dupToDart(),
-        dataOut.rec,
+        dartDataOut,
+        recipient,
       );
     });
   }
 
-  static Future<ProtocolData> advance(Uint8List context, Uint8List data) {
+  static Future<ProtocolData> advance(Uint8List context, List<List<int>> data) {
     return Isolate.run(() => _advanceWorker(context, data));
   }
 

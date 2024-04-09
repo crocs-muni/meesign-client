@@ -5,6 +5,7 @@ import 'dart:io' as io;
 import 'dart:io';
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:test/test.dart';
 
@@ -83,17 +84,29 @@ void main() {
     TaskRepository<T> taskRepository,
     KeyType keyType,
     Protocol protocol, {
-    required int n,
+    int? n,
+    List<int>? shares,
     required int t,
     required Future<void> Function(TaskRepository, Group) createTask,
   }) async {
+    n ??= shares!.length;
+    shares ??= List.filled(n, 1);
+
     final ds = await Future.wait(
       [for (var i = 0; i < n; ++i) deviceRepository.register('d$i')],
     );
 
     await Future.wait(ds.map((d) => groupRepository.subscribe(d.id)));
+    final members = ds
+        .expandIndexed((i, d) => Iterable.generate(shares![i], (_) => d))
+        .toList();
     await groupRepository.group(
-        '$t $n ${keyType.name} ${protocol.name}', ds, t, protocol, keyType);
+      '$t of ${shares.join(' ')} ${keyType.name} ${protocol.name}',
+      members,
+      t,
+      protocol,
+      keyType,
+    );
     await approveAllFirst(groupRepository, ds);
     final gs = await Future.wait(
       ds.map((d) => groupRepository.observeGroups(d.id).firstElement()),
@@ -108,12 +121,17 @@ void main() {
     );
   }
 
-  Future<void> testSignPdf({required int n, required int t}) async {
+  Future<void> testSignPdf({
+    int? n,
+    List<int>? shares,
+    required int t,
+  }) async {
     final files = await testRepository(
       fileRepository,
       KeyType.signPdf,
       Protocol.gg18,
       n: n,
+      shares: shares,
       t: t,
       createTask: (_, Group g) async {
         final data = await io.File(testFilePath).readAsBytes();
@@ -126,8 +144,12 @@ void main() {
     }
   }
 
-  Future<void> testSignChallenge(Protocol protocol,
-      {required int n, required int t}) async {
+  Future<void> testSignChallenge(
+    Protocol protocol, {
+    int? n,
+    List<int>? shares,
+    required int t,
+  }) async {
     final rng = Random();
     final message = List.generate(1024, (_) => rng.nextInt(256));
 
@@ -136,6 +158,7 @@ void main() {
       KeyType.signChallenge,
       protocol,
       n: n,
+      shares: shares,
       t: t,
       createTask: (_, Group g) async {
         await challengeRepository.sign('test challenge', message, g.id);
@@ -145,7 +168,11 @@ void main() {
     // TODO: verify signatures
   }
 
-  Future<void> testDecrypt({required int n, required int t}) async {
+  Future<void> testDecrypt({
+    int? n,
+    List<int>? shares,
+    required int t,
+  }) async {
     final rng = Random();
     final message = List.generate(1024, (_) => rng.nextInt(256));
 
@@ -154,6 +181,7 @@ void main() {
       KeyType.decrypt,
       Protocol.elgamal,
       n: n,
+      shares: shares,
       t: t,
       createTask: (_, Group g) async {
         await decryptRepository.encrypt(
@@ -169,6 +197,7 @@ void main() {
   group('sign PDF', () {
     test('2-3', () => testSignPdf(n: 3, t: 2));
     test('3-3', () => testSignPdf(n: 3, t: 3));
+    test('3-[1, 2, 3]', () => testSignPdf(shares: [1, 2, 3], t: 3));
     test('15-20', () => testSignPdf(n: 20, t: 15), tags: 'large');
   });
 
@@ -176,12 +205,16 @@ void main() {
     group('gg18', () {
       test('2-3', () => testSignChallenge(Protocol.gg18, n: 3, t: 2));
       test('3-3', () => testSignChallenge(Protocol.gg18, n: 3, t: 3));
+      test('3-[1, 2, 3]',
+          () => testSignChallenge(Protocol.gg18, shares: [1, 2, 3], t: 3));
       test('15-20', () => testSignChallenge(Protocol.gg18, n: 20, t: 15),
           tags: 'large');
     });
     group('frost', () {
       test('2-3', () => testSignChallenge(Protocol.frost, n: 3, t: 2));
       test('3-3', () => testSignChallenge(Protocol.frost, n: 3, t: 3));
+      test('3-[1, 2, 3]',
+          () => testSignChallenge(Protocol.frost, shares: [1, 2, 3], t: 3));
       test('15-20', () => testSignChallenge(Protocol.frost, n: 20, t: 15),
           tags: 'large');
     });
@@ -190,11 +223,14 @@ void main() {
   group('decrypt', () {
     test('2-3', () => testDecrypt(n: 3, t: 2));
     test('3-3', () => testDecrypt(n: 3, t: 3));
+    test('3-[1, 2, 3]', () => testDecrypt(shares: [1, 2, 3], t: 3));
     test('15-20', () => testDecrypt(n: 20, t: 15), tags: 'large');
   });
 
   tearDown(() async {
     try {
+      // FIXME: not all db updates are written when the test finishes
+      await Future.delayed(const Duration(milliseconds: 100));
       await database.close();
       appDir.deleteSync(recursive: true);
     } catch (_) {}

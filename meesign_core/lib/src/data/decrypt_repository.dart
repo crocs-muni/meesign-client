@@ -70,12 +70,13 @@ class DecryptRepository extends TaskRepository<Decrypt> {
   }
 
   @override
-  Future<db.Task> initTask(Uuid did, db.Task task) async {
+  Future<db.Task> initTask(Uuid did, db.Task task, rpc.Task rpcTask) async {
     final group = await _taskDao.getGroup(did.bytes, gid: task.gid);
     return task.copyWith(
       context: Value(ProtocolWrapper.init(
         group.protocol.toNative(),
         group.context,
+        shares: rpcTask.data.length,
       )),
     );
   }

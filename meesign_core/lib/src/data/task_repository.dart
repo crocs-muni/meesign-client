@@ -96,7 +96,7 @@ abstract class TaskRepository<T> {
   @visibleForOverriding
   Future<void> createTask(Uuid did, rpc.Task rpcTask);
   @visibleForOverriding
-  Future<db.Task> initTask(Uuid did, db.Task task);
+  Future<db.Task> initTask(Uuid did, db.Task task, rpc.Task rpcTask);
   @visibleForOverriding
   Future<void> finishTask(Uuid did, db.Task task, rpc.Task rpcTask);
 
@@ -141,16 +141,18 @@ abstract class TaskRepository<T> {
     if (rpcTask.round <= task.round) return task;
     if (rpcTask.round != task.round + 1) throw StateException();
 
-    if (task.round == 0) task = await initTask(did, task);
+    if (task.round == 0) task = await initTask(did, task, rpcTask);
     final res = await ProtocolWrapper.advance(
       task.context!,
-      rpcTask.data.first as Uint8List,
+      rpcTask.data,
     );
     // TODO: rollback if we fail to deliver the update
     bool forCard = res.recipient == Recipient.Card;
-    if (!forCard) {
+    if (forCard) {
+      if (res.data.length == 1) throw StateException();
+    } else {
       try {
-        await _taskSource.update(did, task.id, [res.data], task.attempt);
+        await _taskSource.update(did, task.id, res.data, task.attempt);
       } on GrpcError catch (e) {
         // FIXME: avoid matching error strings
         if (e.message == 'Stale update') return task;
@@ -162,7 +164,7 @@ abstract class TaskRepository<T> {
       state: forCard ? TaskState.needsCard : TaskState.running,
       round: task.round + 1,
       context: Value(res.context),
-      data: Value(forCard ? res.data : null),
+      data: Value(forCard ? res.data.first : null),
     );
   }
 
@@ -320,10 +322,10 @@ abstract class TaskRepository<T> {
       int recipient;
       do {
         final resp = await card.transceive(data);
-        final res = await ProtocolWrapper.advance(context, resp);
+        final res = await ProtocolWrapper.advance(context, [resp]);
         // TODO: save intermediate res to db?
         context = res.context;
-        data = res.data;
+        data = res.data.first;
         recipient = res.recipient;
       } while (recipient != Recipient.Server);
 
