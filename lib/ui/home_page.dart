@@ -16,7 +16,7 @@ import 'package:meesign_core/meesign_card.dart';
 import 'package:meesign_core/meesign_data.dart';
 import 'package:meesign_core/meesign_model.dart';
 import 'package:mime/mime.dart';
-import 'package:open_file/open_file.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:share_plus/share_plus.dart';
@@ -167,7 +167,7 @@ void _openFile(String path) {
   } else {
     // FIXME: try to avoid open_file package,
     // it seems to be of low quality
-    OpenFile.open(path);
+    OpenFilex.open(path);
   }
 }
 
