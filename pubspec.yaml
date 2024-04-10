@@ -39,7 +39,7 @@ dependencies:
   animations: ^2.0.2
   # TODO: fully migrate to file_selector,
   # file_picker has suboptimal linux impl
-  file_picker: ^6.0.0
+  file_picker: ^8.0.0+1
   flutter_nfc_kit: ^3.1.0
   path_provider: ^2.0.8
   # FIXME: find an alternative, open_file seems to be
@@ -51,7 +51,7 @@ dependencies:
   path: ^1.8.0
   async: ^2.8.2
   dart_pcsc: ^2.0.0
-  mobile_scanner: ^3.3.0
+  mobile_scanner: ^4.0.1
   characters: ^1.2.0
   flutter_svg: ^2.0.7
   url_launcher: ^6.1.2
@@ -64,7 +64,7 @@ dependencies:
   file_selector: ^1.0.0
   collection: ^1.17.1
   mime: ^1.0.4
-  share_plus: ^7.2.1
+  share_plus: ^8.0.3
   image_picker: ^1.0.7
 
 dev_dependencies:
