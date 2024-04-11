@@ -56,11 +56,13 @@ class FlexibleAvatarAppBar extends StatelessWidget {
     return Column(
       children: [
         Expanded(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 32),
-            child: FittedBox(
-              child: CircleAvatar(
-                child: Text(name.initials),
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 32),
+              child: FittedBox(
+                child: CircleAvatar(
+                  child: Text(name.initials),
+                ),
               ),
             ),
           ),
