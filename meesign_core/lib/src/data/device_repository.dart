@@ -21,6 +21,7 @@ class DeviceRepository {
     final resp = await _dispatcher.unauth.register(
       rpc.RegistrationRequest()
         ..name = name
+        ..kind = rpc.DeviceKind.USER
         ..csr = key.csr,
     );
 
@@ -29,9 +30,13 @@ class DeviceRepository {
     // TODO: store key in db for consistency?
     await _keyStore.store(did, pkcs12);
     await _deviceDao.insertDevice(
-      db.DevicesCompanion.insert(id: did.bytes, name: name),
+      db.DevicesCompanion.insert(
+        id: did.bytes,
+        name: name,
+        kind: DeviceKind.user,
+      ),
     );
-    return Device(name, did, DateTime.now());
+    return Device(name, did, DeviceKind.user, DateTime.now());
   }
 
   Future<Iterable<Device>> _fetchAll() async {
@@ -41,6 +46,7 @@ class DeviceRepository {
       (device) => Device(
         device.name,
         Uuid(device.identifier),
+        DeviceKindConversion.fromNetwork(device.kind),
         DateTime.fromMillisecondsSinceEpoch(
           device.lastActive.toInt() * 1000,
         ),
@@ -72,6 +78,7 @@ class DeviceRepository {
           .map((device) => db.DevicesCompanion.insert(
                 id: device.id.bytes,
                 name: device.name,
+                kind: device.kind,
               ));
       await _deviceDao.upsertDevices(updates);
 

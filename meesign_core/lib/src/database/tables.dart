@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 
+import '../model/device.dart';
 import '../model/key_type.dart';
 import '../model/protocol.dart';
 import '../model/task.dart';
@@ -7,6 +8,7 @@ import '../model/task.dart';
 class Devices extends Table {
   BlobColumn get id => blob()();
   TextColumn get name => text()();
+  TextColumn get kind => textEnum<DeviceKind>()();
 
   @override
   Set<Column> get primaryKey => {id};

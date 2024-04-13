@@ -10,7 +10,7 @@ class QrCoder {
 
   String encode(Device device) {
     final base64Id = _base64encoder.convert(device.id.bytes);
-    return '$mime;$base64Id,${device.name}';
+    return '$mime;$base64Id,${device.name},${device.kind.name}';
   }
 
   Device decode(String? data) {
@@ -18,13 +18,13 @@ class QrCoder {
       throw const FormatException('Incorrect QR data format');
     }
 
-    final args = data.split(';')[1];
-    int i = args.indexOf(',');
-    if (i == -1) throw const FormatException('Malformed QR data');
+    final args = data.split(';')[1].split(',');
+    if (args.length != 3) throw const FormatException('Malformed QR data');
 
-    final id = _base64decoder.convert(args.substring(0, i));
-    final name = args.substring(i + 1);
+    final id = _base64decoder.convert(args[0]);
+    final name = args[1];
+    final kind = DeviceKind.values.firstWhere((kind) => kind.name == args[2]);
 
-    return Device(name, Uuid(id), DateTime.now());
+    return Device(name, Uuid(id), kind, DateTime.now());
   }
 }

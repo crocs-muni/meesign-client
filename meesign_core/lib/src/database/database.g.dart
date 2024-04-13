@@ -18,8 +18,14 @@ class $DevicesTable extends Devices with TableInfo<$DevicesTable, Device> {
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
       'name', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
   @override
-  List<GeneratedColumn> get $columns => [id, name];
+  late final GeneratedColumnWithTypeConverter<DeviceKind, String> kind =
+      GeneratedColumn<String>('kind', aliasedName, false,
+              type: DriftSqlType.string, requiredDuringInsert: true)
+          .withConverter<DeviceKind>($DevicesTable.$converterkind);
+  @override
+  List<GeneratedColumn> get $columns => [id, name, kind];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -41,6 +47,7 @@ class $DevicesTable extends Devices with TableInfo<$DevicesTable, Device> {
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
+    context.handle(_kindMeta, const VerificationResult.success());
     return context;
   }
 
@@ -54,6 +61,8 @@ class $DevicesTable extends Devices with TableInfo<$DevicesTable, Device> {
           .read(DriftSqlType.blob, data['${effectivePrefix}id'])!,
       name: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      kind: $DevicesTable.$converterkind.fromSql(attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}kind'])!),
     );
   }
 
@@ -61,17 +70,24 @@ class $DevicesTable extends Devices with TableInfo<$DevicesTable, Device> {
   $DevicesTable createAlias(String alias) {
     return $DevicesTable(attachedDatabase, alias);
   }
+
+  static JsonTypeConverter2<DeviceKind, String, String> $converterkind =
+      const EnumNameConverter<DeviceKind>(DeviceKind.values);
 }
 
 class Device extends DataClass implements Insertable<Device> {
   final Uint8List id;
   final String name;
-  const Device({required this.id, required this.name});
+  final DeviceKind kind;
+  const Device({required this.id, required this.name, required this.kind});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<Uint8List>(id);
     map['name'] = Variable<String>(name);
+    {
+      map['kind'] = Variable<String>($DevicesTable.$converterkind.toSql(kind));
+    }
     return map;
   }
 
@@ -79,6 +95,7 @@ class Device extends DataClass implements Insertable<Device> {
     return DevicesCompanion(
       id: Value(id),
       name: Value(name),
+      kind: Value(kind),
     );
   }
 
@@ -88,6 +105,8 @@ class Device extends DataClass implements Insertable<Device> {
     return Device(
       id: serializer.fromJson<Uint8List>(json['id']),
       name: serializer.fromJson<String>(json['name']),
+      kind: $DevicesTable.$converterkind
+          .fromJson(serializer.fromJson<String>(json['kind'])),
     );
   }
   @override
@@ -96,64 +115,79 @@ class Device extends DataClass implements Insertable<Device> {
     return <String, dynamic>{
       'id': serializer.toJson<Uint8List>(id),
       'name': serializer.toJson<String>(name),
+      'kind':
+          serializer.toJson<String>($DevicesTable.$converterkind.toJson(kind)),
     };
   }
 
-  Device copyWith({Uint8List? id, String? name}) => Device(
+  Device copyWith({Uint8List? id, String? name, DeviceKind? kind}) => Device(
         id: id ?? this.id,
         name: name ?? this.name,
+        kind: kind ?? this.kind,
       );
   @override
   String toString() {
     return (StringBuffer('Device(')
           ..write('id: $id, ')
-          ..write('name: $name')
+          ..write('name: $name, ')
+          ..write('kind: $kind')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash($driftBlobEquality.hash(id), name);
+  int get hashCode => Object.hash($driftBlobEquality.hash(id), name, kind);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Device &&
           $driftBlobEquality.equals(other.id, this.id) &&
-          other.name == this.name);
+          other.name == this.name &&
+          other.kind == this.kind);
 }
 
 class DevicesCompanion extends UpdateCompanion<Device> {
   final Value<Uint8List> id;
   final Value<String> name;
+  final Value<DeviceKind> kind;
   final Value<int> rowid;
   const DevicesCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
+    this.kind = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   DevicesCompanion.insert({
     required Uint8List id,
     required String name,
+    required DeviceKind kind,
     this.rowid = const Value.absent(),
   })  : id = Value(id),
-        name = Value(name);
+        name = Value(name),
+        kind = Value(kind);
   static Insertable<Device> custom({
     Expression<Uint8List>? id,
     Expression<String>? name,
+    Expression<String>? kind,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
+      if (kind != null) 'kind': kind,
       if (rowid != null) 'rowid': rowid,
     });
   }
 
   DevicesCompanion copyWith(
-      {Value<Uint8List>? id, Value<String>? name, Value<int>? rowid}) {
+      {Value<Uint8List>? id,
+      Value<String>? name,
+      Value<DeviceKind>? kind,
+      Value<int>? rowid}) {
     return DevicesCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
+      kind: kind ?? this.kind,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -167,6 +201,10 @@ class DevicesCompanion extends UpdateCompanion<Device> {
     if (name.present) {
       map['name'] = Variable<String>(name.value);
     }
+    if (kind.present) {
+      map['kind'] =
+          Variable<String>($DevicesTable.$converterkind.toSql(kind.value));
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -178,6 +216,7 @@ class DevicesCompanion extends UpdateCompanion<Device> {
     return (StringBuffer('DevicesCompanion(')
           ..write('id: $id, ')
           ..write('name: $name, ')
+          ..write('kind: $kind, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();

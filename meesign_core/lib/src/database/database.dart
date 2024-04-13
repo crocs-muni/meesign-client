@@ -6,7 +6,8 @@ import 'package:path/path.dart' as path_pkg;
 
 import 'daos.dart';
 import 'tables.dart';
-// FIXME: bug in modular generation? necessary for TaskState
+// FIXME: bug in modular generation? necessary for TaskState, DeviceKind
+import '../model/device.dart';
 import '../model/key_type.dart';
 import '../model/protocol.dart';
 import '../model/task.dart';
