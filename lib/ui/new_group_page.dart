@@ -127,6 +127,49 @@ class WeightedAvatar extends StatelessWidget {
   }
 }
 
+class WarningBanner extends StatelessWidget {
+  final String title;
+  final String text;
+
+  const WarningBanner({
+    super.key,
+    required this.title,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      color: colorScheme.errorContainer,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.warning,
+                color: colorScheme.error,
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(text),
+        ],
+      ),
+    );
+  }
+}
+
 class NewGroupPage extends StatefulWidget {
   const NewGroupPage({super.key});
 
@@ -211,12 +254,42 @@ class _NewGroupPageState extends State<NewGroupPage> {
     );
   }
 
+  // TODO: offer fix application?
+  ({String title, String text})? _getWarning() {
+    final gcd = _members.fold(_threshold, (gcd, m) => gcd.gcd(m.shares));
+    // fix must satisfy fix * _threshold ~/ gcd >= _minThreshold
+    final fix = (_minThreshold * gcd / _threshold).ceil();
+    if (_members.length > 1 && fix < gcd) {
+      final newThreshold = fix * _threshold ~/ gcd;
+      final newShares = _members.map((m) => fix * m.shares ~/ gcd).join(', ');
+      return (
+        title: 'Unnecessarily many shares',
+        text: 'You can achieve the same voting rights distribution by setting '
+            'threshold to $newThreshold and shares to ($newShares). '
+            'This may improve performance.',
+      );
+    }
+
+    if (_shareCount > 20 && _protocol == Protocol.gg18) {
+      return (
+        title: 'Many shares',
+        text: 'You may experience degraded performance with certain protocols '
+            'if the share count is too high. Consider removing some members or '
+            'lowering the number of shares they receive if this poses an issue.',
+      );
+    }
+
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final membersButtonStyle = _memberErr != null
         ? FilledButton.styleFrom(
             backgroundColor: Theme.of(context).colorScheme.errorContainer)
         : null;
+
+    final warning = _getWarning();
 
     return Scaffold(
       appBar: AppBar(
@@ -343,6 +416,11 @@ class _NewGroupPageState extends State<NewGroupPage> {
               ),
             ],
           ),
+          if (warning != null)
+            WarningBanner(
+              title: warning.title,
+              text: warning.text,
+            ),
           OptionTile(
             title: 'Purpose',
             children: [
