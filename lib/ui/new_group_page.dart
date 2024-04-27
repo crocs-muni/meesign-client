@@ -15,28 +15,70 @@ class OptionTile extends StatelessWidget {
   final String title;
   final EdgeInsets padding;
   final List<Widget> children;
+  final Widget? help;
 
   const OptionTile({
     super.key,
     required this.title,
     this.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
     this.children = const [],
+    this.help,
   });
 
   @override
   Widget build(BuildContext context) {
+    Widget? helpButton;
+    if (help != null) {
+      helpButton = SizedBox.square(
+        dimension: 24,
+        child: IconButton(
+          padding: const EdgeInsets.all(0),
+          iconSize: 18,
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  icon: const Icon(Icons.help),
+                  title: Text(title),
+                  content: SingleChildScrollView(
+                    child: help,
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('OK'),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+          icon: const Icon(Icons.help),
+        ),
+      );
+    }
+
     return Padding(
       padding: padding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
+        children: [
+          Row(
+            children: [
               Text(
                 title,
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
-              const SizedBox(height: 8),
-            ] +
-            children,
+              const SizedBox(width: 8),
+              if (helpButton != null) helpButton,
+            ],
+          ),
+          const SizedBox(height: 8),
+          ...children,
+        ],
       ),
     );
   }
@@ -44,11 +86,11 @@ class OptionTile extends StatelessWidget {
 
 class NumberInput extends StatelessWidget {
   final int value;
-  final void Function(int) onUpdate;
+  final void Function(int)? onUpdate;
 
   const NumberInput({
     required this.value,
-    required this.onUpdate,
+    this.onUpdate,
     super.key,
   });
 
@@ -59,7 +101,7 @@ class NumberInput extends StatelessWidget {
       children: [
         IconButton(
           icon: const Icon(Icons.chevron_left),
-          onPressed: () => onUpdate(value - 1),
+          onPressed: onUpdate != null ? () => onUpdate!(value - 1) : null,
         ),
         Container(
           alignment: Alignment.center,
@@ -71,7 +113,7 @@ class NumberInput extends StatelessWidget {
         ),
         IconButton(
           icon: const Icon(Icons.chevron_right),
-          onPressed: () => onUpdate(value + 1),
+          onPressed: onUpdate != null ? () => onUpdate!(value + 1) : null,
         ),
       ],
     );
@@ -327,6 +369,38 @@ class _NewGroupPageState extends State<NewGroupPage> {
           ),
           OptionTile(
             title: 'Members',
+            help: const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'By default, each member receives one share of the group\'s '
+                  'private key. As a result, all members have equal voting '
+                  'rights.\n\n'
+                  'You can change the number of key shares a given member '
+                  'receives using the arrows next to its name. The circle '
+                  'around user\'s avatar visualizes its voting power.\n\n'
+                  'For example, the user below receives one share which '
+                  'amounts to one third of the total number of votes.',
+                ),
+                SizedBox(height: 16),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    WeightedAvatar(
+                      index: 0,
+                      weights: [1, 2],
+                      child: Text('E'),
+                    ),
+                    SizedBox(width: 16),
+                    Text('example'),
+                    SizedBox(width: 8),
+                    NumberInput(
+                      value: 1,
+                    ),
+                  ],
+                ),
+              ],
+            ),
             children: [
               Row(
                 children: [
@@ -393,6 +467,13 @@ class _NewGroupPageState extends State<NewGroupPage> {
           ),
           OptionTile(
             title: 'Threshold',
+            help: const Text(
+              'No group task can succeed unless at least the specified number '
+              'of positive votes is gathered from the group\'s members.\n\n'
+              'By carefully setting up the threshold and the number of shares '
+              'each user receives, you can enforce that only certain subsets '
+              'of the group can proceed with a given task.',
+            ),
             children: [
               Row(
                 children: [
