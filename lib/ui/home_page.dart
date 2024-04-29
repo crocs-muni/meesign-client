@@ -35,6 +35,7 @@ import '../widget/empty_list.dart';
 import '../widget/entity_chip.dart';
 import 'card_reader_page.dart';
 import 'device_page.dart';
+import 'group_page.dart';
 import 'home_state.dart';
 
 class TaskStateIndicator extends StatelessWidget {
@@ -353,6 +354,21 @@ class GroupsSubPage extends StatelessWidget {
                 onPressed: () => model.joinGroup(task, agree: false),
               ),
             ],
+            actions: [
+              FilledButton.tonal(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (context) => GroupPage(
+                        group: group,
+                      ),
+                    ),
+                  );
+                },
+                child: const Text('View'),
+              ),
+            ],
             cardActions: [
               FilledButton.tonal(
                 onPressed: () => _launchCardReader(
@@ -361,17 +377,6 @@ class GroupsSubPage extends StatelessWidget {
               ),
             ],
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text('Threshold: ${group.threshold} / ${group.shares}'),
-                  Text('Purpose: ${[
-                    'Sign PDF',
-                    'Challenge',
-                    'Decrypt'
-                  ][group.keyType.index]}'),
-                ],
-              ),
               Container(
                 alignment: Alignment.topLeft,
                 child: Wrap(
