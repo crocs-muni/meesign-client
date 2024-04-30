@@ -135,19 +135,17 @@ class TaskDao extends DatabaseAccessor<Database> with _$TaskDaoMixin {
     final onTask =
         tasks.id.equalsExp(files.tid) & tasks.did.equalsExp(files.did);
     final onGroup = groups.id.equalsExp(tasks.gid);
-    return query
-        .join([
-          innerJoin(tasks, onTask),
-          innerJoin(groups, onGroup),
-        ])
-        .map(
-          (res) => FileTask(
-            res.readTable(tasks),
-            res.readTable(files),
-            res.readTable(groups),
-          ),
-        )
-        .watch();
+    return query.join([
+      innerJoin(tasks, onTask),
+      innerJoin(groups, onGroup),
+    ]).asyncMap((res) async {
+      final group = res.readTable(groups);
+      return FileTask(
+        res.readTable(tasks),
+        res.readTable(files),
+        PopulatedGroup(group, await getGroupMembers(group.tid)),
+      );
+    }).watch();
   }
 
   Future<void> insertChallenge(ChallengesCompanion entity) =>
@@ -164,19 +162,17 @@ class TaskDao extends DatabaseAccessor<Database> with _$TaskDaoMixin {
     final onTask = tasks.id.equalsExp(challenges.tid) &
         tasks.did.equalsExp(challenges.did);
     final onGroup = groups.id.equalsExp(tasks.gid);
-    return query
-        .join([
-          innerJoin(tasks, onTask),
-          innerJoin(groups, onGroup),
-        ])
-        .map(
-          (res) => ChallengeTask(
-            res.readTable(tasks),
-            res.readTable(challenges),
-            res.readTable(groups),
-          ),
-        )
-        .watch();
+    return query.join([
+      innerJoin(tasks, onTask),
+      innerJoin(groups, onGroup),
+    ]).asyncMap((res) async {
+      final group = res.readTable(groups);
+      return ChallengeTask(
+        res.readTable(tasks),
+        res.readTable(challenges),
+        PopulatedGroup(group, await getGroupMembers(group.tid)),
+      );
+    }).watch();
   }
 
   Future<void> insertDecrypt(DecryptsCompanion entity) =>
@@ -195,19 +191,17 @@ class TaskDao extends DatabaseAccessor<Database> with _$TaskDaoMixin {
     final onTask =
         tasks.id.equalsExp(decrypts.tid) & tasks.did.equalsExp(decrypts.did);
     final onGroup = groups.id.equalsExp(tasks.gid);
-    return query
-        .join([
-          innerJoin(tasks, onTask),
-          innerJoin(groups, onGroup),
-        ])
-        .map(
-          (res) => DecryptTask(
-            res.readTable(tasks),
-            res.readTable(decrypts),
-            res.readTable(groups),
-          ),
-        )
-        .watch();
+    return query.join([
+      innerJoin(tasks, onTask),
+      innerJoin(groups, onGroup),
+    ]).asyncMap((res) async {
+      final group = res.readTable(groups);
+      return DecryptTask(
+        res.readTable(tasks),
+        res.readTable(decrypts),
+        PopulatedGroup(group, await getGroupMembers(group.tid)),
+      );
+    }).watch();
   }
 }
 
@@ -227,21 +221,21 @@ class GroupTask {
 
 class FileTask {
   final Task task;
-  final Group group;
+  final PopulatedGroup group;
   final File file;
   FileTask(this.task, this.file, this.group);
 }
 
 class ChallengeTask {
   final Task task;
-  final Group group;
+  final PopulatedGroup group;
   final Challenge challenge;
   ChallengeTask(this.task, this.challenge, this.group);
 }
 
 class DecryptTask {
   final Task task;
-  final Group group;
+  final PopulatedGroup group;
   final Decrypt decrypt;
   DecryptTask(this.task, this.decrypt, this.group);
 }
