@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meesign_core/meesign_model.dart';
 
 import '../ui/device_page.dart';
+import '../ui/group_page.dart';
 import '../util/chars.dart';
 
 class EntityChip extends StatelessWidget {
@@ -50,6 +51,27 @@ class DeviceChip extends StatelessWidget {
           context,
           MaterialPageRoute<void>(
             builder: (context) => DevicePage(device: device),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class GroupChip extends StatelessWidget {
+  final Group group;
+
+  const GroupChip({super.key, required this.group});
+
+  @override
+  Widget build(BuildContext context) {
+    return EntityChip(
+      name: group.name,
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute<void>(
+            builder: (_) => GroupPage(group: group),
           ),
         );
       },

@@ -284,7 +284,7 @@ class SigningSubPage extends StatelessWidget {
           return TaskTile(
             task: task,
             name: task.info.basename,
-            actionChip: EntityChip(name: task.info.group.name),
+            actionChip: GroupChip(group: task.info.group),
             actions: <Widget>[
               FilledButton.tonal(
                 child: const Text('View'),
@@ -414,7 +414,7 @@ class ChallengeSubPage extends StatelessWidget {
           return TaskTile(
             task: task,
             name: task.info.name,
-            actionChip: EntityChip(name: task.info.group.name),
+            actionChip: GroupChip(group: task.info.group),
             approveActions: [
               FilledButton.tonal(
                 child: const Text('Sign'),
@@ -561,7 +561,7 @@ class DecryptSubPage extends StatelessWidget {
             task: task,
             name: task.info.name,
             desc: statusMessage(task),
-            actionChip: EntityChip(name: task.info.group.name),
+            actionChip: GroupChip(group: task.info.group),
             approveActions: [
               FilledButton.tonal(
                 child: const Text('Decrypt'),
