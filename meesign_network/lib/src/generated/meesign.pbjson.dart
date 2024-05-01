@@ -150,6 +150,10 @@ const GroupRequest$json = {
       '6': '.meesign.KeyType',
       '10': 'keyType'
     },
+    {'1': 'note', '3': 6, '4': 1, '5': 9, '9': 0, '10': 'note', '17': true},
+  ],
+  '8': [
+    {'1': '_note'},
   ],
 };
 
@@ -158,7 +162,8 @@ final $typed_data.Uint8List groupRequestDescriptor = $convert.base64Decode(
     'CgxHcm91cFJlcXVlc3QSEgoEbmFtZRgBIAEoCVIEbmFtZRIdCgpkZXZpY2VfaWRzGAIgAygMUg'
     'lkZXZpY2VJZHMSHAoJdGhyZXNob2xkGAMgASgNUgl0aHJlc2hvbGQSMQoIcHJvdG9jb2wYBCAB'
     'KA4yFS5tZWVzaWduLlByb3RvY29sVHlwZVIIcHJvdG9jb2wSKwoIa2V5X3R5cGUYBSABKA4yEC'
-    '5tZWVzaWduLktleVR5cGVSB2tleVR5cGU=');
+    '5tZWVzaWduLktleVR5cGVSB2tleVR5cGUSFwoEbm90ZRgGIAEoCUgAUgRub3RliAEBQgcKBV9u'
+    'b3Rl');
 
 @$core.Deprecated('Use groupDescriptor instead')
 const Group$json = {
@@ -184,6 +189,10 @@ const Group$json = {
       '10': 'keyType'
     },
     {'1': 'device_ids', '3': 6, '4': 3, '5': 12, '10': 'deviceIds'},
+    {'1': 'note', '3': 7, '4': 1, '5': 9, '9': 0, '10': 'note', '17': true},
+  ],
+  '8': [
+    {'1': '_note'},
   ],
 };
 
@@ -192,7 +201,8 @@ final $typed_data.Uint8List groupDescriptor = $convert.base64Decode(
     'CgVHcm91cBIeCgppZGVudGlmaWVyGAEgASgMUgppZGVudGlmaWVyEhIKBG5hbWUYAiABKAlSBG'
     '5hbWUSHAoJdGhyZXNob2xkGAMgASgNUgl0aHJlc2hvbGQSMQoIcHJvdG9jb2wYBCABKA4yFS5t'
     'ZWVzaWduLlByb3RvY29sVHlwZVIIcHJvdG9jb2wSKwoIa2V5X3R5cGUYBSABKA4yEC5tZWVzaW'
-    'duLktleVR5cGVSB2tleVR5cGUSHQoKZGV2aWNlX2lkcxgGIAMoDFIJZGV2aWNlSWRz');
+    'duLktleVR5cGVSB2tleVR5cGUSHQoKZGV2aWNlX2lkcxgGIAMoDFIJZGV2aWNlSWRzEhcKBG5v'
+    'dGUYByABKAlIAFIEbm90ZYgBAUIHCgVfbm90ZQ==');
 
 @$core.Deprecated('Use devicesRequestDescriptor instead')
 const DevicesRequest$json = {

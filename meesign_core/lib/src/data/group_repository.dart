@@ -32,8 +32,9 @@ class GroupRepository extends TaskRepository<Group> {
     List<Member> members,
     int threshold,
     Protocol protocol,
-    KeyType keyType,
-  ) async {
+    KeyType keyType, {
+    String? note,
+  }) async {
     await _dispatcher.unauth.group(
       rpc.GroupRequest()
         ..deviceIds.addAll(members.expand((member) =>
@@ -41,7 +42,8 @@ class GroupRepository extends TaskRepository<Group> {
         ..name = name
         ..threshold = threshold
         ..protocol = protocol.toNetwork()
-        ..keyType = keyType.toNetwork(),
+        ..keyType = keyType.toNetwork()
+        ..note = note ?? '',
     );
   }
 
@@ -80,6 +82,7 @@ class GroupRepository extends TaskRepository<Group> {
           protocol: protocol,
           keyType: keyType,
           context: Uint8List(0),
+          note: Value(req.note),
         ),
       );
 

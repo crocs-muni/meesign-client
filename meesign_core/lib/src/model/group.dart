@@ -24,6 +24,7 @@ class Group {
   final int threshold;
   final Protocol protocol;
   final KeyType keyType;
+  final String? note;
 
   const Group(
     this.id,
@@ -31,8 +32,9 @@ class Group {
     this.members,
     this.threshold,
     this.protocol,
-    this.keyType,
-  );
+    this.keyType, {
+    this.note,
+  });
 
   int get shares => members.map((m) => m.shares).sum;
 
@@ -47,6 +49,7 @@ extension GroupConversion on db.Group {
         threshold,
         protocol,
         keyType,
+        note: note,
       );
 }
 

@@ -48,6 +48,7 @@ class Groups extends Table {
   TextColumn get keyType => textEnum<KeyType>()();
   BoolColumn get withCard => boolean().withDefault(const Constant(false))();
   BlobColumn get context => blob()();
+  TextColumn get note => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {tid, did};

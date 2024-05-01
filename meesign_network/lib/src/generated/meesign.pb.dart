@@ -304,6 +304,7 @@ class GroupRequest extends $pb.GeneratedMessage {
     $core.int? threshold,
     ProtocolType? protocol,
     KeyType? keyType,
+    $core.String? note,
   }) {
     final $result = create();
     if (name != null) {
@@ -320,6 +321,9 @@ class GroupRequest extends $pb.GeneratedMessage {
     }
     if (keyType != null) {
       $result.keyType = keyType;
+    }
+    if (note != null) {
+      $result.note = note;
     }
     return $result;
   }
@@ -347,6 +351,7 @@ class GroupRequest extends $pb.GeneratedMessage {
         defaultOrMaker: KeyType.SignPDF,
         valueOf: KeyType.valueOf,
         enumValues: KeyType.values)
+    ..aOS(6, _omitFieldNames ? '' : 'note')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('Using this can add significant overhead to your binary. '
@@ -422,6 +427,18 @@ class GroupRequest extends $pb.GeneratedMessage {
   $core.bool hasKeyType() => $_has(4);
   @$pb.TagNumber(5)
   void clearKeyType() => clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.String get note => $_getSZ(5);
+  @$pb.TagNumber(6)
+  set note($core.String v) {
+    $_setString(5, v);
+  }
+
+  @$pb.TagNumber(6)
+  $core.bool hasNote() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearNote() => clearField(6);
 }
 
 class Group extends $pb.GeneratedMessage {
@@ -432,6 +449,7 @@ class Group extends $pb.GeneratedMessage {
     ProtocolType? protocol,
     KeyType? keyType,
     $core.Iterable<$core.List<$core.int>>? deviceIds,
+    $core.String? note,
   }) {
     final $result = create();
     if (identifier != null) {
@@ -451,6 +469,9 @@ class Group extends $pb.GeneratedMessage {
     }
     if (deviceIds != null) {
       $result.deviceIds.addAll(deviceIds);
+    }
+    if (note != null) {
+      $result.note = note;
     }
     return $result;
   }
@@ -480,6 +501,7 @@ class Group extends $pb.GeneratedMessage {
         enumValues: KeyType.values)
     ..p<$core.List<$core.int>>(
         6, _omitFieldNames ? '' : 'deviceIds', $pb.PbFieldType.PY)
+    ..aOS(7, _omitFieldNames ? '' : 'note')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('Using this can add significant overhead to your binary. '
@@ -565,6 +587,18 @@ class Group extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(6)
   $core.List<$core.List<$core.int>> get deviceIds => $_getList(5);
+
+  @$pb.TagNumber(7)
+  $core.String get note => $_getSZ(6);
+  @$pb.TagNumber(7)
+  set note($core.String v) {
+    $_setString(6, v);
+  }
+
+  @$pb.TagNumber(7)
+  $core.bool hasNote() => $_has(6);
+  @$pb.TagNumber(7)
+  void clearNote() => clearField(7);
 }
 
 class DevicesRequest extends $pb.GeneratedMessage {
