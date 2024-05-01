@@ -23,12 +23,3 @@ dev_dependencies:
   drift_dev: ^2.5.2
   lints: ^3.0.0
   test: ^1.16.0
-
-# FIXME: remove after next drift_dev release
-# https://github.com/simolus3/drift/issues/2904
-dependency_overrides:
-  drift_dev:
-    git:
-      url: https://github.com/simolus3/drift.git
-      ref: develop
-      path: drift_dev

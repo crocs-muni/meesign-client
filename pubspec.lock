@@ -109,10 +109,10 @@ packages:
     dependency: transitive
     description:
       name: drift
-      sha256: "3b276c838ff7f8e19aac18a51f9b388715268f3534eaaf8047c8455ef3c1738d"
+      sha256: "049057eba8692cc097c9d0be7612d0a6dd65e3bd283de7e352f9dc81de23169a"
       url: "https://pub.dev"
     source: hosted
-    version: "2.16.0"
+    version: "2.17.0"
   fake_async:
     dependency: transitive
     description:
