@@ -91,8 +91,9 @@ class HomeState with ChangeNotifier {
   }
 
   Future<void> addGroup(String name, List<Member> members, int threshold,
-          Protocol protocol, KeyType keyType) =>
-      _groupRepository.group(name, members, threshold, protocol, keyType);
+          Protocol protocol, KeyType keyType, String? note) =>
+      _groupRepository.group(name, members, threshold, protocol, keyType,
+          note: note);
 
   Future<void> sign(XFile file, Group group) async {
     await _fileRepository.sign(file.name, await file.readAsBytes(), group.id);

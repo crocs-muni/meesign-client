@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:convert';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -188,9 +189,14 @@ class _NewGroupPageState extends State<NewGroupPage> {
   int _threshold = _minThreshold;
   final List<Member> _members = [];
   final _nameController = TextEditingController();
-  String? _nameErr, _memberErr;
+  final _policyController = TextEditingController();
+  String? _nameErr, _memberErr, _policyErr;
   KeyType _keyType = KeyType.signPdf;
   Protocol _protocol = KeyType.signPdf.supportedProtocols.first;
+  bool _policyTime = false;
+  TimeOfDay _policyAfterTime = const TimeOfDay(hour: 0, minute: 0);
+  TimeOfDay _policyBeforeTime = const TimeOfDay(hour: 23, minute: 59);
+  bool _policyDecline = false;
 
   int get _shareCount => _members.map((m) => m.shares).sum;
 
@@ -201,6 +207,13 @@ class _NewGroupPageState extends State<NewGroupPage> {
       if (_nameErr != null) {
         setState(() {
           _nameErr = null;
+        });
+      }
+    });
+    _policyController.addListener(() {
+      if (_policyErr != null) {
+        setState(() {
+          _policyErr = null;
         });
       }
     });
@@ -226,10 +239,26 @@ class _NewGroupPageState extends State<NewGroupPage> {
     });
   }
 
+  bool get _hasBot =>
+      _members.any((member) => member.device.kind == DeviceKind.bot);
+
   void _selectPeer(String route) async {
     // TODO: pass the current selection to the search page?
     final devices = await Navigator.pushNamed(context, route);
     _addMembers(devices);
+  }
+
+  Map<String, dynamic> _buildPolicy({bool includeAll = false}) {
+    String pad(num n) => n.toString().padLeft(2, '0');
+    return {
+      if (_policyTime || includeAll) ...{
+        'after':
+            '${pad(_policyAfterTime.hour)}:${pad(_policyAfterTime.minute)}',
+        'before':
+            '${pad(_policyBeforeTime.hour)}:${pad(_policyBeforeTime.minute)}',
+      },
+      if (_policyDecline || includeAll) 'decline': _policyDecline,
+    };
   }
 
   void _tryCreate() {
@@ -243,7 +272,20 @@ class _NewGroupPageState extends State<NewGroupPage> {
         _memberErr = "Add member";
       });
     }
-    if (_nameErr != null || _memberErr != null) return;
+
+    Map<String, dynamic> policy = _buildPolicy();
+
+    if (_policyController.text.trim().isNotEmpty) {
+      try {
+        final customPolicy = jsonDecode(_policyController.text);
+        policy = {...policy, ...customPolicy};
+      } catch (e) {
+        setState(() {
+          _policyErr = 'Invalid JSON';
+        });
+      }
+    }
+    if (_nameErr != null || _memberErr != null || _policyErr != null) return;
 
     Navigator.pop(
       context,
@@ -254,6 +296,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
         _threshold,
         _protocol,
         _keyType,
+        note: _hasBot ? jsonEncode(policy) : null,
       ),
     );
   }
@@ -492,6 +535,80 @@ class _NewGroupPageState extends State<NewGroupPage> {
               ),
             ],
           ),
+          if (_hasBot)
+            OptionTile(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              titlePadding: const EdgeInsets.symmetric(horizontal: 16),
+              title: 'Policy',
+              help: const Text(
+                'If a bot is present in the group, you can set a policy that '
+                'modifies its behavior (when to approve or decline requests).\n\n'
+                'Depending on the bot\'s configuration, it may disregard the '
+                'user-provided policy.',
+              ),
+              children: [
+                CheckboxListTile(
+                  value: _policyTime,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      _policyTime = value!;
+                    });
+                  },
+                  controlAffinity: ListTileControlAffinity.leading,
+                  title: Row(
+                    children: [
+                      const Text('Time'),
+                      const SizedBox(width: 8),
+                      FilledButton.tonalIcon(
+                        onPressed: _policyTime
+                            ? () async {
+                                final value = await showTimePicker(
+                                  context: context,
+                                  initialTime: _policyAfterTime,
+                                );
+                                if (value != null) {
+                                  setState(() {
+                                    _policyAfterTime = value;
+                                  });
+                                }
+                              }
+                            : null,
+                        icon: const Icon(Symbols.access_time),
+                        label: Text(_policyAfterTime.format(context)),
+                      ),
+                      const Text(' – '),
+                      FilledButton.tonalIcon(
+                        onPressed: _policyTime
+                            ? () async {
+                                final value = await showTimePicker(
+                                  context: context,
+                                  initialTime: _policyBeforeTime,
+                                );
+                                if (value != null) {
+                                  setState(() {
+                                    _policyBeforeTime = value;
+                                  });
+                                }
+                              }
+                            : null,
+                        icon: const Icon(Symbols.access_time),
+                        label: Text(_policyBeforeTime.format(context)),
+                      ),
+                    ],
+                  ),
+                ),
+                CheckboxListTile(
+                  value: _policyDecline,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      _policyDecline = value!;
+                    });
+                  },
+                  controlAffinity: ListTileControlAffinity.leading,
+                  title: const Text('Decline if not satisfied immediately'),
+                ),
+              ],
+            ),
           ExpansionTile(
             title: const Text('Advanced options'),
             collapsedTextColor:
@@ -515,7 +632,23 @@ class _NewGroupPageState extends State<NewGroupPage> {
                     ],
                   ),
                 ],
-              )
+              ),
+              if (_hasBot)
+                OptionTile(
+                  title: 'Custom policy',
+                  children: [
+                    TextField(
+                      controller: _policyController,
+                      decoration: InputDecoration(
+                        border: const OutlineInputBorder(),
+                        errorText: _policyErr,
+                        hintText: const JsonEncoder.withIndent('  ')
+                            .convert(_buildPolicy(includeAll: true)),
+                      ),
+                      maxLines: null,
+                    ),
+                  ],
+                ),
             ],
           ),
         ],
