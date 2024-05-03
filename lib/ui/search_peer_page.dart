@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../app_container.dart';
 import '../theme.dart';
 import '../util/chars.dart';
+import '../widget/device_name.dart';
 import '../widget/entity_chip.dart';
 
 class DeviceSelectionBar extends StatefulWidget implements PreferredSizeWidget {
@@ -84,7 +85,11 @@ class DeviceSuggestionTile extends StatelessWidget {
           child: Text(device.name.initials),
         ),
       ),
-      title: Text(device.name),
+      title: DeviceName(
+        device.name,
+        kind: device.kind,
+        iconSize: 20,
+      ),
       subtitle: Text(
         device.id.encode().splitByLength(4).join(' '),
         softWrap: false,

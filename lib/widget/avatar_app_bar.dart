@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../util/chars.dart';
-
 class FlexibleAvatarAppBar extends StatelessWidget {
-  final String name;
+  final Widget avatar;
+  final Widget title;
 
   const FlexibleAvatarAppBar({
     super.key,
-    required this.name,
+    required this.avatar,
+    required this.title,
   });
 
   @override
@@ -20,7 +20,7 @@ class FlexibleAvatarAppBar extends StatelessWidget {
               padding: const EdgeInsets.only(top: 32),
               child: FittedBox(
                 child: CircleAvatar(
-                  child: Text(name.initials),
+                  child: avatar,
                 ),
               ),
             ),
@@ -29,10 +29,9 @@ class FlexibleAvatarAppBar extends StatelessWidget {
         SizedBox(
           height: kToolbarHeight,
           child: Center(
-            child: Text(
-              name,
-              textAlign: TextAlign.center,
+            child: DefaultTextStyle.merge(
               style: Theme.of(context).textTheme.titleLarge,
+              child: title,
             ),
           ),
         ),

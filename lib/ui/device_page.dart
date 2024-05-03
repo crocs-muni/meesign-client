@@ -5,6 +5,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../util/chars.dart';
 import '../util/qr_coder.dart';
 import '../widget/avatar_app_bar.dart';
+import '../widget/device_name.dart';
 
 class HexTable extends StatelessWidget {
   final String hex;
@@ -90,7 +91,10 @@ class DevicePage extends StatelessWidget {
           SliverAppBar(
             expandedHeight: 192,
             pinned: true,
-            flexibleSpace: FlexibleAvatarAppBar(name: device.name),
+            flexibleSpace: FlexibleAvatarAppBar(
+              avatar: Text(device.name.initials),
+              title: DeviceName(device.name),
+            ),
           ),
           SliverList.list(
             children: [

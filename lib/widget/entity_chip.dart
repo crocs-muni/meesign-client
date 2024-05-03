@@ -4,35 +4,7 @@ import 'package:meesign_core/meesign_model.dart';
 import '../ui/device_page.dart';
 import '../ui/group_page.dart';
 import '../util/chars.dart';
-
-class EntityChip extends StatelessWidget {
-  final String name;
-
-  final void Function()? onPressed;
-  final void Function()? onDeleted;
-
-  const EntityChip({
-    super.key,
-    required this.name,
-    this.onPressed,
-    this.onDeleted,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InputChip(
-      avatar: CircleAvatar(
-        child: Text(
-          name.initials,
-          style: Theme.of(context).textTheme.labelLarge,
-        ),
-      ),
-      label: Text(name),
-      onPressed: onPressed,
-      onDeleted: onDeleted,
-    );
-  }
-}
+import 'device_name.dart';
 
 class DeviceChip extends StatelessWidget {
   final Device device;
@@ -43,8 +15,18 @@ class DeviceChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return EntityChip(
-      name: device.name,
+    return InputChip(
+      avatar: CircleAvatar(
+        child: Text(
+          device.name.initials,
+          style: Theme.of(context).textTheme.labelLarge,
+        ),
+      ),
+      label: DeviceName(
+        device.name,
+        kind: device.kind,
+        iconSize: 20,
+      ),
       onDeleted: onDeleted,
       onPressed: () {
         Navigator.push(
@@ -65,8 +47,14 @@ class GroupChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return EntityChip(
-      name: group.name,
+    return InputChip(
+      avatar: CircleAvatar(
+        child: Text(
+          group.name.initials,
+          style: Theme.of(context).textTheme.labelLarge,
+        ),
+      ),
+      label: Text(group.name),
       onPressed: () {
         Navigator.push(
           context,

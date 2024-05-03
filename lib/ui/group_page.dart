@@ -4,6 +4,7 @@ import 'package:meesign_core/meesign_model.dart';
 
 import '../util/chars.dart';
 import '../widget/avatar_app_bar.dart';
+import '../widget/device_name.dart';
 import '../widget/weighted_avatar.dart';
 import 'device_page.dart';
 
@@ -40,10 +41,10 @@ class GroupPage extends StatelessWidget {
             weights: weights,
             child: Text(member.device.name.initials),
           ),
-          title: Text(
+          title: DeviceName(
             member.device.name,
-            softWrap: false,
-            overflow: TextOverflow.fade,
+            kind: member.device.kind,
+            iconSize: 20,
           ),
           trailing: Text(
             '(${member.shares})',
@@ -98,7 +99,8 @@ class GroupPage extends StatelessWidget {
             expandedHeight: 192,
             pinned: true,
             flexibleSpace: FlexibleAvatarAppBar(
-              name: group.name,
+              avatar: Text(group.name.initials),
+              title: Text(group.name),
             ),
           ),
           SliverToBoxAdapter(

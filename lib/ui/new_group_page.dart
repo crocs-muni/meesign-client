@@ -10,6 +10,7 @@ import 'dart:io';
 
 import '../routes.dart';
 import '../util/chars.dart';
+import '../widget/device_name.dart';
 import '../widget/weighted_avatar.dart';
 
 class OptionTile extends StatelessWidget {
@@ -386,10 +387,10 @@ class _NewGroupPageState extends State<NewGroupPage> {
                     weights: _members.map((m) => m.shares).toList(),
                     child: Text(member.device.name.initials),
                   ),
-                  title: Text(
+                  title: DeviceName(
                     member.device.name,
-                    softWrap: false,
-                    overflow: TextOverflow.fade,
+                    kind: member.device.kind,
+                    iconSize: 20,
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
