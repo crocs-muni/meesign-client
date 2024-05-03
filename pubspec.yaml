@@ -67,6 +67,8 @@ dependencies:
   share_plus: ^8.0.3
   image_picker: ^1.0.7
   fl_chart: ^0.67.0
+  # https://github.com/flutter/flutter/issues/102560
+  material_symbols_icons: ^4.2719.3
 
 dev_dependencies:
   flutter_test:

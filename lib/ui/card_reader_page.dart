@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' hide Card;
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:meesign_core/meesign_card.dart';
 
 import '../card/card.dart';
@@ -126,7 +127,7 @@ class _CardReaderPageState extends State<CardReaderPage> {
                   ),
                 ),
                 const Icon(
-                  Icons.contactless,
+                  Symbols.contactless,
                   size: 64,
                 ),
               ],

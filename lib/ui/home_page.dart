@@ -12,6 +12,7 @@ import 'package:flutter/material.dart' hide Card;
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:meesign_core/meesign_card.dart';
 import 'package:meesign_core/meesign_data.dart';
 import 'package:meesign_core/meesign_model.dart';
@@ -47,7 +48,7 @@ class TaskStateIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     switch (task.state) {
       case TaskState.created:
-        return const Icon(Icons.arrow_drop_down);
+        return const Icon(Symbols.arrow_drop_down);
       case TaskState.running:
         return SizedBox(
           height: 24,
@@ -59,12 +60,12 @@ class TaskStateIndicator extends StatelessWidget {
           ),
         );
       case TaskState.needsCard:
-        return const Icon(Icons.payment);
+        return const Icon(Symbols.payment);
       case TaskState.finished:
-        return Icon(Icons.check,
+        return Icon(Symbols.check,
             color: Theme.of(context).extension<CustomColors>()!.success);
       case TaskState.failed:
-        return Icon(Icons.error_outline,
+        return Icon(Symbols.error_outline,
             color: Theme.of(context).colorScheme.error);
     }
   }
@@ -241,7 +242,7 @@ class TaskTile<T> extends StatelessWidget {
 
     return Deletable(
       dismissibleKey: ObjectKey(task),
-      icon: task.archived ? Icons.unarchive_outlined : Icons.archive_outlined,
+      icon: task.archived ? Symbols.unarchive : Symbols.archive,
       color: task.archived
           ? Theme.of(context).colorScheme.surfaceVariant
           : Theme.of(context).extension<CustomColors>()!.successContainer!,
@@ -520,7 +521,7 @@ class DecryptSubPage extends StatelessWidget {
                       const SnackBar(content: Text('Copied!')),
                     );
                   },
-                  icon: const Icon(Icons.copy),
+                  icon: const Icon(Symbols.content_copy),
                 ),
               var t when t.isImage => IconButton(
                   onPressed: () async {
@@ -529,8 +530,8 @@ class DecryptSubPage extends StatelessWidget {
                     sub.resume();
                   },
                   icon: Icon(PlatformGroup.isMobile
-                      ? Icons.share_outlined
-                      : Icons.save_alt),
+                      ? Symbols.share
+                      : Symbols.save_alt),
                 ),
               _ => const SizedBox(),
             },
@@ -706,13 +707,13 @@ class _DataInputDialogState extends State<DataInputDialog> {
               if (widget.dataInputTypes.contains(DataInputType.text))
                 const ButtonSegment<DataInputType>(
                   value: DataInputType.text,
-                  icon: Icon(Icons.description),
+                  icon: Icon(Symbols.description),
                   label: Text('Text'),
                 ),
               if (widget.dataInputTypes.contains(DataInputType.image))
                 const ButtonSegment<DataInputType>(
                   value: DataInputType.image,
-                  icon: Icon(Icons.image),
+                  icon: Icon(Symbols.image),
                   label: Text('Image'),
                 ),
             ],
@@ -969,24 +970,24 @@ class _HomePageViewState extends State<HomePageView> {
         key: const ValueKey('SignFab'),
         onPressed: _sign,
         label: const Text('Sign'),
-        icon: const Icon(Icons.add),
+        icon: const Icon(Symbols.add),
       ),
       FloatingActionButton.extended(
         key: const ValueKey('ChallengeFab'),
         onPressed: _challenge,
         label: const Text('Challenge'),
-        icon: const Icon(Icons.add),
+        icon: const Icon(Symbols.add),
       ),
       FloatingActionButton.extended(
         key: const ValueKey('EncryptFab'),
         onPressed: _encrypt,
         label: const Text('Encrypt'),
-        icon: const Icon(Icons.add),
+        icon: const Icon(Symbols.add),
       ),
       FloatingActionButton.extended(
         onPressed: _group,
         label: const Text('New'),
-        icon: const Icon(Icons.add),
+        icon: const Icon(Symbols.add),
       )
     ];
 
@@ -1067,27 +1068,27 @@ class _HomePageViewState extends State<HomePageView> {
           NavigationDestination(
             icon: CounterBadge(
               stream: context.watch<HomeState>().nSignReqs,
-              child: const Icon(Icons.draw),
+              child: const Icon(Symbols.draw),
             ),
             label: 'Signing',
           ),
           NavigationDestination(
             icon: CounterBadge(
               stream: context.watch<HomeState>().nChallengeReqs,
-              child: const Icon(Icons.quiz),
+              child: const Icon(Symbols.quiz),
             ),
             label: 'Challenge',
           ),
           NavigationDestination(
               icon: CounterBadge(
                 stream: context.watch<HomeState>().nDecryptReqs,
-                child: const Icon(Icons.key),
+                child: const Icon(Symbols.key),
               ),
               label: 'Decrypt'),
           NavigationDestination(
             icon: CounterBadge(
               stream: context.watch<HomeState>().nGroupReqs,
-              child: const Icon(Icons.group),
+              child: const Icon(Symbols.group),
             ),
             label: 'Groups',
           ),

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:meesign_core/meesign_model.dart';
 
 import 'dart:io';
@@ -33,13 +34,13 @@ class OptionTile extends StatelessWidget {
         dimension: 24,
         child: IconButton(
           padding: const EdgeInsets.all(0),
-          iconSize: 18,
+          iconSize: 20,
           onPressed: () {
             showDialog(
               context: context,
               builder: (context) {
                 return AlertDialog(
-                  icon: const Icon(Icons.help),
+                  icon: const Icon(Symbols.help),
                   title: Text(title),
                   content: SingleChildScrollView(
                     child: help,
@@ -56,7 +57,7 @@ class OptionTile extends StatelessWidget {
               },
             );
           },
-          icon: const Icon(Icons.help),
+          icon: const Icon(Symbols.help, opticalSize: 20),
         ),
       );
     }
@@ -100,7 +101,7 @@ class NumberInput extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         IconButton(
-          icon: const Icon(Icons.chevron_left),
+          icon: const Icon(Symbols.chevron_left),
           onPressed: onUpdate != null ? () => onUpdate!(value - 1) : null,
         ),
         Container(
@@ -112,7 +113,7 @@ class NumberInput extends StatelessWidget {
           ),
         ),
         IconButton(
-          icon: const Icon(Icons.chevron_right),
+          icon: const Icon(Symbols.chevron_right),
           onPressed: onUpdate != null ? () => onUpdate!(value + 1) : null,
         ),
       ],
@@ -143,7 +144,8 @@ class WarningBanner extends StatelessWidget {
           Row(
             children: [
               Icon(
-                Icons.warning,
+                Symbols.warning,
+                fill: 1,
                 color: colorScheme.error,
               ),
               const SizedBox(width: 16),
@@ -357,7 +359,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                 children: [
                   Expanded(
                     child: FilledButton.tonalIcon(
-                      icon: const Icon(Icons.search),
+                      icon: const Icon(Symbols.search),
                       label: const Text('Search'),
                       style: membersButtonStyle,
                       onPressed: () => _selectPeer(Routes.newGroupSearch),
@@ -367,7 +369,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                   if (Platform.isAndroid || Platform.isIOS)
                     Expanded(
                       child: FilledButton.tonalIcon(
-                        icon: const Icon(Icons.qr_code),
+                        icon: const Icon(Symbols.qr_code),
                         label: const Text('Scan'),
                         style: membersButtonStyle,
                         onPressed: () => _selectPeer(Routes.newGroupQr),
@@ -409,7 +411,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                             _members.removeAt(i);
                           });
                         },
-                        icon: const Icon(Icons.delete),
+                        icon: const Icon(Symbols.delete),
                       )
                     ],
                   ),
@@ -428,7 +430,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.person),
+                  const Icon(Symbols.person),
                   Expanded(
                     child: Slider(
                       value: min(_threshold, _shareCount).toDouble(),
@@ -443,7 +445,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                           : null,
                     ),
                   ),
-                  const Icon(Icons.people),
+                  const Icon(Symbols.people),
                 ],
               ),
             ],

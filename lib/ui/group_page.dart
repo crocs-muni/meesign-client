@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:meesign_core/meesign_model.dart';
 
 import '../util/chars.dart';
@@ -24,7 +25,7 @@ class GroupPage extends StatelessWidget {
       ListTile(
         leading: const SizedBox.square(
           dimension: kIconSize,
-          child: Icon(Icons.group),
+          child: Icon(Symbols.group),
         ),
         title: const Text('Members'),
         subtitle: Text(
@@ -63,7 +64,7 @@ class GroupPage extends StatelessWidget {
       ListTile(
         leading: const SizedBox.square(
           dimension: kIconSize,
-          child: Icon(Icons.donut_large),
+          child: Icon(Symbols.donut_large),
         ),
         title: const Text('Threshold'),
         subtitle: Text('${group.threshold} / ${group.shares}'),
@@ -71,7 +72,7 @@ class GroupPage extends StatelessWidget {
       ListTile(
         leading: const SizedBox.square(
           dimension: kIconSize,
-          child: Icon(Icons.flag),
+          child: Icon(Symbols.flag),
         ),
         title: const Text('Purpose'),
         subtitle: Text(switch (group.keyType) {
@@ -83,7 +84,7 @@ class GroupPage extends StatelessWidget {
       ListTile(
         leading: const SizedBox.square(
           dimension: kIconSize,
-          child: Icon(Icons.code),
+          child: Icon(Symbols.code),
         ),
         title: const Text('Protocol'),
         subtitle: Text(group.protocol.name.toUpperCase()),
