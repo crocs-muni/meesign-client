@@ -12,6 +12,11 @@ extension DeviceKindConversion on DeviceKind {
         rpc.DeviceKind.BOT => DeviceKind.bot,
         _ => throw ArgumentError('Unknown device kind'),
       };
+
+  rpc.DeviceKind toNetwork() => switch (this) {
+        DeviceKind.user => rpc.DeviceKind.USER,
+        DeviceKind.bot => rpc.DeviceKind.BOT,
+      };
 }
 
 @immutable

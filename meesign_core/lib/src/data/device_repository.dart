@@ -15,13 +15,14 @@ class DeviceRepository {
 
   DeviceRepository(this._dispatcher, this._keyStore, this._deviceDao);
 
-  Future<Device> register(String name) async {
+  Future<Device> register(String name,
+      {DeviceKind kind = DeviceKind.user}) async {
     final key = AuthWrapper.keygen(name);
 
     final resp = await _dispatcher.unauth.register(
       rpc.RegistrationRequest()
         ..name = name
-        ..kind = rpc.DeviceKind.USER
+        ..kind = kind.toNetwork()
         ..csr = key.csr,
     );
 

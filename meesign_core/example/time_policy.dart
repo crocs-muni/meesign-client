@@ -137,7 +137,10 @@ void main(List<String> args) async {
   final challengeRepository =
       ChallengeRepository(dispatcher, taskSource, taskDao);
 
-  final device = await deviceRepository.register(options['name']);
+  final device = await deviceRepository.register(
+    options['name'],
+    kind: DeviceKind.bot,
+  );
   print('Registered as ${device.name}');
 
   await groupRepository.subscribe(device.id);

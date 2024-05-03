@@ -93,7 +93,7 @@ class DevicePage extends StatelessWidget {
             pinned: true,
             flexibleSpace: FlexibleAvatarAppBar(
               avatar: Text(device.name.initials),
-              title: DeviceName(device.name),
+              title: DeviceName(device.name, kind: device.kind),
             ),
           ),
           SliverList.list(
