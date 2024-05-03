@@ -14,3 +14,7 @@ extension SplitByLength on String {
         count, (int i) => substring(i * length, (i + 1) * length));
   }
 }
+
+extension Capitalize on String {
+  String capitalize() => '${this[0].toUpperCase()}${substring(1)}';
+}

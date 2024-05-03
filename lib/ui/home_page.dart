@@ -704,17 +704,17 @@ class _DataInputDialogState extends State<DataInputDialog> {
               });
             },
             segments: [
-              if (widget.dataInputTypes.contains(DataInputType.text))
-                const ButtonSegment<DataInputType>(
-                  value: DataInputType.text,
-                  icon: Icon(Symbols.description),
-                  label: Text('Text'),
-                ),
-              if (widget.dataInputTypes.contains(DataInputType.image))
-                const ButtonSegment<DataInputType>(
-                  value: DataInputType.image,
-                  icon: Icon(Symbols.image),
-                  label: Text('Image'),
+              for (final type in widget.dataInputTypes)
+                ButtonSegment<DataInputType>(
+                  value: type,
+                  icon: Icon(
+                    switch (type) {
+                      DataInputType.text => Symbols.description,
+                      DataInputType.image => Symbols.image,
+                    },
+                    fill: _dataInputType == type ? 1 : 0,
+                  ),
+                  label: Text(type.name.capitalize()),
                 ),
             ],
           ),
@@ -1068,27 +1068,27 @@ class _HomePageViewState extends State<HomePageView> {
           NavigationDestination(
             icon: CounterBadge(
               stream: context.watch<HomeState>().nSignReqs,
-              child: const Icon(Symbols.draw),
+              child: Icon(Symbols.draw, fill: _index == 0 ? 1 : 0),
             ),
             label: 'Signing',
           ),
           NavigationDestination(
             icon: CounterBadge(
               stream: context.watch<HomeState>().nChallengeReqs,
-              child: const Icon(Symbols.quiz),
+              child: Icon(Symbols.quiz, fill: _index == 1 ? 1 : 0),
             ),
             label: 'Challenge',
           ),
           NavigationDestination(
               icon: CounterBadge(
                 stream: context.watch<HomeState>().nDecryptReqs,
-                child: const Icon(Symbols.key),
+                child: Icon(Symbols.key, fill: _index == 2 ? 1 : 0),
               ),
               label: 'Decrypt'),
           NavigationDestination(
             icon: CounterBadge(
               stream: context.watch<HomeState>().nGroupReqs,
-              child: const Icon(Symbols.group),
+              child: Icon(Symbols.group, fill: _index == 3 ? 1 : 0),
             ),
             label: 'Groups',
           ),
