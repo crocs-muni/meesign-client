@@ -16,13 +16,18 @@ import '../widget/weighted_avatar.dart';
 class OptionTile extends StatelessWidget {
   final String title;
   final EdgeInsets padding;
+  final EdgeInsets titlePadding;
   final List<Widget> children;
   final Widget? help;
 
   const OptionTile({
     super.key,
     required this.title,
-    this.padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    this.padding = const EdgeInsets.symmetric(
+      horizontal: 16,
+      vertical: 12,
+    ),
+    this.titlePadding = const EdgeInsets.all(0),
     this.children = const [],
     this.help,
   });
@@ -68,15 +73,18 @@ class OptionTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              Text(
-                title,
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-              const SizedBox(width: 8),
-              if (helpButton != null) helpButton,
-            ],
+          Padding(
+            padding: titlePadding,
+            child: Row(
+              children: [
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                const SizedBox(width: 8),
+                if (helpButton != null) helpButton,
+              ],
+            ),
           ),
           const SizedBox(height: 8),
           ...children,
