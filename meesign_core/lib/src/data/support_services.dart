@@ -10,11 +10,17 @@ class SupportServices {
 
   SupportServices(this._dispatcher);
 
+  static final serverVersionConstraint =
+      VersionConstraint.compatibleWith(Version(0, 3, 0));
+
   Future<Version> getVersion([Uuid? did]) async {
     final info = await (did != null ? _dispatcher[did] : _dispatcher.unauth)
         .getServerInfo(ServerInfoRequest());
     return Version.parse(info.version);
   }
+
+  Future<bool> checkCompatibility([Uuid? did]) async =>
+      serverVersionConstraint.allows(await getVersion(did));
 
   Future<void> log(Uuid? did, String message) =>
       (did != null ? _dispatcher[did] : _dispatcher.unauth)
