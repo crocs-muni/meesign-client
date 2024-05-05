@@ -101,6 +101,9 @@ class InitPageState extends State<InitPage> {
                 );
               },
             ),
+            const SizedBox(
+              height: 32,
+            ),
           ],
         ),
       ),
