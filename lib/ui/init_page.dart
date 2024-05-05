@@ -64,9 +64,6 @@ class InitPageState extends State<InitPage> {
     return Scaffold(
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 24,
-          ),
           children: [
             const SizedBox(
               height: 54,
@@ -94,10 +91,15 @@ class InitPageState extends State<InitPage> {
               future: _hasUserFuture,
               builder: (_, snapshot) {
                 if (snapshot.data ?? true) return Container();
-                return RegistrationForm(
-                  prefillHost: widget.prefillHost,
-                  prefillName: widget.prefillName,
-                  onRegistered: _launchHome,
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                  ),
+                  child: RegistrationForm(
+                    prefillHost: widget.prefillHost,
+                    prefillName: widget.prefillName,
+                    onRegistered: _launchHome,
+                  ),
                 );
               },
             ),
