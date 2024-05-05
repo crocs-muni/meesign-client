@@ -176,6 +176,17 @@ class _RegistrationFormState extends State<RegistrationForm> {
     try {
       final dispatcher = NetworkDispatcher(host, di.keyStore,
           serverCerts: await di.caCerts, allowBadCerts: di.allowBadCerts);
+      final support = SupportServices(dispatcher);
+
+      final compatible = await support.checkCompatibility();
+      if (!compatible) {
+        setState(() {
+          _working = false;
+          _hostError = 'Incompatible server';
+        });
+        return;
+      }
+
       final deviceRepository =
           DeviceRepository(dispatcher, di.keyStore, di.database.deviceDao);
       final device = await deviceRepository.register(
