@@ -9,8 +9,9 @@ class SupportServices {
 
   SupportServices(this._dispatcher);
 
-  Future<String> getVersion() async {
-    final info = await _dispatcher.unauth.getServerInfo(ServerInfoRequest());
+  Future<String> getVersion([Uuid? did]) async {
+    final info = await (did != null ? _dispatcher[did] : _dispatcher.unauth)
+        .getServerInfo(ServerInfoRequest());
     return info.version;
   }
 
