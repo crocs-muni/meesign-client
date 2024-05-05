@@ -73,7 +73,10 @@ class InitPageState extends State<InitPage> {
             ),
             SvgPicture.asset(
               'assets/icon_logo.svg',
-              color: Theme.of(context).colorScheme.primaryContainer,
+              colorFilter: ColorFilter.mode(
+                Theme.of(context).colorScheme.primaryContainer,
+                BlendMode.srcIn,
+              ),
               width: 72,
             ),
             const SizedBox(
