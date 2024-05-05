@@ -129,26 +129,23 @@ class _RegistrationFormState extends State<RegistrationForm> {
   final _hostController = TextEditingController();
 
   bool _working = false;
-  // FIXME: use form?
-  TextEditingController? _errorField;
+  String? _nameError;
+  String? _hostError;
 
   @override
   void initState() {
     super.initState();
 
-    void Function() makeListener(TextEditingController controller) => () {
-          if (_errorField == controller) {
-            setState(() {
-              _errorField = null;
-            });
-          }
-        };
-
     _nameController.text = widget.prefillName;
     _hostController.text = widget.prefillHost;
 
-    _nameController.addListener(makeListener(_nameController));
-    _hostController.addListener(makeListener(_hostController));
+    void clearErrors() {
+      if (_nameError != null) setState(() => _nameError = null);
+      if (_hostError != null) setState(() => _hostError = null);
+    }
+
+    _nameController.addListener(clearErrors);
+    _hostController.addListener(clearErrors);
   }
 
   @override
@@ -163,38 +160,35 @@ class _RegistrationFormState extends State<RegistrationForm> {
     if (_working) return;
 
     if (_nameController.text.isEmpty) {
-      setState(() {
-        _errorField = _nameController;
-      });
+      setState(() => _nameError = 'Name must not be empty');
       return;
     }
 
     setState(() {
       _working = true;
-      _errorField = null;
+      _nameError = null;
+      _hostError = null;
     });
 
     final di = context.read<AppContainer>();
     final host = _hostController.text.trim();
-    late final Device device;
 
     try {
       final dispatcher = NetworkDispatcher(host, di.keyStore,
           serverCerts: await di.caCerts, allowBadCerts: di.allowBadCerts);
       final deviceRepository =
           DeviceRepository(dispatcher, di.keyStore, di.database.deviceDao);
-      device = await deviceRepository.register(
+      final device = await deviceRepository.register(
         _nameController.text,
       );
+      widget.onRegistered(User(device.id, host));
     } catch (e) {
       setState(() {
         _working = false;
-        _errorField = _hostController;
+        _hostError = 'Failed to register';
       });
       rethrow;
     }
-
-    widget.onRegistered(User(device.id, host));
   }
 
   @override
@@ -206,7 +200,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
           decoration: InputDecoration(
             labelText: 'Name',
             border: const OutlineInputBorder(),
-            errorText: _errorField == _nameController ? 'Invalid name' : null,
+            errorText: _nameError,
           ),
           textInputAction: TextInputAction.next,
           enabled: !_working,
@@ -225,8 +219,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
           decoration: InputDecoration(
             labelText: 'Server',
             border: const OutlineInputBorder(),
-            errorText:
-                _errorField == _hostController ? 'Failed to register' : null,
+            errorText: _hostError,
           ),
           enabled: !_working,
           onSubmitted: (_) => _register(),
