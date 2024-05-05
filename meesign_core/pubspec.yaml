@@ -15,6 +15,7 @@ dependencies:
   meesign_network: {path: ../meesign_network}
   meta: ^1.7.0
   path: ^1.8.1
+  pub_semver: ^2.1.4
   rxdart: ^0.27.5
   synchronized: ^3.0.0+3
 
