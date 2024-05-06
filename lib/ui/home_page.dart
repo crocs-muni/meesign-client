@@ -26,7 +26,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../app_container.dart';
 import '../card/card.dart';
 import '../routes.dart';
-import '../sync.dart';
 import '../theme.dart';
 import '../util/chars.dart';
 import '../util/platform.dart';
@@ -760,15 +759,15 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final di = context.read<AppContainer>();
+    final session = context.read<AppContainer>().session!;
     return ChangeNotifierProvider(
       create: (context) => HomeState(
-        di.userRepository,
-        di.deviceRepository,
-        di.groupRepository,
-        di.fileRepository,
-        di.challengeRepository,
-        di.decryptRepository,
+        session.user,
+        session.deviceRepository,
+        session.groupRepository,
+        session.fileRepository,
+        session.challengeRepository,
+        session.decryptRepository,
       ),
       child: const HomePageView(),
     );
@@ -1018,10 +1017,12 @@ class _HomePageViewState extends State<HomePageView> {
                     );
                   },
                   icon: AnimatedBuilder(
-                    animation: context.read<Sync>().subscribed,
+                    animation:
+                        context.read<AppContainer>().session!.sync.subscribed,
                     builder: (context, child) {
+                      final session = context.read<AppContainer>().session!;
                       return Badge(
-                        backgroundColor: context.read<Sync>().subscribed.value
+                        backgroundColor: session.sync.subscribed.value
                             ? Theme.of(context)
                                 .extension<CustomColors>()!
                                 .success

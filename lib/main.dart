@@ -11,7 +11,6 @@ import 'package:provider/provider.dart';
 
 import 'app_container.dart';
 import 'routes.dart';
-import 'sync.dart';
 import 'theme.dart';
 import 'ui/home_page.dart';
 import 'ui/init_page.dart';
@@ -85,12 +84,9 @@ void main(List<String> args) async {
         appDirectory: appDir,
       ),
       dispose: (_, appContainer) => appContainer.dispose(),
-      child: Provider(
-        create: (_) => Sync(),
-        child: MyApp(
-          prefillHost: results?['host'],
-          prefillName: results?['name'],
-        ),
+      child: MyApp(
+        prefillHost: results?['host'],
+        prefillName: results?['name'],
       ),
     ),
   );

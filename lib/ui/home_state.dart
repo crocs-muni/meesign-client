@@ -41,17 +41,17 @@ class HomeState with ChangeNotifier {
   }
 
   HomeState(
-    UserRepository userRepository,
+    User user,
     DeviceRepository deviceRepository,
     this._groupRepository,
     this._fileRepository,
     this._challengeRepository,
     this._decryptRepository,
   ) {
-    userRepository.getUser().then((user) async {
-      if (user == null) return;
-      _listen(user.did);
-      device = await deviceRepository.getDevice(user.did);
+    _listen(user.did);
+    deviceRepository.getDevice(user.did).then((value) {
+      device = value;
+      notifyListeners();
     });
   }
 

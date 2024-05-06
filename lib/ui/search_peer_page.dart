@@ -124,7 +124,8 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
   void _query(String query) async {
     Iterable<Device> results = [];
     try {
-      final deviceRepository = context.read<AppContainer>().deviceRepository;
+      final deviceRepository =
+          context.read<AppContainer>().session!.deviceRepository;
       // TODO: allow searching by id?
       results = await deviceRepository.search(_queryController.text);
     } catch (_) {}

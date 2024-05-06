@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 
 import '../app_container.dart';
 import '../routes.dart';
-import '../sync.dart';
 import '../util/chars.dart';
 
 class InitPage extends StatefulWidget {
@@ -27,18 +26,11 @@ class InitPageState extends State<InitPage> {
   late final Future<bool> _hasUserFuture;
 
   Future<void> _launchHome(User user) async {
-    final di = context.read<AppContainer>();
-    final sync = context.read<Sync>();
+    final container = context.read<AppContainer>();
 
-    await di.userRepository.setUser(user);
-    await di.init(user.host);
-
-    sync.init(user.did, [
-      di.groupRepository,
-      di.fileRepository,
-      di.challengeRepository,
-      di.decryptRepository,
-    ]);
+    await container.userRepository.setUser(user);
+    final session = await container.startUserSession(user);
+    session.startSync();
 
     if (mounted) {
       Navigator.pushReplacementNamed(context, Routes.home);
@@ -48,8 +40,8 @@ class InitPageState extends State<InitPage> {
   @override
   void initState() {
     super.initState();
-    final di = context.read<AppContainer>();
-    final userFuture = di.userRepository.getUser();
+    final container = context.read<AppContainer>();
+    final userFuture = container.userRepository.getUser();
     _hasUserFuture = userFuture.then((value) => value != null);
 
     userFuture.then((user) async {
@@ -175,15 +167,13 @@ class _RegistrationFormState extends State<RegistrationForm> {
       _hostError = null;
     });
 
-    final di = context.read<AppContainer>();
+    final container = context.read<AppContainer>();
     final host = _hostController.text.trim();
 
     try {
-      final dispatcher = NetworkDispatcher(host, di.keyStore,
-          serverCerts: await di.caCerts, allowBadCerts: di.allowBadCerts);
-      final support = SupportServices(dispatcher);
+      final session = await container.createAnonymousSession(host);
 
-      final compatible = await support.checkCompatibility();
+      final compatible = await session.supportServices.checkCompatibility();
       if (!compatible) {
         setState(() {
           _working = false;
@@ -192,9 +182,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
         return;
       }
 
-      final deviceRepository =
-          DeviceRepository(dispatcher, di.keyStore, di.database.deviceDao);
-      final device = await deviceRepository.register(
+      final device = await session.deviceRepository.register(
         _nameController.text,
       );
       widget.onRegistered(User(device.id, host));
