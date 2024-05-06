@@ -7,6 +7,14 @@ import 'package:provider/provider.dart';
 import '../app_container.dart';
 import '../routes.dart';
 import '../util/chars.dart';
+import '../widget/warning_banner.dart';
+
+enum UserStatus {
+  ok,
+  unregistered,
+  unrecognized,
+  outdated,
+}
 
 class InitPage extends StatefulWidget {
   final String prefillName;
@@ -23,13 +31,17 @@ class InitPage extends StatefulWidget {
 }
 
 class InitPageState extends State<InitPage> {
-  late final Future<bool> _hasUserFuture;
+  User? _savedUser;
+  UserStatus? _status;
 
   Future<void> _launchHome(User user) async {
     final container = context.read<AppContainer>();
 
     await container.userRepository.setUser(user);
-    final session = await container.startUserSession(user);
+    final currentSession = container.session;
+    final session = currentSession != null && currentSession.user == user
+        ? currentSession
+        : await container.startUserSession(user);
     session.startSync();
 
     if (mounted) {
@@ -37,18 +49,52 @@ class InitPageState extends State<InitPage> {
     }
   }
 
+  Future<void> _initApp() async {
+    final container = context.read<AppContainer>();
+    final user = await container.userRepository.getUser();
+    _savedUser = user;
+
+    if (user == null) {
+      setState(() => _status = UserStatus.unregistered);
+      return;
+    }
+
+    final session = await container.startUserSession(user);
+
+    try {
+      final compatible =
+          await session.supportServices.checkCompatibility(user.did);
+      if (!compatible) {
+        setState(() => _status = UserStatus.outdated);
+        return;
+      }
+    } on UnknownDeviceException {
+      setState(() => _status = UserStatus.unrecognized);
+      return;
+    } catch (e) {
+      // likely a networking error, e.g., the user may be offline,
+      // in such a case, let the user access their data
+    }
+
+    setState(() => _status = UserStatus.ok);
+    await Future.delayed(const Duration(milliseconds: 400));
+    _launchHome(user);
+  }
+
+  Future<void> _deleteAppData() async {
+    setState(() {
+      _savedUser = null;
+      _status = null;
+    });
+    final container = context.read<AppContainer>();
+    await container.recreate(deleteData: true);
+    setState(() => _status = UserStatus.unregistered);
+  }
+
   @override
   void initState() {
     super.initState();
-    final container = context.read<AppContainer>();
-    final userFuture = container.userRepository.getUser();
-    _hasUserFuture = userFuture.then((value) => value != null);
-
-    userFuture.then((user) async {
-      if (user == null) return;
-      await Future.delayed(const Duration(milliseconds: 400));
-      _launchHome(user);
-    });
+    _initApp();
   }
 
   @override
@@ -79,11 +125,9 @@ class InitPageState extends State<InitPage> {
             const SizedBox(
               height: 32,
             ),
-            FutureBuilder<bool>(
-              future: _hasUserFuture,
-              builder: (_, snapshot) {
-                if (snapshot.data ?? true) return Container();
-                return Padding(
+            switch (_status) {
+              UserStatus.ok || null => Container(),
+              UserStatus.unregistered => Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
                   ),
@@ -92,9 +136,41 @@ class InitPageState extends State<InitPage> {
                     prefillName: widget.prefillName,
                     onRegistered: _launchHome,
                   ),
-                );
-              },
-            ),
+                ),
+              UserStatus.unrecognized => WarningBanner(
+                  title: 'Unknown device',
+                  text: 'The previously used server does not recognize this '
+                      'device. This likely means that the server was '
+                      'redeployed.\n\nYou are advised to delete your data '
+                      'and start anew. Alternatively, to browse your old data, '
+                      'you may try to proceed anyway. However, you will not '
+                      'be able to participate in new tasks.',
+                  actions: [
+                    OutlinedButton(
+                      onPressed: () => _launchHome(_savedUser!),
+                      child: const Text('Proceed anyway'),
+                    ),
+                    FilledButton.tonal(
+                      onPressed: _deleteAppData,
+                      child: const Text('Delete data'),
+                    ),
+                  ],
+                ),
+              UserStatus.outdated => WarningBanner(
+                  title: 'Unsupported server',
+                  text: 'The previously used server is incompatible with this '
+                      'client. The server was likely upgraded.\n\n'
+                      'You are advised to install a newer client and start anew. '
+                      'Alternatively, to browse your old data, you may try to '
+                      'proceed anyway. However, the client may be unstable.',
+                  actions: [
+                    OutlinedButton(
+                      onPressed: () => _launchHome(_savedUser!),
+                      child: const Text('Proceed anyway'),
+                    ),
+                  ],
+                ),
+            },
             const SizedBox(
               height: 32,
             ),
