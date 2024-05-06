@@ -87,13 +87,13 @@ class UserSession extends AnonymousSession {
 }
 
 class AppContainer {
-  final Directory appDirectory;
+  final Directory dataDirectory;
 
-  late final KeyStore keyStore = KeyStore(appDirectory);
-  late final FileStore fileStore = FileStore(appDirectory);
-  final Database database;
+  late KeyStore keyStore;
+  late FileStore fileStore;
+  late Database database;
 
-  late final UserRepository userRepository = UserRepository(database.userDao);
+  late UserRepository userRepository;
   UserSession? session;
 
   final Reporter reporter = Reporter(Logger.root);
@@ -104,8 +104,28 @@ class AppContainer {
     return data.lengthInBytes == 0 ? null : data.buffer.asUint8List();
   }
 
-  AppContainer({required this.appDirectory})
-      : database = Database(appDirectory);
+  AppContainer({required Directory appDirectory})
+      : dataDirectory = Directory('${appDirectory.path}/data/') {
+    _init();
+  }
+
+  void _init() {
+    keyStore = KeyStore(dataDirectory);
+    fileStore = FileStore(dataDirectory);
+    database = Database(dataDirectory);
+    userRepository = UserRepository(database.userDao);
+  }
+
+  Future<void> recreate({bool deleteData = false}) async {
+    endUserSession();
+    try {
+      await database.close();
+      if (deleteData) await dataDirectory.delete(recursive: true);
+    } catch (e) {
+      Logger.root.severe(e.toString(), e);
+    }
+    _init();
+  }
 
   Future<AnonymousSession> createAnonymousSession(String host) async {
     return AnonymousSession(
