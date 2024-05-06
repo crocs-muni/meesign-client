@@ -5,6 +5,8 @@ import 'package:pub_semver/pub_semver.dart';
 import '../util/uuid.dart';
 import 'network_dispatcher.dart';
 
+class UnknownDeviceException implements Exception {}
+
 class SupportServices {
   final NetworkDispatcher _dispatcher;
 
@@ -19,8 +21,17 @@ class SupportServices {
     return Version.parse(info.version);
   }
 
-  Future<bool> checkCompatibility([Uuid? did]) async =>
-      serverVersionConstraint.allows(await getVersion(did));
+  Future<bool> checkCompatibility([Uuid? did]) async {
+    try {
+      return serverVersionConstraint.allows(await getVersion(did));
+    } on GrpcError catch (e) {
+      // FIXME: any better solution?
+      if (e.message == 'Unknown device certificate') {
+        throw UnknownDeviceException();
+      }
+      rethrow;
+    }
+  }
 
   Future<void> log(Uuid? did, String message) =>
       (did != null ? _dispatcher[did] : _dispatcher.unauth)
