@@ -64,8 +64,13 @@ class TaskStateIndicator extends StatelessWidget {
         return Icon(Symbols.check,
             color: Theme.of(context).extension<CustomColors>()!.success);
       case TaskState.failed:
-        return Icon(Symbols.error_outline,
-            color: Theme.of(context).colorScheme.error);
+        return Icon(
+          switch (task.error) {
+            TaskError.rejected => Symbols.block,
+            _ => Symbols.error_outline,
+          },
+          color: Theme.of(context).colorScheme.error,
+        );
     }
   }
 }
@@ -94,7 +99,10 @@ String? statusMessage(Task task) {
     case TaskState.finished:
       return null;
     case TaskState.failed:
-      return 'Task failed';
+      return switch (task.error) {
+        TaskError.rejected => 'Task rejected',
+        _ => 'Task failed',
+      };
   }
 }
 
