@@ -5,6 +5,7 @@ import 'dart:io' as io;
 import 'dart:io';
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:test/test.dart';
 
@@ -97,8 +98,11 @@ void main() {
 
     await Future.wait(ds.map((d) => groupRepository.subscribe(d.id)));
     final members = [for (final (i, d) in ds.indexed) Member(d, shares[i])];
+    final sharesDesc = shares.any((value) => value > 1)
+        ? shares.join(' ')
+        : shares.sum.toString();
     await groupRepository.group(
-      '$t of ${shares.join(' ')} ${keyType.name} ${protocol.name}',
+      '$t of $sharesDesc ${keyType.name} ${protocol.name}',
       members,
       t,
       protocol,
