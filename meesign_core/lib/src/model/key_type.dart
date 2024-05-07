@@ -11,27 +11,16 @@ enum KeyType {
 }
 
 extension KeyTypeConversion on KeyType {
-  rpc.KeyType toNetwork() {
-    switch (this) {
-      case KeyType.signPdf:
-        return rpc.KeyType.SignPDF;
-      case KeyType.signChallenge:
-        return rpc.KeyType.SignChallenge;
-      case KeyType.decrypt:
-        return rpc.KeyType.Decrypt;
-    }
-  }
+  rpc.KeyType toNetwork() => switch (this) {
+        KeyType.signPdf => rpc.KeyType.SignPDF,
+        KeyType.signChallenge => rpc.KeyType.SignChallenge,
+        KeyType.decrypt => rpc.KeyType.Decrypt,
+      };
 
-  static KeyType fromNetwork(rpc.KeyType keyType) {
-    switch (keyType) {
-      case rpc.KeyType.SignPDF:
-        return KeyType.signPdf;
-      case rpc.KeyType.SignChallenge:
-        return KeyType.signChallenge;
-      case rpc.KeyType.Decrypt:
-        return KeyType.decrypt;
-      default:
-        throw ArgumentError('Unknown key type');
-    }
-  }
+  static KeyType fromNetwork(rpc.KeyType keyType) => switch (keyType) {
+        rpc.KeyType.SignPDF => KeyType.signPdf,
+        rpc.KeyType.SignChallenge => KeyType.signChallenge,
+        rpc.KeyType.Decrypt => KeyType.decrypt,
+        _ => throw ArgumentError('Unknown key type'),
+      };
 }

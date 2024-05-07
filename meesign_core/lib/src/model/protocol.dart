@@ -20,38 +20,23 @@ enum Protocol {
 }
 
 extension ProtocolConversion on Protocol {
-  int toNative() {
-    switch (this) {
-      case Protocol.gg18:
-        return ProtocolId.Gg18;
-      case Protocol.elgamal:
-        return ProtocolId.Elgamal;
-      case Protocol.frost:
-        return ProtocolId.Frost;
-    }
-  }
+  int toNative() => switch (this) {
+        Protocol.gg18 => ProtocolId.Gg18,
+        Protocol.elgamal => ProtocolId.Elgamal,
+        Protocol.frost => ProtocolId.Frost,
+      };
 
-  ProtocolType toNetwork() {
-    switch (this) {
-      case Protocol.gg18:
-        return ProtocolType.GG18;
-      case Protocol.elgamal:
-        return ProtocolType.ELGAMAL;
-      case Protocol.frost:
-        return ProtocolType.FROST;
-    }
-  }
+  ProtocolType toNetwork() => switch (this) {
+        Protocol.gg18 => ProtocolType.GG18,
+        Protocol.elgamal => ProtocolType.ELGAMAL,
+        Protocol.frost => ProtocolType.FROST,
+      };
 
-  static Protocol fromNetwork(ProtocolType protocolType) {
-    switch (protocolType) {
-      case ProtocolType.GG18:
-        return Protocol.gg18;
-      case ProtocolType.ELGAMAL:
-        return Protocol.elgamal;
-      case ProtocolType.FROST:
-        return Protocol.frost;
-      default:
-        throw ArgumentError('Unknown protocol');
-    }
-  }
+  static Protocol fromNetwork(ProtocolType protocolType) =>
+      switch (protocolType) {
+        ProtocolType.GG18 => Protocol.gg18,
+        ProtocolType.ELGAMAL => Protocol.elgamal,
+        ProtocolType.FROST => Protocol.frost,
+        _ => throw ArgumentError('Unknown protocol'),
+      };
 }
