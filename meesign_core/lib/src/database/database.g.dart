@@ -940,6 +940,12 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
       GeneratedColumn<String>('state', aliasedName, false,
               type: DriftSqlType.string, requiredDuringInsert: true)
           .withConverter<TaskState>($TasksTable.$converterstate);
+  static const VerificationMeta _errorMeta = const VerificationMeta('error');
+  @override
+  late final GeneratedColumnWithTypeConverter<TaskError?, String> error =
+      GeneratedColumn<String>('error', aliasedName, true,
+              type: DriftSqlType.string, requiredDuringInsert: false)
+          .withConverter<TaskError?>($TasksTable.$convertererrorn);
   static const VerificationMeta _approvedMeta =
       const VerificationMeta('approved');
   @override
@@ -987,8 +993,19 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
       'data', aliasedName, true,
       type: DriftSqlType.blob, requiredDuringInsert: false);
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, did, gid, state, approved, archived, round, attempt, context, data];
+  List<GeneratedColumn> get $columns => [
+        id,
+        did,
+        gid,
+        state,
+        error,
+        approved,
+        archived,
+        round,
+        attempt,
+        context,
+        data
+      ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1015,6 +1032,7 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
           _gidMeta, gid.isAcceptableOrUnknown(data['gid']!, _gidMeta));
     }
     context.handle(_stateMeta, const VerificationResult.success());
+    context.handle(_errorMeta, const VerificationResult.success());
     if (data.containsKey('approved')) {
       context.handle(_approvedMeta,
           approved.isAcceptableOrUnknown(data['approved']!, _approvedMeta));
@@ -1056,6 +1074,8 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
           .read(DriftSqlType.blob, data['${effectivePrefix}gid']),
       state: $TasksTable.$converterstate.fromSql(attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}state'])!),
+      error: $TasksTable.$convertererrorn.fromSql(attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}error'])),
       approved: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}approved'])!,
       archived: attachedDatabase.typeMapping
@@ -1078,6 +1098,10 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
 
   static JsonTypeConverter2<TaskState, String, String> $converterstate =
       const EnumNameConverter<TaskState>(TaskState.values);
+  static JsonTypeConverter2<TaskError, String, String> $convertererror =
+      const EnumNameConverter<TaskError>(TaskError.values);
+  static JsonTypeConverter2<TaskError?, String?, String?> $convertererrorn =
+      JsonTypeConverter2.asNullable($convertererror);
 }
 
 class Task extends DataClass implements Insertable<Task> {
@@ -1085,6 +1109,7 @@ class Task extends DataClass implements Insertable<Task> {
   final Uint8List did;
   final Uint8List? gid;
   final TaskState state;
+  final TaskError? error;
   final bool approved;
   final bool archived;
   final int round;
@@ -1096,6 +1121,7 @@ class Task extends DataClass implements Insertable<Task> {
       required this.did,
       this.gid,
       required this.state,
+      this.error,
       required this.approved,
       required this.archived,
       required this.round,
@@ -1112,6 +1138,10 @@ class Task extends DataClass implements Insertable<Task> {
     }
     {
       map['state'] = Variable<String>($TasksTable.$converterstate.toSql(state));
+    }
+    if (!nullToAbsent || error != null) {
+      map['error'] =
+          Variable<String>($TasksTable.$convertererrorn.toSql(error));
     }
     map['approved'] = Variable<bool>(approved);
     map['archived'] = Variable<bool>(archived);
@@ -1132,6 +1162,8 @@ class Task extends DataClass implements Insertable<Task> {
       did: Value(did),
       gid: gid == null && nullToAbsent ? const Value.absent() : Value(gid),
       state: Value(state),
+      error:
+          error == null && nullToAbsent ? const Value.absent() : Value(error),
       approved: Value(approved),
       archived: Value(archived),
       round: Value(round),
@@ -1152,6 +1184,8 @@ class Task extends DataClass implements Insertable<Task> {
       gid: serializer.fromJson<Uint8List?>(json['gid']),
       state: $TasksTable.$converterstate
           .fromJson(serializer.fromJson<String>(json['state'])),
+      error: $TasksTable.$convertererrorn
+          .fromJson(serializer.fromJson<String?>(json['error'])),
       approved: serializer.fromJson<bool>(json['approved']),
       archived: serializer.fromJson<bool>(json['archived']),
       round: serializer.fromJson<int>(json['round']),
@@ -1169,6 +1203,8 @@ class Task extends DataClass implements Insertable<Task> {
       'gid': serializer.toJson<Uint8List?>(gid),
       'state':
           serializer.toJson<String>($TasksTable.$converterstate.toJson(state)),
+      'error': serializer
+          .toJson<String?>($TasksTable.$convertererrorn.toJson(error)),
       'approved': serializer.toJson<bool>(approved),
       'archived': serializer.toJson<bool>(archived),
       'round': serializer.toJson<int>(round),
@@ -1183,6 +1219,7 @@ class Task extends DataClass implements Insertable<Task> {
           Uint8List? did,
           Value<Uint8List?> gid = const Value.absent(),
           TaskState? state,
+          Value<TaskError?> error = const Value.absent(),
           bool? approved,
           bool? archived,
           int? round,
@@ -1194,6 +1231,7 @@ class Task extends DataClass implements Insertable<Task> {
         did: did ?? this.did,
         gid: gid.present ? gid.value : this.gid,
         state: state ?? this.state,
+        error: error.present ? error.value : this.error,
         approved: approved ?? this.approved,
         archived: archived ?? this.archived,
         round: round ?? this.round,
@@ -1208,6 +1246,7 @@ class Task extends DataClass implements Insertable<Task> {
           ..write('did: $did, ')
           ..write('gid: $gid, ')
           ..write('state: $state, ')
+          ..write('error: $error, ')
           ..write('approved: $approved, ')
           ..write('archived: $archived, ')
           ..write('round: $round, ')
@@ -1224,6 +1263,7 @@ class Task extends DataClass implements Insertable<Task> {
       $driftBlobEquality.hash(did),
       $driftBlobEquality.hash(gid),
       state,
+      error,
       approved,
       archived,
       round,
@@ -1238,6 +1278,7 @@ class Task extends DataClass implements Insertable<Task> {
           $driftBlobEquality.equals(other.did, this.did) &&
           $driftBlobEquality.equals(other.gid, this.gid) &&
           other.state == this.state &&
+          other.error == this.error &&
           other.approved == this.approved &&
           other.archived == this.archived &&
           other.round == this.round &&
@@ -1251,6 +1292,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
   final Value<Uint8List> did;
   final Value<Uint8List?> gid;
   final Value<TaskState> state;
+  final Value<TaskError?> error;
   final Value<bool> approved;
   final Value<bool> archived;
   final Value<int> round;
@@ -1263,6 +1305,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.did = const Value.absent(),
     this.gid = const Value.absent(),
     this.state = const Value.absent(),
+    this.error = const Value.absent(),
     this.approved = const Value.absent(),
     this.archived = const Value.absent(),
     this.round = const Value.absent(),
@@ -1276,6 +1319,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     required Uint8List did,
     this.gid = const Value.absent(),
     required TaskState state,
+    this.error = const Value.absent(),
     this.approved = const Value.absent(),
     this.archived = const Value.absent(),
     this.round = const Value.absent(),
@@ -1291,6 +1335,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     Expression<Uint8List>? did,
     Expression<Uint8List>? gid,
     Expression<String>? state,
+    Expression<String>? error,
     Expression<bool>? approved,
     Expression<bool>? archived,
     Expression<int>? round,
@@ -1304,6 +1349,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       if (did != null) 'did': did,
       if (gid != null) 'gid': gid,
       if (state != null) 'state': state,
+      if (error != null) 'error': error,
       if (approved != null) 'approved': approved,
       if (archived != null) 'archived': archived,
       if (round != null) 'round': round,
@@ -1319,6 +1365,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       Value<Uint8List>? did,
       Value<Uint8List?>? gid,
       Value<TaskState>? state,
+      Value<TaskError?>? error,
       Value<bool>? approved,
       Value<bool>? archived,
       Value<int>? round,
@@ -1331,6 +1378,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       did: did ?? this.did,
       gid: gid ?? this.gid,
       state: state ?? this.state,
+      error: error ?? this.error,
       approved: approved ?? this.approved,
       archived: archived ?? this.archived,
       round: round ?? this.round,
@@ -1356,6 +1404,10 @@ class TasksCompanion extends UpdateCompanion<Task> {
     if (state.present) {
       map['state'] =
           Variable<String>($TasksTable.$converterstate.toSql(state.value));
+    }
+    if (error.present) {
+      map['error'] =
+          Variable<String>($TasksTable.$convertererrorn.toSql(error.value));
     }
     if (approved.present) {
       map['approved'] = Variable<bool>(approved.value);
@@ -1388,6 +1440,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
           ..write('did: $did, ')
           ..write('gid: $gid, ')
           ..write('state: $state, ')
+          ..write('error: $error, ')
           ..write('approved: $approved, ')
           ..write('archived: $archived, ')
           ..write('round: $round, ')

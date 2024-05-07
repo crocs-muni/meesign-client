@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:collection/collection.dart';
 import 'package:convert/convert.dart';
 import 'package:drift/drift.dart';
 import 'package:meesign_core/src/database/daos.dart';
@@ -93,6 +94,14 @@ abstract class TaskRepository<T> {
 
   TaskRepository(this._taskType, this._taskSource, this._taskDao);
 
+  Future<db.Group> _getAssociatedGroup(Uuid did, db.Task task) {
+    // FIXME: unify group references
+    return task.gid != null
+        ? _taskDao.getGroup(did.bytes, gid: task.gid)
+        // applies for unfinished group tasks
+        : _taskDao.getGroup(did.bytes, tid: task.id);
+  }
+
   @visibleForOverriding
   Future<void> createTask(Uuid did, rpc.Task rpcTask);
   @visibleForOverriding
@@ -106,8 +115,21 @@ abstract class TaskRepository<T> {
     return task;
   }
 
-  Future<db.Task> _syncFailed(db.Task task, rpc.Task rpcTask) async {
-    return task.copyWith(context: Value(null), state: TaskState.failed);
+  Future<db.Task> _syncFailed(Uuid did, db.Task task, rpc.Task rpcTask) async {
+    final group = await _getAssociatedGroup(did, task);
+    final members = await _taskDao.getGroupMembers(group.tid);
+    final shareCount = members.map((m) => m.shares).sum;
+
+    TaskError? error;
+    if (rpcTask.reject > shareCount - group.threshold) {
+      error = TaskError.rejected;
+    }
+
+    return task.copyWith(
+      context: Value(null),
+      state: TaskState.failed,
+      error: Value(error),
+    );
   }
 
   Future<db.Task> _syncFinished(
@@ -201,7 +223,7 @@ abstract class TaskRepository<T> {
           newTask = await _syncCreated(did, task, rpcTask);
           break;
         case rpc.Task_TaskState.FAILED:
-          newTask = await _syncFailed(task, rpcTask);
+          newTask = await _syncFailed(did, task, rpcTask);
           break;
         case rpc.Task_TaskState.FINISHED:
           newTask = await _syncFinished(did, task, rpcTask);
@@ -303,10 +325,7 @@ abstract class TaskRepository<T> {
     if (task == null || task.state != TaskState.needsCard) {
       throw StateException();
     }
-    final group = await (task.gid != null
-        ? _taskDao.getGroup(did.bytes, gid: task.gid)
-        // applies for unfinished group tasks
-        : _taskDao.getGroup(did.bytes, tid: tid.bytes));
+    final group = await _getAssociatedGroup(did, task);
 
     final aid = hex.decode(group.protocol.aid!);
     final resp = await card.send(CommandApdu(
