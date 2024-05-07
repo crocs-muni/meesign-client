@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:animations/animations.dart';
 import 'package:collection/collection.dart';
+import 'package:convert/convert.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/foundation.dart';
@@ -12,6 +12,7 @@ import 'package:flutter/material.dart' hide Card;
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:meesign_core/meesign_card.dart';
 import 'package:meesign_core/meesign_data.dart';
@@ -391,8 +392,89 @@ class GroupsSubPage extends StatelessWidget {
   }
 }
 
+enum DataView { hex, text }
+
 class ChallengeSubPage extends StatelessWidget {
   const ChallengeSubPage({super.key});
+
+  Future<void> showChallengeDialog(
+    BuildContext context,
+    Challenge challenge,
+  ) async {
+    final dataHex = hex.encode(challenge.data);
+    String? dataStr;
+    try {
+      dataStr = utf8.decode(
+        challenge.data,
+        allowMalformed: false,
+      );
+    } on FormatException {
+      dataStr = null;
+    }
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        final supportedViews = {
+          if (dataStr != null) DataView.text,
+          DataView.hex,
+        };
+        DataView view = supportedViews.first;
+
+        return AlertDialog(
+          icon: const Icon(Symbols.quiz),
+          title: Text(challenge.name),
+          content: SingleChildScrollView(
+            child: StatefulBuilder(
+              builder: (context, setState) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (supportedViews.length > 1) ...[
+                      SegmentedButton<DataView>(
+                        segments: [
+                          for (final view in supportedViews)
+                            ButtonSegment(
+                              value: view,
+                              label: Text(view.name.capitalize()),
+                            ),
+                        ],
+                        selected: {view},
+                        onSelectionChanged: (newView) {
+                          setState(() => view = newView.first);
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                    Center(
+                      child: switch (view) {
+                        DataView.hex => Text(
+                            dataHex,
+                            style: const TextStyle(
+                              fontFamily: 'RobotoMono',
+                            ),
+                          ),
+                        DataView.text => Text(
+                            dataStr!,
+                          ),
+                      },
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Hide'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -424,6 +506,12 @@ class ChallengeSubPage extends StatelessWidget {
                     (card) => model.advanceChallengeWithCard(task, card)),
                 child: const Text('Read card'),
               ),
+            ],
+            actions: [
+              FilledButton.tonal(
+                onPressed: () => showChallengeDialog(context, task.info),
+                child: const Text('View'),
+              )
             ],
             onArchiveChange: (archive) =>
                 model.archiveTask(task, archive: archive),
