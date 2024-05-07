@@ -98,6 +98,8 @@ String? statusMessage(Task task) {
   }
 }
 
+enum TaskListSection { requests, finished, failed, archived }
+
 Widget buildTaskListView<T>(
   List<Task<T>> tasks, {
   required Widget emptyView,
@@ -105,58 +107,52 @@ Widget buildTaskListView<T>(
   bool showArchived = false,
 }) {
   // TODO: possibly filter in database
-  final archivedGroups = tasks.groupListsBy((task) => task.archived);
-  final finishedGroups = (archivedGroups[false] ?? [])
-      .groupListsBy((task) => task.state == TaskState.finished);
-  final unfinished = finishedGroups[false] ?? [];
-  final finished = finishedGroups[true] ?? [];
-  final archived = archivedGroups[true] ?? [];
 
-  // TODO: unfinished.sort((a, b) => b.timeCreated.compareTo(a.timeCreated));
+  final taskGroups = tasks.groupListsBy((task) {
+    if (task.archived) return TaskListSection.archived;
+    return switch (task.state) {
+      TaskState.finished => TaskListSection.finished,
+      TaskState.failed => TaskListSection.failed,
+      _ => TaskListSection.requests,
+    };
+  });
 
-  int length = finished.length + unfinished.length;
-  if (showArchived) length += archived.length;
+  final sections = [
+    TaskListSection.requests,
+    TaskListSection.finished,
+    TaskListSection.failed,
+    if (showArchived) TaskListSection.archived,
+  ];
 
-  if (length == 0) return emptyView;
+  final taskCount = sections.map((s) => (taskGroups[s] ?? []).length).sum;
+
+  if (taskCount == 0) return emptyView;
 
   return ListView.builder(
-    itemCount: length + 2 + (showArchived ? 1 : 0),
+    itemCount: taskCount + sections.length,
     itemBuilder: (context, i) {
-      if (i == 0) {
-        return const ListTile(
-          title: Text(
-            'Requests',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          dense: true,
-        );
+      for (final section in sections) {
+        final sectionTasks = taskGroups[section] ?? [];
+
+        if (i == 0) {
+          return ListTile(
+            title: Text(
+              section.name.capitalize(),
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            dense: true,
+          );
+        }
+        i -= 1;
+
+        if (i < sectionTasks.length) {
+          return taskBuilder(context, sectionTasks[i]);
+        }
+
+        i -= sectionTasks.length;
       }
-      if (i == 1 + unfinished.length) {
-        return const ListTile(
-          title: Text(
-            'Finished',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          dense: true,
-        );
-      }
-      if (i == 2 + unfinished.length + finished.length) {
-        return const ListTile(
-          title: Text(
-            'Archive',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          dense: true,
-        );
-      }
-      if (i <= unfinished.length) {
-        return taskBuilder(context, unfinished[i - 1]);
-      } else if (i <= 1 + unfinished.length + finished.length) {
-        return taskBuilder(context, finished[i - unfinished.length - 2]);
-      } else {
-        final task = archived[i - unfinished.length - finished.length - 3];
-        return taskBuilder(context, task);
-      }
+
+      return null;
     },
   );
 }
