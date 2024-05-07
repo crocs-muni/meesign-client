@@ -45,11 +45,9 @@ class TaskStateIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    switch (task.state) {
-      case TaskState.created:
-        return const Icon(Symbols.arrow_drop_down);
-      case TaskState.running:
-        return SizedBox(
+    return switch (task.state) {
+      TaskState.created => const Icon(Symbols.arrow_drop_down),
+      TaskState.running => SizedBox(
           height: 24,
           width: 24,
           // TODO: add animation
@@ -57,21 +55,20 @@ class TaskStateIndicator extends StatelessWidget {
             value: task.round / task.nRounds,
             strokeWidth: 2.0,
           ),
-        );
-      case TaskState.needsCard:
-        return const Icon(Symbols.payment);
-      case TaskState.finished:
-        return Icon(Symbols.check,
-            color: Theme.of(context).extension<CustomColors>()!.success);
-      case TaskState.failed:
-        return Icon(
+        ),
+      TaskState.needsCard => const Icon(Symbols.payment),
+      TaskState.finished => Icon(
+          Symbols.check,
+          color: Theme.of(context).extension<CustomColors>()!.success,
+        ),
+      TaskState.failed => Icon(
           switch (task.error) {
             TaskError.rejected => Symbols.block,
             _ => Symbols.error_outline,
           },
           color: Theme.of(context).colorScheme.error,
-        );
-    }
+        ),
+    };
   }
 }
 
@@ -88,22 +85,17 @@ extension Intersperse<T> on List<T> {
 }
 
 String? statusMessage(Task task) {
-  switch (task.state) {
-    case TaskState.created:
-      return 'Waiting for confirmation '
-          '${task.approved ? 'by others' : ''}';
-    case TaskState.running:
-      return 'Working on task';
-    case TaskState.needsCard:
-      return 'Needs card to continue';
-    case TaskState.finished:
-      return null;
-    case TaskState.failed:
-      return switch (task.error) {
+  return switch (task.state) {
+    TaskState.created => 'Waiting for confirmation '
+        '${task.approved ? 'by others' : ''}',
+    TaskState.running => 'Working on task',
+    TaskState.needsCard => 'Needs card to continue',
+    TaskState.finished => null,
+    TaskState.failed => switch (task.error) {
         TaskError.rejected => 'Task rejected',
         _ => 'Task failed',
-      };
-  }
+      },
+  };
 }
 
 enum TaskListSection { requests, finished, failed, archived }
