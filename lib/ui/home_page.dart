@@ -101,7 +101,7 @@ String? statusMessage(Task task) {
 Widget buildTaskListView<T>(
   List<Task<T>> tasks, {
   required Widget emptyView,
-  required Widget Function(BuildContext, Task<T>, bool) taskBuilder,
+  required Widget Function(BuildContext, Task<T>) taskBuilder,
   bool showArchived = false,
 }) {
   // TODO: possibly filter in database
@@ -150,12 +150,12 @@ Widget buildTaskListView<T>(
         );
       }
       if (i <= unfinished.length) {
-        return taskBuilder(context, unfinished[i - 1], false);
+        return taskBuilder(context, unfinished[i - 1]);
       } else if (i <= 1 + unfinished.length + finished.length) {
-        return taskBuilder(context, finished[i - unfinished.length - 2], true);
+        return taskBuilder(context, finished[i - unfinished.length - 2]);
       } else {
         final task = archived[i - unfinished.length - finished.length - 3];
-        return taskBuilder(context, task, task.state == TaskState.finished);
+        return taskBuilder(context, task);
       }
     },
   );
@@ -278,7 +278,7 @@ class SigningSubPage extends StatelessWidget {
         model.signTasks,
         emptyView: const EmptyList(hint: 'Add new group first.'),
         showArchived: model.showArchived,
-        taskBuilder: (context, task, finished) {
+        taskBuilder: (context, task) {
           return TaskTile(
             task: task,
             name: task.info.basename,
@@ -320,7 +320,7 @@ class GroupsSubPage extends StatelessWidget {
           hint: 'Try creating a new group.',
         ),
         showArchived: model.showArchived,
-        taskBuilder: (context, task, finished) {
+        taskBuilder: (context, task) {
           final group = task.info;
           final members = group.members;
           final thisMember = members.firstWhere(
@@ -406,7 +406,7 @@ class ChallengeSubPage extends StatelessWidget {
           hint: 'Challenge signing requests.',
         ),
         showArchived: model.showArchived,
-        taskBuilder: (context, task, finished) {
+        taskBuilder: (context, task) {
           return TaskTile(
             task: task,
             name: task.info.name,
@@ -551,7 +551,7 @@ class DecryptSubPage extends StatelessWidget {
           hint: 'Requests for decryptions.',
         ),
         showArchived: model.showArchived,
-        taskBuilder: (context, task, finished) {
+        taskBuilder: (context, task) {
           return TaskTile(
             task: task,
             name: task.info.name,
@@ -568,7 +568,7 @@ class DecryptSubPage extends StatelessWidget {
               )
             ],
             actions: [
-              if (finished)
+              if (task.state == TaskState.finished)
                 FilledButton.tonal(
                   onPressed: () => showDecryptDialog(context, task.info),
                   child: const Text('View'),
