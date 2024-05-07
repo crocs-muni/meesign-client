@@ -208,7 +208,6 @@ class TaskTile<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final finished = task.state == TaskState.finished;
     final desc = this.desc ?? statusMessage(task);
     final trailing = this.trailing ?? TaskStateIndicator(task);
     final allActions = actions +
@@ -246,7 +245,9 @@ class TaskTile<T> extends StatelessWidget {
       child: ExpansionTile(
         title: Text(name),
         subtitle: desc != null ? Text(desc) : null,
-        initiallyExpanded: !finished,
+        initiallyExpanded: !task.archived &&
+            task.state != TaskState.finished &&
+            task.state != TaskState.failed,
         leading: leading,
         trailing: trailing,
         childrenPadding: const EdgeInsets.symmetric(
