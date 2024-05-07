@@ -100,7 +100,6 @@ String? statusMessage(Task task) {
 
 Widget buildTaskListView<T>(
   List<Task<T>> tasks, {
-  required String finishedTitle,
   required Widget emptyView,
   required Widget Function(BuildContext, Task<T>, bool) taskBuilder,
   bool showArchived = false,
@@ -133,10 +132,10 @@ Widget buildTaskListView<T>(
         );
       }
       if (i == 1 + unfinished.length) {
-        return ListTile(
+        return const ListTile(
           title: Text(
-            finishedTitle,
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            'Finished',
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
           dense: true,
         );
@@ -277,7 +276,6 @@ class SigningSubPage extends StatelessWidget {
     return Consumer<HomeState>(builder: (context, model, child) {
       return buildTaskListView<File>(
         model.signTasks,
-        finishedTitle: 'Signed files',
         emptyView: const EmptyList(hint: 'Add new group first.'),
         showArchived: model.showArchived,
         taskBuilder: (context, task, finished) {
@@ -318,7 +316,6 @@ class GroupsSubPage extends StatelessWidget {
     return Consumer<HomeState>(builder: (context, model, child) {
       return buildTaskListView<Group>(
         model.groupTasks,
-        finishedTitle: 'Groups',
         emptyView: const EmptyList(
           hint: 'Try creating a new group.',
         ),
@@ -405,7 +402,6 @@ class ChallengeSubPage extends StatelessWidget {
     return Consumer<HomeState>(builder: (context, model, child) {
       return buildTaskListView<Challenge>(
         model.challengeTasks,
-        finishedTitle: 'Finished',
         emptyView: const EmptyList(
           hint: 'Challenge signing requests.',
         ),
@@ -551,7 +547,6 @@ class DecryptSubPage extends StatelessWidget {
     return Consumer<HomeState>(builder: (context, model, child) {
       return buildTaskListView<Decrypt>(
         model.decryptTasks,
-        finishedTitle: 'Finished',
         emptyView: const EmptyList(
           hint: 'Requests for decryptions.',
         ),
