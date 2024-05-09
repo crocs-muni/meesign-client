@@ -125,7 +125,7 @@ Widget buildTaskListView<T>(
     TaskListSection.requests,
     TaskListSection.finished,
     TaskListSection.rejected,
-    TaskListSection.failed,
+    if (taskGroups[TaskListSection.failed] != null) TaskListSection.failed,
     if (showArchived) TaskListSection.archived,
   ];
 
