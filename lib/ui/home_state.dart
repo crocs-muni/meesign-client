@@ -12,7 +12,7 @@ extension TaskDetails on Task {
 }
 
 class HomeState with ChangeNotifier {
-  static const maxFileSize = FileRepository.maxFileSize;
+  static const maxDataSize = FileRepository.maxFileSize;
 
   // TODO: migrate from ChangeNotifier to streams
 

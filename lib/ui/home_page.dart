@@ -860,7 +860,7 @@ class _HomePageViewState extends State<HomePageView> {
     final file = await _pickPdfFile();
     if (file == null) return;
 
-    if (await file.length() > HomeState.maxFileSize) {
+    if (await file.length() > HomeState.maxDataSize) {
       showErrorDialog(
         title: 'File too large',
         desc: 'Please select a smaller one.',
@@ -937,12 +937,20 @@ class _HomePageViewState extends State<HomePageView> {
       },
     );
     if (result == null) return;
+    final (description, mimeType, data) = result;
+
+    if (data.length > HomeState.maxDataSize) {
+      showErrorDialog(
+        title: 'Data too large',
+        desc: 'Please select a smaller image or enter a shorter text.',
+      );
+      return;
+    }
 
     final group = await _selectGroup(KeyType.decrypt); // TODO change
     if (group == null) return;
 
     try {
-      final (description, mimeType, data) = result;
       await context
           .read<HomeState>()
           .encrypt(description, mimeType, data, group);
