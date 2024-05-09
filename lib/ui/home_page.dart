@@ -841,6 +841,7 @@ class _HomePageViewState extends State<HomePageView> {
         context: context,
         builder: (context) {
           return AlertDialog(
+            icon: const Icon(Symbols.error),
             title: Text(title),
             content: Text(desc),
             actions: <Widget>[
