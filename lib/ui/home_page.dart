@@ -91,11 +91,7 @@ String? statusMessage(Task task) {
         '${task.approved ? 'by others' : ''}',
     TaskState.running => 'Working on task',
     TaskState.needsCard => 'Needs card to continue',
-    TaskState.finished => null,
-    TaskState.failed => switch (task.error) {
-        TaskError.rejected => 'Task rejected',
-        _ => 'Task failed',
-      },
+    _ => null,
   };
 }
 
