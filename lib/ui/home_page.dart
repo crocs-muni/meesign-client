@@ -99,7 +99,7 @@ String? statusMessage(Task task) {
   };
 }
 
-enum TaskListSection { requests, finished, failed, archived }
+enum TaskListSection { requests, finished, rejected, failed, archived }
 
 Widget buildTaskListView<T>(
   List<Task<T>> tasks, {
@@ -113,7 +113,10 @@ Widget buildTaskListView<T>(
     if (task.archived) return TaskListSection.archived;
     return switch (task.state) {
       TaskState.finished => TaskListSection.finished,
-      TaskState.failed => TaskListSection.failed,
+      TaskState.failed => switch (task.error) {
+          TaskError.rejected => TaskListSection.rejected,
+          _ => TaskListSection.failed,
+        },
       _ => TaskListSection.requests,
     };
   });
@@ -121,6 +124,7 @@ Widget buildTaskListView<T>(
   final sections = [
     TaskListSection.requests,
     TaskListSection.finished,
+    TaskListSection.rejected,
     TaskListSection.failed,
     if (showArchived) TaskListSection.archived,
   ];
