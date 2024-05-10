@@ -1,6 +1,6 @@
 name: meesign_native
 description: Dart wrappers around MeeSign Rust and C++ libraries.
-version: 0.3.0
+version: 0.4.0
 publish_to: none
 
 environment:

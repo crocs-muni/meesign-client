@@ -478,21 +478,21 @@ packages:
       path: meesign_core
       relative: true
     source: path
-    version: "0.3.0"
+    version: "0.4.0"
   meesign_native:
     dependency: transitive
     description:
       path: meesign_native
       relative: true
     source: path
-    version: "0.3.0"
+    version: "0.4.0"
   meesign_network:
     dependency: transitive
     description:
       path: meesign_network
       relative: true
     source: path
-    version: "0.3.0"
+    version: "0.4.0"
   meta:
     dependency: transitive
     description:
