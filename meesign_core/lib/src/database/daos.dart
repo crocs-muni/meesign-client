@@ -7,7 +7,7 @@ part 'daos.g.dart';
 
 @DriftAccessor(tables: [Devices])
 class DeviceDao extends DatabaseAccessor<Database> with _$DeviceDaoMixin {
-  DeviceDao(Database db) : super(db);
+  DeviceDao(super.db);
 
   Future<List<Device>> getDevices(Iterable<Uint8List> ids) {
     final query = select(devices)..where((devices) => devices.id.isIn(ids));
@@ -25,7 +25,7 @@ class DeviceDao extends DatabaseAccessor<Database> with _$DeviceDaoMixin {
 
 @DriftAccessor(tables: [Users])
 class UserDao extends DatabaseAccessor<Database> with _$UserDaoMixin {
-  UserDao(Database db) : super(db);
+  UserDao(super.db);
 
   Future<User?> getUser() {
     final query = select(users);
@@ -41,7 +41,7 @@ class UserDao extends DatabaseAccessor<Database> with _$UserDaoMixin {
   tables: [Tasks, Groups, GroupMembers, Devices, Files, Challenges, Decrypts],
 )
 class TaskDao extends DatabaseAccessor<Database> with _$TaskDaoMixin {
-  TaskDao(Database db) : super(db);
+  TaskDao(super.db);
 
   Future<Task?> getTask(Uint8List did, Uint8List id) {
     final query = select(tasks)

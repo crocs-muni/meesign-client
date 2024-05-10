@@ -4,7 +4,7 @@ import 'package:grpc/grpc.dart';
 
 class BcastRespStream<T> extends StreamView<T> {
   final Future<void> headers;
-  BcastRespStream(Stream<T> stream, this.headers) : super(stream);
+  BcastRespStream(super.stream, this.headers);
 }
 
 extension BcastRespStreamExt<T> on ResponseStream<T> {

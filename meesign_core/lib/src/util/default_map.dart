@@ -3,7 +3,7 @@ import 'dart:collection';
 class DefaultMap<K, V> extends MapView<K, V> {
   final V Function() defaultValue;
 
-  DefaultMap(Map<K, V> map, this.defaultValue) : super(map);
+  DefaultMap(super.map, this.defaultValue);
 
   @override
   V operator [](Object? key) {
