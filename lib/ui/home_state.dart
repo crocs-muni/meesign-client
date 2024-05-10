@@ -90,6 +90,11 @@ class HomeState with ChangeNotifier {
     });
   }
 
+  bool hasGroup(KeyType type, {bool? inclArchived}) => groupTasks.any((task) =>
+      task.info.keyType == type &&
+      task.state == TaskState.finished &&
+      (!task.archived || (inclArchived ?? _showArchived)));
+
   Future<void> addGroup(String name, List<Member> members, int threshold,
           Protocol protocol, KeyType keyType, String? note) =>
       _groupRepository.group(name, members, threshold, protocol, keyType,

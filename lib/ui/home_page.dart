@@ -274,7 +274,11 @@ class SigningSubPage extends StatelessWidget {
     return Consumer<HomeState>(builder: (context, model, child) {
       return buildTaskListView<File>(
         model.signTasks,
-        emptyView: const EmptyList(hint: 'Add new group first.'),
+        emptyView: EmptyList(
+          hint: model.hasGroup(KeyType.signPdf)
+              ? 'Try signing a PDF file.'
+              : 'Start by creating a group for signing.',
+        ),
         showArchived: model.showArchived,
         taskBuilder: (context, task) {
           return TaskTile(
@@ -481,8 +485,10 @@ class ChallengeSubPage extends StatelessWidget {
     return Consumer<HomeState>(builder: (context, model, child) {
       return buildTaskListView<Challenge>(
         model.challengeTasks,
-        emptyView: const EmptyList(
-          hint: 'Challenge signing requests.',
+        emptyView: EmptyList(
+          hint: model.hasGroup(KeyType.signChallenge)
+              ? 'Try creating a new challenge.'
+              : 'Start by creating a group for challenges.',
         ),
         showArchived: model.showArchived,
         taskBuilder: (context, task) {
@@ -632,8 +638,10 @@ class DecryptSubPage extends StatelessWidget {
     return Consumer<HomeState>(builder: (context, model, child) {
       return buildTaskListView<Decrypt>(
         model.decryptTasks,
-        emptyView: const EmptyList(
-          hint: 'Requests for decryptions.',
+        emptyView: EmptyList(
+          hint: model.hasGroup(KeyType.decrypt)
+              ? 'Try encrypting some data.'
+              : 'Start by creating a group for decryption.',
         ),
         showArchived: model.showArchived,
         taskBuilder: (context, task) {
