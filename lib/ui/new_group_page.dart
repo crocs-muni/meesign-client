@@ -6,9 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:meesign_core/meesign_model.dart';
+import 'package:provider/provider.dart';
 
 import 'dart:io';
 
+import '../app_container.dart';
 import '../routes.dart';
 import '../util/chars.dart';
 import '../widget/device_name.dart';
@@ -174,6 +176,11 @@ class _NewGroupPageState extends State<NewGroupPage> {
         });
       }
     });
+
+    final session = context.read<AppContainer>().session!;
+    session.deviceRepository
+        .getDevice(session.user.did)
+        .then((device) => setState(() => _members.add(Member(device, 1))));
   }
 
   @override
