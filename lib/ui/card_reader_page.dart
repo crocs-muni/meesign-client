@@ -108,6 +108,8 @@ class _CardReaderPageState extends State<CardReaderPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(),
       body: ListView(
@@ -115,8 +117,8 @@ class _CardReaderPageState extends State<CardReaderPage> {
           Material(
             shape: const CircleBorder(),
             color: _hasError
-                ? Theme.of(context).colorScheme.errorContainer
-                : Theme.of(context).colorScheme.primaryContainer,
+                ? colorScheme.errorContainer
+                : colorScheme.primaryContainer,
             child: Stack(
               alignment: AlignmentDirectional.center,
               children: [
@@ -126,9 +128,10 @@ class _CardReaderPageState extends State<CardReaderPage> {
                     value: _status == ReaderOkStatus.working ? null : 0,
                   ),
                 ),
-                const Icon(
+                Icon(
                   Symbols.contactless,
                   size: 64,
+                  color: _hasError ? colorScheme.error : colorScheme.primary,
                 ),
               ],
             ),
