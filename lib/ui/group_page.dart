@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:meesign_core/meesign_model.dart';
@@ -21,6 +23,14 @@ class GroupPage extends StatelessWidget {
     bool isUser(Member m) => m.device.kind == DeviceKind.user;
     final nUsers = group.members.where(isUser).length;
     final nBots = group.members.length - nUsers;
+    var policy = group.note;
+    if (policy != null) {
+      try {
+        policy = jsonDecode(policy).toString();
+      } on Exception {
+        // show raw policy
+      }
+    }
 
     final children = [
       ListTile(
@@ -90,6 +100,15 @@ class GroupPage extends StatelessWidget {
         title: const Text('Protocol'),
         subtitle: Text(group.protocol.name.toUpperCase()),
       ),
+      if (policy != null)
+        ListTile(
+          leading: const SizedBox.square(
+            dimension: kIconSize,
+            child: Icon(Symbols.policy),
+          ),
+          title: const Text('Policy'),
+          subtitle: Text(policy),
+        ),
     ];
 
     return Scaffold(
