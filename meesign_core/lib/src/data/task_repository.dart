@@ -171,7 +171,7 @@ abstract class TaskRepository<T> {
     // TODO: rollback if we fail to deliver the update
     bool forCard = res.recipient == Recipient.Card;
     if (forCard) {
-      if (res.data.length == 1) throw StateException();
+      if (res.data.length != 1) throw StateException();
     } else {
       try {
         await _taskSource.update(did, task.id, res.data, task.attempt);
