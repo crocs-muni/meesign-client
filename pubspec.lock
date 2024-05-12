@@ -101,10 +101,10 @@ packages:
     dependency: "direct main"
     description:
       name: dart_pcsc
-      sha256: "44a5dd176bde27adbfcdbc8b92cf402e0be541f7e7d45d6f1ee89340b051fb81"
+      sha256: "078b0016aa833dd57542214f075d2992e136e8f6c9b8c84cbc06d6b97eaca769"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.1"
+    version: "2.0.2"
   drift:
     dependency: transitive
     description:
