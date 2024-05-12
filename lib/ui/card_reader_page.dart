@@ -124,8 +124,11 @@ class _CardReaderPageState extends State<CardReaderPage> {
               children: [
                 SizedBox.square(
                   dimension: 140,
-                  child: CircularProgressIndicator(
-                    value: _status == ReaderOkStatus.working ? null : 0,
+                  child: Padding(
+                    padding: const EdgeInsets.all(2),
+                    child: CircularProgressIndicator(
+                      value: _status == ReaderOkStatus.working ? null : 0,
+                    ),
                   ),
                 ),
                 Icon(
