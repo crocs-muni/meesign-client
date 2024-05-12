@@ -149,7 +149,8 @@ class _NewGroupPageState extends State<NewGroupPage> {
   final List<Member> _members = [];
   final _nameController = TextEditingController();
   final _policyController = TextEditingController();
-  String? _nameErr, _memberErr, _policyErr;
+  String? _nameErr, _policyErr;
+  ({String title, String text})? _sharesErr;
   KeyType _keyType = KeyType.signPdf;
   Protocol _protocol = KeyType.signPdf.supportedProtocols.first;
   bool _policyTime = false;
@@ -199,7 +200,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
         if (_members.any((member) => member.device.id == device.id)) continue;
         _members.add(Member(device, 1));
       }
-      if (_members.length >= 2) _memberErr = null;
+      _sharesErr = null;
     });
   }
 
@@ -231,9 +232,13 @@ class _NewGroupPageState extends State<NewGroupPage> {
         _nameErr = "Enter group name";
       });
     }
-    if (_members.length < 2) {
+    if (_shareCount < 2) {
       setState(() {
-        _memberErr = "Add member";
+        _sharesErr = (
+          title: 'At least two shares required',
+          text: 'Either add new members to the group or '
+              'give more shares to the existing members.',
+        );
       });
     }
 
@@ -249,7 +254,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
         });
       }
     }
-    if (_nameErr != null || _memberErr != null || _policyErr != null) return;
+    if (_nameErr != null || _sharesErr != null || _policyErr != null) return;
 
     Navigator.pop(
       context,
@@ -266,7 +271,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
   }
 
   // TODO: offer fix application?
-  ({String title, String text})? _getWarning() {
+  ({String title, String text})? _getSharesWarning() {
     final gcd = _members.fold(_threshold, (gcd, m) => gcd.gcd(m.shares));
     // fix must satisfy fix * _threshold ~/ gcd >= _minThreshold
     final fix = (_minThreshold * gcd / _threshold).ceil();
@@ -295,12 +300,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
   @override
   Widget build(BuildContext context) {
-    final membersButtonStyle = _memberErr != null
-        ? FilledButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.errorContainer)
-        : null;
-
-    final warning = _getWarning();
+    final sharesIssue = _sharesErr ?? _getSharesWarning();
 
     return Scaffold(
       appBar: AppBar(
@@ -377,7 +377,6 @@ class _NewGroupPageState extends State<NewGroupPage> {
                     child: FilledButton.tonalIcon(
                       icon: const Icon(Symbols.search),
                       label: const Text('Search'),
-                      style: membersButtonStyle,
                       onPressed: () => _selectPeer(Routes.newGroupSearch),
                     ),
                   ),
@@ -387,7 +386,6 @@ class _NewGroupPageState extends State<NewGroupPage> {
                       child: FilledButton.tonalIcon(
                         icon: const Icon(Symbols.qr_code),
                         label: const Text('Scan'),
-                        style: membersButtonStyle,
                         onPressed: () => _selectPeer(Routes.newGroupQr),
                       ),
                     ),
@@ -416,6 +414,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                           setState(() {
                             if (newWeight > 0) {
                               _members[i] = Member(member.device, newWeight);
+                              _sharesErr = null;
                             }
                           });
                         },
@@ -425,6 +424,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                         onPressed: () {
                           setState(() {
                             _members.removeAt(i);
+                            _sharesErr = null;
                           });
                         },
                         icon: const Icon(Symbols.delete),
@@ -466,10 +466,10 @@ class _NewGroupPageState extends State<NewGroupPage> {
               ),
             ],
           ),
-          if (warning != null)
+          if (sharesIssue != null)
             WarningBanner(
-              title: warning.title,
-              text: warning.text,
+              title: sharesIssue.title,
+              text: sharesIssue.text,
             ),
           OptionTile(
             title: 'Purpose',
