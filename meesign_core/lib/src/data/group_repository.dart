@@ -35,16 +35,16 @@ class GroupRepository extends TaskRepository<Group> {
     KeyType keyType, {
     String? note,
   }) async {
-    await _dispatcher.unauth.group(
-      rpc.GroupRequest()
-        ..deviceIds.addAll(members.expand((member) =>
-            Iterable.generate(member.shares, (_) => member.device.id.bytes)))
-        ..name = name
-        ..threshold = threshold
-        ..protocol = protocol.toNetwork()
-        ..keyType = keyType.toNetwork()
-        ..note = note ?? '',
-    );
+    final request = rpc.GroupRequest()
+      ..deviceIds.addAll(members.expand((member) =>
+          Iterable.generate(member.shares, (_) => member.device.id.bytes)))
+      ..name = name
+      ..threshold = threshold
+      ..protocol = protocol.toNetwork()
+      ..keyType = keyType.toNetwork();
+    if (note != null) request.note = note;
+
+    await _dispatcher.unauth.group(request);
   }
 
   @override
@@ -82,7 +82,7 @@ class GroupRepository extends TaskRepository<Group> {
           protocol: protocol,
           keyType: keyType,
           context: Uint8List(0),
-          note: Value(req.note),
+          note: Value(req.hasNote() ? req.note : null),
         ),
       );
 
