@@ -1144,6 +1144,10 @@ class _HomePageViewState extends State<HomePageView> {
                   onTap: () => model.showArchived = !model.showArchived,
                   child: const Text('Archived'),
                 ),
+                PopupMenuItem(
+                  onTap: () => Navigator.pushNamed(context, Routes.about),
+                  child: const Text('About'),
+                ),
               ],
             );
           }),

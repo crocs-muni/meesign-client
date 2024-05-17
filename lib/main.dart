@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 import 'app_container.dart';
 import 'routes.dart';
 import 'theme.dart';
+import 'ui/about_page.dart';
 import 'ui/home_page.dart';
 import 'ui/init_page.dart';
 import 'ui/new_group_page.dart';
@@ -127,6 +128,7 @@ class MyApp extends StatelessWidget {
               prefillHost: prefillHost ?? 'meesign.crocs.fi.muni.cz',
               prefillName: prefillName ?? '',
             ),
+        Routes.about: (_) => const AboutPage(),
       },
     );
   }
