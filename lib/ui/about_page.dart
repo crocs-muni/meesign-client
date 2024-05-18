@@ -4,7 +4,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AboutPage extends StatelessWidget {
-  static const version = '0.4.0';
+  static const version = '0.4.1';
 
   static const crocsAuth = 'crocs.fi.muni.cz';
   static const meesignAuth = 'meesign.$crocsAuth';

@@ -1,6 +1,6 @@
 name: meesign_core
 description: Core layer of MeeSign client shared by GUI and CLI.
-version: 0.4.0
+version: 0.4.1
 publish_to: none
 
 environment:
