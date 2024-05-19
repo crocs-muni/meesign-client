@@ -91,9 +91,11 @@ class _CardReaderPageState extends State<CardReaderPage> {
         setStatus(ReaderOkStatus.waiting);
       }
     } catch (e) {
-      /* FIXME: make sure not to end up in a busy loop */
       if (!mounted) return;
       _showError();
+      /* TODO: request a retry from the user instead? */
+      await Future.delayed(const Duration(seconds: 1));
+      if (!mounted) return;
       _poll();
     }
   }
