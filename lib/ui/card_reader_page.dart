@@ -99,11 +99,13 @@ class _CardReaderPageState extends State<CardReaderPage> {
   }
 
   void _showError({String message = 'Failed to read card'}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-      ),
-    );
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+        ),
+      );
   }
 
   @override
