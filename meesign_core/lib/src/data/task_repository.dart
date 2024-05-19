@@ -119,9 +119,11 @@ abstract class TaskRepository<T> {
     final group = await _getAssociatedGroup(did, task);
     final members = await _taskDao.getGroupMembers(group.tid);
     final shareCount = members.map((m) => m.shares).sum;
+    final threshold =
+        rpcTask.type == rpc.TaskType.GROUP ? shareCount : group.threshold;
 
     TaskError? error;
-    if (rpcTask.reject > shareCount - group.threshold) {
+    if (rpcTask.reject > shareCount - threshold) {
       error = TaskError.rejected;
     }
 
