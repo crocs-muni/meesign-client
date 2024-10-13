@@ -26,8 +26,9 @@ class ResponseApdu {
 
   ResponseApdu(Uint8List data) : _rawData = data;
 
-  UnmodifiableUint8ListView get data => UnmodifiableUint8ListView(
-      Uint8List.view(_rawData.buffer, 0, _rawData.lengthInBytes - 2));
+  Uint8List get data =>
+      Uint8List.view(_rawData.buffer, 0, _rawData.lengthInBytes - 2)
+          .asUnmodifiableView();
 
   int get status => (_rawData[_rawData.length - 2] << 8) + _rawData.last;
 }
