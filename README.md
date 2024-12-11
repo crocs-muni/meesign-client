@@ -57,3 +57,7 @@ For increased security, the app can optionally transfer the user's private key s
 Supported applets:
 
 * [JCFROST](https://github.com/crocs-muni/JCFROST)
+
+## Acknowledgements
+
+* This work was supported by the Ministry of the Interior of the Czech Republic under grant VJ01010084 in program IMPAKT I.
