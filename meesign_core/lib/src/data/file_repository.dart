@@ -12,6 +12,7 @@ import '../util/uuid.dart';
 import 'file_store.dart';
 import 'network_dispatcher.dart';
 import 'task_repository.dart';
+import 'key_store.dart';
 
 export 'file_store.dart';
 
@@ -19,11 +20,13 @@ class FileRepository extends TaskRepository<File> {
   static const maxFileSize = 8 * 1024 * 1024;
 
   final NetworkDispatcher _dispatcher;
+  final KeyStore _keyStore;
   final TaskDao _taskDao;
   final FileStore _fileStore;
 
   FileRepository(
     this._dispatcher,
+    this._keyStore,
     TaskSource taskSource,
     this._taskDao,
     this._fileStore,
@@ -74,6 +77,8 @@ class FileRepository extends TaskRepository<File> {
       context: Value(ProtocolWrapper.init(
         group.protocol.toNative(),
         group.context,
+        group.certificates!,
+        _keyStore.load(did) as Uint8List,
         shares: rpcTask.data.length,
       )),
     );

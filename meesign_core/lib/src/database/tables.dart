@@ -49,6 +49,7 @@ class Groups extends Table {
   TextColumn get keyType => textEnum<KeyType>()();
   BoolColumn get withCard => boolean().withDefault(const Constant(false))();
   BlobColumn get context => blob()();
+  BlobColumn get certificates => blob().nullable()();
   TextColumn get note => text().nullable()();
 
   @override
