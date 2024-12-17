@@ -79,11 +79,19 @@ class MeeSignCryptoLib {
 
   ffi.Pointer<Protocol> protocol_keygen(
     int proto_id,
+    ffi.Pointer<ffi.Uint8> certs_ptr,
+    int certs_len,
+    ffi.Pointer<ffi.Uint8> pkcs12_ptr,
+    int pkcs12_len,
     bool with_card,
     int shares,
   ) {
     return _protocol_keygen(
       proto_id,
+      certs_ptr,
+      certs_len,
+      pkcs12_ptr,
+      pkcs12_len,
       with_card,
       shares,
     );
@@ -92,9 +100,16 @@ class MeeSignCryptoLib {
   late final _protocol_keygenPtr = _lookup<
       ffi.NativeFunction<
           ffi.Pointer<Protocol> Function(
-              ffi.Int32, ffi.Bool, ffi.UintPtr)>>('protocol_keygen');
-  late final _protocol_keygen = _protocol_keygenPtr
-      .asFunction<ffi.Pointer<Protocol> Function(int, bool, int)>();
+              ffi.Int32,
+              ffi.Pointer<ffi.Uint8>,
+              ffi.UintPtr,
+              ffi.Pointer<ffi.Uint8>,
+              ffi.UintPtr,
+              ffi.Bool,
+              ffi.UintPtr)>>('protocol_keygen');
+  late final _protocol_keygen = _protocol_keygenPtr.asFunction<
+      ffi.Pointer<Protocol> Function(int, ffi.Pointer<ffi.Uint8>, int,
+          ffi.Pointer<ffi.Uint8>, int, bool, int)>();
 
   Buffer protocol_advance(
     ffi.Pointer<Protocol> proto_ptr,
@@ -146,22 +161,38 @@ class MeeSignCryptoLib {
     int proto_id,
     ffi.Pointer<ffi.Uint8> group_ptr,
     int group_len,
+    ffi.Pointer<ffi.Uint8> certs_ptr,
+    int certs_len,
+    ffi.Pointer<ffi.Uint8> pkcs12_ptr,
+    int pkcs12_len,
     int shares,
   ) {
     return _protocol_init(
       proto_id,
       group_ptr,
       group_len,
+      certs_ptr,
+      certs_len,
+      pkcs12_ptr,
+      pkcs12_len,
       shares,
     );
   }
 
   late final _protocol_initPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Pointer<Protocol> Function(ffi.Int32, ffi.Pointer<ffi.Uint8>,
-              ffi.UintPtr, ffi.UintPtr)>>('protocol_init');
+          ffi.Pointer<Protocol> Function(
+              ffi.Int32,
+              ffi.Pointer<ffi.Uint8>,
+              ffi.UintPtr,
+              ffi.Pointer<ffi.Uint8>,
+              ffi.UintPtr,
+              ffi.Pointer<ffi.Uint8>,
+              ffi.UintPtr,
+              ffi.UintPtr)>>('protocol_init');
   late final _protocol_init = _protocol_initPtr.asFunction<
-      ffi.Pointer<Protocol> Function(int, ffi.Pointer<ffi.Uint8>, int, int)>();
+      ffi.Pointer<Protocol> Function(int, ffi.Pointer<ffi.Uint8>, int,
+          ffi.Pointer<ffi.Uint8>, int, ffi.Pointer<ffi.Uint8>, int, int)>();
 
   void auth_key_free(
     AuthKey key,

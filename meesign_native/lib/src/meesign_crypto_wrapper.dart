@@ -64,10 +64,13 @@ class Error {
 }
 
 class ProtocolWrapper {
-  static Uint8List keygen(int protoId,
+  static Uint8List keygen(int protoId, Uint8List certs, Uint8List pkcs12,
       {bool withCard = false, int shares = 1}) {
     return using((Arena alloc) {
-      final proto = _lib.protocol_keygen(protoId, withCard, shares);
+      final certsBuf = certs.dupToNative(alloc);
+      final pkcs12Buf = pkcs12.dupToNative(alloc);
+
+      final proto = _lib.protocol_keygen(protoId, certsBuf, certs.length, pkcs12Buf, pkcs12.length, withCard, shares);
       final context = alloc.using(
         _lib.protocol_serialize(proto),
         _lib.buffer_free,
@@ -77,11 +80,13 @@ class ProtocolWrapper {
     });
   }
 
-  static Uint8List init(int protoId, Uint8List group, {int shares = 1}) {
+  static Uint8List init(int protoId, Uint8List group, Uint8List certs, Uint8List pkcs12, {int shares = 1}) {
     return using((Arena alloc) {
       final groupBuf = group.dupToNative(alloc);
+      final certsBuf = certs.dupToNative(alloc);
+      final pkcs12Buf = pkcs12.dupToNative(alloc);
 
-      final proto = _lib.protocol_init(protoId, groupBuf, group.length, shares);
+      final proto = _lib.protocol_init(protoId, groupBuf, group.length, certsBuf, certs.length, pkcs12Buf, pkcs12.length, shares);
       final context = alloc.using(
         _lib.protocol_serialize(proto),
         _lib.buffer_free,
