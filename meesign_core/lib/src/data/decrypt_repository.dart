@@ -12,13 +12,16 @@ import '../util/mime_type.dart';
 import '../util/uuid.dart';
 import 'task_repository.dart';
 import 'network_dispatcher.dart';
+import 'key_store.dart';
 
 class DecryptRepository extends TaskRepository<Decrypt> {
   final TaskDao _taskDao;
   final NetworkDispatcher _dispatcher;
+  final KeyStore _keyStore;
 
   DecryptRepository(
     this._dispatcher,
+    this._keyStore,
     TaskSource taskSource,
     this._taskDao,
   ) : super(rpc.TaskType.DECRYPT, taskSource, _taskDao);
@@ -76,6 +79,8 @@ class DecryptRepository extends TaskRepository<Decrypt> {
       context: Value(ProtocolWrapper.init(
         group.protocol.toNative(),
         group.context,
+        group.certificates!,
+        _keyStore.load(did) as Uint8List,
         shares: rpcTask.data.length,
       )),
     );

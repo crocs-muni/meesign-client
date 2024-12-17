@@ -11,13 +11,16 @@ import '../model/task.dart';
 import '../util/uuid.dart';
 import 'network_dispatcher.dart';
 import 'task_repository.dart';
+import 'key_store.dart';
 
 class ChallengeRepository extends TaskRepository<Challenge> {
   final NetworkDispatcher _dispatcher;
+  final KeyStore _keyStore;
   final TaskDao _taskDao;
 
   ChallengeRepository(
     this._dispatcher,
+    this._keyStore,
     TaskSource taskSource,
     this._taskDao,
   ) : super(rpc.TaskType.SIGN_CHALLENGE, taskSource, _taskDao);
@@ -67,6 +70,8 @@ class ChallengeRepository extends TaskRepository<Challenge> {
       context: Value(ProtocolWrapper.init(
         group.protocol.toNative(),
         group.context,
+        group.certificates!,
+        _keyStore.load(did) as Uint8List,
         shares: rpcTask.data.length,
       )),
     );
