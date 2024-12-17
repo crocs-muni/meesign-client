@@ -468,6 +468,12 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
   late final GeneratedColumn<Uint8List> context = GeneratedColumn<Uint8List>(
       'context', aliasedName, false,
       type: DriftSqlType.blob, requiredDuringInsert: true);
+  static const VerificationMeta _certificatesMeta =
+      const VerificationMeta('certificates');
+  @override
+  late final GeneratedColumn<Uint8List> certificates =
+      GeneratedColumn<Uint8List>('certificates', aliasedName, true,
+          type: DriftSqlType.blob, requiredDuringInsert: false);
   static const VerificationMeta _noteMeta = const VerificationMeta('note');
   @override
   late final GeneratedColumn<String> note = GeneratedColumn<String>(
@@ -484,6 +490,7 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
         keyType,
         withCard,
         context,
+        certificates,
         note
       ];
   @override
@@ -535,6 +542,12 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
     } else if (isInserting) {
       context.missing(_contextMeta);
     }
+    if (data.containsKey('certificates')) {
+      context.handle(
+          _certificatesMeta,
+          certificates.isAcceptableOrUnknown(
+              data['certificates']!, _certificatesMeta));
+    }
     if (data.containsKey('note')) {
       context.handle(
           _noteMeta, note.isAcceptableOrUnknown(data['note']!, _noteMeta));
@@ -568,6 +581,8 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
           .read(DriftSqlType.bool, data['${effectivePrefix}with_card'])!,
       context: attachedDatabase.typeMapping
           .read(DriftSqlType.blob, data['${effectivePrefix}context'])!,
+      certificates: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}certificates']),
       note: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}note']),
     );
@@ -594,6 +609,7 @@ class Group extends DataClass implements Insertable<Group> {
   final KeyType keyType;
   final bool withCard;
   final Uint8List context;
+  final Uint8List? certificates;
   final String? note;
   const Group(
       {this.id,
@@ -605,6 +621,7 @@ class Group extends DataClass implements Insertable<Group> {
       required this.keyType,
       required this.withCard,
       required this.context,
+      this.certificates,
       this.note});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -626,6 +643,9 @@ class Group extends DataClass implements Insertable<Group> {
     }
     map['with_card'] = Variable<bool>(withCard);
     map['context'] = Variable<Uint8List>(context);
+    if (!nullToAbsent || certificates != null) {
+      map['certificates'] = Variable<Uint8List>(certificates);
+    }
     if (!nullToAbsent || note != null) {
       map['note'] = Variable<String>(note);
     }
@@ -643,6 +663,9 @@ class Group extends DataClass implements Insertable<Group> {
       keyType: Value(keyType),
       withCard: Value(withCard),
       context: Value(context),
+      certificates: certificates == null && nullToAbsent
+          ? const Value.absent()
+          : Value(certificates),
       note: note == null && nullToAbsent ? const Value.absent() : Value(note),
     );
   }
@@ -662,6 +685,7 @@ class Group extends DataClass implements Insertable<Group> {
           .fromJson(serializer.fromJson<String>(json['keyType'])),
       withCard: serializer.fromJson<bool>(json['withCard']),
       context: serializer.fromJson<Uint8List>(json['context']),
+      certificates: serializer.fromJson<Uint8List?>(json['certificates']),
       note: serializer.fromJson<String?>(json['note']),
     );
   }
@@ -680,6 +704,7 @@ class Group extends DataClass implements Insertable<Group> {
           .toJson<String>($GroupsTable.$converterkeyType.toJson(keyType)),
       'withCard': serializer.toJson<bool>(withCard),
       'context': serializer.toJson<Uint8List>(context),
+      'certificates': serializer.toJson<Uint8List?>(certificates),
       'note': serializer.toJson<String?>(note),
     };
   }
@@ -694,6 +719,7 @@ class Group extends DataClass implements Insertable<Group> {
           KeyType? keyType,
           bool? withCard,
           Uint8List? context,
+          Value<Uint8List?> certificates = const Value.absent(),
           Value<String?> note = const Value.absent()}) =>
       Group(
         id: id.present ? id.value : this.id,
@@ -705,6 +731,8 @@ class Group extends DataClass implements Insertable<Group> {
         keyType: keyType ?? this.keyType,
         withCard: withCard ?? this.withCard,
         context: context ?? this.context,
+        certificates:
+            certificates.present ? certificates.value : this.certificates,
         note: note.present ? note.value : this.note,
       );
   @override
@@ -719,6 +747,7 @@ class Group extends DataClass implements Insertable<Group> {
           ..write('keyType: $keyType, ')
           ..write('withCard: $withCard, ')
           ..write('context: $context, ')
+          ..write('certificates: $certificates, ')
           ..write('note: $note')
           ..write(')'))
         .toString();
@@ -735,6 +764,7 @@ class Group extends DataClass implements Insertable<Group> {
       keyType,
       withCard,
       $driftBlobEquality.hash(context),
+      $driftBlobEquality.hash(certificates),
       note);
   @override
   bool operator ==(Object other) =>
@@ -749,6 +779,7 @@ class Group extends DataClass implements Insertable<Group> {
           other.keyType == this.keyType &&
           other.withCard == this.withCard &&
           $driftBlobEquality.equals(other.context, this.context) &&
+          $driftBlobEquality.equals(other.certificates, this.certificates) &&
           other.note == this.note);
 }
 
@@ -762,6 +793,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
   final Value<KeyType> keyType;
   final Value<bool> withCard;
   final Value<Uint8List> context;
+  final Value<Uint8List?> certificates;
   final Value<String?> note;
   final Value<int> rowid;
   const GroupsCompanion({
@@ -774,6 +806,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
     this.keyType = const Value.absent(),
     this.withCard = const Value.absent(),
     this.context = const Value.absent(),
+    this.certificates = const Value.absent(),
     this.note = const Value.absent(),
     this.rowid = const Value.absent(),
   });
@@ -787,6 +820,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
     required KeyType keyType,
     this.withCard = const Value.absent(),
     required Uint8List context,
+    this.certificates = const Value.absent(),
     this.note = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : tid = Value(tid),
@@ -806,6 +840,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
     Expression<String>? keyType,
     Expression<bool>? withCard,
     Expression<Uint8List>? context,
+    Expression<Uint8List>? certificates,
     Expression<String>? note,
     Expression<int>? rowid,
   }) {
@@ -819,6 +854,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
       if (keyType != null) 'key_type': keyType,
       if (withCard != null) 'with_card': withCard,
       if (context != null) 'context': context,
+      if (certificates != null) 'certificates': certificates,
       if (note != null) 'note': note,
       if (rowid != null) 'rowid': rowid,
     });
@@ -834,6 +870,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
       Value<KeyType>? keyType,
       Value<bool>? withCard,
       Value<Uint8List>? context,
+      Value<Uint8List?>? certificates,
       Value<String?>? note,
       Value<int>? rowid}) {
     return GroupsCompanion(
@@ -846,6 +883,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
       keyType: keyType ?? this.keyType,
       withCard: withCard ?? this.withCard,
       context: context ?? this.context,
+      certificates: certificates ?? this.certificates,
       note: note ?? this.note,
       rowid: rowid ?? this.rowid,
     );
@@ -883,6 +921,9 @@ class GroupsCompanion extends UpdateCompanion<Group> {
     if (context.present) {
       map['context'] = Variable<Uint8List>(context.value);
     }
+    if (certificates.present) {
+      map['certificates'] = Variable<Uint8List>(certificates.value);
+    }
     if (note.present) {
       map['note'] = Variable<String>(note.value);
     }
@@ -904,6 +945,7 @@ class GroupsCompanion extends UpdateCompanion<Group> {
           ..write('keyType: $keyType, ')
           ..write('withCard: $withCard, ')
           ..write('context: $context, ')
+          ..write('certificates: $certificates, ')
           ..write('note: $note, ')
           ..write('rowid: $rowid')
           ..write(')'))

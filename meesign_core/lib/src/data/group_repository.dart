@@ -14,14 +14,17 @@ import '../util/uuid.dart';
 import 'device_repository.dart';
 import 'network_dispatcher.dart';
 import 'task_repository.dart';
+import 'key_store.dart';
 
 class GroupRepository extends TaskRepository<Group> {
   final NetworkDispatcher _dispatcher;
+  final KeyStore _keyStore;
   final TaskDao _taskDao;
   final DeviceRepository _deviceRepository;
 
   GroupRepository(
     this._dispatcher,
+    this._keyStore,
     TaskSource taskSource,
     this._taskDao,
     this._deviceRepository,
@@ -97,10 +100,19 @@ class GroupRepository extends TaskRepository<Group> {
 
   @override
   Future<db.Task> initTask(Uuid did, db.Task task, rpc.Task rpcTask) async {
+    await _taskDao.updateGroup(
+      db.GroupsCompanion(
+        tid: Value(task.id),
+        did: Value(did.bytes),
+        certificates: Value(rpcTask.data[0] as Uint8List),
+      ),
+    );
     final group = await _taskDao.getGroup(did.bytes, tid: task.id);
     return task.copyWith(
       context: Value(ProtocolWrapper.keygen(
         group.protocol.toNative(),
+        group.certificates!,
+        _keyStore.load(did) as Uint8List,
         shares: rpcTask.data.length,
         withCard: group.withCard,
       )),
