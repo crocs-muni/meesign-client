@@ -39,9 +39,7 @@ class InitPageState extends State<InitPage> {
 
     await container.userRepository.setUser(user);
     final currentSession = container.session;
-    final session = currentSession != null && currentSession.user == user
-        ? currentSession
-        : await container.startUserSession(user);
+    final session = currentSession != null && currentSession.user == user ? currentSession : await container.startUserSession(user);
     session.startSync();
 
     if (mounted) {
@@ -62,8 +60,7 @@ class InitPageState extends State<InitPage> {
     final session = await container.startUserSession(user);
 
     try {
-      final compatible =
-          await session.supportServices.checkCompatibility(user.did);
+      final compatible = await session.supportServices.checkCompatibility(user.did);
       if (!compatible) {
         setState(() => _status = UserStatus.outdated);
         return;
