@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'app_container.dart';
+import 'pages/register_page.dart';
 import 'routes.dart';
 import 'theme.dart';
 import 'ui/about_page.dart';
@@ -124,7 +125,7 @@ class MyApp extends StatelessWidget {
         Routes.newGroup: (_) => const NewGroupPage(),
         Routes.newGroupSearch: (_) => const SearchPeerPage(),
         Routes.newGroupQr: (_) => const QrReaderPage(),
-        Routes.init: (_) => InitPage(
+        Routes.init: (_) => RegisterPage(
               prefillHost: prefillHost ?? 'meesign.crocs.fi.muni.cz',
               prefillName: prefillName ?? '',
             ),

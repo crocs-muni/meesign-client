@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../theme.dart';
+
 class WarningBanner extends StatelessWidget {
   final String title;
   final String text;
   final List<Widget> actions;
+  final bool roundedBorder;
 
   const WarningBanner({
     super.key,
     required this.title,
     required this.text,
     this.actions = const [],
+    this.roundedBorder = true,
   });
 
   @override
@@ -38,8 +42,11 @@ class WarningBanner extends StatelessWidget {
     );
 
     return Container(
-      color: colorScheme.errorContainer,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(XLARGE_PADDING),
+      decoration: BoxDecoration(
+        color: colorScheme.errorContainer,
+        borderRadius: BorderRadius.circular(roundedBorder ? MEDIUM_BORDER_RADIUS : 0),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

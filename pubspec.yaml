@@ -56,7 +56,7 @@ dependencies:
   mobile_scanner: ^4.0.1
   characters: ^1.2.0
   flutter_svg: ^2.0.7
-  url_launcher: ^6.1.2
+  url_launcher: ^6.3.1
   meesign_core:
     path: meesign_core
   args: ^2.3.1
@@ -72,6 +72,8 @@ dependencies:
   # https://github.com/flutter/flutter/issues/102560
   material_symbols_icons: ^4.2719.3
   convert: ^3.1.1
+  mesh_gradient: ^1.3.8
+  simple_gradient_text: ^1.3.0
 
 dev_dependencies:
   flutter_test:
@@ -96,8 +98,11 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/icon_logo.svg
+    - assets/icon_logo_light_mode.svg
+    - assets/icon_logo_dark_mode.svg
     - assets/crocs_logo.svg
+    - assets/ministerstvo_vnitra_cz_logo.svg
+    - assets/ministerstvo_vnitra_cz_logo_dark_mode.svg
     - assets/ca-cert.pem
 
   # An image asset can refer to one or more resolution-specific "variants", see
