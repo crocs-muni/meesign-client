@@ -179,9 +179,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
     });
 
     final session = context.read<AppContainer>().session!;
-    session.deviceRepository
-        .getDevice(session.user.did)
-        .then((device) => setState(() => _members.add(Member(device, 1))));
+    session.deviceRepository.getDevice(session.user.did).then((device) => setState(() => _members.add(Member(device, 1))));
   }
 
   @override
@@ -190,8 +188,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
     super.dispose();
   }
 
-  void _setThreshold(int value) =>
-      _threshold = max(_minThreshold, min(value, _shareCount));
+  void _setThreshold(int value) => _threshold = max(_minThreshold, min(value, _shareCount));
 
   void _addMembers(Object? devices) {
     if (devices is! List<Device>) return;
@@ -204,8 +201,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
     });
   }
 
-  bool get _hasBot =>
-      _members.any((member) => member.device.kind == DeviceKind.bot);
+  bool get _hasBot => _members.any((member) => member.device.kind == DeviceKind.bot);
 
   void _selectPeer(String route) async {
     // TODO: pass the current selection to the search page?
@@ -217,10 +213,8 @@ class _NewGroupPageState extends State<NewGroupPage> {
     String pad(num n) => n.toString().padLeft(2, '0');
     return {
       if (_policyTime || includeAll) ...{
-        'after':
-            '${pad(_policyAfterTime.hour)}:${pad(_policyAfterTime.minute)}',
-        'before':
-            '${pad(_policyBeforeTime.hour)}:${pad(_policyBeforeTime.minute)}',
+        'after': '${pad(_policyAfterTime.hour)}:${pad(_policyAfterTime.minute)}',
+        'before': '${pad(_policyBeforeTime.hour)}:${pad(_policyBeforeTime.minute)}',
       },
       if (_policyDecline || includeAll) 'decline': _policyDecline,
     };
@@ -575,8 +569,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
             ),
           ExpansionTile(
             title: const Text('Advanced options'),
-            collapsedTextColor:
-                Theme.of(context).textTheme.bodyLarge?.color?.withOpacity(0.5),
+            collapsedTextColor: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.5),
             expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               OptionTile(
@@ -606,8 +599,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                       decoration: InputDecoration(
                         border: const OutlineInputBorder(),
                         errorText: _policyErr,
-                        hintText: const JsonEncoder.withIndent('  ')
-                            .convert(_buildPolicy(includeAll: true)),
+                        hintText: const JsonEncoder.withIndent('  ').convert(_buildPolicy(includeAll: true)),
                       ),
                       maxLines: null,
                     ),

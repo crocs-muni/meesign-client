@@ -15,7 +15,6 @@ import 'routes.dart';
 import 'theme.dart';
 import 'ui/about_page.dart';
 import 'ui/home_page.dart';
-import 'ui/init_page.dart';
 import 'ui/new_group_page.dart';
 import 'ui/qr_reader_page.dart';
 import 'ui/search_peer_page.dart';

@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
-import 'package:simple_gradient_text/simple_gradient_text.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../app_container.dart';
 import '../enums/user_status.dart';
 import '../routes.dart';
 import '../templates/default_page_template.dart';
-import '../theme.dart';
+import '../ui_constants.dart';
 import '../widget/auth/registration_form.dart';
 import '../widget/common/fluid_gradient.dart';
 import '../widget/warning_banner.dart';
@@ -25,7 +24,7 @@ class RegisterPage extends StatefulWidget {
   });
 
   @override
-  _RegisterPageState createState() => _RegisterPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
 class _RegisterPageState extends State<RegisterPage> {
@@ -104,7 +103,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget _buildPageBody(BuildContext context) {
     return Stack(
       children: [
-        const FluidGradient(),
+        FluidGradient(),
         AnimatedCrossFade(
           duration: const Duration(milliseconds: 1000),
           firstChild: _getCardLoader(),
@@ -175,7 +174,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Widget _buildLogoSection(BuildContext context) {
     const double logoWidth = 100;
-    const bool gradientText = false;
 
     return Column(
       children: [
@@ -184,20 +182,13 @@ class _RegisterPageState extends State<RegisterPage> {
           width: logoWidth,
         ),
         SizedBox(height: MEDIUM_GAP),
-        GradientText(
+        Text(
           'MeeSign',
           textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.displayLarge?.copyWith(fontWeight: FontWeight.bold),
-          colors: gradientText
-              ? [
-                  Colors.blueGrey,
-                  Colors.lightBlue,
-                  Colors.indigo,
-                ]
-              : [
-                  Theme.of(context).colorScheme.onSurface,
-                  Theme.of(context).colorScheme.onSurface,
-                ],
+          style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
         ),
       ],
     );

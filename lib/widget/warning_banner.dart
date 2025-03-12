@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import '../theme.dart';
+import '../ui_constants.dart';
 
 class WarningBanner extends StatelessWidget {
   final String title;

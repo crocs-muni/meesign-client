@@ -211,9 +211,7 @@ class TaskTile<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final desc = this.desc ?? statusMessage(task);
     final trailing = this.trailing ?? TaskStateIndicator(task);
-    final allActions = actions +
-        (task.approvable ? approveActions : []) +
-        (task.state == TaskState.needsCard ? cardActions : []);
+    final allActions = actions + (task.approvable ? approveActions : []) + (task.state == TaskState.needsCard ? cardActions : []);
 
     final actionRow = allActions.isNotEmpty || actionChip != null
         ? Row(
@@ -237,18 +235,14 @@ class TaskTile<T> extends StatelessWidget {
     return Deletable(
       dismissibleKey: ObjectKey(task),
       icon: task.archived ? Symbols.unarchive : Symbols.archive,
-      color: task.archived
-          ? Theme.of(context).colorScheme.surfaceVariant
-          : Theme.of(context).extension<CustomColors>()!.successContainer!,
+      color: task.archived ? Theme.of(context).colorScheme.surfaceContainerHighest : Theme.of(context).extension<CustomColors>()!.successContainer!,
       onDeleted: (_) {
         if (onArchiveChange != null) onArchiveChange!(!task.archived);
       },
       child: ExpansionTile(
         title: Text(name),
         subtitle: desc != null ? Text(desc) : null,
-        initiallyExpanded: !task.archived &&
-            task.state != TaskState.finished &&
-            task.state != TaskState.failed,
+        initiallyExpanded: !task.archived && task.state != TaskState.finished && task.state != TaskState.failed,
         leading: leading,
         trailing: trailing,
         childrenPadding: const EdgeInsets.symmetric(
@@ -275,9 +269,7 @@ class SigningSubPage extends StatelessWidget {
       return buildTaskListView<File>(
         model.signTasks,
         emptyView: EmptyList(
-          hint: model.hasGroup(KeyType.signPdf)
-              ? 'Try signing a PDF file.'
-              : 'Start by creating a group for signing.',
+          hint: model.hasGroup(KeyType.signPdf) ? 'Try signing a PDF file.' : 'Start by creating a group for signing.',
         ),
         showArchived: model.showArchived,
         taskBuilder: (context, task) {
@@ -301,8 +293,7 @@ class SigningSubPage extends StatelessWidget {
                 onPressed: () => model.joinSign(task, agree: false),
               ),
             ],
-            onArchiveChange: (archive) =>
-                model.archiveTask(task, archive: archive),
+            onArchiveChange: (archive) => model.archiveTask(task, archive: archive),
           );
         },
       );
@@ -340,12 +331,9 @@ class GroupsSubPage extends StatelessWidget {
                 child: const Text('Join'),
                 onPressed: () => model.joinGroup(task, agree: true),
               ),
-              if (CardManager.platformSupported &&
-                  group.protocol.cardSupport &&
-                  thisMember.shares == 1)
+              if (CardManager.platformSupported && group.protocol.cardSupport && thisMember.shares == 1)
                 FilledButton.tonal(
-                  onPressed: () =>
-                      model.joinGroup(task, agree: true, withCard: true),
+                  onPressed: () => model.joinGroup(task, agree: true, withCard: true),
                   child: const Text('Join with card'),
                 ),
               OutlinedButton(
@@ -370,8 +358,7 @@ class GroupsSubPage extends StatelessWidget {
             ],
             cardActions: [
               FilledButton.tonal(
-                onPressed: () => _launchCardReader(
-                    context, (card) => model.advanceGroupWithCard(task, card)),
+                onPressed: () => _launchCardReader(context, (card) => model.advanceGroupWithCard(task, card)),
                 child: const Text('Read card'),
               ),
             ],
@@ -381,14 +368,11 @@ class GroupsSubPage extends StatelessWidget {
                 child: Wrap(
                   spacing: 8,
                   runSpacing: 4,
-                  children: [
-                    for (var m in members) DeviceChip(device: m.device)
-                  ],
+                  children: [for (var m in members) DeviceChip(device: m.device)],
                 ),
               ),
             ],
-            onArchiveChange: (archive) =>
-                model.archiveTask(task, archive: archive),
+            onArchiveChange: (archive) => model.archiveTask(task, archive: archive),
           );
         },
       );
@@ -486,9 +470,7 @@ class ChallengeSubPage extends StatelessWidget {
       return buildTaskListView<Challenge>(
         model.challengeTasks,
         emptyView: EmptyList(
-          hint: model.hasGroup(KeyType.signChallenge)
-              ? 'Try creating a new challenge.'
-              : 'Start by creating a group for challenges.',
+          hint: model.hasGroup(KeyType.signChallenge) ? 'Try creating a new challenge.' : 'Start by creating a group for challenges.',
         ),
         showArchived: model.showArchived,
         taskBuilder: (context, task) {
@@ -508,8 +490,7 @@ class ChallengeSubPage extends StatelessWidget {
             ],
             cardActions: [
               FilledButton.tonal(
-                onPressed: () => _launchCardReader(context,
-                    (card) => model.advanceChallengeWithCard(task, card)),
+                onPressed: () => _launchCardReader(context, (card) => model.advanceChallengeWithCard(task, card)),
                 child: const Text('Read card'),
               ),
             ],
@@ -519,8 +500,7 @@ class ChallengeSubPage extends StatelessWidget {
                 child: const Text('View'),
               )
             ],
-            onArchiveChange: (archive) =>
-                model.archiveTask(task, archive: archive),
+            onArchiveChange: (archive) => model.archiveTask(task, archive: archive),
           );
         },
       );
@@ -556,17 +536,19 @@ class DecryptSubPage extends StatelessWidget {
     const duration = Duration(seconds: 5);
     const refreshInterval = Duration(milliseconds: 20);
     int steps = duration.inMilliseconds ~/ refreshInterval.inMilliseconds;
-    final countdown =
-        Stream.periodic(refreshInterval, (i) => max(0, steps - i));
+    final countdown = Stream.periodic(refreshInterval, (i) => max(0, steps - i));
     final countdownSubject = BehaviorSubject<int>();
     final sub = countdown.listen((value) {
       countdownSubject.add(value);
-      if (value == 0) Navigator.pop(context);
+
+      if (value == 0) {
+        if (context.mounted) {
+          Navigator.pop(context);
+        }
+      }
     });
 
-    final text = decrypt.dataType == MimeType.textUtf8
-        ? utf8.decode(decrypt.data, allowMalformed: true)
-        : null;
+    final text = decrypt.dataType == MimeType.textUtf8 ? utf8.decode(decrypt.data, allowMalformed: true) : null;
 
     await showDialog(
       context: context,
@@ -615,9 +597,7 @@ class DecryptSubPage extends StatelessWidget {
                     await _shareDecrypt(decrypt);
                     sub.resume();
                   },
-                  icon: Icon(PlatformGroup.isMobile
-                      ? Symbols.share
-                      : Symbols.save_alt),
+                  icon: Icon(PlatformGroup.isMobile ? Symbols.share : Symbols.save_alt),
                 ),
               _ => const SizedBox(),
             },
@@ -639,9 +619,7 @@ class DecryptSubPage extends StatelessWidget {
       return buildTaskListView<Decrypt>(
         model.decryptTasks,
         emptyView: EmptyList(
-          hint: model.hasGroup(KeyType.decrypt)
-              ? 'Try encrypting some data.'
-              : 'Start by creating a group for decryption.',
+          hint: model.hasGroup(KeyType.decrypt) ? 'Try encrypting some data.' : 'Start by creating a group for decryption.',
         ),
         showArchived: model.showArchived,
         taskBuilder: (context, task) {
@@ -667,8 +645,7 @@ class DecryptSubPage extends StatelessWidget {
                   child: const Text('View'),
                 )
             ],
-            onArchiveChange: (archive) =>
-                model.archiveTask(task, archive: archive),
+            onArchiveChange: (archive) => model.archiveTask(task, archive: archive),
           );
         },
       );
@@ -714,8 +691,7 @@ class _DataInputDialogState extends State<DataInputDialog> {
 
     final bytes = await file.readAsBytes();
 
-    final header =
-        bytes.sublist(0, min(defaultMagicNumbersMaxLength, bytes.length));
+    final header = bytes.sublist(0, min(defaultMagicNumbersMaxLength, bytes.length));
     final mimeTypeStr = lookupMimeType(file.path, headerBytes: header);
 
     setState(() {
@@ -822,9 +798,7 @@ class _DataInputDialogState extends State<DataInputDialog> {
                 : Stack(
                     alignment: Alignment.center,
                     children: [
-                      _imageMimeType == MimeType.imageSvg
-                          ? SvgPicture.memory(image)
-                          : Image.memory(image),
+                      _imageMimeType == MimeType.imageSvg ? SvgPicture.memory(image) : Image.memory(image),
                       Positioned.fill(
                         child: Material(
                           type: MaterialType.transparency,
@@ -875,10 +849,7 @@ class _HomePageViewState extends State<HomePageView> {
   Future<Group?> _selectGroup(keyType) async {
     final state = context.read<HomeState>();
     final groups = state.groupTasks
-        .where((task) =>
-            task.state == TaskState.finished &&
-            task.info.keyType == keyType &&
-            (state.showArchived || !task.archived))
+        .where((task) => task.state == TaskState.finished && task.info.keyType == keyType && (state.showArchived || !task.archived))
         .map((task) => task.info);
 
     return showDialog<Group?>(
@@ -924,8 +895,7 @@ class _HomePageViewState extends State<HomePageView> {
     return file;
   }
 
-  void showErrorDialog({required String title, required String desc}) =>
-      showDialog<void>(
+  void showErrorDialog({required String title, required String desc}) => showDialog<void>(
         context: context,
         builder: (context) {
           return AlertDialog(
@@ -945,7 +915,12 @@ class _HomePageViewState extends State<HomePageView> {
   // TODO: reduce repetition across request methods
   // (_sign, _challenge, _group, _encrypt)
 
+  HomeState _syncGetHomeState(BuildContext context) => context.read<HomeState>();
+
   Future<void> _sign() async {
+    // Retrieve the HomeState instance before the async gap
+    final homeState = _syncGetHomeState(context);
+
     final file = await _pickPdfFile();
     if (file == null) return;
 
@@ -961,7 +936,7 @@ class _HomePageViewState extends State<HomePageView> {
     if (group == null) return;
 
     try {
-      await context.read<HomeState>().sign(file, group);
+      await homeState.sign(file, group);
     } catch (e) {
       showErrorDialog(
         title: 'Sign request failed',
@@ -972,6 +947,9 @@ class _HomePageViewState extends State<HomePageView> {
   }
 
   Future<void> _challenge() async {
+    // Retrieve the HomeState instance before the async gap
+    final homeState = _syncGetHomeState(context);
+
     final result = await showDialog<(String, MimeType, Uint8List)?>(
       context: context,
       builder: (context) {
@@ -988,7 +966,8 @@ class _HomePageViewState extends State<HomePageView> {
 
     try {
       final (description, _, data) = result;
-      await context.read<HomeState>().challenge(description, data, group);
+
+      await homeState.challenge(description, data, group);
     } catch (e) {
       showErrorDialog(
         title: 'Challenge request failed',
@@ -999,12 +978,16 @@ class _HomePageViewState extends State<HomePageView> {
   }
 
   Future<void> _group() async {
+    // Retrieve the HomeState instance before the async gap
+    final homeState = _syncGetHomeState(context);
+
     final res = await Navigator.pushNamed(context, Routes.newGroup) as Group?;
     if (res == null) return;
 
     try {
-      await context.read<HomeState>().addGroup(res.name, res.members,
-          res.threshold, res.protocol, res.keyType, res.note);
+      if (context.mounted) {
+        await homeState.addGroup(res.name, res.members, res.threshold, res.protocol, res.keyType, res.note);
+      }
     } catch (e) {
       showErrorDialog(
         title: 'Group request failed',
@@ -1015,6 +998,9 @@ class _HomePageViewState extends State<HomePageView> {
   }
 
   Future<void> _encrypt() async {
+    // Retrieve the HomeState instance before the async gap
+    final homeState = _syncGetHomeState(context);
+
     final result = await showDialog<(String, MimeType, Uint8List)?>(
       context: context,
       builder: (context) {
@@ -1040,9 +1026,9 @@ class _HomePageViewState extends State<HomePageView> {
     if (group == null) return;
 
     try {
-      await context
-          .read<HomeState>()
-          .encrypt(description, mimeType, data, group);
+      if (context.mounted) {
+        await homeState.encrypt(description, mimeType, data, group);
+      }
     } catch (e) {
       showErrorDialog(
         title: 'Decryption request failed',
@@ -1108,21 +1094,17 @@ class _HomePageViewState extends State<HomePageView> {
                     Navigator.push(
                       context,
                       MaterialPageRoute<void>(
-                        builder: (BuildContext context) =>
-                            DevicePage(device: device),
+                        builder: (BuildContext context) => DevicePage(device: device),
                       ),
                     );
                   },
                   icon: AnimatedBuilder(
-                    animation:
-                        context.read<AppContainer>().session!.sync.subscribed,
+                    animation: context.read<AppContainer>().session!.sync.subscribed,
                     builder: (context, child) {
                       final session = context.read<AppContainer>().session!;
                       return Badge(
                         backgroundColor: session.sync.subscribed.value
-                            ? Theme.of(context)
-                                .extension<CustomColors>()!
-                                .success
+                            ? Theme.of(context).extension<CustomColors>()!.success
                             : Theme.of(context).colorScheme.error,
                         smallSize: 8,
                         child: CircleAvatar(

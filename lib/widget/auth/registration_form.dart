@@ -1,11 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
 import '../../app_container.dart';
-import '../../theme.dart';
+import '../../ui_constants.dart';
 import '../../util/chars.dart';
 
 class RegistrationForm extends StatefulWidget {

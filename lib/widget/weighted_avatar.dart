@@ -36,10 +36,7 @@ class WeightedAvatar extends StatelessWidget {
                     radius: 2,
                     value: weight.toDouble(),
                     showTitle: false,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .primary
-                        .withOpacity(j == index ? 1 : .2),
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: j == index ? 1 : .2),
                   )
               ],
             ),

@@ -23,9 +23,7 @@ class ReaderOkStatus extends ReaderStatus {
   const ReaderOkStatus._(super.message) : super._();
 
   static final waiting = ReaderOkStatus._(
-    PlatformGroup.isMobile
-        ? 'Hold a card near the device'
-        : 'Insert a card into the reader',
+    PlatformGroup.isMobile ? 'Hold a card near the device' : 'Insert a card into the reader',
   );
   static const working = ReaderOkStatus._('Do not remove the card');
 }
@@ -85,7 +83,9 @@ class _CardReaderPageState extends State<CardReaderPage> {
 
       try {
         await widget.onCard(card);
-        Navigator.pop(context);
+        if (mounted) {
+          Navigator.pop(context);
+        }
       } finally {
         await card.disconnect();
         setStatus(ReaderOkStatus.waiting);
@@ -120,9 +120,7 @@ class _CardReaderPageState extends State<CardReaderPage> {
         children: [
           Material(
             shape: const CircleBorder(),
-            color: _hasError
-                ? colorScheme.errorContainer
-                : colorScheme.primaryContainer,
+            color: _hasError ? colorScheme.errorContainer : colorScheme.primaryContainer,
             child: Stack(
               alignment: AlignmentDirectional.center,
               children: [

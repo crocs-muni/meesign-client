@@ -28,17 +28,14 @@ class AnonymousSession {
     FileStore fileStore,
     Database database,
   ) {
-    dispatcher = NetworkDispatcher(host, keyStore,
-        serverCerts: serverCerts, allowBadCerts: allowBadCerts);
+    dispatcher = NetworkDispatcher(host, keyStore, serverCerts: serverCerts, allowBadCerts: allowBadCerts);
 
     supportServices = SupportServices(dispatcher);
 
-    deviceRepository =
-        DeviceRepository(dispatcher, keyStore, database.deviceDao);
+    deviceRepository = DeviceRepository(dispatcher, keyStore, database.deviceDao);
     final taskSource = TaskSource(dispatcher);
     final taskDao = database.taskDao;
-    groupRepository =
-        GroupRepository(dispatcher, taskSource, taskDao, deviceRepository);
+    groupRepository = GroupRepository(dispatcher, taskSource, taskDao, deviceRepository);
     fileRepository = FileRepository(dispatcher, taskSource, taskDao, fileStore);
     challengeRepository = ChallengeRepository(dispatcher, taskSource, taskDao);
     decryptRepository = DecryptRepository(dispatcher, taskSource, taskDao);
@@ -104,8 +101,7 @@ class AppContainer {
     return data.lengthInBytes == 0 ? null : data.buffer.asUint8List();
   }
 
-  AppContainer({required Directory appDirectory})
-      : dataDirectory = Directory('${appDirectory.path}/data/') {
+  AppContainer({required Directory appDirectory}) : dataDirectory = Directory('${appDirectory.path}/data/') {
     _init();
   }
 
@@ -128,13 +124,11 @@ class AppContainer {
   }
 
   Future<AnonymousSession> createAnonymousSession(String host) async {
-    return AnonymousSession(
-        host, await caCerts, allowBadCerts, keyStore, fileStore, database);
+    return AnonymousSession(host, await caCerts, allowBadCerts, keyStore, fileStore, database);
   }
 
   Future<UserSession> startUserSession(User user) async {
-    session = UserSession(
-        user, await caCerts, allowBadCerts, keyStore, fileStore, database);
+    session = UserSession(user, await caCerts, allowBadCerts, keyStore, fileStore, database);
     reporter.start(session!.supportServices);
     return session!;
   }

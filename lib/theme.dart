@@ -9,7 +9,7 @@ class AppTheme {
   );
 
   static final dark = ThemeData(
-    colorSchemeSeed: Color(0x415f91),
+    colorSchemeSeed: Color(0xFF415F91),
     useMaterial3: true,
     brightness: Brightness.dark,
     extensions: [darkCustomColors],
@@ -84,20 +84,3 @@ class CustomColors extends ThemeExtension<CustomColors> {
     );
   }
 }
-
-// Standardized gap sizes
-const SMALL_GAP = 8.0;
-const MEDIUM_GAP = 16.0;
-const LARGE_GAP = 24.0;
-const XLARGE_GAP = 32.0;
-
-// Standardized border radiuses
-const SMALL_BORDER_RADIUS = 8.0;
-const MEDIUM_BORDER_RADIUS = 16.0;
-const LARGE_BORDER_RADIUS = 32.0;
-
-// Standardized padding
-const double SMALL_PADDING = 8.0;
-const double MEDIUM_PADDING = 16.0;
-const double LARGE_PADDING = 24.0;
-const double XLARGE_PADDING = 32.0;
