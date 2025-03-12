@@ -45,7 +45,8 @@ class WarningBanner extends StatelessWidget {
       padding: const EdgeInsets.all(XLARGE_PADDING),
       decoration: BoxDecoration(
         color: colorScheme.errorContainer,
-        borderRadius: BorderRadius.circular(roundedBorder ? MEDIUM_BORDER_RADIUS : 0),
+        borderRadius:
+            BorderRadius.circular(roundedBorder ? MEDIUM_BORDER_RADIUS : 0),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

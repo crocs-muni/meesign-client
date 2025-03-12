@@ -80,7 +80,8 @@ class CustomColors extends ThemeExtension<CustomColors> {
       success: Color.lerp(success, other.success, t),
       onSuccess: Color.lerp(onSuccess, other.onSuccess, t),
       successContainer: Color.lerp(successContainer, other.successContainer, t),
-      onSuccessContainer: Color.lerp(onSuccessContainer, other.onSuccessContainer, t),
+      onSuccessContainer:
+          Color.lerp(onSuccessContainer, other.onSuccessContainer, t),
     );
   }
 }

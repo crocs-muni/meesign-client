@@ -77,7 +77,9 @@ class DeviceSuggestionTile extends StatelessWidget {
       value: selected,
       onChanged: onChanged,
       secondary: Badge(
-        backgroundColor: active ? Theme.of(context).extension<CustomColors>()!.success : Theme.of(context).colorScheme.error,
+        backgroundColor: active
+            ? Theme.of(context).extension<CustomColors>()!.success
+            : Theme.of(context).colorScheme.error,
         smallSize: 8,
         child: CircleAvatar(
           child: Text(device.name.initials),
@@ -122,7 +124,8 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
   void _query(String query) async {
     Iterable<Device> results = [];
     try {
-      final deviceRepository = context.read<AppContainer>().session!.deviceRepository;
+      final deviceRepository =
+          context.read<AppContainer>().session!.deviceRepository;
       // TODO: allow searching by id?
       results = await deviceRepository.search(_queryController.text);
     } catch (_) {}
@@ -182,7 +185,9 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: FilledButton(
-              onPressed: _selection.isEmpty ? null : () => Navigator.pop(context, _selection),
+              onPressed: _selection.isEmpty
+                  ? null
+                  : () => Navigator.pop(context, _selection),
               child: const Text('Add'),
             ),
           ),
