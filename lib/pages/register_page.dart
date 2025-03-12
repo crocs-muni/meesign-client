@@ -38,7 +38,9 @@ class _RegisterPageState extends State<RegisterPage> {
 
     await container.userRepository.setUser(user);
     final currentSession = container.session;
-    final session = currentSession != null && currentSession.user == user ? currentSession : await container.startUserSession(user);
+    final session = currentSession != null && currentSession.user == user
+        ? currentSession
+        : await container.startUserSession(user);
     session.startSync();
 
     if (mounted) {
@@ -59,7 +61,8 @@ class _RegisterPageState extends State<RegisterPage> {
     final session = await container.startUserSession(user);
 
     try {
-      final compatible = await session.supportServices.checkCompatibility(user.did);
+      final compatible =
+          await session.supportServices.checkCompatibility(user.did);
       if (!compatible) {
         setState(() => _status = UserStatus.outdated);
         return;
@@ -108,7 +111,9 @@ class _RegisterPageState extends State<RegisterPage> {
           duration: const Duration(milliseconds: 1000),
           firstChild: _getCardLoader(),
           secondChild: _getLoadedCard(),
-          crossFadeState: _status != null ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+          crossFadeState: _status != null
+              ? CrossFadeState.showSecond
+              : CrossFadeState.showFirst,
         )
       ],
     );
@@ -116,7 +121,8 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Widget _getCardLoader() {
     return SizedBox(
-      height: MediaQuery.sizeOf(context).height, // This is to prevent loader from jumping during cross fade
+      height: MediaQuery.sizeOf(context)
+          .height, // This is to prevent loader from jumping during cross fade
       child: Center(
         child: CircularProgressIndicator(),
       ),
@@ -157,7 +163,9 @@ class _RegisterPageState extends State<RegisterPage> {
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(LARGE_BORDER_RADIUS),
-            border: Border.all(color: borderColor.withValues(alpha: borderOpacity), width: borderWidth),
+            border: Border.all(
+                color: borderColor.withValues(alpha: borderOpacity),
+                width: borderWidth),
             boxShadow: [
               BoxShadow(
                 color: borderColor.withValues(alpha: shadowOpacity),
@@ -178,7 +186,9 @@ class _RegisterPageState extends State<RegisterPage> {
     return Column(
       children: [
         SvgPicture.asset(
-          Theme.of(context).brightness == Brightness.dark ? 'assets/icon_logo_dark_mode.svg' : 'assets/icon_logo_light_mode.svg',
+          Theme.of(context).brightness == Brightness.dark
+              ? 'assets/icon_logo_dark_mode.svg'
+              : 'assets/icon_logo_light_mode.svg',
           width: logoWidth,
         ),
         SizedBox(height: MEDIUM_GAP),

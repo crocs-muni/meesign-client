@@ -14,12 +14,15 @@ class DefaultPageTemplate extends StatelessWidget {
             child: SingleChildScrollView(
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height, // Ensure at least full screen height
+              minHeight: MediaQuery.of(context)
+                  .size
+                  .height, // Ensure at least full screen height
             ),
             child: IntrinsicHeight(
               child: Column(
                 children: [
-                  Expanded(child: body), // Ensures that body fills available space
+                  Expanded(
+                      child: body), // Ensures that body fills available space
                 ],
               ),
             ),

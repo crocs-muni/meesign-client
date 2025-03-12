@@ -120,17 +120,18 @@ class _RegistrationFormState extends State<RegistrationForm> {
           controller: _nameController,
           focusNode: _nameControllerFocus,
           decoration: InputDecoration(
-            suffixIcon: _nameController.text == '' || !_nameControllerFocus.hasFocus
-                ? null
-                : IconButton(
-                    // Icon to
-                    icon: const Icon(Icons.clear),
-                    onPressed: () {
-                      setState(() {
-                        _nameController.clear();
-                      });
-                    },
-                  ),
+            suffixIcon:
+                _nameController.text == '' || !_nameControllerFocus.hasFocus
+                    ? null
+                    : IconButton(
+                        // Icon to
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          setState(() {
+                            _nameController.clear();
+                          });
+                        },
+                      ),
             labelText: 'Name',
             filled: true,
             border: const OutlineInputBorder(),
@@ -153,17 +154,18 @@ class _RegistrationFormState extends State<RegistrationForm> {
           controller: _hostController,
           focusNode: _hostControllerFocus,
           decoration: InputDecoration(
-            suffixIcon: _hostController.text == '' || !_hostControllerFocus.hasFocus
-                ? SizedBox()
-                : IconButton(
-                    // Icon to
-                    icon: const Icon(Icons.clear),
-                    onPressed: () {
-                      setState(() {
-                        _hostController.clear();
-                      });
-                    },
-                  ),
+            suffixIcon:
+                _hostController.text == '' || !_hostControllerFocus.hasFocus
+                    ? SizedBox()
+                    : IconButton(
+                        // Icon to
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          setState(() {
+                            _hostController.clear();
+                          });
+                        },
+                      ),
             labelText: 'Server',
             filled: true,
             border: const OutlineInputBorder(),
@@ -180,7 +182,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
           width: 200,
           height: 42,
           child: FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary),
+            style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary),
             onPressed: _register,
             child: _working
                 ? SizedBox.square(
