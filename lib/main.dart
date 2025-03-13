@@ -7,11 +7,11 @@ import 'app_container.dart';
 import 'pages/register_page.dart';
 import 'routes.dart';
 import 'theme.dart';
-import 'ui/about_page.dart';
-import 'pages/home_page.dart';
-import 'ui/new_group_page.dart';
-import 'ui/qr_reader_page.dart';
-import 'ui/search_peer_page.dart';
+import 'pages/about_page.dart';
+import 'app/widget/tabbed_scaffold.dart';
+import 'pages/new_group_page.dart';
+import 'pages/qr_reader_page.dart';
+import 'pages/search_peer_page.dart';
 import 'util/app_arg_parser.dart';
 import 'util/app_dir_getter.dart';
 import 'util/error_logger.dart';
@@ -64,7 +64,7 @@ class MeeSignClient extends StatelessWidget {
       themeMode: ThemeMode.system,
       initialRoute: Routes.init,
       routes: {
-        Routes.home: (_) => const HomePage(),
+        Routes.home: (_) => const TabbedScaffold(),
         Routes.newGroup: (_) => const NewGroupPage(),
         Routes.newGroupSearch: (_) => const SearchPeerPage(),
         Routes.newGroupQr: (_) => const QrReaderPage(),

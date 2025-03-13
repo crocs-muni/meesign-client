@@ -2,9 +2,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:meesign_core/meesign_core.dart';
 
+import '../enums/task_status.dart';
 import '../util/chars.dart';
-
-enum TaskListSection { requests, finished, rejected, failed, archived }
 
 Widget buildTaskListView<T>(
   List<Task<T>> tasks, {

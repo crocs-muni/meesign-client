@@ -12,9 +12,9 @@ import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../ui/home_state.dart';
 import '../util/platform.dart';
 import '../util/status_message.dart';
+import '../view_model/app_view_model.dart';
 import '../widget/empty_list.dart';
 import '../widget/entity_chip.dart';
 import '../widget/task_list_view.dart';
@@ -132,7 +132,7 @@ class DecryptSubPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<HomeState>(builder: (context, model, child) {
+    return Consumer<AppViewModel>(builder: (context, model, child) {
       return buildTaskListView<Decrypt>(
         model.decryptTasks,
         emptyView: EmptyList(

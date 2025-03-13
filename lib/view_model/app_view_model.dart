@@ -6,12 +6,9 @@ import 'package:meesign_core/meesign_card.dart';
 import 'package:meesign_core/meesign_data.dart';
 import 'package:rxdart/rxdart.dart';
 
-extension TaskDetails on Task {
-  bool get approvable =>
-      !approved && (state == TaskState.created || state == TaskState.running);
-}
+import '../util/extensions/task_approvable.dart';
 
-class HomeState with ChangeNotifier {
+class AppViewModel with ChangeNotifier {
   static const maxDataSize = FileRepository.maxFileSize;
 
   // TODO: migrate from ChangeNotifier to streams
@@ -40,7 +37,7 @@ class HomeState with ChangeNotifier {
     notifyListeners();
   }
 
-  HomeState(
+  AppViewModel(
     User user,
     DeviceRepository deviceRepository,
     this._groupRepository,
