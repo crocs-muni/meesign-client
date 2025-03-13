@@ -3,8 +3,8 @@ import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
 import '../card/card.dart';
-import '../ui/group_page.dart';
-import '../ui/home_state.dart';
+import '../view_model/app_view_model.dart';
+import 'group_page.dart';
 import '../util/card_reader_launcher.dart';
 import '../widget/empty_list.dart';
 import '../widget/entity_chip.dart';
@@ -17,7 +17,7 @@ class GroupsSubPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<HomeState>(builder: (context, model, child) {
+    return Consumer<AppViewModel>(builder: (context, model, child) {
       return buildTaskListView<Group>(
         model.groupTasks,
         emptyView: const EmptyList(

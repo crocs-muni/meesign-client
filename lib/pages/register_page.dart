@@ -9,8 +9,8 @@ import '../enums/user_status.dart';
 import '../routes.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
-import '../widget/auth/registration_form.dart';
-import '../widget/common/fluid_gradient.dart';
+import '../widget/registration_form.dart';
+import '../widget/fluid_gradient.dart';
 import '../widget/warning_banner.dart';
 
 class RegisterPage extends StatefulWidget {

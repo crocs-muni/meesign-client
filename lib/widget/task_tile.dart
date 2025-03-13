@@ -3,9 +3,9 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:meesign_core/meesign_core.dart';
 
 import '../theme.dart';
-import '../ui/home_state.dart';
-import '../util/list_intersperse.dart';
+import '../util/extensions/list_intersperse.dart';
 import '../util/status_message.dart';
+import '../util/extensions/task_approvable.dart';
 import 'dismissible.dart';
 import 'task_state_indicator.dart';
 

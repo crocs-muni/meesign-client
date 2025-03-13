@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:meesign_core/meesign_model.dart';
 
-import '../ui/device_page.dart';
-import '../ui/group_page.dart';
+import '../pages/device_page.dart';
+import '../pages/group_page.dart';
 import '../util/chars.dart';
 import 'device_name.dart';
 

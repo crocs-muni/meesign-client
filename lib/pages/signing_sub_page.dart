@@ -6,7 +6,7 @@ import 'package:open_filex/open_filex.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../ui/home_state.dart';
+import '../view_model/app_view_model.dart';
 import '../widget/empty_list.dart';
 import '../widget/entity_chip.dart';
 import '../widget/task_list_view.dart';
@@ -17,7 +17,7 @@ class SigningSubPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<HomeState>(builder: (context, model, child) {
+    return Consumer<AppViewModel>(builder: (context, model, child) {
       return buildTaskListView<File>(
         model.signTasks,
         emptyView: EmptyList(

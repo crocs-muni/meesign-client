@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
-import '../../app_container.dart';
-import '../../ui_constants.dart';
-import '../../util/chars.dart';
+import '../app_container.dart';
+import '../ui_constants.dart';
+import '../util/chars.dart';
 
 class RegistrationForm extends StatefulWidget {
   final String prefillName;

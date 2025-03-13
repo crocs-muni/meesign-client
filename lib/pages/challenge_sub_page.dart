@@ -6,9 +6,9 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
-import '../ui/home_state.dart';
 import '../util/card_reader_launcher.dart';
 import '../util/chars.dart';
+import '../view_model/app_view_model.dart';
 import '../widget/empty_list.dart';
 import '../widget/entity_chip.dart';
 import '../widget/task_list_view.dart';
@@ -100,7 +100,7 @@ class ChallengeSubPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<HomeState>(builder: (context, model, child) {
+    return Consumer<AppViewModel>(builder: (context, model, child) {
       return buildTaskListView<Challenge>(
         model.challengeTasks,
         emptyView: EmptyList(
