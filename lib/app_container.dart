@@ -9,9 +9,7 @@ import 'sync.dart';
 
 class AnonymousSession {
   final String host;
-
   late final NetworkDispatcher dispatcher;
-
   late final SupportServices supportServices;
 
   late final DeviceRepository deviceRepository;
@@ -88,12 +86,11 @@ class UserSession extends AnonymousSession {
 
 class AppContainer {
   final Directory dataDirectory;
-
   late KeyStore keyStore;
   late FileStore fileStore;
   late Database database;
-
   late UserRepository userRepository;
+
   UserSession? session;
 
   final Reporter reporter = Reporter(Logger.root);
