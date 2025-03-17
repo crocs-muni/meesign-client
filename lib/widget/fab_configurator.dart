@@ -27,7 +27,11 @@ class FabConfigurator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return fabs[index];
+    try {
+      return fabs[index];
+    } on RangeError {
+      return const SizedBox();
+    }
   }
 
   AppViewModel _syncGetHomeState(BuildContext context) =>
