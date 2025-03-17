@@ -5,6 +5,7 @@ import 'package:logging/logging.dart';
 import 'package:meesign_core/meesign_data.dart';
 
 import 'reporter.dart';
+import 'services/settings_controller.dart';
 import 'sync.dart';
 
 class AnonymousSession {
@@ -90,6 +91,7 @@ class AppContainer {
   late FileStore fileStore;
   late Database database;
   late UserRepository userRepository;
+  late SettingsController settingsController;
 
   UserSession? session;
 
@@ -111,6 +113,7 @@ class AppContainer {
     fileStore = FileStore(dataDirectory);
     database = Database(dataDirectory);
     userRepository = UserRepository(database.userDao);
+    settingsController = SettingsController();
   }
 
   Future<void> recreate({bool deleteData = false}) async {
