@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../pages/settings_page.dart';
 import '../../ui_constants.dart';
+import '../../util/layout_getter.dart';
 import '../../view_model/app_view_model.dart';
 import '../../widget/fluid_gradient.dart';
 import '../model/navigation_tab_model.dart';
@@ -48,8 +49,6 @@ class HomePageView extends StatefulWidget {
 
 class _HomePageViewState extends State<HomePageView> {
   int _index = 0;
-  final double _minTabletLayoutWidth = 700;
-  final double _minLaptopLayoutWidth = 1000;
   late List<NavigationTabModel> _tabs;
 
   @override
@@ -70,16 +69,18 @@ class _HomePageViewState extends State<HomePageView> {
       builder: (context, constraints) {
         return Stack(
           children: [
-            FluidGradient(),
+            if (constraints.maxWidth > minTabletLayoutWidth) ...[
+              FluidGradient(),
+            ],
             Container(
               padding: EdgeInsets.all(
-                  constraints.maxWidth > _minTabletLayoutWidth
+                  constraints.maxWidth > minTabletLayoutWidth
                       ? LARGE_PADDING
                       : 0),
               child: Center(
                 child: Container(
                   padding: EdgeInsets.all(
-                      constraints.maxWidth > _minTabletLayoutWidth
+                      constraints.maxWidth > minTabletLayoutWidth
                           ? LARGE_PADDING
                           : 0),
                   decoration: BoxDecoration(
@@ -96,9 +97,10 @@ class _HomePageViewState extends State<HomePageView> {
                       ),
                     ],
                   ),
-                  constraints: BoxConstraints(maxWidth: _minLaptopLayoutWidth),
+                  constraints: BoxConstraints(maxWidth: minLaptopLayoutWidth),
                   child: Scaffold(
-                    appBar: buildAppBar(context),
+                    appBar: buildAppBar(context,
+                        LayoutGetter.getCurLayout(constraints.maxWidth)),
                     body: _buildResponsiveLayout(
                         _buildIndexedStack(), constraints.maxWidth),
                     floatingActionButton:
@@ -182,10 +184,10 @@ class _HomePageViewState extends State<HomePageView> {
   }
 
   Widget _buildResponsiveLayout(Widget child, double width) {
-    if (width > _minLaptopLayoutWidth) {
+    if (width > minLaptopLayoutWidth) {
       return Center(
         child: Container(
-          constraints: BoxConstraints(maxWidth: _minLaptopLayoutWidth),
+          constraints: BoxConstraints(maxWidth: minLaptopLayoutWidth),
           child: Row(
             children: <Widget>[
               NavigationRail(
@@ -209,7 +211,7 @@ class _HomePageViewState extends State<HomePageView> {
           ),
         ),
       );
-    } else if (width > _minTabletLayoutWidth) {
+    } else if (width > minTabletLayoutWidth) {
       // Show the navigation rail and the child widget from the tab
       return Row(
         children: <Widget>[
@@ -251,7 +253,7 @@ class _HomePageViewState extends State<HomePageView> {
   }
 
   Widget _buildBottomNavigation(double width) {
-    if (width > _minTabletLayoutWidth) {
+    if (width > minTabletLayoutWidth) {
       return const SizedBox.shrink();
     } else {
       return NavigationBar(

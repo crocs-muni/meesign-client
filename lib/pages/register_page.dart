@@ -11,6 +11,7 @@ import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
 import '../widget/registration_form.dart';
 import '../widget/fluid_gradient.dart';
+import '../widget/smart_logo.dart';
 import '../widget/warning_banner.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -99,6 +100,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return DefaultPageTemplate(
+      includePadding: false,
       body: _buildPageBody(context),
     );
   }
@@ -185,12 +187,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
     return Column(
       children: [
-        SvgPicture.asset(
-          Theme.of(context).brightness == Brightness.dark
-              ? 'assets/icon_logo_dark_mode.svg'
-              : 'assets/icon_logo_light_mode.svg',
-          width: logoWidth,
-        ),
+        SmartLogo(logoWidth: logoWidth),
         SizedBox(height: MEDIUM_GAP),
         Text(
           'MeeSign',

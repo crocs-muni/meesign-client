@@ -27,6 +27,20 @@ class Device {
   final DateTime lastActive;
 
   const Device(this.name, this.id, this.kind, this.lastActive);
+
+  Device copyWith({
+    String? name,
+    Uuid? id,
+    DeviceKind? kind,
+    DateTime? lastActive,
+  }) {
+    return Device(
+      name ?? this.name,
+      id ?? this.id,
+      kind ?? this.kind,
+      lastActive ?? this.lastActive,
+    );
+  }
 }
 
 extension DeviceConversion on db.Device {
