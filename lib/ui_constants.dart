@@ -16,3 +16,10 @@ const double SMALL_PADDING = 8.0;
 const double MEDIUM_PADDING = 16.0;
 const double LARGE_PADDING = 24.0;
 const double XLARGE_PADDING = 32.0;
+
+// Responsive layout breakpoints
+const double minTabletLayoutWidth = 700;
+const double minLaptopLayoutWidth = 1000;
+
+// UI element sizes
+const mobileAppBarHeight = 80.0;

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
+const Color _colorSchemeSeed = Color(0xFF415F91);
+
 class AppTheme {
   static final light = ThemeData(
-    colorSchemeSeed: Colors.amber,
+    colorSchemeSeed: _colorSchemeSeed,
     useMaterial3: true,
     brightness: Brightness.light,
     extensions: [lightCustomColors],
@@ -22,7 +24,7 @@ class AppTheme {
 const success = Color(0xFF4E7D4D);
 
 CustomColors lightCustomColors = const CustomColors(
-  sourceSuccess: Color(0xFF4E7D4D),
+  sourceSuccess: _colorSchemeSeed,
   success: Color(0xFF246C2C),
   onSuccess: Color(0xFFFFFFFF),
   successContainer: Color(0xFFA9F5A5),

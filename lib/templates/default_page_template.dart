@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../ui_constants.dart';
+
 class DefaultPageTemplate extends StatelessWidget {
   final Widget body;
   final bool showAppBar;
   final String appBarTitle;
   final bool fullHeight;
   final String backButtonText;
+  final bool includePadding;
 
   const DefaultPageTemplate({
     super.key,
@@ -14,6 +17,7 @@ class DefaultPageTemplate extends StatelessWidget {
     this.appBarTitle = '',
     this.backButtonText = 'Back',
     this.fullHeight = true,
+    this.includePadding = true,
   });
 
   @override
@@ -21,29 +25,25 @@ class DefaultPageTemplate extends StatelessWidget {
     return Scaffold(
       appBar: showAppBar
           ? AppBar(
+              forceMaterialTransparency: true,
+              surfaceTintColor: Colors.transparent,
               leadingWidth: 120,
               leading: _buildCustomBackButton(context),
               title: Text(appBarTitle),
             )
           : null,
-      body: SizedBox(
-        width: double.infinity,
-        child: SafeArea(
-            child: SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: fullHeight ? MediaQuery.of(context).size.height : 0,
-            ),
-            child: IntrinsicHeight(
-              child: Column(
-                children: [
-                  Expanded(
-                      child: body), // Ensures that body fills available space
-                ],
-              ),
-            ),
+      body: Container(
+        padding: EdgeInsets.all(includePadding ? MEDIUM_PADDING : 0),
+        child: SizedBox(
+          width: double.infinity,
+          child: SafeArea(
+            child: fullHeight
+                ? body
+                : SingleChildScrollView(
+                    child: body,
+                  ),
           ),
-        )),
+        ),
       ),
     );
   }
