@@ -79,10 +79,9 @@ class _DeviceSettingsPageState extends State<DeviceSettingsPage> {
                             },
                           ),
                     filled: true,
-                    hint: Text(
-                      'Name to identify yourself',
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.outline),
+                    hintText: 'Name to identify yourself',
+                    hintStyle: TextStyle(
+                      color: Theme.of(context).colorScheme.outline,
                     ),
                     border: const OutlineInputBorder(),
                     enabledBorder: OutlineInputBorder(
