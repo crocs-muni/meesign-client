@@ -6,55 +6,90 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../app/model/settings.dart';
 
 class SettingsController {
-  final _settingsController = BehaviorSubject<Settings>.seeded(Settings(
-    themeMode:
-        SchedulerBinding.instance.platformDispatcher.platformBrightness ==
-                Brightness.dark
-            ? ThemeMode.dark
-            : ThemeMode.light,
-  ));
+  // Seed settings controller stream with default settings
+  final _settingsController = BehaviorSubject<Settings>.seeded(
+    Settings(
+      themeMode: ThemeMode.system,
+    ),
+  );
+
   Stream<Settings> get settingsStream => _settingsController.stream;
 
   SettingsController() {
     setup();
   }
+
   void setup() async {
-    // Initialize the theme mode with the current platform brightness
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-
-    bool? useDarkMode = sharedPreferences.getBool('useDarkMode');
-    if (useDarkMode == null) {
-      ThemeMode systemTheme = getSystemThemeMode();
-      useDarkMode = systemTheme == ThemeMode.dark;
-      sharedPreferences.setBool('useDarkMode', useDarkMode);
-    }
-
-    updateThemeMode(useDarkMode ? ThemeMode.dark : ThemeMode.light);
-    sharedPreferences.setBool('useDarkMode', useDarkMode);
+    _initThemeSettings();
+    _initShowArchivedItemsSettings();
   }
 
   void updateThemeMode(ThemeMode themeMode) =>
-      _updateSettings(themeMode: themeMode);
+      _updateSettingsStream(themeMode: themeMode);
+  void updateShowArchivedItems(bool showArchivedItems) =>
+      _updateSettingsStream(showArchivedItems: showArchivedItems);
 
-  void _updateSettings({ThemeMode? themeMode}) {
+  void _updateSettingsStream({ThemeMode? themeMode, bool? showArchivedItems}) {
     final currentSettings = _settingsController.value;
-    final updatedSettings = currentSettings.copyWith(themeMode: themeMode);
+    final updatedSettings = currentSettings.copyWith(
+      themeMode: themeMode ?? currentSettings.themeMode,
+      showArchivedItems: showArchivedItems ?? currentSettings.showArchivedItems,
+    );
     _settingsController.add(updatedSettings);
 
     SharedPreferences.getInstance().then((sharedPreferences) {
-      sharedPreferences.setBool('useDarkMode', themeMode == ThemeMode.dark);
+      sharedPreferences.setString(
+          'themeMode', getThemeIdentifier(updatedSettings.themeMode));
+      sharedPreferences.setBool(
+          'showArchivedItems', updatedSettings.showArchivedItems);
     });
   }
 
-  void getSharedPref() async {
-    SharedPreferences.getInstance().then((sharedPreferences) {
-      // print('Dark mode: ${sharedPreferences.getBool('useDarkMode')}');
-    });
+  void _initThemeSettings() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String? themeModeIdentifier =
+        sharedPreferences.getString('themeMode') ?? 'system';
+
+    updateThemeMode(getThemeModeFromIdentifier(themeModeIdentifier));
+    sharedPreferences.setString('themeMode', themeModeIdentifier);
   }
 
-  ThemeMode getSystemThemeMode() {
+  void _initShowArchivedItemsSettings() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    bool? showArchivedItems =
+        sharedPreferences.getBool('showArchivedItems') ?? false;
+
+    updateShowArchivedItems(showArchivedItems);
+    sharedPreferences.setBool('showArchivedItems', showArchivedItems);
+  }
+
+  ThemeMode getSystemBrightness() {
     var brightness =
         SchedulerBinding.instance.platformDispatcher.platformBrightness;
     return brightness == Brightness.dark ? ThemeMode.dark : ThemeMode.light;
+  }
+
+  String getThemeIdentifier(ThemeMode themeMode) {
+    switch (themeMode) {
+      case ThemeMode.dark:
+        return 'dark';
+      case ThemeMode.light:
+        return 'light';
+      case ThemeMode.system:
+        return 'system';
+    }
+  }
+
+  ThemeMode getThemeModeFromIdentifier(String identifier) {
+    switch (identifier) {
+      case 'dark':
+        return ThemeMode.dark;
+      case 'light':
+        return ThemeMode.light;
+      case 'system':
+        return ThemeMode.system;
+      default:
+        return ThemeMode.system;
+    }
   }
 }

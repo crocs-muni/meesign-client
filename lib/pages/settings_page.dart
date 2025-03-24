@@ -3,8 +3,9 @@ import 'package:provider/provider.dart';
 
 import '../templates/default_page_template.dart';
 import '../view_model/app_view_model.dart';
+import 'about_page.dart';
 import 'device_settings_page.dart';
-import 'theme_settings_page.dart';
+import 'general_settings_page.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -13,7 +14,7 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AppViewModel>(builder: (context, model, child) {
       return DefaultPageTemplate(
-        fullHeight: false,
+        wrapInScroll: true,
         body: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,9 +37,14 @@ class SettingsPage extends StatelessWidget {
         "page": DeviceSettingsPage()
       },
       {
-        "icon": Icons.lightbulb,
-        "text": "Dark / Light mode",
-        "page": ThemeSettingsPage()
+        "icon": Icons.question_mark,
+        "text": "About this project",
+        "page": AboutPage()
+      },
+      {
+        "icon": Icons.settings,
+        "text": "General settings",
+        "page": GeneralSettingsPage()
       },
     ];
 
@@ -52,6 +58,9 @@ class SettingsPage extends StatelessWidget {
         itemBuilder: (context, index) {
           final item = menuItems[index];
           return ListTile(
+            shape: RoundedRectangleBorder(
+              borderRadius: _getBorderRadius(index, menuItems.length),
+            ),
             leading: Icon(item["icon"]),
             title: Text(item["text"]),
             onTap: () {
@@ -65,5 +74,16 @@ class SettingsPage extends StatelessWidget {
         },
       ),
     );
+  }
+
+  BorderRadius _getBorderRadius(int index, int length) {
+    // This is to make the ripple effect respect the border radius
+    if (index == 0) {
+      return BorderRadius.vertical(top: Radius.circular(10));
+    } else if (index == length - 1) {
+      return BorderRadius.vertical(bottom: Radius.circular(10));
+    } else {
+      return BorderRadius.zero;
+    }
   }
 }
