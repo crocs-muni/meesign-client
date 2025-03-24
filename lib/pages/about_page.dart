@@ -3,6 +3,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../templates/default_page_template.dart';
+import '../ui_constants.dart';
+import '../widget/smart_logo.dart';
+
 class AboutPage extends StatelessWidget {
   static const version = '0.4.2';
 
@@ -22,107 +26,126 @@ class AboutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    return DefaultPageTemplate(
+        wrapInScroll: true,
+        showAppBar: true,
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            _buildLogoSection(context),
+            SizedBox(height: MEDIUM_GAP),
+            _buildCrocsSection(context),
+            SizedBox(height: XLARGE_GAP),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildWebsiteButton('Project website', meesignAuth),
+                SizedBox(width: MEDIUM_GAP),
+                _buildWebsiteButton('CROCS website', crocsAuth),
+              ],
+            ),
+            SizedBox(height: MEDIUM_GAP),
+            _buildAuthorsSection(context),
+          ],
+        ));
+  }
 
-    final linkStyle = theme.textTheme.titleMedium?.copyWith(
-      decoration: TextDecoration.underline,
-      color: theme.colorScheme.tertiary,
+  Widget _buildLogoSection(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+
+    return Column(
+      children: [
+        SmartLogo(logoWidth: 72),
+        Text('MeeSign',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 50)),
+        Text('version $version',
+            style: theme.textTheme.bodyLarge
+                ?.copyWith(color: theme.colorScheme.outline)),
+        SizedBox(height: MEDIUM_GAP),
+      ],
     );
+  }
 
-    final sectionStyle = theme.textTheme.titleLarge;
+  Widget _buildCrocsSection(BuildContext context) {
+    ThemeData theme = Theme.of(context);
 
-    const sectionGap = 32.0;
-    const itemGap = 16.0;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('About'),
-      ),
-      body: SizedBox.expand(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SvgPicture.asset(
-                'assets/icon_logo.svg',
-                colorFilter: ColorFilter.mode(
-                  theme.colorScheme.primaryContainer,
+    return Column(
+      children: [
+        Text('Developed by', style: theme.textTheme.bodyMedium),
+        SizedBox(height: MEDIUM_GAP),
+        SvgPicture.asset(
+          'assets/crocs_logo.svg',
+          colorFilter: theme.brightness == Brightness.dark
+              ? ColorFilter.mode(
+                  theme.colorScheme.onSurface,
                   BlendMode.srcIn,
-                ),
-                width: 72,
-              ),
-              const SizedBox(height: itemGap),
-              Text(
-                'MeeSign',
-                textAlign: TextAlign.center,
-                style: theme.textTheme.displayLarge,
-              ),
-              const SizedBox(height: itemGap),
-              Text(
-                version,
-                style: theme.textTheme.titleLarge,
-              ),
-              const SizedBox(height: itemGap),
-              InkWell(
-                onTap: () => launchUrl(Uri.https(meesignAuth)),
-                borderRadius: const BorderRadius.all(Radius.circular(4)),
-                child: Text(
-                  meesignAuth,
-                  style: linkStyle,
-                ),
-              ),
-              const SizedBox(height: sectionGap),
-              Text(
-                'Developed by',
-                style: sectionStyle,
-              ),
-              const SizedBox(height: itemGap),
-              SvgPicture.asset(
-                'assets/crocs_logo.svg',
-                colorFilter: theme.brightness == Brightness.dark
-                    ? ColorFilter.mode(
-                        theme.colorScheme.onSurface,
-                        BlendMode.srcIn,
-                      )
-                    : null,
-                height: 72,
-              ),
-              const SizedBox(height: itemGap),
-              InkWell(
-                onTap: () => launchUrl(Uri.https(crocsAuth)),
-                borderRadius: const BorderRadius.all(Radius.circular(4)),
-                child: Text(
-                  crocsAuth,
-                  style: linkStyle,
-                ),
-              ),
-              const SizedBox(height: sectionGap),
-              Text(
-                'Authors',
-                style: sectionStyle,
-              ),
-              const SizedBox(height: itemGap),
-              for (final author in authors)
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox.square(
+                )
+              : null,
+          height: 72,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAuthorsSection(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+
+    return Column(
+      children: [
+        Divider(thickness: 0),
+        Text('Authors:',
+            style: theme.textTheme.headlineLarge?.copyWith(
+                fontWeight: FontWeight.bold, color: theme.colorScheme.primary)),
+        SizedBox(height: SMALL_GAP),
+        for (final author in authors)
+          InkWell(
+            borderRadius:
+                BorderRadius.all(Radius.circular(SMALL_BORDER_RADIUS)),
+            onTap: () {
+              launchUrl(
+                Uri.https('github.com', author.github),
+              );
+            },
+            child: Container(
+              constraints: BoxConstraints(minWidth: 160),
+              padding: EdgeInsets.all(SMALL_PADDING),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: MEDIUM_PADDING),
+                    child: SizedBox.square(
                       dimension: 24,
-                      child: IconButton(
-                        padding: const EdgeInsets.all(0),
-                        iconSize: 20,
-                        icon: const Icon(Symbols.link, opticalSize: 20),
-                        onPressed: () => launchUrl(
-                          Uri.https('github.com', author.github),
-                        ),
-                      ),
+                      child: Icon(Symbols.link, opticalSize: 20),
                     ),
-                    const SizedBox(width: 4),
-                    Text(author.name),
-                  ],
-                ),
-              const SizedBox(height: sectionGap),
-            ],
+                  ),
+                  Container(
+                    constraints: BoxConstraints(minWidth: 100),
+                    child: Text(author.name),
+                  )
+                ],
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildWebsiteButton(String text, String link) {
+    return FilledButton.icon(
+      onPressed: () {
+        launchUrl(Uri.https(link));
+      },
+      label: Container(
+        padding: EdgeInsets.symmetric(vertical: SMALL_PADDING),
+        child: Text(text),
+      ),
+      icon: Icon(Icons.chevron_right, size: 25),
+      style: ButtonStyle(
+        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
           ),
         ),
       ),

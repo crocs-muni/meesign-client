@@ -6,7 +6,7 @@ class DefaultPageTemplate extends StatelessWidget {
   final Widget body;
   final bool showAppBar;
   final String appBarTitle;
-  final bool fullHeight;
+  final bool wrapInScroll;
   final String backButtonText;
   final bool includePadding;
 
@@ -16,7 +16,7 @@ class DefaultPageTemplate extends StatelessWidget {
     this.showAppBar = false,
     this.appBarTitle = '',
     this.backButtonText = 'Back',
-    this.fullHeight = true,
+    this.wrapInScroll = false,
     this.includePadding = true,
   });
 
@@ -37,12 +37,11 @@ class DefaultPageTemplate extends StatelessWidget {
         child: SizedBox(
           width: double.infinity,
           child: SafeArea(
-            child: fullHeight
-                ? body
-                : SingleChildScrollView(
-                    child: body,
-                  ),
-          ),
+              child: wrapInScroll
+                  ? SingleChildScrollView(
+                      child: body,
+                    )
+                  : body),
         ),
       ),
     );

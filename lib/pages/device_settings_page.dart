@@ -62,6 +62,8 @@ class _DeviceSettingsPageState extends State<DeviceSettingsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 TextField(
+                  enabled: false,
+                  readOnly: true,
                   controller: _nameController,
                   focusNode: _nameControllerFocus,
                   onChanged: (_) => setState(() {}),
@@ -90,27 +92,6 @@ class _DeviceSettingsPageState extends State<DeviceSettingsPage> {
                           width: 0),
                     ),
                     errorText: null,
-                  ),
-                ),
-                SizedBox(height: MEDIUM_GAP),
-                FilledButton.icon(
-                  onPressed: _nameController.text.isEmpty ||
-                          _nameController.text == model.device?.name
-                      ? null
-                      : () {
-                          // TODO: Update device name
-                        },
-                  icon: Icon(Icons.save),
-                  label: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    child: Text('Update name'),
-                  ),
-                  style: ButtonStyle(
-                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
                   ),
                 ),
               ],
