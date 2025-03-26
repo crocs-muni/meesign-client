@@ -214,12 +214,12 @@ void main(List<String> args) async {
   final deviceRepository =
       DeviceRepository(dispatcher, keyStore, database.deviceDao);
   final groupRepository =
-      GroupRepository(dispatcher, taskSource, taskDao, deviceRepository);
+      GroupRepository(dispatcher, keyStore, taskSource, taskDao, deviceRepository);
   final fileRepository =
-      FileRepository(dispatcher, taskSource, taskDao, DummyFileStore());
+      FileRepository(dispatcher, keyStore, taskSource, taskDao, DummyFileStore());
   final challengeRepository =
-      ChallengeRepository(dispatcher, taskSource, taskDao);
-  final decryptRepository = DecryptRepository(dispatcher, taskSource, taskDao);
+      ChallengeRepository(dispatcher, keyStore, taskSource, taskDao);
+  final decryptRepository = DecryptRepository(dispatcher, keyStore, taskSource, taskDao);
 
   var user = await userRepository.getUser();
   Device device;
