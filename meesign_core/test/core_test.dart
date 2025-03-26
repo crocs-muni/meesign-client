@@ -73,11 +73,11 @@ void main() {
     final taskSource = TaskSource(dispatcher);
     final taskDao = database.taskDao;
     groupRepository =
-        GroupRepository(dispatcher, taskSource, taskDao, deviceRepository);
+        GroupRepository(dispatcher, keyStore, taskSource, taskDao, deviceRepository);
     final fileStore = FileStore(appDir);
-    fileRepository = FileRepository(dispatcher, taskSource, taskDao, fileStore);
-    challengeRepository = ChallengeRepository(dispatcher, taskSource, taskDao);
-    decryptRepository = DecryptRepository(dispatcher, taskSource, taskDao);
+    fileRepository = FileRepository(dispatcher, keyStore, taskSource, taskDao, fileStore);
+    challengeRepository = ChallengeRepository(dispatcher, keyStore, taskSource, taskDao);
+    decryptRepository = DecryptRepository(dispatcher, keyStore, taskSource, taskDao);
   });
 
   Future<List<T>> testRepository<T>(
