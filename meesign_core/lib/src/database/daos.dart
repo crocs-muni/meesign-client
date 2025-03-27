@@ -32,6 +32,11 @@ class UserDao extends DatabaseAccessor<Database> with _$UserDaoMixin {
     return query.getSingleOrNull();
   }
 
+  Future<List<User>> getAllUsers() {
+    final query = select(users);
+    return query.get();
+  }
+
   Future<void> upsertUser(UsersCompanion entity) {
     return into(users).insertOnConflictUpdate(entity);
   }

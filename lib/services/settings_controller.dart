@@ -22,18 +22,23 @@ class SettingsController {
   void setup() async {
     _initThemeSettings();
     _initShowArchivedItemsSettings();
+    _initCurrentUserIdSettings();
   }
 
   void updateThemeMode(ThemeMode themeMode) =>
       _updateSettingsStream(themeMode: themeMode);
   void updateShowArchivedItems(bool showArchivedItems) =>
       _updateSettingsStream(showArchivedItems: showArchivedItems);
+  void updateCurrentUserId(String currentUserId) =>
+      _updateSettingsStream(currentUserId: currentUserId);
 
-  void _updateSettingsStream({ThemeMode? themeMode, bool? showArchivedItems}) {
+  void _updateSettingsStream(
+      {ThemeMode? themeMode, bool? showArchivedItems, String? currentUserId}) {
     final currentSettings = _settingsController.value;
     final updatedSettings = currentSettings.copyWith(
       themeMode: themeMode ?? currentSettings.themeMode,
       showArchivedItems: showArchivedItems ?? currentSettings.showArchivedItems,
+      currentUserId: currentUserId ?? currentSettings.currentUserId,
     );
     _settingsController.add(updatedSettings);
 
@@ -42,6 +47,8 @@ class SettingsController {
           'themeMode', getThemeIdentifier(updatedSettings.themeMode));
       sharedPreferences.setBool(
           'showArchivedItems', updatedSettings.showArchivedItems);
+      sharedPreferences.setString(
+          'currentUserId', updatedSettings.currentUserId);
     });
   }
 
@@ -61,6 +68,47 @@ class SettingsController {
 
     updateShowArchivedItems(showArchivedItems);
     sharedPreferences.setBool('showArchivedItems', showArchivedItems);
+  }
+
+  void _initCurrentUserIdSettings() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String? currentUserId = sharedPreferences.getString('currentUserId') ?? '';
+
+    updateCurrentUserId(currentUserId);
+    sharedPreferences.setString('currentUserId', currentUserId);
+  }
+
+  void saveUserIdentifier(String deviceName, String host, String id) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setString("$deviceName/$host", id);
+  }
+
+  Future<String?> getSavedUserId(String deviceName, String host) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return sharedPreferences.getString("$deviceName/$host");
+  }
+
+  void saveHostData(String deviceName, String host) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setString("host", host);
+    sharedPreferences.setString("name", deviceName);
+  }
+
+  Future<void> deleteHostData() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String? host = sharedPreferences.getString("host");
+    String? name = sharedPreferences.getString("name");
+    sharedPreferences.remove("${name!}/${host!}");
+  }
+
+  void saveNameById(String name, String id) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setString(id, name);
+  }
+
+  Future<String?> getNameById(String id) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return sharedPreferences.getString(id);
   }
 
   ThemeMode getSystemBrightness() {

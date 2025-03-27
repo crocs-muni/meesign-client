@@ -117,7 +117,9 @@ class AppContainer {
   }
 
   Future<void> recreate({bool deleteData = false}) async {
+    settingsController.updateCurrentUserId('logged out');
     endUserSession();
+
     try {
       await database.close();
       if (deleteData) await dataDirectory.delete(recursive: true);

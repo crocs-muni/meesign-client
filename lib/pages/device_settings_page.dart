@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../app_container.dart';
+import '../services/settings_controller.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
 import '../util/fade_black_page_transition.dart';
@@ -75,11 +76,35 @@ class _DeviceSettingsPageState extends State<DeviceSettingsPage> {
         final appContainer = context.read<AppContainer>();
         await appContainer.recreate(deleteData: true);
 
+        final SettingsController settingsController =
+            appContainer.settingsController;
+        settingsController.deleteHostData();
+
         if (mounted) {
           Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
             FadeBlackPageTransition.fadeBlack(destination: RegisterPage()),
             (route) => false,
           );
+        }
+      },
+    );
+  }
+
+  void _showChangeServerDialog() {
+    return showConfirmationDialog(
+      context,
+      'Confirm profile change',
+      'Are you sure you want to change server or device?',
+      'Confirm',
+      () async {
+        if (mounted) {
+          Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+            FadeBlackPageTransition.fadeBlack(destination: RegisterPage()),
+            (route) => false,
+          );
+
+          final appContainer = context.read<AppContainer>();
+          await appContainer.recreate(deleteData: false);
         }
       },
     );
@@ -142,7 +167,7 @@ class _DeviceSettingsPageState extends State<DeviceSettingsPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Change server",
+          "Change server or device",
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         SizedBox(height: SMALL_GAP),
@@ -153,11 +178,11 @@ class _DeviceSettingsPageState extends State<DeviceSettingsPage> {
         SizedBox(height: MEDIUM_GAP),
         FilledButton.icon(
           onPressed: () {
-            _showDeleteDialog();
+            _showChangeServerDialog();
           },
           label: Padding(
             padding: EdgeInsets.symmetric(vertical: 15),
-            child: Text('Change server'),
+            child: Text('Change profile'),
           ),
           icon: Icon(Icons.sync),
           style: ButtonStyle(

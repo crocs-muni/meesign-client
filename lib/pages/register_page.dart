@@ -4,9 +4,11 @@ import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../app/model/settings.dart';
 import '../app/widget/tabbed_scaffold.dart';
 import '../app_container.dart';
 import '../enums/user_status.dart';
+import '../services/settings_controller.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
 import '../util/fade_black_page_transition.dart';
@@ -35,10 +37,13 @@ class _RegisterPageState extends State<RegisterPage> {
 
   final double cardMaxWidth = 500;
 
-  Future<void> _launchHome(User user) async {
+  Future<void> _launchHome(User user, registerNewUser) async {
     final container = context.read<AppContainer>();
 
-    await container.userRepository.setUser(user);
+    if (registerNewUser) {
+      await container.userRepository.setUser(user);
+    }
+
     final currentSession = container.session;
     final session = currentSession != null && currentSession.user == user
         ? currentSession
@@ -57,9 +62,24 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
+  Future<String> _getCurrentUserId() async {
+    final container = context.read<AppContainer>();
+    final SettingsController settingsController = container.settingsController;
+
+    Settings appSettings = await settingsController.settingsStream.first;
+    return appSettings.currentUserId;
+  }
+
   Future<void> _initApp() async {
     final container = context.read<AppContainer>();
-    final user = await container.userRepository.getUser();
+
+    // wait 1 seconds to get first stream value
+    await Future.delayed(Duration(seconds: 1));
+
+    // Try to init current user
+    String currentUserId = await _getCurrentUserId();
+    var user =
+        await container.userRepository.getUser(searchedUserId: currentUserId);
     _savedUser = user;
 
     if (user == null) {
@@ -86,7 +106,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
     setState(() => _status = UserStatus.ok);
     await Future.delayed(const Duration(milliseconds: 400));
-    _launchHome(user);
+    _launchHome(user, true);
   }
 
   Future<void> _deleteAppData() async {
@@ -252,7 +272,7 @@ class _RegisterPageState extends State<RegisterPage> {
             'be able to participate in new tasks.',
         actions: [
           OutlinedButton(
-            onPressed: () => _launchHome(_savedUser!),
+            onPressed: () => _launchHome(_savedUser!, true),
             child: const Text('Proceed anyway'),
           ),
           FilledButton.tonal(
@@ -276,7 +296,7 @@ class _RegisterPageState extends State<RegisterPage> {
             'proceed anyway. However, the client may be unstable.',
         actions: [
           OutlinedButton(
-            onPressed: () => _launchHome(_savedUser!),
+            onPressed: () => _launchHome(_savedUser!, true),
             child: const Text('Proceed anyway'),
           ),
         ],
