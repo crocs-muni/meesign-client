@@ -4,11 +4,12 @@ import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../app/widget/tabbed_scaffold.dart';
 import '../app_container.dart';
 import '../enums/user_status.dart';
-import '../routes.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
+import '../util/fade_black_page_transition.dart';
 import '../widget/registration_form.dart';
 import '../widget/fluid_gradient.dart';
 import '../widget/smart_logo.dart';
@@ -44,8 +45,15 @@ class _RegisterPageState extends State<RegisterPage> {
         : await container.startUserSession(user);
     session.startSync();
 
+    // Delay transition to show loading indicator inside button
+    int delayMilliseconds = 500;
+    await Future.delayed(Duration(milliseconds: delayMilliseconds));
+
     if (mounted) {
-      Navigator.pushReplacementNamed(context, Routes.home);
+      Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+        FadeBlackPageTransition.fadeBlack(destination: TabbedScaffold()),
+        (route) => false,
+      );
     }
   }
 
