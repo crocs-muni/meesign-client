@@ -4,13 +4,14 @@ import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
 import '../app_container.dart';
+import '../services/settings_controller.dart';
 import '../ui_constants.dart';
 import '../util/chars.dart';
 
 class RegistrationForm extends StatefulWidget {
   final String prefillName;
   final String prefillHost;
-  final void Function(User) onRegistered;
+  final void Function(User, bool) onRegistered;
 
   const RegistrationForm({
     super.key,
@@ -28,6 +29,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
   final _hostController = TextEditingController();
   final FocusNode _nameControllerFocus = FocusNode();
   final FocusNode _hostControllerFocus = FocusNode();
+
+  bool _showExistingUser = false;
 
   bool _working = false;
   String? _nameError;
@@ -99,10 +102,47 @@ class _RegistrationFormState extends State<RegistrationForm> {
         return;
       }
 
-      final device = await session.deviceRepository.register(
+      bool isNewUser = true;
+      User? currentUser;
+
+      final SettingsController settingsController =
+          container.settingsController;
+      String? existingUserId = await settingsController.getSavedUserId(
+          _nameController.text, _hostController.text);
+
+      if (existingUserId != null && existingUserId.isNotEmpty) {
+        currentUser = await container.userRepository
+            .getUser(searchedUserId: existingUserId);
+        isNewUser = false;
+      }
+
+      if (currentUser == null) {
+        final device = await session.deviceRepository.register(
+          _nameController.text,
+        );
+
+        currentUser = User(device.id, host);
+        isNewUser = true;
+      }
+
+      settingsController
+          .updateCurrentUserId(String.fromCharCodes(currentUser.did.bytes));
+
+      settingsController.saveUserIdentifier(
         _nameController.text,
+        _hostController.text,
+        String.fromCharCodes(currentUser.did.bytes),
       );
-      widget.onRegistered(User(device.id, host));
+
+      settingsController.saveHostData(
+        _nameController.text,
+        _hostController.text,
+      );
+
+      settingsController.saveNameById(
+          _nameController.text, String.fromCharCodes(currentUser.did.bytes));
+
+      widget.onRegistered(currentUser, isNewUser);
     } catch (e) {
       setState(() {
         _working = false;
@@ -196,7 +236,72 @@ class _RegistrationFormState extends State<RegistrationForm> {
                 : const Text('Register'),
           ),
         ),
+        SizedBox(height: MEDIUM_GAP),
+        SizedBox(
+          width: 200,
+          height: 42,
+          child: FilledButton(
+            style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary),
+            onPressed: () {
+              setState(() {
+                _showExistingUser = !_showExistingUser;
+              });
+            },
+            child: _working
+                ? SizedBox.square(
+                    dimension: 24,
+                    child: CircularProgressIndicator(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      strokeWidth: 4,
+                    ),
+                  )
+                : Text(_showExistingUser
+                    ? 'Hide existnig users'
+                    : 'Show existing users'),
+          ),
+        ),
+        SizedBox(height: MEDIUM_GAP),
+        if (_showExistingUser) ...[
+          FutureBuilder<Widget>(
+            future: _buildUserList(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return snapshot.data!;
+              }
+              return CircularProgressIndicator();
+            },
+          )
+        ]
       ],
+    );
+  }
+
+  Future<Widget> _buildUserList() async {
+    final container = context.read<AppContainer>();
+    var users = await container.userRepository.getAllUsers();
+    final SettingsController settingsController = container.settingsController;
+
+    return SizedBox(
+      height: 200,
+      child: ListView.builder(
+        itemCount: users.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: FutureBuilder(
+                future: settingsController
+                    .getNameById(String.fromCharCodes(users[index].did.bytes)),
+                builder: (context, snapshot) {
+                  return Text(snapshot.data.toString());
+                }),
+            subtitle: Text(users[index].host),
+            onTap: () {
+              _nameController.text = "";
+              _hostController.text = users[index].host;
+            },
+          );
+        },
+      ),
     );
   }
 }
