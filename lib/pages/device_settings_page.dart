@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../app_container.dart';
-import '../services/settings_controller.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
 import '../util/fade_black_page_transition.dart';
@@ -73,19 +72,7 @@ class _DeviceSettingsPageState extends State<DeviceSettingsPage> {
       'Are you sure you want to delete this device?',
       'Delete',
       () async {
-        final appContainer = context.read<AppContainer>();
-        await appContainer.recreate(deleteData: true);
-
-        final SettingsController settingsController =
-            appContainer.settingsController;
-        settingsController.deleteHostData();
-
-        if (mounted) {
-          Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-            FadeBlackPageTransition.fadeBlack(destination: RegisterPage()),
-            (route) => false,
-          );
-        }
+        confirmDeviceChange(deleteData: true);
       },
     );
   }
@@ -96,18 +83,30 @@ class _DeviceSettingsPageState extends State<DeviceSettingsPage> {
       'Confirm profile change',
       'Are you sure you want to change server or device?',
       'Confirm',
-      () async {
-        final appContainer = context.read<AppContainer>();
-        await appContainer.recreate(deleteData: false);
-
-        if (mounted) {
-          Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-            FadeBlackPageTransition.fadeBlack(destination: RegisterPage()),
-            (route) => false,
-          );
-        }
+      () {
+        confirmDeviceChange(deleteData: false);
       },
     );
+  }
+
+  void confirmDeviceChange({bool deleteData = false}) {
+    final appContainer = context.read<AppContainer>();
+
+    appContainer.recreate(deleteData: deleteData);
+
+    if (deleteData) {
+      appContainer.settingsController.deleteHostData();
+    }
+
+    // This is to ensure that the app is recreated before navigating
+    Future.delayed(const Duration(milliseconds: 0), () {
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+          FadeBlackPageTransition.fadeBlack(destination: RegisterPage()),
+          (route) => false,
+        );
+      }
+    });
   }
 
   Widget _buildDeviceNameSection() {
@@ -182,7 +181,7 @@ class _DeviceSettingsPageState extends State<DeviceSettingsPage> {
           },
           label: Padding(
             padding: EdgeInsets.symmetric(vertical: 15),
-            child: Text('Change profile'),
+            child: Text('Change device'),
           ),
           icon: Icon(Icons.sync),
           style: ButtonStyle(

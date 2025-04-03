@@ -46,20 +46,10 @@ class AppContainer {
   Future<void> recreate({bool deleteData = false}) async {
     settingsController.updateCurrentUserId('logged out');
 
-    Uuid userDid = session?.user.did ?? Uuid(const []);
-    String userDataPath = '${dataDirectory.path}${userDid.encode()}/';
-
     try {
       if (deleteData) {
-        // 1. Delete user from local DB
-        await userRepository.deleteUser(userDid.bytes);
-
-        // 2. Delete device from local db
-        await session?.deviceRepository.deleteLocalDevice(userDid.bytes);
-
-        // 3. Delete user data from the user's directory
-        Directory usedDataDirectory = Directory(userDataPath);
-        await usedDataDirectory.delete(recursive: true);
+        Uuid userDid = session?.user.did ?? Uuid(const []);
+        deleteDevice(userDid);
       }
 
       endUserSession();
@@ -68,6 +58,20 @@ class AppContainer {
       Logger.root.severe(e.toString(), e);
     }
     _init();
+  }
+
+  Future<void> deleteDevice(Uuid userDid) async {
+    String userDataPath = '${dataDirectory.path}${userDid.encode()}/';
+
+    // 1. Delete user from local DB
+    await userRepository.deleteUser(userDid.bytes);
+
+    // 2. Delete device from local db
+    await session?.deviceRepository.deleteLocalDevice(userDid.bytes);
+
+    // 3. Delete user data from the user's directory
+    Directory usedDataDirectory = Directory(userDataPath);
+    await usedDataDirectory.delete(recursive: true);
   }
 
   Future<AnonymousSession> createAnonymousSession(String host) async {
