@@ -5,13 +5,14 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../app/model/settings.dart';
-import '../app/widget/tabbed_scaffold.dart';
 import '../app_container.dart';
+import '../enums/screen_layout.dart';
 import '../enums/user_status.dart';
 import '../services/settings_controller.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
-import '../util/fade_black_page_transition.dart';
+import '../util/launch_home.dart';
+import '../util/layout_getter.dart';
 import '../widget/registration_form.dart';
 import '../widget/fluid_gradient.dart';
 import '../widget/smart_logo.dart';
@@ -36,31 +37,7 @@ class _RegisterPageState extends State<RegisterPage> {
   UserStatus? _status;
 
   final double cardMaxWidth = 500;
-
-  Future<void> _launchHome(User user, registerNewUser) async {
-    final container = context.read<AppContainer>();
-
-    if (registerNewUser) {
-      await container.userRepository.setUser(user);
-    }
-
-    final currentSession = container.session;
-    final session = currentSession != null && currentSession.user == user
-        ? currentSession
-        : await container.startUserSession(user);
-    session.startSync();
-
-    // Delay transition to show loading indicator inside button
-    int delayMilliseconds = 500;
-    await Future.delayed(Duration(milliseconds: delayMilliseconds));
-
-    if (mounted) {
-      Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-        FadeBlackPageTransition.fadeBlack(destination: TabbedScaffold()),
-        (route) => false,
-      );
-    }
-  }
+  final double cardMaxHeight = 660;
 
   Future<String> _getCurrentUserId() async {
     final container = context.read<AppContainer>();
@@ -74,7 +51,7 @@ class _RegisterPageState extends State<RegisterPage> {
     final container = context.read<AppContainer>();
 
     // wait 1 seconds to get first stream value
-    await Future.delayed(Duration(seconds: 1));
+    await Future.delayed(Duration(seconds: 0));
 
     // Try to init current user
     String currentUserId = await _getCurrentUserId();
@@ -106,7 +83,10 @@ class _RegisterPageState extends State<RegisterPage> {
 
     setState(() => _status = UserStatus.ok);
     await Future.delayed(const Duration(milliseconds: 400));
-    _launchHome(user, true);
+
+    if (mounted) {
+      launchHome(user: user, context: context, registerNewUser: true);
+    }
   }
 
   Future<void> _deleteAppData() async {
@@ -161,20 +141,21 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Widget _getLoadedCard() {
     return _buildBackgroundCard(
-      context,
-      Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const SizedBox(height: XLARGE_GAP),
-          _buildLogoSection(context),
-          const SizedBox(height: XLARGE_GAP),
-          _buildContent(),
-          SizedBox(height: LARGE_GAP),
-          _buildMinistryFooter(context),
-        ],
-      ),
-    );
+        context,
+        SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: XLARGE_GAP),
+              _buildLogoSection(context),
+              const SizedBox(height: XLARGE_GAP),
+              _buildContent(),
+              SizedBox(height: LARGE_GAP),
+              _buildMinistryFooter(context),
+            ],
+          ),
+        ));
   }
 
   Widget _buildBackgroundCard(BuildContext context, Widget child) {
@@ -183,30 +164,56 @@ class _RegisterPageState extends State<RegisterPage> {
     const double shadowOpacity = 0.12;
     const double shadowRadius = 5;
     const Color borderColor = Colors.black;
+    const int animationDuration = 250;
 
-    return Center(
-      child: Container(
-        constraints: BoxConstraints(maxWidth: cardMaxWidth),
-        alignment: Alignment.center,
-        padding: EdgeInsets.all(MEDIUM_PADDING),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(LARGE_BORDER_RADIUS),
-            border: Border.all(
-                color: borderColor.withValues(alpha: borderOpacity),
-                width: borderWidth),
-            boxShadow: [
-              BoxShadow(
-                color: borderColor.withValues(alpha: shadowOpacity),
-                spreadRadius: shadowRadius,
-                blurRadius: shadowRadius * 3,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        bool compactLayout = LayoutGetter.getCurLayout(constraints.maxWidth) ==
+            ScreenLayout.mobile;
+        bool minWidthReached = cardMaxWidth >= constraints.maxWidth;
+
+        return Center(
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: animationDuration),
+            curve: Curves.easeInOut,
+            constraints: BoxConstraints(
+                maxWidth: cardMaxWidth, maxHeight: cardMaxHeight),
+            alignment: Alignment.center,
+            padding: EdgeInsets.all(compactLayout ? 0 : MEDIUM_PADDING),
+            child: AnimatedContainer(
+              duration: Duration(milliseconds: animationDuration),
+              curve: Curves.easeInOut,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(
+                    minWidthReached ? 0 : LARGE_BORDER_RADIUS),
+                border: Border.all(
+                    color: borderColor.withValues(alpha: borderOpacity),
+                    width: borderWidth),
+                boxShadow: [
+                  BoxShadow(
+                    color: borderColor.withValues(alpha: shadowOpacity),
+                    spreadRadius: shadowRadius,
+                    blurRadius: shadowRadius * 3,
+                  ),
+                ],
               ),
-            ],
+              child: _buildNestedNavigator(child),
+            ),
           ),
-          child: child,
-        ),
-      ),
+        );
+      },
+    );
+  }
+
+  Widget _buildNestedNavigator(Widget child) {
+    return Navigator(
+      key: Key('nestedNavigator'),
+      onGenerateRoute: (routeSettings) {
+        return MaterialPageRoute(builder: (context) {
+          return child;
+        });
+      },
     );
   }
 
@@ -240,9 +247,7 @@ class _RegisterPageState extends State<RegisterPage> {
       case UserStatus.ok:
         return Container();
       default:
-        return Center(
-          child: CircularProgressIndicator(),
-        );
+        return _buildRegistrationForm();
     }
   }
 
@@ -254,7 +259,6 @@ class _RegisterPageState extends State<RegisterPage> {
       child: RegistrationForm(
         prefillHost: widget.prefillHost,
         prefillName: widget.prefillName,
-        onRegistered: _launchHome,
       ),
     );
   }
@@ -272,7 +276,8 @@ class _RegisterPageState extends State<RegisterPage> {
             'be able to participate in new tasks.',
         actions: [
           OutlinedButton(
-            onPressed: () => _launchHome(_savedUser!, true),
+            onPressed: () => launchHome(
+                user: _savedUser!, context: context, registerNewUser: true),
             child: const Text('Proceed anyway'),
           ),
           FilledButton.tonal(
@@ -296,7 +301,8 @@ class _RegisterPageState extends State<RegisterPage> {
             'proceed anyway. However, the client may be unstable.',
         actions: [
           OutlinedButton(
-            onPressed: () => _launchHome(_savedUser!, true),
+            onPressed: () => launchHome(
+                user: _savedUser!, context: context, registerNewUser: true),
             child: const Text('Proceed anyway'),
           ),
         ],

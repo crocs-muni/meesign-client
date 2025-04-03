@@ -42,4 +42,8 @@ class UserRepository {
       ),
     );
   }
+
+  Future<void> deleteUser(Uint8List searchedUserId) async {
+    await _userDao.deleteUser(searchedUserId);
+  }
 }

@@ -127,7 +127,12 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
       final deviceRepository =
           context.read<AppContainer>().session!.deviceRepository;
       // TODO: allow searching by id?
+
+      // Fetch devices from server
       results = await deviceRepository.search(_queryController.text);
+
+      // Fetch devices from local db
+      // results = await deviceRepository.getAllLocalDevices();
     } catch (_) {}
 
     _pivot = DateTime.now().subtract(activeThreshold);

@@ -111,6 +111,16 @@ class SettingsController {
     return sharedPreferences.getString(id);
   }
 
+  void saveLastHostname(String hostname) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setString('hostname', hostname);
+  }
+
+  Future<String?> getLastHostname() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return sharedPreferences.getString('hostname');
+  }
+
   ThemeMode getSystemBrightness() {
     var brightness =
         SchedulerBinding.instance.platformDispatcher.platformBrightness;

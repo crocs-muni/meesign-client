@@ -6,91 +6,18 @@ import 'package:meesign_core/meesign_data.dart';
 
 import 'reporter.dart';
 import 'services/settings_controller.dart';
-import 'sync.dart';
-
-class AnonymousSession {
-  final String host;
-  late final NetworkDispatcher dispatcher;
-  late final SupportServices supportServices;
-
-  late final DeviceRepository deviceRepository;
-  late final GroupRepository groupRepository;
-  late final FileRepository fileRepository;
-  late final ChallengeRepository challengeRepository;
-  late final DecryptRepository decryptRepository;
-
-  AnonymousSession(
-    this.host,
-    List<int>? serverCerts,
-    bool allowBadCerts,
-    KeyStore keyStore,
-    FileStore fileStore,
-    Database database,
-  ) {
-    dispatcher = NetworkDispatcher(host, keyStore,
-        serverCerts: serverCerts, allowBadCerts: allowBadCerts);
-
-    supportServices = SupportServices(dispatcher);
-
-    deviceRepository =
-        DeviceRepository(dispatcher, keyStore, database.deviceDao);
-    final taskSource = TaskSource(dispatcher);
-    final taskDao = database.taskDao;
-    groupRepository =
-        GroupRepository(dispatcher, taskSource, taskDao, deviceRepository);
-    fileRepository = FileRepository(dispatcher, taskSource, taskDao, fileStore);
-    challengeRepository = ChallengeRepository(dispatcher, taskSource, taskDao);
-    decryptRepository = DecryptRepository(dispatcher, taskSource, taskDao);
-  }
-
-  void dispose() {
-    // TODO: cleanup (e.g., close dispatcher connections?)
-  }
-}
-
-class UserSession extends AnonymousSession {
-  final User user;
-
-  final Sync sync = Sync();
-
-  UserSession(
-    this.user,
-    List<int>? serverCerts,
-    bool allowBadCerts,
-    KeyStore keyStore,
-    FileStore fileStore,
-    Database database,
-  ) : super(
-          user.host,
-          serverCerts,
-          allowBadCerts,
-          keyStore,
-          fileStore,
-          database,
-        );
-
-  void startSync() {
-    sync.init(user.did, [
-      groupRepository,
-      fileRepository,
-      challengeRepository,
-      decryptRepository,
-    ]);
-  }
-
-  @override
-  void dispose() {
-    // TODO: stop sync
-    super.dispose();
-  }
-}
+import 'sessions/anonymous_session.dart';
+import 'sessions/user_session.dart';
 
 class AppContainer {
   final Directory dataDirectory;
+
   late KeyStore keyStore;
   late FileStore fileStore;
+
   late Database database;
   late UserRepository userRepository;
+
   late SettingsController settingsController;
 
   UserSession? session;
@@ -118,11 +45,25 @@ class AppContainer {
 
   Future<void> recreate({bool deleteData = false}) async {
     settingsController.updateCurrentUserId('logged out');
-    endUserSession();
+
+    Uuid userDid = session?.user.did ?? Uuid(const []);
+    String userDataPath = '${dataDirectory.path}${userDid.encode()}/';
 
     try {
+      if (deleteData) {
+        // 1. Delete user from local DB
+        await userRepository.deleteUser(userDid.bytes);
+
+        // 2. Delete device from local db
+        await session?.deviceRepository.deleteLocalDevice(userDid.bytes);
+
+        // 3. Delete user data from the user's directory
+        Directory usedDataDirectory = Directory(userDataPath);
+        await usedDataDirectory.delete(recursive: true);
+      }
+
+      endUserSession();
       await database.close();
-      if (deleteData) await dataDirectory.delete(recursive: true);
     } catch (e) {
       Logger.root.severe(e.toString(), e);
     }

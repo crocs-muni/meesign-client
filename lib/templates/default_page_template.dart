@@ -4,11 +4,13 @@ import '../ui_constants.dart';
 
 class DefaultPageTemplate extends StatelessWidget {
   final Widget body;
+  final List<Widget> appBarActions;
   final bool showAppBar;
   final String appBarTitle;
   final bool wrapInScroll;
   final String backButtonText;
   final bool includePadding;
+  final bool transparentBackground;
 
   const DefaultPageTemplate({
     super.key,
@@ -18,13 +20,19 @@ class DefaultPageTemplate extends StatelessWidget {
     this.backButtonText = 'Back',
     this.wrapInScroll = false,
     this.includePadding = true,
+    this.transparentBackground = false,
+    this.appBarActions = const [],
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: transparentBackground
+          ? Colors.transparent
+          : Theme.of(context).scaffoldBackgroundColor,
       appBar: showAppBar
           ? AppBar(
+              actions: appBarActions,
               forceMaterialTransparency: true,
               surfaceTintColor: Colors.transparent,
               leadingWidth: 120,
