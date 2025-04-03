@@ -7,17 +7,17 @@ import '../app_container.dart';
 import '../services/settings_controller.dart';
 import '../ui_constants.dart';
 import '../util/chars.dart';
+import '../util/launch_home.dart';
+import 'existing_user_list.dart';
 
 class RegistrationForm extends StatefulWidget {
   final String prefillName;
   final String prefillHost;
-  final void Function(User, bool) onRegistered;
 
   const RegistrationForm({
     super.key,
     this.prefillHost = '',
     this.prefillName = '',
-    required this.onRegistered,
   });
 
   @override
@@ -30,8 +30,6 @@ class _RegistrationFormState extends State<RegistrationForm> {
   final FocusNode _nameControllerFocus = FocusNode();
   final FocusNode _hostControllerFocus = FocusNode();
 
-  bool _showExistingUser = false;
-
   bool _working = false;
   String? _nameError;
   String? _hostError;
@@ -41,13 +39,27 @@ class _RegistrationFormState extends State<RegistrationForm> {
     super.initState();
 
     _nameController.text = widget.prefillName;
-    _hostController.text = widget.prefillHost;
+    setupHostname();
 
     _nameController.addListener(clearErrors);
     _hostController.addListener(clearErrors);
 
     _nameControllerFocus.addListener(checkFocus);
     _hostControllerFocus.addListener(checkFocus);
+  }
+
+  void setupHostname() async {
+    final container = context.read<AppContainer>();
+    SettingsController settingsController = container.settingsController;
+
+    // Load last hostname user was connected to
+    String? lastHostname = await settingsController.getLastHostname();
+
+    if (lastHostname != null && lastHostname.isNotEmpty) {
+      _hostController.text = lastHostname;
+    } else {
+      _hostController.text = widget.prefillHost;
+    }
   }
 
   @override
@@ -125,6 +137,9 @@ class _RegistrationFormState extends State<RegistrationForm> {
         isNewUser = true;
       }
 
+      // Update last hostname so it can be automatically filled in next time
+      settingsController.saveLastHostname(_hostController.text);
+
       settingsController
           .updateCurrentUserId(String.fromCharCodes(currentUser.did.bytes));
 
@@ -142,7 +157,10 @@ class _RegistrationFormState extends State<RegistrationForm> {
       settingsController.saveNameById(
           _nameController.text, String.fromCharCodes(currentUser.did.bytes));
 
-      widget.onRegistered(currentUser, isNewUser);
+      if (mounted) {
+        launchHome(
+            user: currentUser, context: context, registerNewUser: isNewUser);
+      }
     } catch (e) {
       setState(() {
         _working = false;
@@ -218,6 +236,14 @@ class _RegistrationFormState extends State<RegistrationForm> {
         const SizedBox(
           height: 32,
         ),
+        _buildButtonSection()
+      ],
+    );
+  }
+
+  Widget _buildButtonSection() {
+    return Column(
+      children: [
         SizedBox(
           width: 200,
           height: 42,
@@ -236,72 +262,23 @@ class _RegistrationFormState extends State<RegistrationForm> {
                 : const Text('Register'),
           ),
         ),
-        SizedBox(height: MEDIUM_GAP),
-        SizedBox(
-          width: 200,
-          height: 42,
-          child: FilledButton(
-            style: FilledButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary),
-            onPressed: () {
-              setState(() {
-                _showExistingUser = !_showExistingUser;
-              });
-            },
-            child: _working
-                ? SizedBox.square(
-                    dimension: 24,
-                    child: CircularProgressIndicator(
-                      color: Theme.of(context).colorScheme.onPrimary,
-                      strokeWidth: 4,
-                    ),
-                  )
-                : Text(_showExistingUser
-                    ? 'Hide existnig users'
-                    : 'Show existing users'),
+        SizedBox(height: SMALL_GAP),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ExistingUserList()),
+            );
+          },
+          style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              shadowColor: Colors.transparent),
+          child: Text(
+            "or use an existing account",
+            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
           ),
-        ),
-        SizedBox(height: MEDIUM_GAP),
-        if (_showExistingUser) ...[
-          FutureBuilder<Widget>(
-            future: _buildUserList(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                return snapshot.data!;
-              }
-              return CircularProgressIndicator();
-            },
-          )
-        ]
+        )
       ],
-    );
-  }
-
-  Future<Widget> _buildUserList() async {
-    final container = context.read<AppContainer>();
-    var users = await container.userRepository.getAllUsers();
-    final SettingsController settingsController = container.settingsController;
-
-    return SizedBox(
-      height: 200,
-      child: ListView.builder(
-        itemCount: users.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: FutureBuilder(
-                future: settingsController
-                    .getNameById(String.fromCharCodes(users[index].did.bytes)),
-                builder: (context, snapshot) {
-                  return Text(snapshot.data.toString());
-                }),
-            subtitle: Text(users[index].host),
-            onTap: () {
-              _nameController.text = "";
-              _hostController.text = users[index].host;
-            },
-          );
-        },
-      ),
     );
   }
 }

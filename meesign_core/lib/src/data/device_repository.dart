@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:meesign_native/meesign_native.dart';
 import 'package:meesign_network/grpc.dart' as rpc;
 
@@ -91,5 +93,14 @@ class DeviceRepository {
 
   Future<Device> getDevice(Uuid id) async {
     return (await getDevices([id])).first;
+  }
+
+  Future<List<Device>> getAllLocalDevices() async {
+    final devices = await _deviceDao.getAllDevices();
+    return devices.map((e) => e.toModel()).toList();
+  }
+
+  Future<void> deleteLocalDevice(Uint8List id) async {
+    await _deviceDao.deleteDevice(id);
   }
 }

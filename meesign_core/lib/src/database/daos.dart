@@ -14,12 +14,21 @@ class DeviceDao extends DatabaseAccessor<Database> with _$DeviceDaoMixin {
     return query.get();
   }
 
+  Future<List<Device>> getAllDevices() {
+    final query = select(devices);
+    return query.get();
+  }
+
   Future<void> insertDevice(DevicesCompanion entity) {
     return into(devices).insert(entity, mode: InsertMode.insertOrIgnore);
   }
 
   Future<void> upsertDevices(Iterable<DevicesCompanion> entities) async {
     await batch((batch) => batch.insertAllOnConflictUpdate(devices, entities));
+  }
+
+  Future<void> deleteDevice(Uint8List id) {
+    return (delete(devices)..where((device) => device.id.equals(id))).go();
   }
 }
 
@@ -39,6 +48,10 @@ class UserDao extends DatabaseAccessor<Database> with _$UserDaoMixin {
 
   Future<void> upsertUser(UsersCompanion entity) {
     return into(users).insertOnConflictUpdate(entity);
+  }
+
+  Future<void> deleteUser(Uint8List id) {
+    return (delete(users)..where((user) => user.id.equals(id))).go();
   }
 }
 

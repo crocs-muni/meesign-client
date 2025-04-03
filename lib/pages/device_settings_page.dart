@@ -97,14 +97,14 @@ class _DeviceSettingsPageState extends State<DeviceSettingsPage> {
       'Are you sure you want to change server or device?',
       'Confirm',
       () async {
+        final appContainer = context.read<AppContainer>();
+        await appContainer.recreate(deleteData: false);
+
         if (mounted) {
           Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
             FadeBlackPageTransition.fadeBlack(destination: RegisterPage()),
             (route) => false,
           );
-
-          final appContainer = context.read<AppContainer>();
-          await appContainer.recreate(deleteData: false);
         }
       },
     );
