@@ -32,6 +32,11 @@ class SettingsPage extends StatelessWidget {
   Widget _buildMenuItems(BuildContext context) {
     final List<Map<String, dynamic>> menuItems = [
       {
+        "icon": Icons.settings,
+        "text": "General settings",
+        "page": GeneralSettingsPage()
+      },
+      {
         "icon": Icons.devices,
         "text": "Device and server",
         "page": DeviceSettingsPage()
@@ -40,11 +45,6 @@ class SettingsPage extends StatelessWidget {
         "icon": Icons.question_mark,
         "text": "About this project",
         "page": AboutPage()
-      },
-      {
-        "icon": Icons.settings,
-        "text": "General settings",
-        "page": GeneralSettingsPage()
       },
     ];
 

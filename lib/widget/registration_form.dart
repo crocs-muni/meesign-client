@@ -8,6 +8,7 @@ import '../services/settings_controller.dart';
 import '../ui_constants.dart';
 import '../util/chars.dart';
 import '../util/launch_home.dart';
+import '../util/set_user_login_prefereces.dart';
 import 'existing_user_list.dart';
 
 class RegistrationForm extends StatefulWidget {
@@ -137,27 +138,13 @@ class _RegistrationFormState extends State<RegistrationForm> {
         isNewUser = true;
       }
 
-      // Update last hostname so it can be automatically filled in next time
-      settingsController.saveLastHostname(_hostController.text);
-
-      settingsController
-          .updateCurrentUserId(String.fromCharCodes(currentUser.did.bytes));
-
-      settingsController.saveUserIdentifier(
-        _nameController.text,
-        _hostController.text,
-        String.fromCharCodes(currentUser.did.bytes),
-      );
-
-      settingsController.saveHostData(
-        _nameController.text,
-        _hostController.text,
-      );
-
-      settingsController.saveNameById(
-          _nameController.text, String.fromCharCodes(currentUser.did.bytes));
-
       if (mounted) {
+        updateUserSessionPreferences(
+          currentUser.did.bytes,
+          _nameController.text,
+          _hostController.text,
+          context,
+        );
         launchHome(
             user: currentUser, context: context, registerNewUser: isNewUser);
       }

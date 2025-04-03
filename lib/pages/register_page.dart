@@ -50,7 +50,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Future<void> _initApp() async {
     final container = context.read<AppContainer>();
 
-    // wait 1 seconds to get first stream value
+    // Wait to get first stream value
     await Future.delayed(Duration(seconds: 0));
 
     // Try to init current user
@@ -85,7 +85,7 @@ class _RegisterPageState extends State<RegisterPage> {
     await Future.delayed(const Duration(milliseconds: 400));
 
     if (mounted) {
-      launchHome(user: user, context: context, registerNewUser: true);
+      launchHome(user: user, context: context, registerNewUser: false);
     }
   }
 

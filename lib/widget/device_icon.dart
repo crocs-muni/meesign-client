@@ -26,40 +26,54 @@ class DeviceIcon extends StatelessWidget {
             ],
             const SizedBox(width: SMALL_GAP / 2),
             Container(
-              padding: const EdgeInsets.only(right: SMALL_PADDING),
-              child: IconButton(
-                onPressed: () {
-                  final device = model.device;
-                  if (device == null) return;
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (BuildContext context) =>
-                          DevicePage(device: device),
-                    ),
-                  );
-                },
-                icon: AnimatedBuilder(
-                  animation:
-                      context.read<AppContainer>().session!.sync.subscribed,
-                  builder: (context, child) {
-                    final session = context.read<AppContainer>().session!;
-                    return Badge(
-                      backgroundColor: session.sync.subscribed.value
-                          ? Theme.of(context).extension<CustomColors>()!.success
-                          : Theme.of(context).colorScheme.error,
-                      smallSize: 8,
-                      child: CircleAvatar(
-                        child: Text(name.initials),
+                padding: const EdgeInsets.only(right: SMALL_PADDING),
+                child: IconButton(
+                  onPressed: () {
+                    final device = model.device;
+                    if (device == null) return;
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (BuildContext context) =>
+                            DevicePage(device: device),
                       ),
                     );
                   },
-                ),
-              ),
-            ),
+                  icon: _buildIndicatorIcon(context, name),
+                )),
           ],
         );
       },
+    );
+  }
+
+  Widget _buildIndicatorIcon(BuildContext context, String name) {
+    if (context.read<AppContainer>().session == null) {
+      return _buildBadge(context, name);
+    }
+
+    var session = context.read<AppContainer>().session;
+
+    return AnimatedBuilder(
+      animation:
+          session != null ? session.sync.subscribed : ValueNotifier(false),
+      builder: (context, child) {
+        return _buildBadge(context, name,
+            isOnline: session != null && session.sync.subscribed.value);
+      },
+    );
+  }
+
+  Widget _buildBadge(BuildContext context, String name,
+      {bool isOnline = false}) {
+    return Badge(
+      backgroundColor: isOnline
+          ? Theme.of(context).extension<CustomColors>()!.success
+          : Theme.of(context).colorScheme.error,
+      smallSize: 8,
+      child: CircleAvatar(
+        child: Text(name.initials),
+      ),
     );
   }
 }

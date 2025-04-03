@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +7,7 @@ import '../services/settings_controller.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
 import '../util/launch_home.dart';
+import '../util/set_user_login_prefereces.dart';
 import '../widget/confirmation_dialog.dart';
 
 class ExistingUserList extends StatefulWidget {
@@ -33,6 +32,10 @@ class ExistingUserListState extends State<ExistingUserList> {
     final container = context.read<AppContainer>();
     _users = await container.userRepository.getAllUsers();
     _usersFetched = true;
+
+    if (_users.isEmpty) {
+      _isEditing = false;
+    }
     setState(() {});
   }
 
@@ -107,17 +110,22 @@ class ExistingUserListState extends State<ExistingUserList> {
   }
 
   Widget _buildDeleteButton(
-    Uint8List userId,
+    User user,
   ) {
     return IconButton(
-      onPressed: () {
+      onPressed: () async {
         showConfirmationDialog(
             context,
             'Are you sure you want to delete this account?',
             'This will delete the selected device and all its communications. This action cannot be undone. ',
             'Delete', () async {
           final container = context.read<AppContainer>();
-          container.userRepository.deleteUser(userId);
+          await container.deleteDevice(user.did);
+
+          // Since container.deleteDevice() uses user session, which we don't have, we also
+          // have to manually delete the device from the local db.
+          var tempSession = await container.createAnonymousSession(user.host);
+          await tempSession.deviceRepository.deleteLocalDevice(user.did.bytes);
 
           fetchUsers();
         });
@@ -187,6 +195,7 @@ class ExistingUserListState extends State<ExistingUserList> {
     const double actionButtonSize = 48;
     final container = context.read<AppContainer>();
     final SettingsController settingsController = container.settingsController;
+    String name = "";
 
     return ListTile(
         leading: Container(
@@ -203,6 +212,7 @@ class ExistingUserListState extends State<ExistingUserList> {
             future: settingsController
                 .getNameById(String.fromCharCodes(user.did.bytes)),
             builder: (context, snapshot) {
+              name = snapshot.data ?? "";
               return Text(snapshot.data.toString());
             }),
         subtitle: Text(user.host),
@@ -219,7 +229,7 @@ class ExistingUserListState extends State<ExistingUserList> {
                     key: ValueKey('delete'),
                     width: actionButtonSize,
                     height: actionButtonSize,
-                    child: _buildDeleteButton(user.did.bytes),
+                    child: _buildDeleteButton(user),
                   )
                 : SizedBox(
                     key: ValueKey('arrow'),
@@ -231,10 +241,16 @@ class ExistingUserListState extends State<ExistingUserList> {
                   ),
           ),
         ),
-        onTap: _isEditing ? null : () => loginSelectedUser(user));
+        onTap: _isEditing ? null : () => loginSelectedUser(user, name));
   }
 
-  void loginSelectedUser(User user) async {
-    await launchHome(user: user, context: context, registerNewUser: true);
+  void loginSelectedUser(User user, String name) async {
+    updateUserSessionPreferences(
+      user.did.bytes,
+      name,
+      user.host,
+      context,
+    );
+    await launchHome(user: user, context: context, registerNewUser: false);
   }
 }
