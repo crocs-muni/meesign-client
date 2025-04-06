@@ -64,13 +64,26 @@ class Error {
 }
 
 class ProtocolWrapper {
-  static Uint8List keygen(int protoId, Uint8List certs, Uint8List pkcs12,
-      {bool withCard = false, int shares = 1}) {
+  static Uint8List keygen(
+    int protoId,
+    Uint8List certs,
+    Uint8List pkcs12, {
+    bool withCard = false,
+    int shares = 1,
+  }) {
     return using((Arena alloc) {
       final certsBuf = certs.dupToNative(alloc);
       final pkcs12Buf = pkcs12.dupToNative(alloc);
 
-      final proto = _lib.protocol_keygen(protoId, certsBuf, certs.length, pkcs12Buf, pkcs12.length, withCard, shares);
+      final proto = _lib.protocol_keygen(
+        protoId,
+        certsBuf,
+        certs.length,
+        pkcs12Buf,
+        pkcs12.length,
+        withCard,
+        shares,
+      );
       final context = alloc.using(
         _lib.protocol_serialize(proto),
         _lib.buffer_free,
@@ -80,13 +93,28 @@ class ProtocolWrapper {
     });
   }
 
-  static Uint8List init(int protoId, Uint8List group, Uint8List certs, Uint8List pkcs12, {int shares = 1}) {
+  static Uint8List init(
+    int protoId,
+    Uint8List group,
+    Uint8List certs,
+    Uint8List pkcs12, {
+    int shares = 1,
+  }) {
     return using((Arena alloc) {
       final groupBuf = group.dupToNative(alloc);
       final certsBuf = certs.dupToNative(alloc);
       final pkcs12Buf = pkcs12.dupToNative(alloc);
 
-      final proto = _lib.protocol_init(protoId, groupBuf, group.length, certsBuf, certs.length, pkcs12Buf, pkcs12.length, shares);
+      final proto = _lib.protocol_init(
+        protoId,
+        groupBuf,
+        group.length,
+        certsBuf,
+        certs.length,
+        pkcs12Buf,
+        pkcs12.length,
+        shares,
+      );
       final context = alloc.using(
         _lib.protocol_serialize(proto),
         _lib.buffer_free,
@@ -109,13 +137,7 @@ class ProtocolWrapper {
       for (final (i, chunk) in data.indexed) {
         final dataBuf = chunk.dupToNative(alloc);
         final dataOut = alloc.using(
-          _lib.protocol_advance(
-            proto,
-            i,
-            dataBuf,
-            chunk.length,
-            error.ptr,
-          ),
+          _lib.protocol_advance(proto, i, dataBuf, chunk.length, error.ptr),
           _lib.buffer_free,
         );
         if (error.occured) throw ProtocolException(error.message);
@@ -128,11 +150,7 @@ class ProtocolWrapper {
         _lib.buffer_free,
       );
 
-      return ProtocolData(
-        contextOut.dupToDart(),
-        dartDataOut,
-        recipient,
-      );
+      return ProtocolData(contextOut.dupToDart(), dartDataOut, recipient);
     });
   }
 
@@ -187,7 +205,12 @@ class AuthWrapper {
 
       final res = alloc.using(
         _lib.auth_cert_key_to_pkcs12(
-            keyPtr, key.length, certPtr, cert.length, error.ptr),
+          keyPtr,
+          key.length,
+          certPtr,
+          cert.length,
+          error.ptr,
+        ),
         _lib.buffer_free,
       );
 
@@ -206,8 +229,13 @@ class ElGamalWrapper {
       final error = alloc.using(Error(), Error.free);
 
       final res = alloc.using(
-        _lib.encrypt(messagePtr.cast(), message.length, publicKeyPtr,
-            publicKey.length, error.ptr),
+        _lib.encrypt(
+          messagePtr.cast(),
+          message.length,
+          publicKeyPtr,
+          publicKey.length,
+          error.ptr,
+        ),
         _lib.buffer_free,
       );
 
