@@ -110,8 +110,13 @@ class DummyFileStore implements FileStore {
       name;
 
   @override
-  Future<String> storeFile(Uuid did, Uuid id, String name, List<int> data,
-          {bool work = false}) async =>
+  Future<String> storeFile(
+    Uuid did,
+    Uuid id,
+    String name,
+    List<int> data, {
+    bool work = false,
+  }) async =>
       getFilePath(did, id, name, work: work);
 }
 
@@ -120,8 +125,11 @@ void printUsage(ArgParser parser, IOSink sink) {
   sink.writeln(parser.usage);
 }
 
-bool? evalPolicy<T>(Map<String, dynamic> basePolicy,
-    Map<String, dynamic> extPolicy, Task<T> task) {
+bool? evalPolicy<T>(
+  Map<String, dynamic> basePolicy,
+  Map<String, dynamic> extPolicy,
+  Task<T> task,
+) {
   var policy = basePolicy;
   if (policy["overridable"] ?? true) {
     policy = {...basePolicy, ...extPolicy};
@@ -166,15 +174,8 @@ void main(List<String> args) async {
       help: 'address of the server',
       defaultsTo: 'localhost',
     )
-    ..addOption(
-      'name',
-      help: 'name of the user',
-      defaultsTo: 'PolicyBot',
-    )
-    ..addOption(
-      'policy',
-      help: 'path to the policy file',
-    );
+    ..addOption('name', help: 'name of the user', defaultsTo: 'PolicyBot')
+    ..addOption('policy', help: 'path to the policy file');
 
   late final ArgResults options;
 
@@ -207,19 +208,44 @@ void main(List<String> args) async {
   final userRepository = UserRepository(userDao);
 
   final keyStore = KeyStore(appDir);
-  final dispatcher =
-      NetworkDispatcher(options['host'], keyStore, allowBadCerts: true);
+  final dispatcher = NetworkDispatcher(
+    options['host'],
+    keyStore,
+    allowBadCerts: true,
+  );
   final taskSource = TaskSource(dispatcher);
   final taskDao = database.taskDao;
-  final deviceRepository =
-      DeviceRepository(dispatcher, keyStore, database.deviceDao);
-  final groupRepository =
-      GroupRepository(dispatcher, keyStore, taskSource, taskDao, deviceRepository);
-  final fileRepository =
-      FileRepository(dispatcher, keyStore, taskSource, taskDao, DummyFileStore());
-  final challengeRepository =
-      ChallengeRepository(dispatcher, keyStore, taskSource, taskDao);
-  final decryptRepository = DecryptRepository(dispatcher, keyStore, taskSource, taskDao);
+  final deviceRepository = DeviceRepository(
+    dispatcher,
+    keyStore,
+    database.deviceDao,
+  );
+  final groupRepository = GroupRepository(
+    dispatcher,
+    keyStore,
+    taskSource,
+    taskDao,
+    deviceRepository,
+  );
+  final fileRepository = FileRepository(
+    dispatcher,
+    keyStore,
+    taskSource,
+    taskDao,
+    DummyFileStore(),
+  );
+  final challengeRepository = ChallengeRepository(
+    dispatcher,
+    keyStore,
+    taskSource,
+    taskDao,
+  );
+  final decryptRepository = DecryptRepository(
+    dispatcher,
+    keyStore,
+    taskSource,
+    taskDao,
+  );
 
   var user = await userRepository.getUser();
   Device device;

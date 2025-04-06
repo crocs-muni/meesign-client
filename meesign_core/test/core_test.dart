@@ -1,5 +1,4 @@
 @Timeout(Duration(seconds: 180))
-
 import 'dart:async';
 import 'dart:io' as io;
 import 'dart:io';
@@ -34,9 +33,7 @@ Future<void> approveAllFirst(
   TaskRepository taskRepository,
   Iterable<Device> devices,
 ) =>
-    Future.wait(
-      devices.map((d) => approveFirst(taskRepository, d)),
-    );
+    Future.wait(devices.map((d) => approveFirst(taskRepository, d)));
 
 Future<void> verifyPdfSignature(String path) async {
   final res = await Process.run('pdfsig', ['-nocert', path]);
@@ -66,18 +63,46 @@ void main() {
   setUp(() {
     database = Database(appDir);
     keyStore = KeyStore(appDir);
-    dispatcher = NetworkDispatcher('localhost', keyStore,
-        serverCerts: serverCerts, allowBadCerts: serverCerts == null);
-    deviceRepository =
-        DeviceRepository(dispatcher, keyStore, database.deviceDao);
+    dispatcher = NetworkDispatcher(
+      'localhost',
+      keyStore,
+      serverCerts: serverCerts,
+      allowBadCerts: serverCerts == null,
+    );
+    deviceRepository = DeviceRepository(
+      dispatcher,
+      keyStore,
+      database.deviceDao,
+    );
     final taskSource = TaskSource(dispatcher);
     final taskDao = database.taskDao;
-    groupRepository =
-        GroupRepository(dispatcher, keyStore, taskSource, taskDao, deviceRepository);
+    groupRepository = GroupRepository(
+      dispatcher,
+      keyStore,
+      taskSource,
+      taskDao,
+      deviceRepository,
+    );
     final fileStore = FileStore(appDir);
-    fileRepository = FileRepository(dispatcher, keyStore, taskSource, taskDao, fileStore);
-    challengeRepository = ChallengeRepository(dispatcher, keyStore, taskSource, taskDao);
-    decryptRepository = DecryptRepository(dispatcher, keyStore, taskSource, taskDao);
+    fileRepository = FileRepository(
+      dispatcher,
+      keyStore,
+      taskSource,
+      taskDao,
+      fileStore,
+    );
+    challengeRepository = ChallengeRepository(
+      dispatcher,
+      keyStore,
+      taskSource,
+      taskDao,
+    );
+    decryptRepository = DecryptRepository(
+      dispatcher,
+      keyStore,
+      taskSource,
+      taskDao,
+    );
   });
 
   Future<List<T>> testRepository<T>(
@@ -92,9 +117,9 @@ void main() {
     n ??= shares!.length;
     shares ??= List.filled(n, 1);
 
-    final ds = await Future.wait(
-      [for (var i = 0; i < n; ++i) deviceRepository.register('d$i')],
-    );
+    final ds = await Future.wait([
+      for (var i = 0; i < n; ++i) deviceRepository.register('d$i'),
+    ]);
 
     await Future.wait(ds.map((d) => groupRepository.subscribe(d.id)));
     final members = [for (final (i, d) in ds.indexed) Member(d, shares[i])];
@@ -122,11 +147,7 @@ void main() {
     );
   }
 
-  Future<void> testSignPdf({
-    int? n,
-    List<int>? shares,
-    required int t,
-  }) async {
+  Future<void> testSignPdf({int? n, List<int>? shares, required int t}) async {
     final files = await testRepository(
       fileRepository,
       KeyType.signPdf,
@@ -169,11 +190,7 @@ void main() {
     // TODO: verify signatures
   }
 
-  Future<void> testDecrypt({
-    int? n,
-    List<int>? shares,
-    required int t,
-  }) async {
+  Future<void> testDecrypt({int? n, List<int>? shares, required int t}) async {
     final rng = Random();
     final message = List.generate(1024, (_) => rng.nextInt(256));
 
@@ -186,7 +203,11 @@ void main() {
       t: t,
       createTask: (_, Group g) async {
         await decryptRepository.encrypt(
-            'test secret', MimeType.octetStream, message, g.id);
+          'test secret',
+          MimeType.octetStream,
+          message,
+          g.id,
+        );
       },
     );
     final results = [for (var d in decrypts) d.data];
@@ -206,18 +227,28 @@ void main() {
     group('gg18', () {
       test('2-3', () => testSignChallenge(Protocol.gg18, n: 3, t: 2));
       test('3-3', () => testSignChallenge(Protocol.gg18, n: 3, t: 3));
-      test('3-[1, 2, 3]',
-          () => testSignChallenge(Protocol.gg18, shares: [1, 2, 3], t: 3));
-      test('15-20', () => testSignChallenge(Protocol.gg18, n: 20, t: 15),
-          tags: 'large');
+      test(
+        '3-[1, 2, 3]',
+        () => testSignChallenge(Protocol.gg18, shares: [1, 2, 3], t: 3),
+      );
+      test(
+        '15-20',
+        () => testSignChallenge(Protocol.gg18, n: 20, t: 15),
+        tags: 'large',
+      );
     });
     group('frost', () {
       test('2-3', () => testSignChallenge(Protocol.frost, n: 3, t: 2));
       test('3-3', () => testSignChallenge(Protocol.frost, n: 3, t: 3));
-      test('3-[1, 2, 3]',
-          () => testSignChallenge(Protocol.frost, shares: [1, 2, 3], t: 3));
-      test('15-20', () => testSignChallenge(Protocol.frost, n: 20, t: 15),
-          tags: 'large');
+      test(
+        '3-[1, 2, 3]',
+        () => testSignChallenge(Protocol.frost, shares: [1, 2, 3], t: 3),
+      );
+      test(
+        '15-20',
+        () => testSignChallenge(Protocol.frost, n: 20, t: 15),
+        tags: 'large',
+      );
     });
   });
 
