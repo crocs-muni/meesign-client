@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../app/model/settings.dart';
 import '../app_container.dart';
@@ -151,8 +149,6 @@ class _RegisterPageState extends State<RegisterPage> {
               _buildLogoSection(context),
               const SizedBox(height: XLARGE_GAP),
               _buildContent(),
-              SizedBox(height: LARGE_GAP),
-              _buildMinistryFooter(context),
             ],
           ),
         ));
@@ -308,30 +304,5 @@ class _RegisterPageState extends State<RegisterPage> {
         ],
       ),
     );
-  }
-
-  Widget _buildMinistryFooter(BuildContext context) {
-    const double logoWidth = 175;
-    final Uri url = Uri.parse('https://mv.gov.cz/mvcren/');
-
-    return Padding(
-      padding: const EdgeInsets.all(XLARGE_PADDING),
-      child: GestureDetector(
-        onTap: () => _launchUrl(url),
-        child: SvgPicture.asset(
-          Theme.of(context).brightness == Brightness.dark
-              ? 'assets/ministerstvo_vnitra_cz_logo_dark_mode.svg'
-              : 'assets/ministerstvo_vnitra_cz_logo.svg',
-          width: logoWidth,
-        ),
-      ),
-    );
-  }
-
-  Future<void> _launchUrl(Uri url) async {
-    // TODO: This requires configuration in AndroidManifest.xml and Info.plist!
-    if (!await launchUrl(url)) {
-      throw Exception('Could not launch $url');
-    }
   }
 }
