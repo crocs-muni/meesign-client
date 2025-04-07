@@ -11,10 +11,12 @@ class DefaultPageTemplate extends StatelessWidget {
   final String backButtonText;
   final bool includePadding;
   final bool transparentBackground;
+  final Widget? floatingActionButton;
 
   const DefaultPageTemplate({
     super.key,
     required this.body,
+    this.floatingActionButton,
     this.showAppBar = false,
     this.appBarTitle = '',
     this.backButtonText = 'Back',
@@ -52,6 +54,7 @@ class DefaultPageTemplate extends StatelessWidget {
                   : body),
         ),
       ),
+      floatingActionButton: floatingActionButton,
     );
   }
 
