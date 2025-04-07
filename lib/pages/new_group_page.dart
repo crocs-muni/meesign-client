@@ -12,127 +12,14 @@ import 'dart:io';
 
 import '../app_container.dart';
 import '../routes.dart';
+import '../templates/default_page_template.dart';
+import '../ui_constants.dart';
 import '../util/chars.dart';
 import '../widget/device_name.dart';
+import '../widget/number_input.dart';
+import '../widget/option_tile.dart';
 import '../widget/warning_banner.dart';
 import '../widget/weighted_avatar.dart';
-
-class OptionTile extends StatelessWidget {
-  final String title;
-  final EdgeInsets padding;
-  final EdgeInsets titlePadding;
-  final List<Widget> children;
-  final Widget? help;
-
-  const OptionTile({
-    super.key,
-    required this.title,
-    this.padding = const EdgeInsets.symmetric(
-      horizontal: 16,
-      vertical: 12,
-    ),
-    this.titlePadding = const EdgeInsets.all(0),
-    this.children = const [],
-    this.help,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    Widget? helpButton;
-    if (help != null) {
-      helpButton = SizedBox.square(
-        dimension: 24,
-        child: IconButton(
-          padding: const EdgeInsets.all(0),
-          iconSize: 20,
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  icon: const Icon(Symbols.help),
-                  title: Text(title),
-                  content: SingleChildScrollView(
-                    child: help,
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text('OK'),
-                    ),
-                  ],
-                );
-              },
-            );
-          },
-          icon: const Icon(Symbols.help, opticalSize: 20),
-        ),
-      );
-    }
-
-    return Padding(
-      padding: padding,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: titlePadding,
-            child: Row(
-              children: [
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-                const SizedBox(width: 8),
-                if (helpButton != null) helpButton,
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          ...children,
-        ],
-      ),
-    );
-  }
-}
-
-class NumberInput extends StatelessWidget {
-  final int value;
-  final void Function(int)? onUpdate;
-
-  const NumberInput({
-    required this.value,
-    this.onUpdate,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        IconButton(
-          icon: const Icon(Symbols.chevron_left),
-          onPressed: onUpdate != null ? () => onUpdate!(value - 1) : null,
-        ),
-        Container(
-          alignment: Alignment.center,
-          width: 20,
-          child: Text(
-            value.toString(),
-            style: Theme.of(context).textTheme.labelLarge,
-          ),
-        ),
-        IconButton(
-          icon: const Icon(Symbols.chevron_right),
-          onPressed: onUpdate != null ? () => onUpdate!(value + 1) : null,
-        ),
-      ],
-    );
-  }
-}
 
 class NewGroupPage extends StatefulWidget {
   const NewGroupPage({super.key});
@@ -170,6 +57,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
         });
       }
     });
+
     _policyController.addListener(() {
       if (_policyErr != null) {
         setState(() {
@@ -298,328 +186,342 @@ class _NewGroupPageState extends State<NewGroupPage> {
     return null;
   }
 
+  Widget _buildCreateGroupButton() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: LARGE_GAP),
+      child: FilledButton.icon(
+          style: FilledButton.styleFrom(
+            minimumSize: const Size.fromHeight(48),
+          ),
+          onPressed: _tryCreate,
+          label: const Text('Create'),
+          icon: Icon(Icons.create_new_folder)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final sharesIssue = _sharesErr ?? _getSharesWarning();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('New Group'),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: FilledButton(
-              onPressed: _tryCreate,
-              child: const Text('Create'),
-            ),
-          ),
-        ],
-      ),
-      body: ListView(
-        children: [
-          OptionTile(
-            title: 'Name',
+    return DefaultPageTemplate(
+        showAppBar: true,
+        appBarTitle: 'New group',
+        body: _buildPageBody(sharesIssue));
+  }
+
+  Widget _buildPageBody(({String title, String text})? sharesIssue) {
+    return Column(
+      children: [
+        Expanded(
+          child: ListView(
             children: [
-              TextField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  // labelText: 'Name',
-                  border: const OutlineInputBorder(),
-                  errorText: _nameErr,
-                ),
-                maxLength: 32,
-                inputFormatters: [
-                  FilteringTextInputFormatter.deny(
-                    RegExp('[${RegExp.escape(asciiPunctuationChars)}]'),
-                  )
-                ],
-              ),
-            ],
-          ),
-          OptionTile(
-            title: 'Members',
-            help: const Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'By default, each member receives one share of the group\'s '
-                  'private key. As a result, all members have equal voting '
-                  'rights.\n\n'
-                  'You can change the number of key shares a given member '
-                  'receives using the arrows next to its name. The circle '
-                  'around user\'s avatar visualizes its voting power.\n\n'
-                  'For example, the user below receives one share which '
-                  'amounts to one third of the total number of votes.',
-                ),
-                SizedBox(height: 16),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    WeightedAvatar(
-                      index: 0,
-                      weights: [1, 2],
-                      child: Text('E'),
-                    ),
-                    SizedBox(width: 16),
-                    Text('example'),
-                    SizedBox(width: 8),
-                    NumberInput(
-                      value: 1,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            children: [
-              Row(
+              OptionTile(
+                title: 'Name',
                 children: [
-                  Expanded(
-                    child: FilledButton.tonalIcon(
-                      icon: const Icon(Symbols.search),
-                      label: const Text('Search'),
-                      onPressed: () => _selectPeer(Routes.newGroupSearch),
+                  TextField(
+                    controller: _nameController,
+                    decoration: InputDecoration(
+                      // labelText: 'Name',
+                      border: const OutlineInputBorder(),
+                      errorText: _nameErr,
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  if (Platform.isAndroid || Platform.isIOS)
-                    Expanded(
-                      child: FilledButton.tonalIcon(
-                        icon: const Icon(Symbols.qr_code),
-                        label: const Text('Scan'),
-                        onPressed: () => _selectPeer(Routes.newGroupQr),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              for (final (i, member) in _members.indexed)
-                ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 0),
-                  leading: WeightedAvatar(
-                    index: i,
-                    weights: _members.map((m) => m.shares).toList(),
-                    child: Text(member.device.name.initials),
-                  ),
-                  title: DeviceName(
-                    member.device.name,
-                    kind: member.device.kind,
-                    iconSize: 20,
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      NumberInput(
-                        value: member.shares,
-                        onUpdate: (newWeight) {
-                          setState(() {
-                            if (newWeight > 0) {
-                              _members[i] = Member(member.device, newWeight);
-                              _sharesErr = null;
-                            }
-                          });
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        onPressed: () {
-                          setState(() {
-                            _members.removeAt(i);
-                            _sharesErr = null;
-                          });
-                        },
-                        icon: const Icon(Symbols.delete),
+                    maxLength: 32,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.deny(
+                        RegExp('[${RegExp.escape(asciiPunctuationChars)}]'),
                       )
                     ],
                   ),
-                ),
-            ],
-          ),
-          OptionTile(
-            title: 'Threshold',
-            help: const Text(
-              'No group task can succeed unless at least the specified number '
-              'of positive votes is gathered from the group\'s members.\n\n'
-              'By carefully setting up the threshold and the number of shares '
-              'each user receives, you can enforce that only certain subsets '
-              'of the group can proceed with a given task.',
-            ),
-            children: [
-              Row(
-                children: [
-                  const Icon(Symbols.person),
-                  Expanded(
-                    child: Slider(
-                      value: min(_threshold, _shareCount).toDouble(),
-                      min: 0,
-                      max: _shareCount.toDouble(),
-                      divisions: max(1, _shareCount),
-                      label: '$_threshold',
-                      onChanged: _shareCount > _minThreshold
-                          ? (value) => setState(() {
-                                _setThreshold(value.round());
-                              })
-                          : null,
+                ],
+              ),
+              OptionTile(
+                title: 'Members',
+                help: const Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'By default, each member receives one share of the group\'s '
+                      'private key. As a result, all members have equal voting '
+                      'rights.\n\n'
+                      'You can change the number of key shares a given member '
+                      'receives using the arrows next to its name. The circle '
+                      'around user\'s avatar visualizes its voting power.\n\n'
+                      'For example, the user below receives one share which '
+                      'amounts to one third of the total number of votes.',
                     ),
-                  ),
-                  const Icon(Symbols.people),
-                ],
-              ),
-            ],
-          ),
-          if (sharesIssue != null)
-            WarningBanner(
-              title: sharesIssue.title,
-              text: sharesIssue.text,
-            ),
-          OptionTile(
-            title: 'Purpose',
-            children: [
-              SegmentedButton<KeyType>(
-                selected: {_keyType},
-                onSelectionChanged: (value) {
-                  setState(() {
-                    _protocol = value.first.supportedProtocols.first;
-                    _keyType = value.first;
-                  });
-                },
-                segments: const [
-                  ButtonSegment<KeyType>(
-                    value: KeyType.signPdf,
-                    label: Text('Sign PDF'),
-                  ),
-                  ButtonSegment<KeyType>(
-                    value: KeyType.signChallenge,
-                    label: Text('Challenge'),
-                  ),
-                  ButtonSegment<KeyType>(
-                    value: KeyType.decrypt,
-                    label: Text('Decrypt'),
-                  )
-                ],
-              ),
-            ],
-          ),
-          if (_hasBot)
-            OptionTile(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              titlePadding: const EdgeInsets.symmetric(horizontal: 16),
-              title: 'Policy',
-              help: const Text(
-                'If a bot is present in the group, you can set a policy that '
-                'modifies its behavior (when to approve or decline requests).\n\n'
-                'Depending on the bot\'s configuration, it may disregard the '
-                'user-provided policy.',
-              ),
-              children: [
-                CheckboxListTile(
-                  value: _policyTime,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      _policyTime = value!;
-                    });
-                  },
-                  controlAffinity: ListTileControlAffinity.leading,
-                  title: Row(
+                    SizedBox(height: 16),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        WeightedAvatar(
+                          index: 0,
+                          weights: [1, 2],
+                          child: Text('E'),
+                        ),
+                        SizedBox(width: 16),
+                        Text('example'),
+                        SizedBox(width: 8),
+                        NumberInput(
+                          value: 1,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                children: [
+                  Row(
                     children: [
-                      const Text('Time'),
+                      Expanded(
+                        child: FilledButton.tonalIcon(
+                          icon: const Icon(Symbols.search),
+                          label: const Text('Search'),
+                          onPressed: () => _selectPeer(Routes.newGroupSearch),
+                        ),
+                      ),
                       const SizedBox(width: 8),
-                      FilledButton.tonalIcon(
-                        onPressed: _policyTime
-                            ? () async {
-                                final value = await showTimePicker(
-                                  context: context,
-                                  initialTime: _policyAfterTime,
-                                );
-                                if (value != null) {
-                                  setState(() {
-                                    _policyAfterTime = value;
-                                  });
-                                }
-                              }
-                            : null,
-                        icon: const Icon(Symbols.access_time),
-                        label: Text(_policyAfterTime.format(context)),
-                      ),
-                      const Text(' – '),
-                      FilledButton.tonalIcon(
-                        onPressed: _policyTime
-                            ? () async {
-                                final value = await showTimePicker(
-                                  context: context,
-                                  initialTime: _policyBeforeTime,
-                                );
-                                if (value != null) {
-                                  setState(() {
-                                    _policyBeforeTime = value;
-                                  });
-                                }
-                              }
-                            : null,
-                        icon: const Icon(Symbols.access_time),
-                        label: Text(_policyBeforeTime.format(context)),
-                      ),
+                      if (Platform.isAndroid || Platform.isIOS)
+                        Expanded(
+                          child: FilledButton.tonalIcon(
+                            icon: const Icon(Symbols.qr_code),
+                            label: const Text('Scan'),
+                            onPressed: () => _selectPeer(Routes.newGroupQr),
+                          ),
+                        ),
                     ],
                   ),
-                ),
-                CheckboxListTile(
-                  value: _policyDecline,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      _policyDecline = value!;
-                    });
-                  },
-                  controlAffinity: ListTileControlAffinity.leading,
-                  title: const Text('Decline if not satisfied immediately'),
-                ),
-              ],
-            ),
-          ExpansionTile(
-            title: const Text('Advanced options'),
-            collapsedTextColor: Theme.of(context)
-                .textTheme
-                .bodyLarge
-                ?.color
-                ?.withValues(alpha: 0.5),
-            expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+                  const SizedBox(height: 8),
+                  for (final (i, member) in _members.indexed)
+                    ListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 0),
+                      leading: WeightedAvatar(
+                        index: i,
+                        weights: _members.map((m) => m.shares).toList(),
+                        child: Text(member.device.name.initials),
+                      ),
+                      title: DeviceName(
+                        member.device.name,
+                        kind: member.device.kind,
+                        iconSize: 20,
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          NumberInput(
+                            value: member.shares,
+                            onUpdate: (newWeight) {
+                              setState(() {
+                                if (newWeight > 0) {
+                                  _members[i] =
+                                      Member(member.device, newWeight);
+                                  _sharesErr = null;
+                                }
+                              });
+                            },
+                          ),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _members.removeAt(i);
+                                _sharesErr = null;
+                              });
+                            },
+                            icon: const Icon(Symbols.delete),
+                          )
+                        ],
+                      ),
+                    ),
+                ],
+              ),
               OptionTile(
-                title: 'Protocol',
+                title: 'Threshold',
+                help: const Text(
+                  'No group task can succeed unless at least the specified number '
+                  'of positive votes is gathered from the group\'s members.\n\n'
+                  'By carefully setting up the threshold and the number of shares '
+                  'each user receives, you can enforce that only certain subsets '
+                  'of the group can proceed with a given task.',
+                ),
                 children: [
-                  SegmentedButton<Protocol>(
-                    selected: {_protocol},
-                    onSelectionChanged: (value) {
-                      setState(() => _protocol = value.first);
-                    },
-                    segments: [
-                      for (var protocol in _keyType.supportedProtocols)
-                        ButtonSegment<Protocol>(
-                          value: protocol,
-                          label: Text(protocol.name.toUpperCase()),
+                  Row(
+                    children: [
+                      const Icon(Symbols.person),
+                      Expanded(
+                        child: Slider(
+                          value: min(_threshold, _shareCount).toDouble(),
+                          min: 0,
+                          max: _shareCount.toDouble(),
+                          divisions: max(1, _shareCount),
+                          label: '$_threshold',
+                          onChanged: _shareCount > _minThreshold
+                              ? (value) => setState(() {
+                                    _setThreshold(value.round());
+                                  })
+                              : null,
                         ),
+                      ),
+                      const Icon(Symbols.people),
+                    ],
+                  ),
+                ],
+              ),
+              if (sharesIssue != null)
+                WarningBanner(
+                  title: sharesIssue.title,
+                  text: sharesIssue.text,
+                ),
+              OptionTile(
+                title: 'Purpose',
+                children: [
+                  SegmentedButton<KeyType>(
+                    selected: {_keyType},
+                    onSelectionChanged: (value) {
+                      setState(() {
+                        _protocol = value.first.supportedProtocols.first;
+                        _keyType = value.first;
+                      });
+                    },
+                    segments: const [
+                      ButtonSegment<KeyType>(
+                        value: KeyType.signPdf,
+                        label: Text('Sign PDF'),
+                      ),
+                      ButtonSegment<KeyType>(
+                        value: KeyType.signChallenge,
+                        label: Text('Challenge'),
+                      ),
+                      ButtonSegment<KeyType>(
+                        value: KeyType.decrypt,
+                        label: Text('Decrypt'),
+                      )
                     ],
                   ),
                 ],
               ),
               if (_hasBot)
                 OptionTile(
-                  title: 'Custom policy',
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  titlePadding: const EdgeInsets.symmetric(horizontal: 16),
+                  title: 'Policy',
+                  help: const Text(
+                    'If a bot is present in the group, you can set a policy that '
+                    'modifies its behavior (when to approve or decline requests).\n\n'
+                    'Depending on the bot\'s configuration, it may disregard the '
+                    'user-provided policy.',
+                  ),
                   children: [
-                    TextField(
-                      controller: _policyController,
-                      decoration: InputDecoration(
-                        border: const OutlineInputBorder(),
-                        errorText: _policyErr,
-                        hintText: const JsonEncoder.withIndent('  ')
-                            .convert(_buildPolicy(includeAll: true)),
+                    CheckboxListTile(
+                      value: _policyTime,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          _policyTime = value!;
+                        });
+                      },
+                      controlAffinity: ListTileControlAffinity.leading,
+                      title: Row(
+                        children: [
+                          const Text('Time'),
+                          const SizedBox(width: 8),
+                          FilledButton.tonalIcon(
+                            onPressed: _policyTime
+                                ? () async {
+                                    final value = await showTimePicker(
+                                      context: context,
+                                      initialTime: _policyAfterTime,
+                                    );
+                                    if (value != null) {
+                                      setState(() {
+                                        _policyAfterTime = value;
+                                      });
+                                    }
+                                  }
+                                : null,
+                            icon: const Icon(Symbols.access_time),
+                            label: Text(_policyAfterTime.format(context)),
+                          ),
+                          const Text(' – '),
+                          FilledButton.tonalIcon(
+                            onPressed: _policyTime
+                                ? () async {
+                                    final value = await showTimePicker(
+                                      context: context,
+                                      initialTime: _policyBeforeTime,
+                                    );
+                                    if (value != null) {
+                                      setState(() {
+                                        _policyBeforeTime = value;
+                                      });
+                                    }
+                                  }
+                                : null,
+                            icon: const Icon(Symbols.access_time),
+                            label: Text(_policyBeforeTime.format(context)),
+                          ),
+                        ],
                       ),
-                      maxLines: null,
+                    ),
+                    CheckboxListTile(
+                      value: _policyDecline,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          _policyDecline = value!;
+                        });
+                      },
+                      controlAffinity: ListTileControlAffinity.leading,
+                      title: const Text('Decline if not satisfied immediately'),
                     ),
                   ],
                 ),
+              ExpansionTile(
+                title: const Text('Advanced options'),
+                collapsedTextColor: Theme.of(context)
+                    .textTheme
+                    .bodyLarge
+                    ?.color
+                    ?.withValues(alpha: 0.5),
+                expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  OptionTile(
+                    title: 'Protocol',
+                    children: [
+                      SegmentedButton<Protocol>(
+                        selected: {_protocol},
+                        onSelectionChanged: (value) {
+                          setState(() => _protocol = value.first);
+                        },
+                        segments: [
+                          for (var protocol in _keyType.supportedProtocols)
+                            ButtonSegment<Protocol>(
+                              value: protocol,
+                              label: Text(protocol.name.toUpperCase()),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  if (_hasBot)
+                    OptionTile(
+                      title: 'Custom policy',
+                      children: [
+                        TextField(
+                          controller: _policyController,
+                          decoration: InputDecoration(
+                            border: const OutlineInputBorder(),
+                            errorText: _policyErr,
+                            hintText: const JsonEncoder.withIndent('  ')
+                                .convert(_buildPolicy(includeAll: true)),
+                          ),
+                          maxLines: null,
+                        ),
+                      ],
+                    ),
+                ],
+              ),
             ],
           ),
-        ],
-      ),
+        ),
+        _buildCreateGroupButton()
+      ],
     );
   }
 }

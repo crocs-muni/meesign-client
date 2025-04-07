@@ -12,7 +12,6 @@ import '../../widget/fluid_gradient.dart';
 import '../model/navigation_tab_model.dart';
 import '../../app_container.dart';
 import '../../widget/counter_badge.dart';
-import '../../widget/fab_configurator.dart';
 import '../../widget/main_app_bar.dart';
 import '../../pages/challenge_sub_page.dart';
 import '../../pages/decrypt_sub_page.dart';
@@ -103,8 +102,8 @@ class _HomePageViewState extends State<HomePageView> {
                         LayoutGetter.getCurLayout(constraints.maxWidth)),
                     body: _buildResponsiveLayout(
                         _buildIndexedStack(), constraints.maxWidth),
-                    floatingActionButton:
-                        FabConfigurator(index: _index, buildContext: context),
+                    floatingActionButton: null,
+                    // FabConfigurator(index: _index, buildContext: context),
                     bottomNavigationBar:
                         _buildBottomNavigation(constraints.maxWidth),
                   ),
