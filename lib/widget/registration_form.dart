@@ -29,7 +29,10 @@ class _RegistrationFormState extends State<RegistrationForm> {
   final _nameController = TextEditingController();
   final _hostController = TextEditingController();
   final FocusNode _nameControllerFocus = FocusNode();
+  final FocusNode _clearNameControllerFocus = FocusNode();
+  final FocusNode _clearHostControllerFocus = FocusNode();
   final FocusNode _hostControllerFocus = FocusNode();
+  final FocusNode _submitFocusNode = FocusNode();
 
   bool _working = false;
   String? _nameError;
@@ -47,6 +50,9 @@ class _RegistrationFormState extends State<RegistrationForm> {
 
     _nameControllerFocus.addListener(checkFocus);
     _hostControllerFocus.addListener(checkFocus);
+    _submitFocusNode.addListener(checkFocus);
+    _clearNameControllerFocus.addListener(checkFocus);
+    _clearHostControllerFocus.addListener(checkFocus);
   }
 
   void setupHostname() async {
@@ -72,6 +78,9 @@ class _RegistrationFormState extends State<RegistrationForm> {
     _hostController.removeListener(clearErrors);
     _nameControllerFocus.removeListener(checkFocus);
     _hostControllerFocus.removeListener(checkFocus);
+    _submitFocusNode.removeListener(checkFocus);
+    _clearHostControllerFocus.removeListener(checkFocus);
+    _clearNameControllerFocus.removeListener(checkFocus);
     super.dispose();
   }
 
@@ -165,18 +174,19 @@ class _RegistrationFormState extends State<RegistrationForm> {
           controller: _nameController,
           focusNode: _nameControllerFocus,
           decoration: InputDecoration(
-            suffixIcon:
-                _nameController.text == '' || !_nameControllerFocus.hasFocus
-                    ? null
-                    : IconButton(
-                        // Icon to
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          setState(() {
-                            _nameController.clear();
-                          });
-                        },
-                      ),
+            suffixIcon: _nameController.text == '' ||
+                    (!_nameControllerFocus.hasFocus &&
+                        !_clearNameControllerFocus.hasFocus)
+                ? null
+                : IconButton(
+                    focusNode: _clearNameControllerFocus,
+                    icon: const Icon(Icons.clear),
+                    onPressed: () {
+                      setState(() {
+                        _nameController.clear();
+                      });
+                    },
+                  ),
             labelText: 'Name',
             filled: true,
             border: const OutlineInputBorder(),
@@ -199,18 +209,19 @@ class _RegistrationFormState extends State<RegistrationForm> {
           controller: _hostController,
           focusNode: _hostControllerFocus,
           decoration: InputDecoration(
-            suffixIcon:
-                _hostController.text == '' || !_hostControllerFocus.hasFocus
-                    ? SizedBox()
-                    : IconButton(
-                        // Icon to
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          setState(() {
-                            _hostController.clear();
-                          });
-                        },
-                      ),
+            suffixIcon: _hostController.text == '' ||
+                    (!_hostControllerFocus.hasFocus &&
+                        !_clearHostControllerFocus.hasFocus)
+                ? SizedBox()
+                : IconButton(
+                    focusNode: _clearHostControllerFocus,
+                    icon: const Icon(Icons.clear),
+                    onPressed: () {
+                      setState(() {
+                        _hostController.clear();
+                      });
+                    },
+                  ),
             labelText: 'Server',
             filled: true,
             border: const OutlineInputBorder(),
@@ -235,8 +246,15 @@ class _RegistrationFormState extends State<RegistrationForm> {
           width: 200,
           height: 42,
           child: FilledButton(
+            focusNode: _submitFocusNode,
             style: FilledButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              side: _submitFocusNode.hasFocus
+                  ? BorderSide(
+                      color: Theme.of(context).colorScheme.secondaryContainer,
+                      width: 5)
+                  : BorderSide.none,
+            ),
             onPressed: _register,
             child: _working
                 ? SizedBox.square(
