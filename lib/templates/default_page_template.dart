@@ -6,6 +6,7 @@ class DefaultPageTemplate extends StatelessWidget {
   final Widget body;
   final List<Widget> appBarActions;
   final bool showAppBar;
+  final PreferredSizeWidget? customAppBar;
   final String appBarTitle;
   final bool wrapInScroll;
   final String backButtonText;
@@ -17,6 +18,7 @@ class DefaultPageTemplate extends StatelessWidget {
     super.key,
     required this.body,
     this.floatingActionButton,
+    this.customAppBar,
     this.showAppBar = false,
     this.appBarTitle = '',
     this.backButtonText = 'Back',
@@ -33,14 +35,15 @@ class DefaultPageTemplate extends StatelessWidget {
           ? Colors.transparent
           : Theme.of(context).scaffoldBackgroundColor,
       appBar: showAppBar
-          ? AppBar(
-              actions: appBarActions,
-              forceMaterialTransparency: true,
-              surfaceTintColor: Colors.transparent,
-              leadingWidth: 120,
-              leading: _buildCustomBackButton(context),
-              title: Text(appBarTitle),
-            )
+          ? customAppBar ??
+              AppBar(
+                actions: appBarActions,
+                forceMaterialTransparency: true,
+                surfaceTintColor: Colors.transparent,
+                leadingWidth: 120,
+                leading: _buildCustomBackButton(context),
+                title: Text(appBarTitle),
+              )
           : null,
       body: Container(
         padding: EdgeInsets.all(includePadding ? MEDIUM_PADDING : 0),

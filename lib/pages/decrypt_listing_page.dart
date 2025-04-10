@@ -12,16 +12,19 @@ import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../enums/fab_type.dart';
+import '../templates/default_page_template.dart';
 import '../util/platform.dart';
 import '../util/status_message.dart';
 import '../view_model/app_view_model.dart';
 import '../widget/empty_list.dart';
 import '../widget/entity_chip.dart';
+import '../widget/fab_configurator.dart';
 import '../widget/task_list_view.dart';
 import '../widget/task_tile.dart';
 
-class DecryptSubPage extends StatelessWidget {
-  const DecryptSubPage({super.key});
+class DecryptListingPage extends StatelessWidget {
+  const DecryptListingPage({super.key});
 
   static Future<void> _shareDecrypt(Decrypt decrypt) async {
     final file = XFile.fromData(
@@ -133,41 +136,45 @@ class DecryptSubPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<AppViewModel>(builder: (context, model, child) {
-      return buildTaskListView<Decrypt>(
-        model.decryptTasks,
-        emptyView: EmptyList(
-          hint: model.hasGroup(KeyType.decrypt)
-              ? 'Try encrypting some data.'
-              : 'Start by creating a group for decryption.',
-        ),
-        showArchived: model.showArchived,
-        taskBuilder: (context, task) {
-          return TaskTile(
-            task: task,
-            name: task.info.name,
-            desc: StatusMessage.getStatusMessage(task),
-            actionChip: GroupChip(group: task.info.group),
-            approveActions: [
-              FilledButton.tonal(
-                child: const Text('Decrypt'),
-                onPressed: () => model.joinDecrypt(task, agree: true),
-              ),
-              OutlinedButton(
-                child: const Text('Decline'),
-                onPressed: () => model.joinDecrypt(task, agree: false),
-              )
-            ],
-            actions: [
-              if (task.state == TaskState.finished)
+      return DefaultPageTemplate(
+        floatingActionButton:
+            FabConfigurator(fabType: FabType.decryptFab, buildContext: context),
+        body: buildTaskListView<Decrypt>(
+          model.decryptTasks,
+          emptyView: EmptyList(
+            hint: model.hasGroup(KeyType.decrypt)
+                ? 'Try encrypting some data.'
+                : 'Start by creating a group for decryption.',
+          ),
+          showArchived: model.showArchived,
+          taskBuilder: (context, task) {
+            return TaskTile(
+              task: task,
+              name: task.info.name,
+              desc: StatusMessage.getStatusMessage(task),
+              actionChip: GroupChip(group: task.info.group),
+              approveActions: [
                 FilledButton.tonal(
-                  onPressed: () => showDecryptDialog(context, task.info),
-                  child: const Text('View'),
+                  child: const Text('Decrypt'),
+                  onPressed: () => model.joinDecrypt(task, agree: true),
+                ),
+                OutlinedButton(
+                  child: const Text('Decline'),
+                  onPressed: () => model.joinDecrypt(task, agree: false),
                 )
-            ],
-            onArchiveChange: (archive) =>
-                model.archiveTask(task, archive: archive),
-          );
-        },
+              ],
+              actions: [
+                if (task.state == TaskState.finished)
+                  FilledButton.tonal(
+                    onPressed: () => showDecryptDialog(context, task.info),
+                    child: const Text('View'),
+                  )
+              ],
+              onArchiveChange: (archive) =>
+                  model.archiveTask(task, archive: archive),
+            );
+          },
+        ),
       );
     });
   }

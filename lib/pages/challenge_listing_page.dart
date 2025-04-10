@@ -6,18 +6,21 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
+import '../enums/fab_type.dart';
+import '../templates/default_page_template.dart';
 import '../util/card_reader_launcher.dart';
 import '../util/chars.dart';
 import '../view_model/app_view_model.dart';
 import '../widget/empty_list.dart';
 import '../widget/entity_chip.dart';
+import '../widget/fab_configurator.dart';
 import '../widget/task_list_view.dart';
 import '../widget/task_tile.dart';
 
 enum DataView { hex, text }
 
-class ChallengeSubPage extends StatelessWidget {
-  const ChallengeSubPage({super.key});
+class ChallengeListingPage extends StatelessWidget {
+  const ChallengeListingPage({super.key});
 
   Future<void> showChallengeDialog(
     BuildContext context,
@@ -101,46 +104,50 @@ class ChallengeSubPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<AppViewModel>(builder: (context, model, child) {
-      return buildTaskListView<Challenge>(
-        model.challengeTasks,
-        emptyView: EmptyList(
-          hint: model.hasGroup(KeyType.signChallenge)
-              ? 'Try creating a new challenge.'
-              : 'Start by creating a group for challenges.',
+      return DefaultPageTemplate(
+        floatingActionButton: FabConfigurator(
+            fabType: FabType.challengeFab, buildContext: context),
+        body: buildTaskListView<Challenge>(
+          model.challengeTasks,
+          emptyView: EmptyList(
+            hint: model.hasGroup(KeyType.signChallenge)
+                ? 'Try creating a new challenge.'
+                : 'Start by creating a group for challenges.',
+          ),
+          showArchived: model.showArchived,
+          taskBuilder: (context, task) {
+            return TaskTile(
+              task: task,
+              name: task.info.name,
+              actionChip: GroupChip(group: task.info.group),
+              approveActions: [
+                FilledButton.tonal(
+                  child: const Text('Sign'),
+                  onPressed: () => model.joinChallenge(task, agree: true),
+                ),
+                OutlinedButton(
+                  child: const Text('Decline'),
+                  onPressed: () => model.joinChallenge(task, agree: false),
+                )
+              ],
+              cardActions: [
+                FilledButton.tonal(
+                  onPressed: () => launchCardReader(context,
+                      (card) => model.advanceChallengeWithCard(task, card)),
+                  child: const Text('Read card'),
+                ),
+              ],
+              actions: [
+                FilledButton.tonal(
+                  onPressed: () => showChallengeDialog(context, task.info),
+                  child: const Text('View'),
+                )
+              ],
+              onArchiveChange: (archive) =>
+                  model.archiveTask(task, archive: archive),
+            );
+          },
         ),
-        showArchived: model.showArchived,
-        taskBuilder: (context, task) {
-          return TaskTile(
-            task: task,
-            name: task.info.name,
-            actionChip: GroupChip(group: task.info.group),
-            approveActions: [
-              FilledButton.tonal(
-                child: const Text('Sign'),
-                onPressed: () => model.joinChallenge(task, agree: true),
-              ),
-              OutlinedButton(
-                child: const Text('Decline'),
-                onPressed: () => model.joinChallenge(task, agree: false),
-              )
-            ],
-            cardActions: [
-              FilledButton.tonal(
-                onPressed: () => launchCardReader(context,
-                    (card) => model.advanceChallengeWithCard(task, card)),
-                child: const Text('Read card'),
-              ),
-            ],
-            actions: [
-              FilledButton.tonal(
-                onPressed: () => showChallengeDialog(context, task.info),
-                child: const Text('View'),
-              )
-            ],
-            onArchiveChange: (archive) =>
-                model.archiveTask(task, archive: archive),
-          );
-        },
       );
     });
   }
