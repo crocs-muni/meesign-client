@@ -13,10 +13,10 @@ import '../model/navigation_tab_model.dart';
 import '../../app_container.dart';
 import '../../widget/counter_badge.dart';
 import '../../widget/main_app_bar.dart';
-import '../../pages/challenge_sub_page.dart';
-import '../../pages/decrypt_sub_page.dart';
-import '../../pages/groups_sub_page.dart';
-import '../../pages/signing_sub_page.dart';
+import '../../pages/challenge_listing_page.dart';
+import '../../pages/decrypt_listing_page.dart';
+import '../../pages/groups_listing_page.dart';
+import '../../pages/signing_listing_page.dart';
 import 'offstage_navigator.dart';
 
 class TabbedScaffold extends StatelessWidget {
@@ -129,7 +129,7 @@ class _HomePageViewState extends State<HomePageView> {
       ),
       NavigationTabModel(
         label: 'Challenge',
-        child: ChallengeSubPage(),
+        child: ChallengeListingPage(),
         icon: _buildCounterIcon(
           stream: context.watch<AppViewModel>().nChallengeReqs,
           icon: Symbols.quiz,
@@ -138,7 +138,7 @@ class _HomePageViewState extends State<HomePageView> {
       ),
       NavigationTabModel(
         label: 'Decrypt',
-        child: DecryptSubPage(),
+        child: DecryptListingPage(),
         icon: _buildCounterIcon(
           stream: context.watch<AppViewModel>().nDecryptReqs,
           icon: Symbols.key,
@@ -147,7 +147,7 @@ class _HomePageViewState extends State<HomePageView> {
       ),
       NavigationTabModel(
         label: 'Groups',
-        child: GroupsSubPage(),
+        child: GroupsListingPage(),
         icon: _buildCounterIcon(
           stream: context.watch<AppViewModel>().nGroupReqs,
           icon: Symbols.group,

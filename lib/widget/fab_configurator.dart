@@ -7,7 +7,8 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:meesign_core/meesign_core.dart';
 
 import '../enums/data_input_type.dart';
-import '../routes.dart';
+import '../enums/fab_type.dart';
+import '../pages/new_group_page.dart';
 import '../view_model/app_view_model.dart';
 import 'data_input_dialog.dart';
 import 'error_dialog.dart';
@@ -20,53 +21,76 @@ import 'package:meesign_core/meesign_model.dart';
 import 'package:provider/provider.dart';
 
 class FabConfigurator extends StatelessWidget {
-  final int index;
+  final FabType fabType;
   final BuildContext buildContext;
   const FabConfigurator(
-      {super.key, required this.index, required this.buildContext});
+      {super.key, required this.fabType, required this.buildContext});
 
   @override
   Widget build(BuildContext context) {
-    try {
-      return fabs[index];
-    } on RangeError {
-      return const SizedBox();
+    switch (fabType) {
+      case FabType.signFab:
+        return _buildSignFab(context);
+      case FabType.challengeFab:
+        return _buildChallengeFab(context);
+      case FabType.decryptFab:
+        return _buildEncryptFab(context);
+      case FabType.groupFab:
+        return _buildGroupsFab(context);
     }
   }
 
   AppViewModel _syncGetHomeState(BuildContext context) =>
       buildContext.read<AppViewModel>();
 
-  List<FloatingActionButton> get fabs => [
-        FloatingActionButton.extended(
-          key: const ValueKey('SignFab'),
-          onPressed: _sign,
-          label: const Text('Sign'),
-          icon: const Icon(Symbols.add),
-        ),
-        FloatingActionButton.extended(
-          key: const ValueKey('ChallengeFab'),
-          onPressed: _challenge,
-          label: const Text('Challenge'),
-          icon: const Icon(Symbols.add),
-        ),
-        FloatingActionButton.extended(
-          key: const ValueKey('EncryptFab'),
-          onPressed: _encrypt,
-          label: const Text('Encrypt'),
-          icon: const Icon(Symbols.add),
-        ),
-        FloatingActionButton.extended(
-          onPressed: _group,
-          label: const Text('New'),
-          icon: const Icon(Symbols.add),
-        )
-      ];
+  Widget _buildSignFab(BuildContext context) {
+    String key = "SignFab";
+    return FloatingActionButton.extended(
+      key: ValueKey(key),
+      heroTag: key,
+      onPressed: () => _sign(context),
+      label: const Text('Sign'),
+      icon: const Icon(Symbols.add),
+    );
+  }
+
+  Widget _buildChallengeFab(BuildContext context) {
+    String key = "ChallengeFab";
+    return FloatingActionButton.extended(
+      key: ValueKey(key),
+      heroTag: key,
+      onPressed: () => _challenge(context),
+      label: const Text('Challenge'),
+      icon: const Icon(Symbols.add),
+    );
+  }
+
+  Widget _buildEncryptFab(BuildContext context) {
+    String key = "EncryptFab";
+    return FloatingActionButton.extended(
+      key: ValueKey(key),
+      heroTag: key,
+      onPressed: () => _encrypt(context),
+      label: const Text('Encrypt'),
+      icon: const Icon(Symbols.add),
+    );
+  }
+
+  Widget _buildGroupsFab(BuildContext context) {
+    String key = "GroupFab";
+    return FloatingActionButton.extended(
+      key: ValueKey(key),
+      heroTag: key,
+      onPressed: () => _group(context),
+      label: const Text('New'),
+      icon: const Icon(Symbols.add),
+    );
+  }
 
   // TODO: reduce repetition across request methods
   // (_sign, _challenge, _group, _encrypt)
 
-  Future<void> _encrypt() async {
+  Future<void> _encrypt(BuildContext context) async {
     // Retrieve the HomeState instance before the async gap
     final homeState = _syncGetHomeState(buildContext);
 
@@ -113,12 +137,14 @@ class FabConfigurator extends StatelessWidget {
     }
   }
 
-  Future<void> _group() async {
+  Future<void> _group(BuildContext context) async {
     // Retrieve the HomeState instance before the async gap
     final homeState = _syncGetHomeState(buildContext);
 
-    final res =
-        await Navigator.pushNamed(buildContext, Routes.newGroup) as Group?;
+    final res = await Navigator.of(context, rootNavigator: false).push(
+      MaterialPageRoute(builder: (context) => NewGroupPage()),
+    ) as Group?;
+
     if (res == null) return;
 
     try {
@@ -138,7 +164,7 @@ class FabConfigurator extends StatelessWidget {
     }
   }
 
-  Future<void> _challenge() async {
+  Future<void> _challenge(BuildContext context) async {
     // Retrieve the HomeState instance before the async gap
     final homeState = _syncGetHomeState(buildContext);
 
@@ -172,7 +198,7 @@ class FabConfigurator extends StatelessWidget {
     }
   }
 
-  Future<void> _sign() async {
+  Future<void> _sign(BuildContext context) async {
     // Retrieve the HomeState instance before the async gap
     final homeState = _syncGetHomeState(buildContext);
 

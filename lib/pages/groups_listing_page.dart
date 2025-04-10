@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
 import '../card/card.dart';
+import '../enums/fab_type.dart';
 import '../templates/default_page_template.dart';
 import '../view_model/app_view_model.dart';
+import '../widget/fab_configurator.dart';
 import 'group_page.dart';
 import '../util/card_reader_launcher.dart';
 import '../widget/empty_list.dart';
@@ -13,16 +14,16 @@ import '../widget/entity_chip.dart';
 import '../util/chars.dart';
 import '../widget/task_list_view.dart';
 import '../widget/task_tile.dart';
-import 'new_group_page.dart';
 
-class GroupsSubPage extends StatelessWidget {
-  const GroupsSubPage({super.key});
+class GroupsListingPage extends StatelessWidget {
+  const GroupsListingPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Consumer<AppViewModel>(builder: (context, model, child) {
       return DefaultPageTemplate(
-          floatingActionButton: _buildGroupFab(context),
+          floatingActionButton:
+              FabConfigurator(fabType: FabType.groupFab, buildContext: context),
           body: buildTaskListView<Group>(
             model.groupTasks,
             emptyView: const EmptyList(
@@ -100,18 +101,5 @@ class GroupsSubPage extends StatelessWidget {
             },
           ));
     });
-  }
-
-  Widget _buildGroupFab(BuildContext context) {
-    return FloatingActionButton.extended(
-      key: const ValueKey('NewGroupFab'),
-      icon: const Icon(Symbols.add),
-      label: const Text('New group'),
-      onPressed: () {
-        Navigator.of(context, rootNavigator: false).push(
-          MaterialPageRoute(builder: (context) => NewGroupPage()),
-        );
-      },
-    );
   }
 }
