@@ -3,108 +3,15 @@ import 'package:meesign_core/meesign_model.dart';
 import 'package:provider/provider.dart';
 
 import '../app_container.dart';
-import '../theme.dart';
-import '../util/chars.dart';
-import '../widget/device_name.dart';
-import '../widget/entity_chip.dart';
-
-class DeviceSelectionBar extends StatefulWidget implements PreferredSizeWidget {
-  final List<Device> devices;
-  final void Function(Device) onDeleted;
-
-  const DeviceSelectionBar({
-    super.key,
-    required this.devices,
-    required this.onDeleted,
-  });
-
-  @override
-  State<DeviceSelectionBar> createState() => _DeviceSelectionBarState();
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kTextTabBarHeight);
-}
-
-class _DeviceSelectionBarState extends State<DeviceSelectionBar> {
-  final _scrollController = ScrollController();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: widget.preferredSize.height,
-      child: Scrollbar(
-        controller: _scrollController,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          controller: _scrollController,
-          itemCount: widget.devices.length,
-          itemBuilder: (context, index) {
-            final device = widget.devices[index];
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: DeviceChip(
-                  device: device,
-                  onDeleted: () => widget.onDeleted(device),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class DeviceSuggestionTile extends StatelessWidget {
-  final Device device;
-  final bool active;
-  final bool selected;
-  final void Function(bool?)? onChanged;
-
-  const DeviceSuggestionTile({
-    super.key,
-    required this.device,
-    this.active = false,
-    this.selected = false,
-    this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return CheckboxListTile(
-      value: selected,
-      onChanged: onChanged,
-      secondary: Badge(
-        backgroundColor: active
-            ? Theme.of(context).extension<CustomColors>()!.success
-            : Theme.of(context).colorScheme.error,
-        smallSize: 8,
-        child: CircleAvatar(
-          child: Text(device.name.initials),
-        ),
-      ),
-      title: DeviceName(
-        device.name,
-        kind: device.kind,
-        iconSize: 20,
-      ),
-      subtitle: Text(
-        device.id.encode().splitByLength(4).join(' '),
-        softWrap: false,
-        overflow: TextOverflow.fade,
-        style: TextStyle(
-          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: .26),
-          fontFamily: 'RobotoMono',
-        ),
-      ),
-    );
-  }
-}
+import '../templates/default_page_template.dart';
+import '../ui_constants.dart';
+import '../widget/device_selection_bar.dart';
+import '../widget/device_suggestion_tile.dart';
+import '../widget/no_results_placeholder.dart';
 
 class SearchPeerPage extends StatefulWidget {
-  const SearchPeerPage({super.key});
+  const SearchPeerPage({super.key, required this.initialSelection});
+  final List<Device> initialSelection;
 
   @override
   State<SearchPeerPage> createState() => _SearchPeerPageState();
@@ -116,6 +23,7 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
   final _queryController = TextEditingController();
   List<Device> _queryResults = [];
   DateTime _pivot = DateTime.now();
+  bool _loaded = false;
 
   final List<Device> _selection = [];
 
@@ -130,6 +38,7 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
 
       // Fetch devices from server
       results = await deviceRepository.search(_queryController.text);
+      _loaded = true;
 
       // Fetch devices from local db
       // results = await deviceRepository.getAllLocalDevices();
@@ -162,6 +71,9 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
   void initState() {
     super.initState();
 
+    // Initialize the selection with the initial selection
+    _selection.addAll(widget.initialSelection);
+
     _queryController.addListener(() {
       _query(_queryController.text);
     });
@@ -177,48 +89,58 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
   @override
   Widget build(BuildContext context) {
     // TODO: migrate to showSearch/SearchDelegate?
-    return Scaffold(
-      appBar: AppBar(
-        title: TextField(
-          controller: _queryController,
-          decoration: const InputDecoration.collapsed(
-            hintText: 'Search for peer',
-          ),
-          autofocus: true,
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: FilledButton(
-              onPressed: _selection.isEmpty
-                  ? null
-                  : () => Navigator.pop(context, _selection),
-              child: const Text('Add'),
+    return DefaultPageTemplate(
+      showAppBar: true,
+      includePadding: false,
+      customAppBar: AppBar(
+          title: _buildDeviceSearchBar(),
+          actions: [_buildAddButton()],
+          bottom: DeviceSelectionBar(
+            devices: _selection,
+            onDeleted: (device) => _changeSelection(device, false),
+          )),
+      body: _queryResults.isEmpty
+          ? !_loaded
+              ? const Center(child: CircularProgressIndicator())
+              : NoResultsPlaceholder(
+                  label: "No peers with such a name found", icon: Icons.devices)
+          : ListView.builder(
+              itemCount: _queryResults.length,
+              itemBuilder: (context, index) {
+                final device = _queryResults[index];
+                return DeviceSuggestionTile(
+                  device: device,
+                  active: _isActive(device),
+                  // TODO: don't recompute this?
+                  selected: _selection.any((elem) => elem.id == device.id),
+                  onChanged: (value) {
+                    if (value != null) _changeSelection(device, value);
+                  },
+                );
+              },
             ),
-          ),
-        ],
-        bottom: _selection.isNotEmpty
-            ? DeviceSelectionBar(
-                devices: _selection,
-                onDeleted: (device) => _changeSelection(device, false),
-              )
-            : null,
+    );
+  }
+
+  Widget _buildAddButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: MEDIUM_PADDING),
+      child: FilledButton(
+        onPressed: _selection.isEmpty
+            ? null
+            : () => Navigator.pop(context, _selection),
+        child: const Text('Add'),
       ),
-      body: ListView.builder(
-        itemCount: _queryResults.length,
-        itemBuilder: (context, index) {
-          final device = _queryResults[index];
-          return DeviceSuggestionTile(
-            device: device,
-            active: _isActive(device),
-            // TODO: don't recompute this?
-            selected: _selection.any((elem) => elem.id == device.id),
-            onChanged: (value) {
-              if (value != null) _changeSelection(device, value);
-            },
-          );
-        },
+    );
+  }
+
+  Widget _buildDeviceSearchBar() {
+    return TextField(
+      controller: _queryController,
+      decoration: const InputDecoration.collapsed(
+        hintText: 'Search for peer',
       ),
+      autofocus: true,
     );
   }
 }

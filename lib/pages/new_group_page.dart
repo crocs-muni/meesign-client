@@ -20,6 +20,7 @@ import '../widget/number_input.dart';
 import '../widget/option_tile.dart';
 import '../widget/warning_banner.dart';
 import '../widget/weighted_avatar.dart';
+import 'search_peer_page.dart';
 
 class NewGroupPage extends StatefulWidget {
   const NewGroupPage({super.key});
@@ -34,6 +35,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
   // TODO: store this in a Group object?
   int _threshold = _minThreshold;
   final List<Member> _members = [];
+  final List<Device> _devices = [];
   final _nameController = TextEditingController();
   final _policyController = TextEditingController();
   String? _nameErr, _policyErr;
@@ -96,9 +98,24 @@ class _NewGroupPageState extends State<NewGroupPage> {
       _members.any((member) => member.device.kind == DeviceKind.bot);
 
   void _selectPeer(String route) async {
-    // TODO: pass the current selection to the search page?
-    final devices = await Navigator.pushNamed(context, route);
-    _addMembers(devices);
+    final devicesSelection =
+        await Navigator.of(context, rootNavigator: false).push(
+      MaterialPageRoute(
+          builder: (context) => SearchPeerPage(
+                initialSelection: _devices,
+              )),
+    );
+
+    if (devicesSelection == null) {
+      return;
+    }
+
+    for (final device in devicesSelection) {
+      if (_devices.any((d) => d.id == device.id)) continue;
+      _devices.add(device);
+    }
+
+    _addMembers(_devices);
   }
 
   Map<String, dynamic> _buildPolicy({bool includeAll = false}) {
@@ -322,7 +339,13 @@ class _NewGroupPageState extends State<NewGroupPage> {
                           IconButton(
                             onPressed: () {
                               setState(() {
+                                // 1. Remove the selected device
+                                _devices.removeWhere(
+                                    (d) => d.id == member.device.id);
+
+                                // 2. Remove the member from the group
                                 _members.removeAt(i);
+
                                 _sharesErr = null;
                               });
                             },
