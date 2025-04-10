@@ -10,6 +10,7 @@ import '../ui_constants.dart';
 import '../util/launch_home.dart';
 import '../util/set_user_login_prefereces.dart';
 import '../widget/confirmation_dialog.dart';
+import 'no_results_placeholder.dart';
 
 class ExistingUserList extends StatefulWidget {
   const ExistingUserList({super.key});
@@ -104,7 +105,8 @@ class ExistingUserListState extends State<ExistingUserList> {
     }
 
     if (_users.isEmpty) {
-      return _buildEmptyListPlaceholder();
+      return NoResultsPlaceholder(
+          label: "No accounts found", icon: Icons.supervisor_account);
     }
 
     return SlidableAutoCloseBehavior(
@@ -240,30 +242,6 @@ class ExistingUserListState extends State<ExistingUserList> {
         ),
       );
     }
-  }
-
-  Widget _buildEmptyListPlaceholder() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.supervisor_account,
-            size: 120,
-            color: Theme.of(context).colorScheme.onSecondary,
-          ),
-          SizedBox(height: SMALL_GAP),
-          Text(
-            "No accounts found",
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge
-                ?.copyWith(color: Theme.of(context).colorScheme.onSurface),
-          ),
-          SizedBox(height: XLARGE_GAP),
-        ],
-      ),
-    );
   }
 
   Widget _buildUserRow(User user, int index) {

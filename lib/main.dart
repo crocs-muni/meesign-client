@@ -15,7 +15,6 @@ import 'pages/about_page.dart';
 import 'app/widget/tabbed_scaffold.dart';
 import 'pages/new_group_page.dart';
 import 'pages/qr_reader_page.dart';
-import 'pages/search_peer_page.dart';
 import 'util/app_arg_parser.dart';
 import 'util/app_dir_getter.dart';
 import 'util/error_logger.dart';
@@ -97,7 +96,6 @@ class MeeSignClient extends StatelessWidget {
           routes: {
             Routes.home: (_) => const TabbedScaffold(),
             Routes.newGroup: (_) => const NewGroupPage(),
-            Routes.newGroupSearch: (_) => const SearchPeerPage(),
             Routes.newGroupQr: (_) => const QrReaderPage(),
             Routes.about: (_) => const AboutPage(),
             Routes.init: (_) => RegisterPage(
