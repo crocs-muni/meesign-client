@@ -157,14 +157,9 @@ class _HomePageViewState extends State<HomePageView> {
         ),
       ),
       NavigationTabModel(
-        label: 'Settings',
-        child: SettingsPage(),
-        icon: _buildCounterIcon(
-          stream: context.watch<AppViewModel>().nGroupReqs,
-          icon: Symbols.settings,
-          fillIcon: context.read<TabsViewModel>().index == 4,
-        ),
-      ),
+          label: 'Settings',
+          child: SettingsPage(),
+          icon: Icon(Symbols.settings)),
     ];
   }
 
@@ -258,7 +253,7 @@ class _HomePageViewState extends State<HomePageView> {
       return const SizedBox.shrink();
     } else {
       return NavigationBar(
-        selectedIndex: context.read<TabsViewModel>().index,
+        selectedIndex: context.watch<TabsViewModel>().index,
         onDestinationSelected: _onItemTapped,
         destinations: _tabs.map<NavigationDestination>(
           (NavigationTabModel destination) {
