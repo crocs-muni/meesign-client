@@ -8,8 +8,11 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../enums/fab_type.dart';
 import '../templates/default_page_template.dart';
+import '../ui_constants.dart';
+import '../util/actions/document_signer.dart';
 import '../view_model/app_view_model.dart';
-import '../widget/empty_list.dart';
+import '../view_model/tabs_view_model.dart';
+import '../widget/controlled_lottie_animation.dart';
 import '../widget/entity_chip.dart';
 import '../widget/fab_configurator.dart';
 import '../widget/task_list_view.dart';
@@ -22,15 +25,10 @@ class SigningSubPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AppViewModel>(builder: (context, model, child) {
       return DefaultPageTemplate(
-        floatingActionButton:
-            FabConfigurator(fabType: FabType.signFab, buildContext: context),
+        floatingActionButton: _buildFab(context, model),
         body: buildTaskListView<File>(
           model.signTasks,
-          emptyView: EmptyList(
-            hint: model.hasGroup(KeyType.signPdf)
-                ? 'Try signing a PDF file.'
-                : 'Start by creating a group for signing.',
-          ),
+          emptyView: _buildEmptySignTasks(context),
           showArchived: model.showArchived,
           taskBuilder: (context, task) {
             return TaskTile(
@@ -70,5 +68,59 @@ class SigningSubPage extends StatelessWidget {
       // it seems to be of low quality
       OpenFilex.open(path);
     }
+  }
+
+  Widget _buildFab(BuildContext context, AppViewModel model) {
+    // Don't show Fab if the list is empty - placeholder with CTA is shown instead
+    if (model.signTasks.isEmpty) {
+      return SizedBox();
+    }
+    return FabConfigurator(fabType: FabType.signFab, buildContext: context);
+  }
+
+  Widget _buildEmptySignTasks(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(bottom: MEDIUM_PADDING),
+            child: ControlledLottieAnimation(
+              startAtTabIndex: 0,
+              assetName: 'assets/lottie/sign.json',
+              stopAtPercentage: 0.2,
+              width: 400,
+              fit: BoxFit.fitWidth,
+            ),
+          ),
+          const Text(
+            'Try signing a PDF file.',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: SMALL_GAP),
+          const Text(
+            'Start by creating a group for signing.',
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: LARGE_GAP),
+          ElevatedButton(
+            onPressed: () {
+              final tabViewModel =
+                  Provider.of<TabsViewModel>(context, listen: false);
+
+              tabViewModel.setIndex(3);
+            },
+            child: const Text('Create a signing group'),
+          ),
+          const SizedBox(height: MEDIUM_GAP),
+          ElevatedButton(
+            onPressed: () {
+              signDocument(context, context);
+            },
+            child: const Text('Sign a document'),
+          )
+        ],
+      ),
+    );
   }
 }
