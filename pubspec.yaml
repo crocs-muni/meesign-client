@@ -76,6 +76,7 @@ dependencies:
   shared_preferences: ^2.3.5
   window_manager: ^0.4.3
   flutter_slidable: ^4.0.0
+  lottie: ^3.3.0
 
 dev_dependencies:
   flutter_test:
@@ -106,6 +107,8 @@ flutter:
     - assets/ministerstvo_vnitra_cz_logo.svg
     - assets/ministerstvo_vnitra_cz_logo_dark_mode.svg
     - assets/ca-cert.pem
+    - assets/lottie/groups_dark_mode.json
+    - assets/lottie/groups_light_mode.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
