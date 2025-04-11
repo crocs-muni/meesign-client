@@ -4,12 +4,14 @@ import '../ui_constants.dart';
 
 class NoResultsPlaceholder extends StatelessWidget {
   final String label;
+  final Widget? customLabel;
   final IconData icon;
 
   const NoResultsPlaceholder({
     super.key,
-    required this.label,
     required this.icon,
+    this.label = "",
+    this.customLabel,
   });
 
   @override
@@ -24,13 +26,14 @@ class NoResultsPlaceholder extends StatelessWidget {
             color: Theme.of(context).colorScheme.onSecondary,
           ),
           SizedBox(height: SMALL_GAP),
-          Text(
-            label,
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge
-                ?.copyWith(color: Theme.of(context).colorScheme.onSurface),
-          ),
+          customLabel ??
+              Text(
+                label,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyLarge
+                    ?.copyWith(color: Theme.of(context).colorScheme.onSurface),
+              ),
           SizedBox(height: XLARGE_GAP),
         ],
       ),

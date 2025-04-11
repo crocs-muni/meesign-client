@@ -8,6 +8,7 @@ import '../../pages/settings_page.dart';
 import '../../ui_constants.dart';
 import '../../util/layout_getter.dart';
 import '../../view_model/app_view_model.dart';
+import '../../view_model/tabs_view_model.dart';
 import '../../widget/fluid_gradient.dart';
 import '../model/navigation_tab_model.dart';
 import '../../app_container.dart';
@@ -25,17 +26,20 @@ class TabbedScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final session = context.read<AppContainer>().session!;
-    return ChangeNotifierProvider(
-      create: (context) => AppViewModel(
-        session.user,
-        session.deviceRepository,
-        session.groupRepository,
-        session.fileRepository,
-        session.challengeRepository,
-        session.decryptRepository,
+
+    return MultiProvider(providers: [
+      ChangeNotifierProvider(create: (_) => TabsViewModel()),
+      ChangeNotifierProvider(
+        create: (context) => AppViewModel(
+          session.user,
+          session.deviceRepository,
+          session.groupRepository,
+          session.fileRepository,
+          session.challengeRepository,
+          session.decryptRepository,
+        ),
       ),
-      child: const HomePageView(),
-    );
+    ], child: const HomePageView());
   }
 }
 
@@ -47,7 +51,6 @@ class HomePageView extends StatefulWidget {
 }
 
 class _HomePageViewState extends State<HomePageView> {
-  int _index = 0;
   late List<NavigationTabModel> _tabs;
 
   @override
@@ -103,7 +106,6 @@ class _HomePageViewState extends State<HomePageView> {
                     body: _buildResponsiveLayout(
                         _buildIndexedStack(), constraints.maxWidth),
                     floatingActionButton: null,
-                    // FabConfigurator(index: _index, buildContext: context),
                     bottomNavigationBar:
                         _buildBottomNavigation(constraints.maxWidth),
                   ),
@@ -124,7 +126,7 @@ class _HomePageViewState extends State<HomePageView> {
         icon: _buildCounterIcon(
           stream: context.watch<AppViewModel>().nSignReqs,
           icon: Symbols.draw,
-          fillIcon: _index == 0,
+          fillIcon: context.read<TabsViewModel>().index == 0,
         ),
       ),
       NavigationTabModel(
@@ -133,7 +135,7 @@ class _HomePageViewState extends State<HomePageView> {
         icon: _buildCounterIcon(
           stream: context.watch<AppViewModel>().nChallengeReqs,
           icon: Symbols.quiz,
-          fillIcon: _index == 1,
+          fillIcon: context.read<TabsViewModel>().index == 1,
         ),
       ),
       NavigationTabModel(
@@ -142,7 +144,7 @@ class _HomePageViewState extends State<HomePageView> {
         icon: _buildCounterIcon(
           stream: context.watch<AppViewModel>().nDecryptReqs,
           icon: Symbols.key,
-          fillIcon: _index == 2,
+          fillIcon: context.read<TabsViewModel>().index == 2,
         ),
       ),
       NavigationTabModel(
@@ -151,7 +153,7 @@ class _HomePageViewState extends State<HomePageView> {
         icon: _buildCounterIcon(
           stream: context.watch<AppViewModel>().nGroupReqs,
           icon: Symbols.group,
-          fillIcon: _index == 3,
+          fillIcon: context.read<TabsViewModel>().index == 3,
         ),
       ),
       NavigationTabModel(
@@ -160,7 +162,7 @@ class _HomePageViewState extends State<HomePageView> {
         icon: _buildCounterIcon(
           stream: context.watch<AppViewModel>().nGroupReqs,
           icon: Symbols.settings,
-          fillIcon: _index == 4,
+          fillIcon: context.read<TabsViewModel>().index == 4,
         ),
       ),
     ];
@@ -169,12 +171,12 @@ class _HomePageViewState extends State<HomePageView> {
   Widget _buildIndexedStack() {
     return _buildPageTransitionSwitcher(IndexedStack(
       // key: ValueKey<String>("IndexedStack_$_index"), // Causes duplicate global key error
-      index: _index,
+      index: context.read<TabsViewModel>().index,
       children: _tabs.map<OffstageNavigator>(
         (NavigationTabModel destination) {
           return OffstageNavigator(
             index: _tabs.indexOf(destination),
-            currentTabIndex: _index,
+            currentTabIndex: context.read<TabsViewModel>().index,
             navigationTab: destination,
           );
         },
@@ -190,7 +192,7 @@ class _HomePageViewState extends State<HomePageView> {
           child: Row(
             children: <Widget>[
               NavigationRail(
-                selectedIndex: _index,
+                selectedIndex: context.read<TabsViewModel>().index,
                 onDestinationSelected: _onItemTapped,
                 extended: true,
                 destinations: _tabs.map<NavigationRailDestination>(
@@ -215,7 +217,7 @@ class _HomePageViewState extends State<HomePageView> {
       return Row(
         children: <Widget>[
           NavigationRail(
-            selectedIndex: _index,
+            selectedIndex: context.read<TabsViewModel>().index,
             onDestinationSelected: _onItemTapped,
             extended: true,
             destinations: _tabs.map<NavigationRailDestination>(
@@ -240,13 +242,13 @@ class _HomePageViewState extends State<HomePageView> {
   }
 
   void _onItemTapped(int index) {
-    if (_index == index) {
+    if (context.read<TabsViewModel>().index == index) {
       // If the user taps the current tab again, pop to the root of that tab
       var navigatorKey = _tabs[index].navigatorKey;
       navigatorKey.currentState?.popUntil((route) => route.isFirst);
     } else {
       setState(() {
-        _index = index;
+        context.read<TabsViewModel>().setIndex(index);
       });
     }
   }
@@ -256,7 +258,7 @@ class _HomePageViewState extends State<HomePageView> {
       return const SizedBox.shrink();
     } else {
       return NavigationBar(
-        selectedIndex: _index,
+        selectedIndex: context.read<TabsViewModel>().index,
         onDestinationSelected: _onItemTapped,
         destinations: _tabs.map<NavigationDestination>(
           (NavigationTabModel destination) {

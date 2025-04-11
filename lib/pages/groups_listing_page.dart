@@ -5,11 +5,13 @@ import 'package:provider/provider.dart';
 import '../card/card.dart';
 import '../enums/fab_type.dart';
 import '../templates/default_page_template.dart';
+import '../ui_constants.dart';
+import '../util/group_creator.dart';
 import '../view_model/app_view_model.dart';
+import '../widget/controlled_lottie_animation.dart';
 import '../widget/fab_configurator.dart';
 import 'group_page.dart';
 import '../util/card_reader_launcher.dart';
-import '../widget/empty_list.dart';
 import '../widget/entity_chip.dart';
 import '../util/chars.dart';
 import '../widget/task_list_view.dart';
@@ -22,13 +24,10 @@ class GroupsListingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AppViewModel>(builder: (context, model, child) {
       return DefaultPageTemplate(
-          floatingActionButton:
-              FabConfigurator(fabType: FabType.groupFab, buildContext: context),
+          floatingActionButton: _buildFab(context, model),
           body: buildTaskListView<Group>(
             model.groupTasks,
-            emptyView: const EmptyList(
-              hint: 'Try creating a new group.',
-            ),
+            emptyView: _buildEmptyGroups(context),
             showArchived: model.showArchived,
             taskBuilder: (context, task) {
               final group = task.info;
@@ -101,5 +100,51 @@ class GroupsListingPage extends StatelessWidget {
             },
           ));
     });
+  }
+
+  Widget _buildFab(BuildContext context, AppViewModel model) {
+    // Don't show Fab if the list is empty - placeholder with CTA is shown instead
+    if (model.groupTasks.isEmpty) {
+      return SizedBox();
+    }
+    return FabConfigurator(fabType: FabType.groupFab, buildContext: context);
+  }
+
+  Widget _buildEmptyGroups(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(bottom: MEDIUM_PADDING),
+            child: ControlledLottieAnimation(
+              startAtTabIndex: 3,
+              assetName: Theme.of(context).brightness == Brightness.light
+                  ? 'assets/lottie/groups_light_mode.json'
+                  : 'assets/lottie/groups_dark_mode.json',
+              stopAtPercentage: 0.5,
+              width: 400,
+              fit: BoxFit.fitWidth,
+            ),
+          ),
+          const Text(
+            'No groups yet!',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: SMALL_GAP),
+          const Text(
+            'Create a group to get started.',
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: LARGE_GAP),
+          ElevatedButton(
+            onPressed: () {
+              createGroup(context, context);
+            },
+            child: const Text('Create group'),
+          )
+        ],
+      ),
+    );
   }
 }

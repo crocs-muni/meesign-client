@@ -8,7 +8,7 @@ import 'package:meesign_core/meesign_core.dart';
 
 import '../enums/data_input_type.dart';
 import '../enums/fab_type.dart';
-import '../pages/new_group_page.dart';
+import '../util/group_creator.dart';
 import '../view_model/app_view_model.dart';
 import 'data_input_dialog.dart';
 import 'error_dialog.dart';
@@ -81,7 +81,7 @@ class FabConfigurator extends StatelessWidget {
     return FloatingActionButton.extended(
       key: ValueKey(key),
       heroTag: key,
-      onPressed: () => _group(context),
+      onPressed: () => createGroup(context, buildContext),
       label: const Text('New'),
       icon: const Icon(Symbols.add),
     );
@@ -131,33 +131,6 @@ class FabConfigurator extends StatelessWidget {
           context: buildContext,
           title: 'Decryption request failed',
           desc: 'Please try again.',
-        );
-      }
-      rethrow;
-    }
-  }
-
-  Future<void> _group(BuildContext context) async {
-    // Retrieve the HomeState instance before the async gap
-    final homeState = _syncGetHomeState(buildContext);
-
-    final res = await Navigator.of(context, rootNavigator: false).push(
-      MaterialPageRoute(builder: (context) => NewGroupPage()),
-    ) as Group?;
-
-    if (res == null) return;
-
-    try {
-      if (buildContext.mounted) {
-        await homeState.addGroup(res.name, res.members, res.threshold,
-            res.protocol, res.keyType, res.note);
-      }
-    } catch (e) {
-      if (buildContext.mounted) {
-        showErrorDialog(
-          context: buildContext,
-          title: 'Group request failed',
-          desc: 'Please try again',
         );
       }
       rethrow;
