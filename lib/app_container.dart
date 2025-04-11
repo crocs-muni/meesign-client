@@ -49,7 +49,7 @@ class AppContainer {
     try {
       if (deleteData) {
         Uuid userDid = session?.user.did ?? Uuid(const []);
-        deleteDevice(userDid);
+        await deleteDevice(userDid);
       }
 
       endUserSession();
