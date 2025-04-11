@@ -20,86 +20,92 @@ import '../widget/task_tile.dart';
 class GroupsListingPage extends StatelessWidget {
   const GroupsListingPage({super.key});
 
+  static final _pageKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
-    return Consumer<AppViewModel>(builder: (context, model, child) {
-      return DefaultPageTemplate(
-          floatingActionButton: _buildFab(context, model),
-          body: buildTaskListView<Group>(
-            model.groupTasks,
-            emptyView: _buildEmptyGroups(context),
-            showArchived: model.showArchived,
-            taskBuilder: (context, task) {
-              final group = task.info;
-              final members = group.members;
-              final thisMember = members.firstWhere(
-                (m) => m.device.id == model.device?.id,
-              );
+    return KeyedSubtree(
+      key: _pageKey,
+      child: Consumer<AppViewModel>(builder: (context, model, child) {
+        return DefaultPageTemplate(
+            floatingActionButton: _buildFab(context, model),
+            body: TaskListView<Group>(
+              key: ValueKey('group_task_list'),
+              tasks: model.groupTasks,
+              emptyView: _buildEmptyGroups(context),
+              showArchived: model.showArchived,
+              taskBuilder: (context, task) {
+                final group = task.info;
+                final members = group.members;
+                final thisMember = members.firstWhere(
+                  (m) => m.device.id == model.device?.id,
+                );
 
-              return TaskTile(
-                task: task,
-                name: group.name,
-                leading: CircleAvatar(
-                  child: Text(group.name.initials),
-                ),
-                approveActions: [
-                  FilledButton.tonal(
-                    child: const Text('Join'),
-                    onPressed: () => model.joinGroup(task, agree: true),
+                return TaskTile(
+                  task: task,
+                  name: group.name,
+                  leading: CircleAvatar(
+                    child: Text(group.name.initials),
                   ),
-                  if (CardManager.platformSupported &&
-                      group.protocol.cardSupport &&
-                      thisMember.shares == 1)
+                  approveActions: [
                     FilledButton.tonal(
-                      onPressed: () =>
-                          model.joinGroup(task, agree: true, withCard: true),
-                      child: const Text('Join with card'),
+                      child: const Text('Join'),
+                      onPressed: () => model.joinGroup(task, agree: true),
                     ),
-                  OutlinedButton(
-                    child: const Text('Decline'),
-                    onPressed: () => model.joinGroup(task, agree: false),
-                  ),
-                ],
-                actions: [
-                  FilledButton.tonal(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute<void>(
-                          builder: (context) => GroupPage(
-                            group: group,
+                    if (CardManager.platformSupported &&
+                        group.protocol.cardSupport &&
+                        thisMember.shares == 1)
+                      FilledButton.tonal(
+                        onPressed: () =>
+                            model.joinGroup(task, agree: true, withCard: true),
+                        child: const Text('Join with card'),
+                      ),
+                    OutlinedButton(
+                      child: const Text('Decline'),
+                      onPressed: () => model.joinGroup(task, agree: false),
+                    ),
+                  ],
+                  actions: [
+                    FilledButton.tonal(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (context) => GroupPage(
+                              group: group,
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                    child: const Text('View'),
-                  ),
-                ],
-                cardActions: [
-                  FilledButton.tonal(
-                    onPressed: () => launchCardReader(context,
-                        (card) => model.advanceGroupWithCard(task, card)),
-                    child: const Text('Read card'),
-                  ),
-                ],
-                children: [
-                  Container(
-                    alignment: Alignment.topLeft,
-                    child: Wrap(
-                      spacing: 8,
-                      runSpacing: 4,
-                      children: [
-                        for (var m in members) DeviceChip(device: m.device)
-                      ],
+                        );
+                      },
+                      child: const Text('View'),
                     ),
-                  ),
-                ],
-                onArchiveChange: (archive) =>
-                    model.archiveTask(task, archive: archive),
-              );
-            },
-          ));
-    });
+                  ],
+                  cardActions: [
+                    FilledButton.tonal(
+                      onPressed: () => launchCardReader(context,
+                          (card) => model.advanceGroupWithCard(task, card)),
+                      child: const Text('Read card'),
+                    ),
+                  ],
+                  children: [
+                    Container(
+                      alignment: Alignment.topLeft,
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
+                        children: [
+                          for (var m in members) DeviceChip(device: m.device)
+                        ],
+                      ),
+                    ),
+                  ],
+                  onArchiveChange: (archive) =>
+                      model.archiveTask(task, archive: archive),
+                );
+              },
+            ));
+      }),
+    );
   }
 
   Widget _buildFab(BuildContext context, AppViewModel model) {

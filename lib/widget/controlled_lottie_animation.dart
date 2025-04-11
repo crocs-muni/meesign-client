@@ -60,6 +60,11 @@ class _ControlledLottieAnimationState extends State<ControlledLottieAnimation>
     if (_loaded && !_controller.isAnimating) {
       if (widget.startAtTabIndex == null ||
           tabIndex == widget.startAtTabIndex) {
+        // This replays the animation when the tab is selected.
+        // Remove the reset() if you want to keep the animation state.
+        _controller.reset();
+
+        // Start the animation if the tab index matches
         _controller.forward();
       }
     }

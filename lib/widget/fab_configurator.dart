@@ -34,7 +34,7 @@ class FabConfigurator extends StatelessWidget {
       key: ValueKey(key),
       heroTag: key,
       onPressed: () => signDocument(context, buildContext),
-      label: const Text('Sign'),
+      label: const Text('New signature'),
       icon: const Icon(Symbols.add),
     );
   }
@@ -45,7 +45,7 @@ class FabConfigurator extends StatelessWidget {
       key: ValueKey(key),
       heroTag: key,
       onPressed: () => createChallenge(context, buildContext),
-      label: const Text('Challenge'),
+      label: const Text('New challenge'),
       icon: const Icon(Symbols.add),
     );
   }
@@ -56,7 +56,7 @@ class FabConfigurator extends StatelessWidget {
       key: ValueKey(key),
       heroTag: key,
       onPressed: () => encryptData(context, buildContext),
-      label: const Text('Encrypt'),
+      label: const Text('New encryption'),
       icon: const Icon(Symbols.add),
     );
   }
@@ -67,7 +67,7 @@ class FabConfigurator extends StatelessWidget {
       key: ValueKey(key),
       heroTag: key,
       onPressed: () => createGroup(context, buildContext),
-      label: const Text('New'),
+      label: const Text('New group'),
       icon: const Icon(Symbols.add),
     );
   }
