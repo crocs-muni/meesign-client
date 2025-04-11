@@ -7,10 +7,12 @@ import '../app_container.dart';
 import '../services/settings_controller.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
+import '../util/chars.dart';
 import '../util/launch_home.dart';
 import '../util/set_user_login_prefereces.dart';
 import '../widget/confirmation_dialog.dart';
 import 'no_results_placeholder.dart';
+import 'skeletonizer_template.dart';
 
 class ExistingUserList extends StatefulWidget {
   const ExistingUserList({super.key});
@@ -47,54 +49,56 @@ class ExistingUserListState extends State<ExistingUserList> {
     return Container(
       padding: EdgeInsets.only(top: MEDIUM_PADDING, bottom: LARGE_PADDING),
       child: DefaultPageTemplate(
+        transparentBackground: true,
         appBarTitle: "Select account",
         showAppBar: true,
         body: Container(
           padding: EdgeInsets.all(MEDIUM_PADDING),
           child: _buildUserTable(),
         ),
-        appBarActions: [
-          _isEditing
-              ? TextButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      if (_selectedUsers.isNotEmpty) {
-                        triggerDeleteUserDialog();
-                        return;
-                      } else {
-                        _isEditing = false;
-                        _selectedUsers = [];
-                      }
-                    });
-                  },
-                  label: Text(
-                    _selectedUsers.isEmpty ? 'Cancel' : 'Delete',
-                    style: TextStyle(
-                        color:
-                            _selectedUsers.isEmpty ? null : Colors.redAccent),
-                  ),
-                  icon: Icon(
-                    _selectedUsers.isEmpty ? Icons.close : Icons.delete,
-                    color: _selectedUsers.isEmpty ? null : Colors.redAccent,
-                  ),
-                )
-              : TextButton.icon(
-                  onPressed: _users.isNotEmpty
-                      ? () {
-                          setState(() {
-                            _isEditing = true;
-                            _selectedUsers = [];
-                          });
-                        }
-                      : null,
-                  label: Text(
-                    "Edit",
-                  ),
-                  icon: Icon(Icons.edit),
-                )
-        ],
+        appBarActions: [_buildAppBarEditAction()],
       ),
     );
+  }
+
+  Widget _buildAppBarEditAction() {
+    return _isEditing
+        ? TextButton.icon(
+            onPressed: () {
+              setState(() {
+                if (_selectedUsers.isNotEmpty) {
+                  triggerDeleteUserDialog();
+                  return;
+                } else {
+                  _isEditing = false;
+                  _selectedUsers = [];
+                }
+              });
+            },
+            label: Text(
+              _selectedUsers.isEmpty ? 'Cancel' : 'Delete',
+              style: TextStyle(
+                  color: _selectedUsers.isEmpty ? null : Colors.redAccent),
+            ),
+            icon: Icon(
+              _selectedUsers.isEmpty ? Icons.close : Icons.delete,
+              color: _selectedUsers.isEmpty ? null : Colors.redAccent,
+            ),
+          )
+        : TextButton.icon(
+            onPressed: _users.isNotEmpty
+                ? () {
+                    setState(() {
+                      _isEditing = true;
+                      _selectedUsers = [];
+                    });
+                  }
+                : null,
+            label: Text(
+              "Edit",
+            ),
+            icon: Icon(Icons.edit),
+          );
   }
 
   Widget _buildUserTable() {
@@ -250,62 +254,66 @@ class ExistingUserListState extends State<ExistingUserList> {
     final SettingsController settingsController = container.settingsController;
     String name = "";
 
-    return ListTile(
-      leading: Container(
-        padding: EdgeInsets.only(right: SMALL_PADDING),
-        child: CircleAvatar(
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          child: Icon(
-            Icons.person,
-            color: Theme.of(context).colorScheme.onPrimary,
-          ),
-        ),
-      ),
-      title: FutureBuilder(
-          future: settingsController
-              .getNameById(String.fromCharCodes(user.did.bytes)),
-          builder: (context, snapshot) {
-            name = snapshot.data ?? "";
-            return Text(snapshot.data.toString());
-          }),
-      subtitle: Text(user.host),
-      trailing: SizedBox(
-        width: actionButtonSize,
-        height: actionButtonSize,
-        child: AnimatedSwitcher(
-          duration: Duration(milliseconds: 300),
-          transitionBuilder: (Widget child, Animation<double> animation) {
-            return _buildTransition(child, animation);
-          },
-          child: _isEditing
-              ? SizedBox(
-                  key: ValueKey('delete'),
-                  width: actionButtonSize,
-                  height: actionButtonSize,
-                  child: _buildDeleteButton(user, index),
-                )
-              : SizedBox(
-                  key: ValueKey('arrow'),
-                  width: actionButtonSize,
-                  height: actionButtonSize,
-                  child: Center(
-                    child: Icon(Icons.arrow_forward_ios),
-                  ),
+    return FutureBuilder(
+        future: settingsController
+            .getNameById(String.fromCharCodes(user.did.bytes)),
+        builder: (context, snapshot) {
+          name = snapshot.data ?? "";
+          return SkeletonizerTemplate(
+            isLoading: !snapshot.hasData,
+            child: ListTile(
+              leading: Container(
+                padding: EdgeInsets.only(right: SMALL_PADDING),
+                child: CircleAvatar(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    child: Text(
+                      name.initials,
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onPrimary),
+                    )),
+              ),
+              title: Text(name),
+              subtitle: Text(user.host),
+              trailing: SizedBox(
+                width: actionButtonSize,
+                height: actionButtonSize,
+                child: AnimatedSwitcher(
+                  duration: Duration(milliseconds: 300),
+                  transitionBuilder:
+                      (Widget child, Animation<double> animation) {
+                    return _buildTransition(child, animation);
+                  },
+                  child: _isEditing
+                      ? SizedBox(
+                          key: ValueKey('delete'),
+                          width: actionButtonSize,
+                          height: actionButtonSize,
+                          child: _buildDeleteButton(user, index),
+                        )
+                      : SizedBox(
+                          key: ValueKey('arrow'),
+                          width: actionButtonSize,
+                          height: actionButtonSize,
+                          child: Center(
+                            child: Icon(Icons.arrow_forward_ios),
+                          ),
+                        ),
                 ),
-        ),
-      ),
-      onTap: _isEditing
-          ? () {
-              setState(() {
-                if (_selectedUsers.contains(index)) {
-                  _selectedUsers.remove(index);
-                } else {
-                  _selectedUsers.add(index);
-                }
-              });
-            }
-          : () => loginSelectedUser(user, name),
-    );
+              ),
+              onTap: _isEditing
+                  ? () {
+                      setState(() {
+                        if (_selectedUsers.contains(index)) {
+                          _selectedUsers.remove(index);
+                        } else {
+                          _selectedUsers.add(index);
+                        }
+                      });
+                    }
+                  : () => loginSelectedUser(user, name),
+            ),
+          );
+        });
   }
 
   void loginSelectedUser(User user, String name) async {
