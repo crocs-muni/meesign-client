@@ -6,7 +6,7 @@ import '../card/card.dart';
 import '../enums/fab_type.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
-import '../util/group_creator.dart';
+import '../util/actions/group_creator.dart';
 import '../view_model/app_view_model.dart';
 import '../widget/controlled_lottie_animation.dart';
 import '../widget/fab_configurator.dart';

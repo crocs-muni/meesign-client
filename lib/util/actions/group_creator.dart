@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
-import '../pages/new_group_page.dart';
-import '../view_model/app_view_model.dart';
-import '../widget/error_dialog.dart';
+import '../../pages/new_group_page.dart';
+import '../../view_model/app_view_model.dart';
+import '../../widget/error_dialog.dart';
 
+// TODO: reduce repetition across request methods
+// (_sign, _challenge, _group, _encrypt)
 Future<void> createGroup(
     BuildContext context, BuildContext buildContext) async {
   // Retrieve the HomeState instance before the async gap
