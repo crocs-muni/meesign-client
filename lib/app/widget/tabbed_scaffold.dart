@@ -37,6 +37,7 @@ class TabbedScaffold extends StatelessWidget {
           session.fileRepository,
           session.challengeRepository,
           session.decryptRepository,
+          context.read<AppContainer>().settingsController,
         ),
       ),
     ], child: const HomePageView());

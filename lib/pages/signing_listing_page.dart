@@ -21,43 +21,48 @@ import '../widget/task_tile.dart';
 class SigningSubPage extends StatelessWidget {
   const SigningSubPage({super.key});
 
+  static final _pageKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
-    return Consumer<AppViewModel>(builder: (context, model, child) {
-      return DefaultPageTemplate(
-        floatingActionButton: _buildFab(context, model),
-        body: buildTaskListView<File>(
-          model.signTasks,
-          emptyView: _buildEmptySignTasks(context),
-          showArchived: model.showArchived,
-          taskBuilder: (context, task) {
-            return TaskTile(
-              task: task,
-              name: task.info.basename,
-              actionChip: GroupChip(group: task.info.group),
-              actions: <Widget>[
-                FilledButton.tonal(
-                  child: const Text('View'),
-                  onPressed: () => _openFile(task.info.path),
-                ),
-              ],
-              approveActions: [
-                FilledButton.tonal(
-                  child: const Text('Sign'),
-                  onPressed: () => model.joinSign(task, agree: true),
-                ),
-                OutlinedButton(
-                  child: const Text('Decline'),
-                  onPressed: () => model.joinSign(task, agree: false),
-                ),
-              ],
-              onArchiveChange: (archive) =>
-                  model.archiveTask(task, archive: archive),
-            );
-          },
-        ),
-      );
-    });
+    return KeyedSubtree(
+      key: _pageKey,
+      child: Consumer<AppViewModel>(builder: (context, model, child) {
+        return DefaultPageTemplate(
+          floatingActionButton: _buildFab(context, model),
+          body: TaskListView<File>(
+            tasks: model.signTasks,
+            emptyView: _buildEmptySignTasks(context),
+            showArchived: model.showArchived,
+            taskBuilder: (context, task) {
+              return TaskTile(
+                task: task,
+                name: task.info.basename,
+                actionChip: GroupChip(group: task.info.group),
+                actions: <Widget>[
+                  FilledButton.tonal(
+                    child: const Text('View'),
+                    onPressed: () => _openFile(task.info.path),
+                  ),
+                ],
+                approveActions: [
+                  FilledButton.tonal(
+                    child: const Text('Sign'),
+                    onPressed: () => model.joinSign(task, agree: true),
+                  ),
+                  OutlinedButton(
+                    child: const Text('Decline'),
+                    onPressed: () => model.joinSign(task, agree: false),
+                  ),
+                ],
+                onArchiveChange: (archive) =>
+                    model.archiveTask(task, archive: archive),
+              );
+            },
+          ),
+        );
+      }),
+    );
   }
 
   void _openFile(String path) {

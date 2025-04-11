@@ -22,7 +22,10 @@ class OffstageNavigator extends StatelessWidget {
         key: navigationTab.navigatorKey,
         onGenerateRoute: (routeSettings) {
           return MaterialPageRoute(builder: (context) {
-            return navigationTab.child;
+            return KeyedSubtree(
+              key: ValueKey('tab_${navigationTab.label}'),
+              child: navigationTab.child,
+            );
           });
         },
       ),

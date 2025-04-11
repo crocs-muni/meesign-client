@@ -71,6 +71,7 @@ class TaskTile<T> extends StatelessWidget {
         if (onArchiveChange != null) onArchiveChange!(!task.archived);
       },
       child: ExpansionTile(
+        key: PageStorageKey<String>('task-${task.id}'),
         title: Text(name),
         subtitle: desc != null ? Text(desc) : null,
         initiallyExpanded: !task.archived &&

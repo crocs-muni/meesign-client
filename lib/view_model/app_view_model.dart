@@ -6,6 +6,7 @@ import 'package:meesign_core/meesign_card.dart';
 import 'package:meesign_core/meesign_data.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../services/settings_controller.dart';
 import '../util/extensions/task_approvable.dart';
 
 class AppViewModel with ChangeNotifier {
@@ -19,6 +20,7 @@ class AppViewModel with ChangeNotifier {
   final FileRepository _fileRepository;
   final ChallengeRepository _challengeRepository;
   final DecryptRepository _decryptRepository;
+  final SettingsController _settingsController;
 
   Stream<int> nGroupReqs = const Stream.empty();
   Stream<int> nSignReqs = const Stream.empty();
@@ -32,10 +34,6 @@ class AppViewModel with ChangeNotifier {
 
   bool _showArchived = false;
   bool get showArchived => _showArchived;
-  set showArchived(bool value) {
-    _showArchived = value;
-    notifyListeners();
-  }
 
   AppViewModel(
     User user,
@@ -44,6 +42,7 @@ class AppViewModel with ChangeNotifier {
     this._fileRepository,
     this._challengeRepository,
     this._decryptRepository,
+    this._settingsController,
   ) {
     _listen(user.did);
     deviceRepository.getDevice(user.did).then((value) {
@@ -83,6 +82,11 @@ class AppViewModel with ChangeNotifier {
     });
     decryptTasksStream.listen((tasks) {
       decryptTasks = tasks;
+      notifyListeners();
+    });
+
+    _settingsController.settingsStream.listen((settings) {
+      _showArchived = settings.showArchivedItems;
       notifyListeners();
     });
   }

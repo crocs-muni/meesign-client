@@ -136,45 +136,50 @@ class DecryptListingPage extends StatelessWidget {
     sub.cancel();
   }
 
+  static final _pageKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
-    return Consumer<AppViewModel>(builder: (context, model, child) {
-      return DefaultPageTemplate(
-        floatingActionButton: _buildFab(context, model),
-        body: buildTaskListView<Decrypt>(
-          model.decryptTasks,
-          emptyView: _buildEmptyDecryptTasks(context),
-          showArchived: model.showArchived,
-          taskBuilder: (context, task) {
-            return TaskTile(
-              task: task,
-              name: task.info.name,
-              desc: StatusMessage.getStatusMessage(task),
-              actionChip: GroupChip(group: task.info.group),
-              approveActions: [
-                FilledButton.tonal(
-                  child: const Text('Decrypt'),
-                  onPressed: () => model.joinDecrypt(task, agree: true),
-                ),
-                OutlinedButton(
-                  child: const Text('Decline'),
-                  onPressed: () => model.joinDecrypt(task, agree: false),
-                )
-              ],
-              actions: [
-                if (task.state == TaskState.finished)
+    return KeyedSubtree(
+      key: _pageKey,
+      child: Consumer<AppViewModel>(builder: (context, model, child) {
+        return DefaultPageTemplate(
+          floatingActionButton: _buildFab(context, model),
+          body: TaskListView<Decrypt>(
+            tasks: model.decryptTasks,
+            emptyView: _buildEmptyDecryptTasks(context),
+            showArchived: model.showArchived,
+            taskBuilder: (context, task) {
+              return TaskTile(
+                task: task,
+                name: task.info.name,
+                desc: StatusMessage.getStatusMessage(task),
+                actionChip: GroupChip(group: task.info.group),
+                approveActions: [
                   FilledButton.tonal(
-                    onPressed: () => showDecryptDialog(context, task.info),
-                    child: const Text('View'),
+                    child: const Text('Decrypt'),
+                    onPressed: () => model.joinDecrypt(task, agree: true),
+                  ),
+                  OutlinedButton(
+                    child: const Text('Decline'),
+                    onPressed: () => model.joinDecrypt(task, agree: false),
                   )
-              ],
-              onArchiveChange: (archive) =>
-                  model.archiveTask(task, archive: archive),
-            );
-          },
-        ),
-      );
-    });
+                ],
+                actions: [
+                  if (task.state == TaskState.finished)
+                    FilledButton.tonal(
+                      onPressed: () => showDecryptDialog(context, task.info),
+                      child: const Text('View'),
+                    )
+                ],
+                onArchiveChange: (archive) =>
+                    model.archiveTask(task, archive: archive),
+              );
+            },
+          ),
+        );
+      }),
+    );
   }
 
   Widget _buildFab(BuildContext context, AppViewModel model) {

@@ -104,50 +104,55 @@ class ChallengeListingPage extends StatelessWidget {
     );
   }
 
+  static final _pageKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
-    return Consumer<AppViewModel>(builder: (context, model, child) {
-      return DefaultPageTemplate(
-        floatingActionButton: _buildFab(context, model),
-        body: buildTaskListView<Challenge>(
-          model.challengeTasks,
-          emptyView: _buildEmptyChallengeTasks(context),
-          showArchived: model.showArchived,
-          taskBuilder: (context, task) {
-            return TaskTile(
-              task: task,
-              name: task.info.name,
-              actionChip: GroupChip(group: task.info.group),
-              approveActions: [
-                FilledButton.tonal(
-                  child: const Text('Sign'),
-                  onPressed: () => model.joinChallenge(task, agree: true),
-                ),
-                OutlinedButton(
-                  child: const Text('Decline'),
-                  onPressed: () => model.joinChallenge(task, agree: false),
-                )
-              ],
-              cardActions: [
-                FilledButton.tonal(
-                  onPressed: () => launchCardReader(context,
-                      (card) => model.advanceChallengeWithCard(task, card)),
-                  child: const Text('Read card'),
-                ),
-              ],
-              actions: [
-                FilledButton.tonal(
-                  onPressed: () => showChallengeDialog(context, task.info),
-                  child: const Text('View'),
-                )
-              ],
-              onArchiveChange: (archive) =>
-                  model.archiveTask(task, archive: archive),
-            );
-          },
-        ),
-      );
-    });
+    return KeyedSubtree(
+      key: _pageKey,
+      child: Consumer<AppViewModel>(builder: (context, model, child) {
+        return DefaultPageTemplate(
+          floatingActionButton: _buildFab(context, model),
+          body: TaskListView<Challenge>(
+            tasks: model.challengeTasks,
+            emptyView: _buildEmptyChallengeTasks(context),
+            showArchived: context.read<AppViewModel>().showArchived,
+            taskBuilder: (context, task) {
+              return TaskTile(
+                task: task,
+                name: task.info.name,
+                actionChip: GroupChip(group: task.info.group),
+                approveActions: [
+                  FilledButton.tonal(
+                    child: const Text('Sign'),
+                    onPressed: () => model.joinChallenge(task, agree: true),
+                  ),
+                  OutlinedButton(
+                    child: const Text('Decline'),
+                    onPressed: () => model.joinChallenge(task, agree: false),
+                  )
+                ],
+                cardActions: [
+                  FilledButton.tonal(
+                    onPressed: () => launchCardReader(context,
+                        (card) => model.advanceChallengeWithCard(task, card)),
+                    child: const Text('Read card'),
+                  ),
+                ],
+                actions: [
+                  FilledButton.tonal(
+                    onPressed: () => showChallengeDialog(context, task.info),
+                    child: const Text('View'),
+                  )
+                ],
+                onArchiveChange: (archive) =>
+                    model.archiveTask(task, archive: archive),
+              );
+            },
+          ),
+        );
+      }),
+    );
   }
 
   Widget _buildFab(BuildContext context, AppViewModel model) {
