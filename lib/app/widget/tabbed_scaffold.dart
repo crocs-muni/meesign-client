@@ -132,7 +132,7 @@ class _HomePageViewState extends State<HomePageView> {
         child: TaskListing(),
         icon: _buildCounterIcon(
           stream: context.watch<AppViewModel>().nAllReqs,
-          icon: Symbols.task,
+          icon: Symbols.task_alt,
           fillIcon: context.read<TabsViewModel>().index == 0,
         ),
       ),

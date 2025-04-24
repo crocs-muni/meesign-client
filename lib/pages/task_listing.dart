@@ -105,27 +105,23 @@ class TaskListing extends StatelessWidget {
                 },
                 child: const Text('Create group'),
               ),
-              if (context
-                  .read<AppViewModel>()
-                  .joinedGroupForTaskTypeExists(KeyType.signPdf)) ...[
-                const SizedBox(height: MEDIUM_GAP),
-                ElevatedButton(
-                  onPressed: () async {
-                    TaskType? result = await showTaskTypeDialog(context);
+              const SizedBox(height: MEDIUM_GAP),
+              ElevatedButton(
+                onPressed: () async {
+                  TaskType? result = await showTaskTypeDialog(context);
 
-                    if (context.mounted) {
-                      if (result == TaskType.sign) {
-                        signDocument(context, context);
-                      } else if (result == TaskType.decrypt) {
-                        encryptData(context, context);
-                      } else if (result == TaskType.challenge) {
-                        createChallenge(context, context);
-                      }
+                  if (context.mounted) {
+                    if (result == TaskType.sign) {
+                      signDocument(context, context);
+                    } else if (result == TaskType.decrypt) {
+                      encryptData(context, context);
+                    } else if (result == TaskType.challenge) {
+                      createChallenge(context, context);
                     }
-                  },
-                  child: const Text('Create new task'),
-                )
-              ]
+                  }
+                },
+                child: const Text('Create new task'),
+              )
             ],
           ),
         ),

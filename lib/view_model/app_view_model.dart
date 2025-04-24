@@ -44,7 +44,7 @@ class AppViewModel with ChangeNotifier {
         nChallengeReqs,
         nDecryptReqs,
         (int s, int c, int d) => s + c + d,
-      );
+      ).asBroadcastStream();
 
   // Show archived items stream
   final BehaviorSubject<bool> _showArchivedController = BehaviorSubject<bool>();
