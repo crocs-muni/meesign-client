@@ -56,7 +56,7 @@ class _ControlledLottieAnimationState extends State<ControlledLottieAnimation>
 
   void _checkAnimationStart() {
     final tabIndex = context.watch<TabsViewModel>().index;
-    const allTasksTabIndex = 5;
+    const allTasksTabIndex = 1;
 
     if (_loaded && !_controller.isAnimating) {
       if (widget.startAtTabIndex == null ||

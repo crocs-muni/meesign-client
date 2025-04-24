@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
@@ -149,6 +150,8 @@ class _RegisterPageState extends State<RegisterPage> {
               _buildLogoSection(context),
               const SizedBox(height: XLARGE_GAP),
               _buildContent(),
+              SizedBox(height: MEDIUM_GAP),
+              _buildMinistryFooter(context),
             ],
           ),
         ));
@@ -302,6 +305,20 @@ class _RegisterPageState extends State<RegisterPage> {
             child: const Text('Proceed anyway'),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildMinistryFooter(BuildContext context) {
+    const double logoWidth = 175;
+
+    return Padding(
+      padding: const EdgeInsets.all(XLARGE_PADDING),
+      child: SvgPicture.asset(
+        Theme.of(context).brightness == Brightness.dark
+            ? 'assets/ministerstvo_vnitra_cz_logo_dark_mode.svg'
+            : 'assets/ministerstvo_vnitra_cz_logo.svg',
+        width: logoWidth,
       ),
     );
   }

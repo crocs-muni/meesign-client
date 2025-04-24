@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
-// const Color _colorSchemeSeed = Color(0xFF415F91); --- Blue theme - don't use on devel branch
+const Color _colorSchemeSeed = Color(0xFF415F91);
 
 class AppTheme {
   static final light = ThemeData(
-    colorSchemeSeed: Colors.amber,
+    colorSchemeSeed: _colorSchemeSeed,
     useMaterial3: true,
     brightness: Brightness.light,
     extensions: [lightCustomColors],
   );
 
   static final dark = ThemeData(
-    colorSchemeSeed: Colors.amber,
+    colorSchemeSeed: _colorSchemeSeed,
     useMaterial3: true,
     brightness: Brightness.dark,
     extensions: [darkCustomColors],

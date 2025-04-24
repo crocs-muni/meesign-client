@@ -15,10 +15,7 @@ import '../model/navigation_tab_model.dart';
 import '../../app_container.dart';
 import '../../widget/counter_badge.dart';
 import '../../widget/main_app_bar.dart';
-import '../../pages/challenge_listing_page.dart';
-import '../../pages/decrypt_listing_page.dart';
 import '../../pages/groups_listing_page.dart';
-import '../../pages/signing_listing_page.dart';
 import 'offstage_navigator.dart';
 
 class TabbedScaffold extends StatelessWidget {
@@ -131,30 +128,12 @@ class _HomePageViewState extends State<HomePageView> {
 
     _tabs = <NavigationTabModel>[
       NavigationTabModel(
-        label: 'Signing',
-        child: SigningListingPage(),
+        label: 'All Tasks',
+        child: TaskListing(),
         icon: _buildCounterIcon(
-          stream: context.watch<AppViewModel>().nSignReqs,
-          icon: Symbols.draw,
+          stream: context.watch<AppViewModel>().nAllReqs,
+          icon: Symbols.task,
           fillIcon: context.read<TabsViewModel>().index == 0,
-        ),
-      ),
-      NavigationTabModel(
-        label: 'Challenge',
-        child: ChallengeListingPage(),
-        icon: _buildCounterIcon(
-          stream: context.watch<AppViewModel>().nChallengeReqs,
-          icon: Symbols.quiz,
-          fillIcon: context.read<TabsViewModel>().index == 1,
-        ),
-      ),
-      NavigationTabModel(
-        label: 'Decrypt',
-        child: DecryptListingPage(),
-        icon: _buildCounterIcon(
-          stream: context.watch<AppViewModel>().nDecryptReqs,
-          icon: Symbols.key,
-          fillIcon: context.read<TabsViewModel>().index == 2,
         ),
       ),
       NavigationTabModel(
@@ -163,22 +142,13 @@ class _HomePageViewState extends State<HomePageView> {
         icon: _buildCounterIcon(
           stream: context.watch<AppViewModel>().nGroupReqs,
           icon: Symbols.group,
-          fillIcon: context.read<TabsViewModel>().index == 3,
+          fillIcon: context.read<TabsViewModel>().index == 1,
         ),
       ),
       NavigationTabModel(
           label: 'Settings',
           child: SettingsPage(),
-          icon: Icon(Symbols.settings)),
-      NavigationTabModel(
-        label: 'All Tasks',
-        child: TaskListing(),
-        icon: _buildCounterIcon(
-          stream: context.watch<AppViewModel>().nAllReqs,
-          icon: Symbols.task,
-          fillIcon: context.read<TabsViewModel>().index == 4,
-        ),
-      ),
+          icon: Icon(Symbols.settings))
     ];
   }
 

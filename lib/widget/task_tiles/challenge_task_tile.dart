@@ -6,7 +6,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
-import '../../pages/challenge_listing_page.dart';
+import '../../enums/data_view.dart';
 import '../../util/card_reader_launcher.dart';
 import '../../util/chars.dart';
 import '../../view_model/app_view_model.dart';

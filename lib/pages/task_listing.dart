@@ -101,7 +101,7 @@ class TaskListing extends StatelessWidget {
                   final tabViewModel =
                       Provider.of<TabsViewModel>(context, listen: false);
 
-                  tabViewModel.setIndex(3);
+                  tabViewModel.setIndex(1);
                 },
                 child: const Text('Create group'),
               ),

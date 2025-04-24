@@ -155,7 +155,7 @@ class TaskListView<T> extends StatelessWidget {
     } else if (T == File) {
       return 'Signing invitations';
     } else {
-      return 'Invitations';
+      return 'Pending requests';
     }
   }
 
@@ -169,7 +169,7 @@ class TaskListView<T> extends StatelessWidget {
     } else if (T == File) {
       return 'Joined signings';
     } else {
-      return 'Joined';
+      return 'Signed or decrypted';
     }
   }
 
