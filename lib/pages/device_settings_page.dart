@@ -6,6 +6,7 @@ import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
 import '../util/fade_black_page_transition.dart';
 import '../view_model/app_view_model.dart';
+import '../widget/change_device_section.dart';
 import '../widget/confirmation_dialog.dart';
 import 'register_page.dart';
 
@@ -51,6 +52,7 @@ class _DeviceSettingsPageState extends State<DeviceSettingsPage> {
     return DefaultPageTemplate(
       appBarTitle: 'Device settings',
       showAppBar: true,
+      wrapInScroll: true,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -118,82 +120,51 @@ class _DeviceSettingsPageState extends State<DeviceSettingsPage> {
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         SizedBox(height: SMALL_GAP),
-        Consumer<AppViewModel>(builder: (context, model, child) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextField(
-                enabled: false,
-                readOnly: true,
-                controller: _nameController,
-                focusNode: _nameControllerFocus,
-                onChanged: (_) => setState(() {}),
-                decoration: InputDecoration(
-                  suffixIcon: _nameController.text == "" ||
-                          !_nameControllerFocus.hasFocus
-                      ? null
-                      : IconButton(
-                          // Icon to
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            setState(() {
-                              _nameController.clear();
-                            });
-                          },
-                        ),
-                  filled: true,
-                  hintText: 'Name to identify yourself',
-                  hintStyle: TextStyle(
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
-                  border: const OutlineInputBorder(),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.primary, width: 0),
-                  ),
-                  errorText: null,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              enabled: false,
+              readOnly: true,
+              controller: _nameController,
+              focusNode: _nameControllerFocus,
+              onChanged: (_) => setState(() {}),
+              decoration: InputDecoration(
+                suffixIcon:
+                    _nameController.text == "" || !_nameControllerFocus.hasFocus
+                        ? null
+                        : IconButton(
+                            // Icon to
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              setState(() {
+                                _nameController.clear();
+                              });
+                            },
+                          ),
+                filled: true,
+                hintText: 'Name to identify yourself',
+                hintStyle: TextStyle(
+                  color: Theme.of(context).colorScheme.outline,
                 ),
+                border: const OutlineInputBorder(),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.primary, width: 0),
+                ),
+                errorText: null,
               ),
-            ],
-          );
-        }),
+            ),
+          ],
+        )
       ],
     );
   }
 
   Widget _buildChangeServerSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Change server or device",
-          style: Theme.of(context).textTheme.bodyLarge,
-        ),
-        SizedBox(height: SMALL_GAP),
-        Text(
-          "This will take you back to the registration screen where you can change the server or register a new device.",
-          style: TextStyle(color: Theme.of(context).colorScheme.outline),
-        ),
-        SizedBox(height: MEDIUM_GAP),
-        FilledButton.icon(
-          onPressed: () {
-            _showChangeServerDialog();
-          },
-          label: Padding(
-            padding: EdgeInsets.symmetric(vertical: 15),
-            child: Text('Change device'),
-          ),
-          icon: Icon(Icons.sync),
-          style: ButtonStyle(
-            shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
+    return ChangeDeviceSection(onChangeServer: () {
+      _showChangeServerDialog();
+    });
   }
 
   Widget _buildDangerZone() {

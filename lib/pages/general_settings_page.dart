@@ -18,6 +18,7 @@ class GeneralSettingsPage extends StatelessWidget {
     return DefaultPageTemplate(
       appBarTitle: 'General settings',
       showAppBar: true,
+      wrapInScroll: true,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,

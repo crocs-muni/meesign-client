@@ -5,7 +5,7 @@ import 'package:meesign_core/meesign_core.dart';
 import '../enums/task_status.dart';
 import '../ui_constants.dart';
 
-class TaskListView<T> extends StatefulWidget {
+class TaskListView<T> extends StatelessWidget {
   final List<Task<T>> tasks;
   final Widget emptyView;
   final Widget Function(BuildContext, Task<T>) taskBuilder;
@@ -20,41 +20,9 @@ class TaskListView<T> extends StatefulWidget {
   });
 
   @override
-  State<TaskListView<T>> createState() => _TaskListViewState<T>();
-}
-
-Widget buildTaskListView<T>(
-  List<Task<T>> tasks, {
-  required BuildContext context,
-  required Widget emptyView,
-  required Widget Function(BuildContext, Task<T>) taskBuilder,
-  bool showArchived = false,
-}) {
-  return TaskListView<T>(
-    key: PageStorageKey('task_list_view'),
-    tasks: tasks,
-    emptyView: emptyView,
-    taskBuilder: taskBuilder,
-    showArchived: showArchived,
-  );
-}
-
-class _TaskListViewState<T> extends State<TaskListView<T>>
-    with AutomaticKeepAliveClientMixin {
-  // Store expansion states locally
-  final Map<TaskListSection, bool> _expandedSections = {
-    for (var section in TaskListSection.values) section: true,
-  };
-
-  @override
-  bool get wantKeepAlive => true;
-
-  @override
   Widget build(BuildContext context) {
-    super.build(context); // Required for AutomaticKeepAliveClientMixin
-
     // Group tasks by section
-    final taskGroups = widget.tasks.groupListsBy((task) {
+    final taskGroups = tasks.groupListsBy((task) {
       if (task.archived) return TaskListSection.archived;
       return switch (task.state) {
         TaskState.finished => TaskListSection.finished,
@@ -71,14 +39,14 @@ class _TaskListViewState<T> extends State<TaskListView<T>>
       TaskListSection.finished,
       TaskListSection.rejected,
       if (taskGroups[TaskListSection.failed] != null) TaskListSection.failed,
-      if (widget.showArchived) TaskListSection.archived,
+      if (showArchived) TaskListSection.archived,
     ];
 
     final taskCount = sections.map((s) => (taskGroups[s] ?? []).length).sum;
 
     if (taskCount == 0) {
-      return widget.emptyView;
-    } else if (!widget.showArchived) {
+      return emptyView;
+    } else if (!showArchived) {
       // Check if there is any non-archived task
       final nonArchivedTaskCount = taskGroups.entries
           .where((entry) => entry.key != TaskListSection.archived)
@@ -86,48 +54,45 @@ class _TaskListViewState<T> extends State<TaskListView<T>>
           .sum;
 
       if (nonArchivedTaskCount == 0) {
-        return widget.emptyView;
+        return emptyView;
       }
     }
 
     return ListView(
       children: sections.map((section) {
         final sectionTasks = taskGroups[section] ?? <Task<T>>[];
-        return Theme(
-            // This is to remove the default divider color of ExpansionTile
-            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-            child: Container(
-              padding: EdgeInsets.symmetric(vertical: SMALL_GAP),
-              child: ExpansionTile(
-                key: PageStorageKey<TaskListSection>(section),
-                initiallyExpanded: _expandedSections[section] ?? true,
-                onExpansionChanged: (expanded) {
-                  setState(() {
-                    _expandedSections[section] = expanded;
-                  });
-                },
-                maintainState: true,
-                childrenPadding: EdgeInsets.only(top: SMALL_GAP),
-                iconColor: Theme.of(context).iconTheme.color,
-                collapsedIconColor: Theme.of(context).iconTheme.color,
-                title:
-                    _buildSectionTitle(context, section, sectionTasks.length),
-                children: sectionTasks.isEmpty
-                    ? [
-                        Padding(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: MEDIUM_PADDING),
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text("No items in this section"),
-                          ),
-                        )
-                      ]
-                    : sectionTasks
-                        .map((task) => widget.taskBuilder(context, task))
-                        .toList(),
-              ),
-            ));
+        return Column(children: [
+          Theme(
+              // This is to remove the default divider color of ExpansionTile
+              data:
+                  Theme.of(context).copyWith(dividerColor: Colors.transparent),
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 0),
+                child: ExpansionTile(
+                  maintainState: true,
+                  initiallyExpanded: true,
+                  childrenPadding: EdgeInsets.only(top: SMALL_GAP),
+                  iconColor: Theme.of(context).iconTheme.color,
+                  collapsedIconColor: Theme.of(context).iconTheme.color,
+                  title:
+                      _buildSectionTitle(context, section, sectionTasks.length),
+                  children: sectionTasks.isEmpty
+                      ? [
+                          Padding(
+                              padding: EdgeInsets.only(left: MEDIUM_GAP),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text("No items in this section"),
+                              ))
+                        ]
+                      : sectionTasks
+                          .map((task) => taskBuilder(context, task))
+                          .toList(),
+                ),
+              )),
+          SizedBox(height: MEDIUM_GAP),
+          if (section != sections.last) const Divider()
+        ]);
       }).toList(),
     );
   }
@@ -138,23 +103,23 @@ class _TaskListViewState<T> extends State<TaskListView<T>>
       children: [
         _getSectionIcon(section),
         SizedBox(width: MEDIUM_GAP),
-        Row(
-          children: [
-            Text(
-              _getSectionTitle(section),
-              style: TextStyle(
-                  fontWeight: FontWeight.w900,
-                  fontSize: Theme.of(context).textTheme.titleLarge?.fontSize),
-            ),
-            SizedBox(width: SMALL_GAP),
-            Text(
-              '($taskCount)',
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: Theme.of(context).textTheme.titleMedium?.fontSize,
-                  color: Theme.of(context).colorScheme.primary),
-            )
-          ],
+        Expanded(
+          child: Text(
+            _getSectionTitle(section),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+                fontWeight: FontWeight.w900,
+                fontSize: Theme.of(context).textTheme.titleLarge?.fontSize),
+          ),
+        ),
+        SizedBox(width: SMALL_GAP),
+        Text(
+          '($taskCount)',
+          style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: Theme.of(context).textTheme.titleMedium?.fontSize,
+              color: Theme.of(context).colorScheme.primary),
         )
       ],
     );
@@ -249,4 +214,19 @@ class _TaskListViewState<T> extends State<TaskListView<T>>
       return 'Archived';
     }
   }
+}
+
+Widget buildTaskListView<T>(
+  List<Task<T>> tasks, {
+  required BuildContext context,
+  required Widget emptyView,
+  required Widget Function(BuildContext, Task<T>) taskBuilder,
+  bool showArchived = false,
+}) {
+  return TaskListView<T>(
+    tasks: tasks,
+    emptyView: emptyView,
+    taskBuilder: taskBuilder,
+    showArchived: showArchived,
+  );
 }

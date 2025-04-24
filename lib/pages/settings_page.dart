@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../templates/default_page_template.dart';
-import '../view_model/app_view_model.dart';
 import 'about_page.dart';
 import 'device_settings_page.dart';
 import 'general_settings_page.dart';
@@ -12,21 +10,19 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AppViewModel>(builder: (context, model, child) {
-      return DefaultPageTemplate(
-        wrapInScroll: true,
-        body: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("What do you want to do?",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
-            _buildMenuItems(context),
-          ],
-        ),
-      );
-    });
+    return DefaultPageTemplate(
+      wrapInScroll: true,
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("What do you want to do?",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          SizedBox(height: 10),
+          _buildMenuItems(context),
+        ],
+      ),
+    );
   }
 
   Widget _buildMenuItems(BuildContext context) {

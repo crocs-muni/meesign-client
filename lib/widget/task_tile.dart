@@ -37,7 +37,7 @@ class TaskTile<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final desc = this.desc ?? StatusMessage.getStatusMessage(task);
-    final trailing = this.trailing ?? TaskStateIndicator(task);
+    final trailing = TaskStateIndicator(task);
     final allActions = actions +
         (task.approvable ? approveActions : []) +
         (task.state == TaskState.needsCard ? cardActions : []);
@@ -71,7 +71,6 @@ class TaskTile<T> extends StatelessWidget {
         if (onArchiveChange != null) onArchiveChange!(!task.archived);
       },
       child: ExpansionTile(
-        key: PageStorageKey<String>('task-${task.id}'),
         title: Text(name),
         subtitle: desc != null ? Text(desc) : null,
         initiallyExpanded: !task.archived &&

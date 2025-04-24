@@ -9,12 +9,27 @@ import 'package:rxdart/rxdart.dart';
 import '../services/settings_controller.dart';
 import '../util/extensions/task_approvable.dart';
 
+class TaskStream {
+  final bool showArchived;
+  final List<Task<Decrypt>> decryptTasks;
+  final List<Task<Group>> groupTasks;
+  final List<Task<File>> signTasks;
+  final List<Task<Challenge>> challengeTasks;
+
+  TaskStream({
+    required this.showArchived,
+    required this.decryptTasks,
+    required this.groupTasks,
+    required this.signTasks,
+    required this.challengeTasks,
+  });
+}
+
 class AppViewModel with ChangeNotifier {
   static const maxDataSize = FileRepository.maxFileSize;
-
-  // TODO: migrate from ChangeNotifier to streams
-
   Device? device;
+
+  final List<Task> allTasks = [];
 
   final GroupRepository _groupRepository;
   final FileRepository _fileRepository;
@@ -26,14 +41,70 @@ class AppViewModel with ChangeNotifier {
   Stream<int> nSignReqs = const Stream.empty();
   Stream<int> nChallengeReqs = const Stream.empty();
   Stream<int> nDecryptReqs = const Stream.empty();
+  Stream<int> get nAllReqs => Rx.combineLatest4(
+        nGroupReqs,
+        nSignReqs,
+        nChallengeReqs,
+        nDecryptReqs,
+        (int g, int s, int c, int d) => g + s + c + d,
+      );
 
-  List<Task<Group>> groupTasks = [];
-  List<Task<File>> signTasks = [];
-  List<Task<Challenge>> challengeTasks = [];
-  List<Task<Decrypt>> decryptTasks = [];
+  // Show archived items stream
+  final BehaviorSubject<bool> _showArchivedController = BehaviorSubject<bool>();
+  Stream<bool> get showArchivedStream => _showArchivedController.stream;
+  bool get showArchived => _showArchivedController.valueOrNull ?? false;
 
-  bool _showArchived = false;
-  bool get showArchived => _showArchived;
+  // Decrypt tasks stream
+  final BehaviorSubject<List<Task<Decrypt>>> _decryptTasksController =
+      BehaviorSubject<List<Task<Decrypt>>>();
+  Stream<List<Task<Decrypt>>> get decryptTasksStream =>
+      _decryptTasksController.stream;
+  List<Task<Decrypt>> get decryptTasks =>
+      _decryptTasksController.valueOrNull ?? [];
+
+  // Group tasks stream
+  final BehaviorSubject<List<Task<Group>>> _groupTasksController =
+      BehaviorSubject<List<Task<Group>>>();
+  Stream<List<Task<Group>>> get groupTasksStream =>
+      _groupTasksController.stream;
+  List<Task<Group>> get groupTasks => _groupTasksController.valueOrNull ?? [];
+
+  // Sign tasks stream
+  final BehaviorSubject<List<Task<File>>> _signTasksController =
+      BehaviorSubject<List<Task<File>>>();
+  Stream<List<Task<File>>> get signTasksStream => _signTasksController.stream;
+  List<Task<File>> get signTasks => _signTasksController.valueOrNull ?? [];
+
+  // Challenge tasks stream
+  final BehaviorSubject<List<Task<Challenge>>> _challengeTasksController =
+      BehaviorSubject<List<Task<Challenge>>>();
+  Stream<List<Task<Challenge>>> get challengeTasksStream =>
+      _challengeTasksController.stream;
+  List<Task<Challenge>> get challengeTasks =>
+      _challengeTasksController.valueOrNull ?? [];
+
+  // General stream of all tasks + the show archived items setting
+  Stream<TaskStream> get combinedTaskStream => Rx.combineLatest5<
+          bool,
+          List<Task<Decrypt>>,
+          List<Task<Group>>,
+          List<Task<File>>,
+          List<Task<Challenge>>,
+          TaskStream>(
+        showArchivedStream,
+        decryptTasksStream,
+        groupTasksStream,
+        signTasksStream,
+        challengeTasksStream,
+        (showArchived, decryptTasks, groupTasks, signTasks, challengeTasks) =>
+            TaskStream(
+          showArchived: showArchived,
+          decryptTasks: decryptTasks,
+          groupTasks: groupTasks,
+          signTasks: signTasks,
+          challengeTasks: challengeTasks,
+        ),
+      );
 
   AppViewModel(
     User user,
@@ -66,35 +137,42 @@ class AppViewModel with ChangeNotifier {
     nSignReqs = signTasksStream.map(pending).shareValue();
     nChallengeReqs = challengeTasksStream.map(pending).shareValue();
     nDecryptReqs = decryptTasksStream.map(pending).shareValue();
+
     notifyListeners();
 
     groupTasksStream.listen((tasks) {
-      groupTasks = tasks;
-      notifyListeners();
+      _groupTasksController.add(tasks);
     });
+
     signTasksStream.listen((tasks) {
-      signTasks = tasks;
-      notifyListeners();
+      _signTasksController.add(tasks);
     });
+
     challengeTasksStream.listen((tasks) {
-      challengeTasks = tasks;
-      notifyListeners();
+      _challengeTasksController.add(tasks);
     });
+
     decryptTasksStream.listen((tasks) {
-      decryptTasks = tasks;
-      notifyListeners();
+      _decryptTasksController.add(tasks);
     });
 
     _settingsController.settingsStream.listen((settings) {
-      _showArchived = settings.showArchivedItems;
-      notifyListeners();
+      _showArchivedController.add(settings.showArchivedItems);
+    });
+
+    combinedTaskStream.listen((allTaskStream) {
+      allTasks.clear();
+      allTasks.addAll(allTaskStream.decryptTasks);
+      allTasks.addAll(allTaskStream.groupTasks);
+      allTasks.addAll(allTaskStream.signTasks);
+      allTasks.addAll(allTaskStream.challengeTasks);
     });
   }
 
   bool hasGroup(KeyType type, {bool? inclArchived}) => groupTasks.any((task) =>
       task.info.keyType == type &&
       task.state == TaskState.finished &&
-      (!task.archived || (inclArchived ?? _showArchived)));
+      (!task.archived || (inclArchived ?? showArchived)));
 
   Future<void> addGroup(String name, List<Member> members, int threshold,
           Protocol protocol, KeyType keyType, String? note) =>
@@ -140,5 +218,17 @@ class AppViewModel with ChangeNotifier {
 
   Future<void> archiveTask<T>(Task<T> task, {required bool archive}) async {
     _selectRepository<T>().archiveTask(device!.id, task.id, archive: archive);
+  }
+
+  bool joinedGroupForTaskTypeExists(KeyType type) {
+    if (showArchived) {
+      return groupTasks.any((task) =>
+          task.info.keyType == type && task.state == TaskState.finished);
+    }
+
+    return groupTasks
+        .where((task) =>
+            task.info.keyType == type && task.state == TaskState.finished)
+        .any((task) => !task.archived);
   }
 }

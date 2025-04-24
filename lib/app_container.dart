@@ -76,24 +76,12 @@ class AppContainer {
 
   Future<AnonymousSession> createAnonymousSession(String host) async {
     return AnonymousSession(
-      host,
-      await caCerts,
-      allowBadCerts,
-      keyStore,
-      fileStore,
-      database,
-    );
+        host, await caCerts, allowBadCerts, keyStore, fileStore, database);
   }
 
   Future<UserSession> startUserSession(User user) async {
     session = UserSession(
-      user,
-      await caCerts,
-      allowBadCerts,
-      keyStore,
-      fileStore,
-      database,
-    );
+        user, await caCerts, allowBadCerts, keyStore, fileStore, database);
     reporter.start(session!.supportServices);
     return session!;
   }

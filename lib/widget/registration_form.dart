@@ -115,15 +115,6 @@ class _RegistrationFormState extends State<RegistrationForm> {
     try {
       final session = await container.createAnonymousSession(host);
 
-      final compatible = await session.supportServices.checkCompatibility();
-      if (!compatible) {
-        setState(() {
-          _working = false;
-          _hostError = 'Incompatible server';
-        });
-        return;
-      }
-
       bool isNewUser = true;
       User? currentUser;
 
@@ -195,6 +186,13 @@ class _RegistrationFormState extends State<RegistrationForm> {
           textInputAction: TextInputAction.next,
           enabled: !_working,
           maxLength: 32,
+          onSubmitted: (_) {
+            if (_hostController.text.isEmpty) {
+              _hostControllerFocus.requestFocus();
+            } else {
+              _register();
+            }
+          },
           onChanged: (_) => setState(() {}),
           inputFormatters: [
             FilteringTextInputFormatter.deny(
