@@ -82,7 +82,11 @@ class TaskListView<T> extends StatelessWidget {
                               padding: EdgeInsets.only(left: MEDIUM_GAP),
                               child: Align(
                                 alignment: Alignment.centerLeft,
-                                child: Text("No items in this section"),
+                                child: Container(
+                                  padding:
+                                      EdgeInsets.only(bottom: SMALL_PADDING),
+                                  child: Text("No items in this section"),
+                                ),
                               ))
                         ]
                       : sectionTasks
@@ -90,7 +94,6 @@ class TaskListView<T> extends StatelessWidget {
                           .toList(),
                 ),
               )),
-          SizedBox(height: MEDIUM_GAP),
           if (section != sections.last) const Divider()
         ]);
       }).toList(),
@@ -101,7 +104,7 @@ class TaskListView<T> extends StatelessWidget {
       BuildContext context, TaskListSection section, int taskCount) {
     return Row(
       children: [
-        _getSectionIcon(section),
+        _getSectionIcon(section, context),
         SizedBox(width: MEDIUM_GAP),
         Expanded(
           child: Text(
@@ -110,7 +113,7 @@ class TaskListView<T> extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
                 fontWeight: FontWeight.w900,
-                fontSize: Theme.of(context).textTheme.titleLarge?.fontSize),
+                fontSize: Theme.of(context).textTheme.bodyLarge?.fontSize),
           ),
         ),
         SizedBox(width: SMALL_GAP),
@@ -135,13 +138,15 @@ class TaskListView<T> extends StatelessWidget {
     };
   }
 
-  Widget _getSectionIcon(TaskListSection section) {
+  Widget _getSectionIcon(TaskListSection section, BuildContext context) {
+    double iconSize = Theme.of(context).textTheme.headlineSmall?.fontSize ?? 24;
+
     return switch (section) {
-      TaskListSection.requests => const Icon(Icons.group_add),
-      TaskListSection.finished => const Icon(Icons.check_circle),
-      TaskListSection.rejected => const Icon(Icons.cancel),
-      TaskListSection.failed => const Icon(Icons.error),
-      TaskListSection.archived => const Icon(Icons.archive),
+      TaskListSection.requests => Icon(Icons.group_add, size: iconSize),
+      TaskListSection.finished => Icon(Icons.check_circle, size: iconSize),
+      TaskListSection.rejected => Icon(Icons.cancel, size: iconSize),
+      TaskListSection.failed => Icon(Icons.error, size: iconSize),
+      TaskListSection.archived => Icon(Icons.archive, size: iconSize),
     };
   }
 
@@ -155,7 +160,7 @@ class TaskListView<T> extends StatelessWidget {
     } else if (T == File) {
       return 'Signing invitations';
     } else {
-      return 'Invitations';
+      return 'Pending requests';
     }
   }
 
@@ -169,7 +174,7 @@ class TaskListView<T> extends StatelessWidget {
     } else if (T == File) {
       return 'Joined signings';
     } else {
-      return 'Joined';
+      return 'Signed or decrypted';
     }
   }
 

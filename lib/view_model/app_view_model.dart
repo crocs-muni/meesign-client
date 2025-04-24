@@ -12,14 +12,12 @@ import '../util/extensions/task_approvable.dart';
 class TaskStream {
   final bool showArchived;
   final List<Task<Decrypt>> decryptTasks;
-  final List<Task<Group>> groupTasks;
   final List<Task<File>> signTasks;
   final List<Task<Challenge>> challengeTasks;
 
   TaskStream({
     required this.showArchived,
     required this.decryptTasks,
-    required this.groupTasks,
     required this.signTasks,
     required this.challengeTasks,
   });
@@ -41,13 +39,12 @@ class AppViewModel with ChangeNotifier {
   Stream<int> nSignReqs = const Stream.empty();
   Stream<int> nChallengeReqs = const Stream.empty();
   Stream<int> nDecryptReqs = const Stream.empty();
-  Stream<int> get nAllReqs => Rx.combineLatest4(
-        nGroupReqs,
+  Stream<int> get nAllReqs => Rx.combineLatest3(
         nSignReqs,
         nChallengeReqs,
         nDecryptReqs,
-        (int g, int s, int c, int d) => g + s + c + d,
-      );
+        (int s, int c, int d) => s + c + d,
+      ).asBroadcastStream();
 
   // Show archived items stream
   final BehaviorSubject<bool> _showArchivedController = BehaviorSubject<bool>();
@@ -100,7 +97,6 @@ class AppViewModel with ChangeNotifier {
             TaskStream(
           showArchived: showArchived,
           decryptTasks: decryptTasks,
-          groupTasks: groupTasks,
           signTasks: signTasks,
           challengeTasks: challengeTasks,
         ),
@@ -163,7 +159,6 @@ class AppViewModel with ChangeNotifier {
     combinedTaskStream.listen((allTaskStream) {
       allTasks.clear();
       allTasks.addAll(allTaskStream.decryptTasks);
-      allTasks.addAll(allTaskStream.groupTasks);
       allTasks.addAll(allTaskStream.signTasks);
       allTasks.addAll(allTaskStream.challengeTasks);
     });
