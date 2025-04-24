@@ -5,6 +5,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
 import '../../pages/settings_page.dart';
+import '../../pages/task_listing.dart';
 import '../../ui_constants.dart';
 import '../../util/layout_getter.dart';
 import '../../view_model/app_view_model.dart';
@@ -52,7 +53,7 @@ class HomePageView extends StatefulWidget {
 }
 
 class _HomePageViewState extends State<HomePageView> {
-  late List<NavigationTabModel> _tabs;
+  List<NavigationTabModel> _tabs = [];
 
   @override
   void didChangeDependencies() {
@@ -120,10 +121,18 @@ class _HomePageViewState extends State<HomePageView> {
   }
 
   void _initializeTabs() {
+    // Since the tabs are initialized in didChangeDependencies
+    // we need to check if they are already initialized.
+    // We cant initialize them in initState because we
+    // need the context to get the AppViewModel
+    if (_tabs.isNotEmpty) {
+      return;
+    }
+
     _tabs = <NavigationTabModel>[
       NavigationTabModel(
         label: 'Signing',
-        child: SigningSubPage(),
+        child: SigningListingPage(),
         icon: _buildCounterIcon(
           stream: context.watch<AppViewModel>().nSignReqs,
           icon: Symbols.draw,
@@ -161,18 +170,27 @@ class _HomePageViewState extends State<HomePageView> {
           label: 'Settings',
           child: SettingsPage(),
           icon: Icon(Symbols.settings)),
+      NavigationTabModel(
+        label: 'All Tasks',
+        child: TaskListing(),
+        icon: _buildCounterIcon(
+          stream: context.watch<AppViewModel>().nAllReqs,
+          icon: Symbols.task,
+          fillIcon: context.read<TabsViewModel>().index == 4,
+        ),
+      ),
     ];
   }
 
   Widget _buildIndexedStack() {
     return _buildPageTransitionSwitcher(IndexedStack(
       // key: ValueKey<String>("IndexedStack_$_index"), // Causes duplicate global key error
-      index: context.read<TabsViewModel>().index,
+      index: context.watch<TabsViewModel>().index,
       children: _tabs.map<OffstageNavigator>(
         (NavigationTabModel destination) {
           return OffstageNavigator(
             index: _tabs.indexOf(destination),
-            currentTabIndex: context.read<TabsViewModel>().index,
+            currentTabIndex: context.watch<TabsViewModel>().index,
             navigationTab: destination,
           );
         },

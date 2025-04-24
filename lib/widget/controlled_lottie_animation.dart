@@ -56,10 +56,12 @@ class _ControlledLottieAnimationState extends State<ControlledLottieAnimation>
 
   void _checkAnimationStart() {
     final tabIndex = context.watch<TabsViewModel>().index;
+    const allTasksTabIndex = 5;
 
     if (_loaded && !_controller.isAnimating) {
       if (widget.startAtTabIndex == null ||
-          tabIndex == widget.startAtTabIndex) {
+          tabIndex == widget.startAtTabIndex ||
+          tabIndex == allTasksTabIndex) {
         // This replays the animation when the tab is selected.
         // Remove the reset() if you want to keep the animation state.
         _controller.reset();

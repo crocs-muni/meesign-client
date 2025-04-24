@@ -4,21 +4,27 @@ import 'package:meesign_core/meesign_core.dart';
 
 import '../theme.dart';
 
-class TaskStateIndicator extends StatelessWidget {
+class TaskStateIndicator extends StatefulWidget {
   final Task task;
 
   const TaskStateIndicator(this.task, {super.key});
 
   @override
+  State<TaskStateIndicator> createState() => _TaskStateIndicatorState();
+}
+
+class _TaskStateIndicatorState extends State<TaskStateIndicator> {
+  @override
   Widget build(BuildContext context) {
-    return switch (task.state) {
+    return switch (widget.task.state) {
       TaskState.created => const Icon(Symbols.arrow_drop_down),
       TaskState.running => SizedBox(
           height: 24,
           width: 24,
           // TODO: add animation
           child: CircularProgressIndicator(
-            value: task.round / task.nRounds,
+            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+            value: widget.task.round / widget.task.nRounds,
             strokeWidth: 2.0,
           ),
         ),
@@ -28,7 +34,7 @@ class TaskStateIndicator extends StatelessWidget {
           color: Theme.of(context).extension<CustomColors>()!.success,
         ),
       TaskState.failed => Icon(
-          switch (task.error) {
+          switch (widget.task.error) {
             TaskError.rejected => Symbols.block,
             _ => Symbols.error_outline,
           },
