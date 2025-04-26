@@ -2,7 +2,7 @@
 //  Generated code. Do not modify.
 //  source: meesign.proto
 //
-// @dart = 2.12
+// @dart = 3.3
 
 // ignore_for_file: annotate_overrides, camel_case_types, comment_references
 // ignore_for_file: constant_identifier_names, library_prefixes
@@ -15,6 +15,8 @@ import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
 import 'meesign.pbenum.dart';
+
+export 'package:protobuf/protobuf.dart' show GeneratedMessageGenericExtensions;
 
 export 'meesign.pbenum.dart';
 
@@ -114,7 +116,7 @@ class ServerInfo extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasVersion() => $_has(0);
   @$pb.TagNumber(1)
-  void clearVersion() => clearField(1);
+  void clearVersion() => $_clearField(1);
 }
 
 class RegistrationRequest extends $pb.GeneratedMessage {
@@ -189,19 +191,19 @@ class RegistrationRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasName() => $_has(0);
   @$pb.TagNumber(1)
-  void clearName() => clearField(1);
+  void clearName() => $_clearField(1);
 
   @$pb.TagNumber(2)
   DeviceKind get kind => $_getN(1);
   @$pb.TagNumber(2)
   set kind(DeviceKind v) {
-    setField(2, v);
+    $_setField(2, v);
   }
 
   @$pb.TagNumber(2)
   $core.bool hasKind() => $_has(1);
   @$pb.TagNumber(2)
-  void clearKind() => clearField(2);
+  void clearKind() => $_clearField(2);
 
   @$pb.TagNumber(3)
   $core.List<$core.int> get csr => $_getN(2);
@@ -213,7 +215,7 @@ class RegistrationRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.bool hasCsr() => $_has(2);
   @$pb.TagNumber(3)
-  void clearCsr() => clearField(3);
+  void clearCsr() => $_clearField(3);
 }
 
 class RegistrationResponse extends $pb.GeneratedMessage {
@@ -282,7 +284,7 @@ class RegistrationResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasDeviceId() => $_has(0);
   @$pb.TagNumber(1)
-  void clearDeviceId() => clearField(1);
+  void clearDeviceId() => $_clearField(1);
 
   @$pb.TagNumber(2)
   $core.List<$core.int> get certificate => $_getN(1);
@@ -294,7 +296,7 @@ class RegistrationResponse extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.bool hasCertificate() => $_has(1);
   @$pb.TagNumber(2)
-  void clearCertificate() => clearField(2);
+  void clearCertificate() => $_clearField(2);
 }
 
 class GroupRequest extends $pb.GeneratedMessage {
@@ -387,10 +389,10 @@ class GroupRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasName() => $_has(0);
   @$pb.TagNumber(1)
-  void clearName() => clearField(1);
+  void clearName() => $_clearField(1);
 
   @$pb.TagNumber(2)
-  $core.List<$core.List<$core.int>> get deviceIds => $_getList(1);
+  $pb.PbList<$core.List<$core.int>> get deviceIds => $_getList(1);
 
   @$pb.TagNumber(3)
   $core.int get threshold => $_getIZ(2);
@@ -402,31 +404,31 @@ class GroupRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.bool hasThreshold() => $_has(2);
   @$pb.TagNumber(3)
-  void clearThreshold() => clearField(3);
+  void clearThreshold() => $_clearField(3);
 
   @$pb.TagNumber(4)
   ProtocolType get protocol => $_getN(3);
   @$pb.TagNumber(4)
   set protocol(ProtocolType v) {
-    setField(4, v);
+    $_setField(4, v);
   }
 
   @$pb.TagNumber(4)
   $core.bool hasProtocol() => $_has(3);
   @$pb.TagNumber(4)
-  void clearProtocol() => clearField(4);
+  void clearProtocol() => $_clearField(4);
 
   @$pb.TagNumber(5)
   KeyType get keyType => $_getN(4);
   @$pb.TagNumber(5)
   set keyType(KeyType v) {
-    setField(5, v);
+    $_setField(5, v);
   }
 
   @$pb.TagNumber(5)
   $core.bool hasKeyType() => $_has(4);
   @$pb.TagNumber(5)
-  void clearKeyType() => clearField(5);
+  void clearKeyType() => $_clearField(5);
 
   @$pb.TagNumber(6)
   $core.String get note => $_getSZ(5);
@@ -438,7 +440,7 @@ class GroupRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   $core.bool hasNote() => $_has(5);
   @$pb.TagNumber(6)
-  void clearNote() => clearField(6);
+  void clearNote() => $_clearField(6);
 }
 
 class Group extends $pb.GeneratedMessage {
@@ -535,7 +537,7 @@ class Group extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasIdentifier() => $_has(0);
   @$pb.TagNumber(1)
-  void clearIdentifier() => clearField(1);
+  void clearIdentifier() => $_clearField(1);
 
   @$pb.TagNumber(2)
   $core.String get name => $_getSZ(1);
@@ -547,7 +549,7 @@ class Group extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.bool hasName() => $_has(1);
   @$pb.TagNumber(2)
-  void clearName() => clearField(2);
+  void clearName() => $_clearField(2);
 
   @$pb.TagNumber(3)
   $core.int get threshold => $_getIZ(2);
@@ -559,34 +561,34 @@ class Group extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.bool hasThreshold() => $_has(2);
   @$pb.TagNumber(3)
-  void clearThreshold() => clearField(3);
+  void clearThreshold() => $_clearField(3);
 
   @$pb.TagNumber(4)
   ProtocolType get protocol => $_getN(3);
   @$pb.TagNumber(4)
   set protocol(ProtocolType v) {
-    setField(4, v);
+    $_setField(4, v);
   }
 
   @$pb.TagNumber(4)
   $core.bool hasProtocol() => $_has(3);
   @$pb.TagNumber(4)
-  void clearProtocol() => clearField(4);
+  void clearProtocol() => $_clearField(4);
 
   @$pb.TagNumber(5)
   KeyType get keyType => $_getN(4);
   @$pb.TagNumber(5)
   set keyType(KeyType v) {
-    setField(5, v);
+    $_setField(5, v);
   }
 
   @$pb.TagNumber(5)
   $core.bool hasKeyType() => $_has(4);
   @$pb.TagNumber(5)
-  void clearKeyType() => clearField(5);
+  void clearKeyType() => $_clearField(5);
 
   @$pb.TagNumber(6)
-  $core.List<$core.List<$core.int>> get deviceIds => $_getList(5);
+  $pb.PbList<$core.List<$core.int>> get deviceIds => $_getList(5);
 
   @$pb.TagNumber(7)
   $core.String get note => $_getSZ(6);
@@ -598,7 +600,7 @@ class Group extends $pb.GeneratedMessage {
   @$pb.TagNumber(7)
   $core.bool hasNote() => $_has(6);
   @$pb.TagNumber(7)
-  void clearNote() => clearField(7);
+  void clearNote() => $_clearField(7);
 }
 
 class DevicesRequest extends $pb.GeneratedMessage {
@@ -689,7 +691,7 @@ class Devices extends $pb.GeneratedMessage {
   static Devices? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.List<Device> get devices => $_getList(0);
+  $pb.PbList<Device> get devices => $_getList(0);
 }
 
 class Device extends $pb.GeneratedMessage {
@@ -775,7 +777,7 @@ class Device extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasIdentifier() => $_has(0);
   @$pb.TagNumber(1)
-  void clearIdentifier() => clearField(1);
+  void clearIdentifier() => $_clearField(1);
 
   @$pb.TagNumber(2)
   $core.String get name => $_getSZ(1);
@@ -787,19 +789,19 @@ class Device extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.bool hasName() => $_has(1);
   @$pb.TagNumber(2)
-  void clearName() => clearField(2);
+  void clearName() => $_clearField(2);
 
   @$pb.TagNumber(3)
   DeviceKind get kind => $_getN(2);
   @$pb.TagNumber(3)
   set kind(DeviceKind v) {
-    setField(3, v);
+    $_setField(3, v);
   }
 
   @$pb.TagNumber(3)
   $core.bool hasKind() => $_has(2);
   @$pb.TagNumber(3)
-  void clearKind() => clearField(3);
+  void clearKind() => $_clearField(3);
 
   @$pb.TagNumber(4)
   $core.List<$core.int> get certificate => $_getN(3);
@@ -811,7 +813,7 @@ class Device extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.bool hasCertificate() => $_has(3);
   @$pb.TagNumber(4)
-  void clearCertificate() => clearField(4);
+  void clearCertificate() => $_clearField(4);
 
   @$pb.TagNumber(5)
   $fixnum.Int64 get lastActive => $_getI64(4);
@@ -823,7 +825,7 @@ class Device extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   $core.bool hasLastActive() => $_has(4);
   @$pb.TagNumber(5)
-  void clearLastActive() => clearField(5);
+  void clearLastActive() => $_clearField(5);
 }
 
 class SignRequest extends $pb.GeneratedMessage {
@@ -895,7 +897,7 @@ class SignRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasName() => $_has(0);
   @$pb.TagNumber(1)
-  void clearName() => clearField(1);
+  void clearName() => $_clearField(1);
 
   @$pb.TagNumber(2)
   $core.List<$core.int> get groupId => $_getN(1);
@@ -907,7 +909,7 @@ class SignRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.bool hasGroupId() => $_has(1);
   @$pb.TagNumber(2)
-  void clearGroupId() => clearField(2);
+  void clearGroupId() => $_clearField(2);
 
   @$pb.TagNumber(3)
   $core.List<$core.int> get data => $_getN(2);
@@ -919,7 +921,7 @@ class SignRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.bool hasData() => $_has(2);
   @$pb.TagNumber(3)
-  void clearData() => clearField(3);
+  void clearData() => $_clearField(3);
 }
 
 class DecryptRequest extends $pb.GeneratedMessage {
@@ -997,7 +999,7 @@ class DecryptRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasName() => $_has(0);
   @$pb.TagNumber(1)
-  void clearName() => clearField(1);
+  void clearName() => $_clearField(1);
 
   @$pb.TagNumber(2)
   $core.List<$core.int> get groupId => $_getN(1);
@@ -1009,7 +1011,7 @@ class DecryptRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.bool hasGroupId() => $_has(1);
   @$pb.TagNumber(2)
-  void clearGroupId() => clearField(2);
+  void clearGroupId() => $_clearField(2);
 
   @$pb.TagNumber(3)
   $core.List<$core.int> get data => $_getN(2);
@@ -1021,7 +1023,7 @@ class DecryptRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.bool hasData() => $_has(2);
   @$pb.TagNumber(3)
-  void clearData() => clearField(3);
+  void clearData() => $_clearField(3);
 
   @$pb.TagNumber(4)
   $core.String get dataType => $_getSZ(3);
@@ -1033,7 +1035,7 @@ class DecryptRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.bool hasDataType() => $_has(3);
   @$pb.TagNumber(4)
-  void clearDataType() => clearField(4);
+  void clearDataType() => $_clearField(4);
 }
 
 class TaskRequest extends $pb.GeneratedMessage {
@@ -1100,7 +1102,7 @@ class TaskRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasTaskId() => $_has(0);
   @$pb.TagNumber(1)
-  void clearTaskId() => clearField(1);
+  void clearTaskId() => $_clearField(1);
 
   @$pb.TagNumber(2)
   $core.List<$core.int> get deviceId => $_getN(1);
@@ -1112,7 +1114,7 @@ class TaskRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.bool hasDeviceId() => $_has(1);
   @$pb.TagNumber(2)
-  void clearDeviceId() => clearField(2);
+  void clearDeviceId() => $_clearField(2);
 }
 
 class Task extends $pb.GeneratedMessage {
@@ -1220,31 +1222,31 @@ class Task extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasId() => $_has(0);
   @$pb.TagNumber(1)
-  void clearId() => clearField(1);
+  void clearId() => $_clearField(1);
 
   @$pb.TagNumber(2)
   TaskType get type => $_getN(1);
   @$pb.TagNumber(2)
   set type(TaskType v) {
-    setField(2, v);
+    $_setField(2, v);
   }
 
   @$pb.TagNumber(2)
   $core.bool hasType() => $_has(1);
   @$pb.TagNumber(2)
-  void clearType() => clearField(2);
+  void clearType() => $_clearField(2);
 
   @$pb.TagNumber(3)
   Task_TaskState get state => $_getN(2);
   @$pb.TagNumber(3)
   set state(Task_TaskState v) {
-    setField(3, v);
+    $_setField(3, v);
   }
 
   @$pb.TagNumber(3)
   $core.bool hasState() => $_has(2);
   @$pb.TagNumber(3)
-  void clearState() => clearField(3);
+  void clearState() => $_clearField(3);
 
   @$pb.TagNumber(4)
   $core.int get round => $_getIZ(3);
@@ -1256,7 +1258,7 @@ class Task extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $core.bool hasRound() => $_has(3);
   @$pb.TagNumber(4)
-  void clearRound() => clearField(4);
+  void clearRound() => $_clearField(4);
 
   @$pb.TagNumber(5)
   $core.int get attempt => $_getIZ(4);
@@ -1268,7 +1270,7 @@ class Task extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   $core.bool hasAttempt() => $_has(4);
   @$pb.TagNumber(5)
-  void clearAttempt() => clearField(5);
+  void clearAttempt() => $_clearField(5);
 
   @$pb.TagNumber(6)
   $core.int get accept => $_getIZ(5);
@@ -1280,7 +1282,7 @@ class Task extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   $core.bool hasAccept() => $_has(5);
   @$pb.TagNumber(6)
-  void clearAccept() => clearField(6);
+  void clearAccept() => $_clearField(6);
 
   @$pb.TagNumber(7)
   $core.int get reject => $_getIZ(6);
@@ -1292,10 +1294,10 @@ class Task extends $pb.GeneratedMessage {
   @$pb.TagNumber(7)
   $core.bool hasReject() => $_has(6);
   @$pb.TagNumber(7)
-  void clearReject() => clearField(7);
+  void clearReject() => $_clearField(7);
 
   @$pb.TagNumber(8)
-  $core.List<$core.List<$core.int>> get data => $_getList(7);
+  $pb.PbList<$core.List<$core.int>> get data => $_getList(7);
 
   @$pb.TagNumber(9)
   $core.List<$core.int> get request => $_getN(8);
@@ -1307,7 +1309,7 @@ class Task extends $pb.GeneratedMessage {
   @$pb.TagNumber(9)
   $core.bool hasRequest() => $_has(8);
   @$pb.TagNumber(9)
-  void clearRequest() => clearField(9);
+  void clearRequest() => $_clearField(9);
 }
 
 class TaskUpdate extends $pb.GeneratedMessage {
@@ -1378,10 +1380,10 @@ class TaskUpdate extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasTask() => $_has(0);
   @$pb.TagNumber(1)
-  void clearTask() => clearField(1);
+  void clearTask() => $_clearField(1);
 
   @$pb.TagNumber(2)
-  $core.List<$core.List<$core.int>> get data => $_getList(1);
+  $pb.PbList<$core.List<$core.int>> get data => $_getList(1);
 
   @$pb.TagNumber(3)
   $core.int get attempt => $_getIZ(2);
@@ -1393,7 +1395,7 @@ class TaskUpdate extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $core.bool hasAttempt() => $_has(2);
   @$pb.TagNumber(3)
-  void clearAttempt() => clearField(3);
+  void clearAttempt() => $_clearField(3);
 }
 
 class TasksRequest extends $pb.GeneratedMessage {
@@ -1455,7 +1457,7 @@ class TasksRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasDeviceId() => $_has(0);
   @$pb.TagNumber(1)
-  void clearDeviceId() => clearField(1);
+  void clearDeviceId() => $_clearField(1);
 }
 
 class Tasks extends $pb.GeneratedMessage {
@@ -1506,7 +1508,7 @@ class Tasks extends $pb.GeneratedMessage {
   static Tasks? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.List<Task> get tasks => $_getList(0);
+  $pb.PbList<Task> get tasks => $_getList(0);
 }
 
 class GroupsRequest extends $pb.GeneratedMessage {
@@ -1568,7 +1570,7 @@ class GroupsRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasDeviceId() => $_has(0);
   @$pb.TagNumber(1)
-  void clearDeviceId() => clearField(1);
+  void clearDeviceId() => $_clearField(1);
 }
 
 class Groups extends $pb.GeneratedMessage {
@@ -1619,7 +1621,7 @@ class Groups extends $pb.GeneratedMessage {
   static Groups? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.List<Group> get groups => $_getList(0);
+  $pb.PbList<Group> get groups => $_getList(0);
 }
 
 class Resp extends $pb.GeneratedMessage {
@@ -1678,7 +1680,7 @@ class Resp extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasMessage() => $_has(0);
   @$pb.TagNumber(1)
-  void clearMessage() => clearField(1);
+  void clearMessage() => $_clearField(1);
 }
 
 class TaskDecision extends $pb.GeneratedMessage {
@@ -1745,7 +1747,7 @@ class TaskDecision extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasTask() => $_has(0);
   @$pb.TagNumber(1)
-  void clearTask() => clearField(1);
+  void clearTask() => $_clearField(1);
 
   @$pb.TagNumber(2)
   $core.bool get accept => $_getBF(1);
@@ -1757,7 +1759,7 @@ class TaskDecision extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.bool hasAccept() => $_has(1);
   @$pb.TagNumber(2)
-  void clearAccept() => clearField(2);
+  void clearAccept() => $_clearField(2);
 }
 
 class TaskAcknowledgement extends $pb.GeneratedMessage {
@@ -1819,7 +1821,7 @@ class TaskAcknowledgement extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasTaskId() => $_has(0);
   @$pb.TagNumber(1)
-  void clearTaskId() => clearField(1);
+  void clearTaskId() => $_clearField(1);
 }
 
 class LogRequest extends $pb.GeneratedMessage {
@@ -1878,7 +1880,7 @@ class LogRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $core.bool hasMessage() => $_has(0);
   @$pb.TagNumber(1)
-  void clearMessage() => clearField(1);
+  void clearMessage() => $_clearField(1);
 }
 
 class SubscribeRequest extends $pb.GeneratedMessage {

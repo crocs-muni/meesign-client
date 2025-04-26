@@ -3,7 +3,7 @@ import 'package:meesign_network/grpc.dart' as rpc;
 
 enum KeyType {
   signPdf([Protocol.gg18]),
-  signChallenge([Protocol.gg18, Protocol.frost]),
+  signChallenge([Protocol.gg18, Protocol.frost, Protocol.musig2]),
   decrypt([Protocol.elgamal]);
 
   final List<Protocol> supportedProtocols;
