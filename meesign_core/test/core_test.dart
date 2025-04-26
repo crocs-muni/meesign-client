@@ -250,6 +250,15 @@ void main() {
         tags: 'large',
       );
     });
+    group('musig2', () {
+      test('2-2', () => testSignChallenge(Protocol.musig2, n: 2, t: 2));
+      test('3-3', () => testSignChallenge(Protocol.musig2, n: 3, t: 3));
+      test(
+        '15-15',
+        () => testSignChallenge(Protocol.musig2, n: 15, t: 15),
+        tags: 'large',
+      );
+    });
   });
 
   group('decrypt', () {

@@ -2,7 +2,7 @@
 //  Generated code. Do not modify.
 //  source: meesign.proto
 //
-// @dart = 2.12
+// @dart = 3.3
 
 // ignore_for_file: annotate_overrides, camel_case_types, comment_references
 // ignore_for_file: constant_identifier_names, library_prefixes
@@ -20,18 +20,21 @@ class ProtocolType extends $pb.ProtobufEnum {
       ProtocolType._(1, _omitEnumNames ? '' : 'ELGAMAL');
   static const ProtocolType FROST =
       ProtocolType._(2, _omitEnumNames ? '' : 'FROST');
+  static const ProtocolType MUSIG2 =
+      ProtocolType._(3, _omitEnumNames ? '' : 'MUSIG2');
 
   static const $core.List<ProtocolType> values = <ProtocolType>[
     GG18,
     ELGAMAL,
     FROST,
+    MUSIG2,
   ];
 
   static final $core.Map<$core.int, ProtocolType> _byValue =
       $pb.ProtobufEnum.initByValue(values);
   static ProtocolType? valueOf($core.int value) => _byValue[value];
 
-  const ProtocolType._($core.int v, $core.String n) : super(v, n);
+  const ProtocolType._(super.v, super.n);
 }
 
 class KeyType extends $pb.ProtobufEnum {
@@ -50,7 +53,7 @@ class KeyType extends $pb.ProtobufEnum {
       $pb.ProtobufEnum.initByValue(values);
   static KeyType? valueOf($core.int value) => _byValue[value];
 
-  const KeyType._($core.int v, $core.String n) : super(v, n);
+  const KeyType._(super.v, super.n);
 }
 
 class TaskType extends $pb.ProtobufEnum {
@@ -73,7 +76,7 @@ class TaskType extends $pb.ProtobufEnum {
       $pb.ProtobufEnum.initByValue(values);
   static TaskType? valueOf($core.int value) => _byValue[value];
 
-  const TaskType._($core.int v, $core.String n) : super(v, n);
+  const TaskType._(super.v, super.n);
 }
 
 class DeviceKind extends $pb.ProtobufEnum {
@@ -89,7 +92,7 @@ class DeviceKind extends $pb.ProtobufEnum {
       $pb.ProtobufEnum.initByValue(values);
   static DeviceKind? valueOf($core.int value) => _byValue[value];
 
-  const DeviceKind._($core.int v, $core.String n) : super(v, n);
+  const DeviceKind._(super.v, super.n);
 }
 
 class Task_TaskState extends $pb.ProtobufEnum {
@@ -113,7 +116,7 @@ class Task_TaskState extends $pb.ProtobufEnum {
       $pb.ProtobufEnum.initByValue(values);
   static Task_TaskState? valueOf($core.int value) => _byValue[value];
 
-  const Task_TaskState._($core.int v, $core.String n) : super(v, n);
+  const Task_TaskState._(super.v, super.n);
 }
 
 const _omitEnumNames = $core.bool.fromEnvironment('protobuf.omit_enum_names');
