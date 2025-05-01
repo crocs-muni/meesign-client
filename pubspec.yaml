@@ -78,6 +78,7 @@ dependencies:
   flutter_slidable: ^4.0.0
   lottie: ^3.3.0
   skeletonizer: ^1.4.3
+  flutter_launcher_icons: ^0.14.3
 
 dev_dependencies:
   flutter_test:
