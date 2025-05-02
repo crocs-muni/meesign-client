@@ -10,8 +10,10 @@ import '../widget/device_suggestion_tile.dart';
 import '../widget/no_results_placeholder.dart';
 
 class SearchPeerPage extends StatefulWidget {
-  const SearchPeerPage({super.key, required this.initialSelection});
+  const SearchPeerPage(
+      {super.key, required this.initialSelection, required this.currentDevice});
   final List<Device> initialSelection;
+  final Device currentDevice;
 
   @override
   State<SearchPeerPage> createState() => _SearchPeerPageState();
@@ -113,9 +115,11 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
                   active: _isActive(device),
                   // TODO: don't recompute this?
                   selected: _selection.any((elem) => elem.id == device.id),
-                  onChanged: (value) {
-                    if (value != null) _changeSelection(device, value);
-                  },
+                  onChanged: device.id == widget.currentDevice.id
+                      ? null
+                      : (value) {
+                          if (value != null) _changeSelection(device, value);
+                        },
                 );
               },
             ),

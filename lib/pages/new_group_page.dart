@@ -12,6 +12,7 @@ import 'dart:io';
 
 import '../app_container.dart';
 import '../routes.dart';
+import '../sessions/user_session.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
 import '../util/chars.dart';
@@ -73,12 +74,19 @@ class _NewGroupPageState extends State<NewGroupPage> {
     session.deviceRepository
         .getDevice(session.user.did)
         .then((device) => setState(() => _members.add(Member(device, 1))));
+
+    setInitialDevices(session);
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     super.dispose();
+  }
+
+  // This serves to auto-select current device on search-peers page
+  Future<void> setInitialDevices(UserSession session) async {
+    _devices.add(await session.deviceRepository.getDevice(session.user.did));
   }
 
   void _setThreshold(int value) =>
@@ -99,11 +107,15 @@ class _NewGroupPageState extends State<NewGroupPage> {
       _members.any((member) => member.device.kind == DeviceKind.bot);
 
   void _selectPeer(String route) async {
-    final devicesSelection =
-        await Navigator.of(context, rootNavigator: false).push(
+    final session = context.read<AppContainer>().session!;
+    final navigator = Navigator.of(context, rootNavigator: false);
+    Device device = await session.deviceRepository.getDevice(session.user.did);
+
+    final devicesSelection = await navigator.push(
       MaterialPageRoute(
           builder: (context) => SearchPeerPage(
                 initialSelection: _devices,
+                currentDevice: device,
               )),
     );
 
