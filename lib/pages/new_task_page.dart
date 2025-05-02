@@ -295,7 +295,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
         .where((task) =>
             task.state == TaskState.finished &&
             task.info.keyType == _taskType &&
-            (state.showArchived || !task.archived))
+            !task.archived)
         .map((task) => task.info);
 
     return Column(
@@ -311,7 +311,8 @@ class _NewTaskPageState extends State<NewTaskPage> {
         ),
         if (groups.isEmpty)
           Padding(
-            padding: const EdgeInsets.only(left: MEDIUM_PADDING),
+            padding:
+                const EdgeInsets.only(left: MEDIUM_PADDING, top: SMALL_PADDING),
             child: Text(
               'No groups available for this type of task yet.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
