@@ -8,7 +8,7 @@ import '../ui_constants.dart';
 import '../widget/smart_logo.dart';
 
 class AboutPage extends StatelessWidget {
-  static const version = '0.4.2';
+  static const version = '0.5.0';
 
   static const crocsAuth = 'crocs.fi.muni.cz';
   static const meesignAuth = 'meesign.$crocsAuth';
@@ -17,8 +17,11 @@ class AboutPage extends StatelessWidget {
   static const authors = [
     (name: 'Antonín Dufka', github: 'dufkan'),
     (name: 'Jiří Gavenda', github: 'jirigav'),
+    (name: 'Robin Chmelík', github: 'Ojin13'),
+    (name: 'Ondřej Chudáček', github: 'SPXcz'),
     (name: 'Jakub Janků', github: 'jjanku'),
     (name: 'Kristián Mika', github: 'KristianMika'),
+    (name: 'Marek Mračna', github: 'MarekMracna'),
     (name: 'Petr Švenda', github: 'petrs'),
   ];
 
