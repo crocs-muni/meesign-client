@@ -128,12 +128,19 @@ class _HomePageViewState extends State<HomePageView> {
 
     _tabs = <NavigationTabModel>[
       NavigationTabModel(
-        label: 'All Tasks',
+        label: 'Completed',
         child: TaskListing(),
+        icon: Icon(Symbols.task_alt),
+      ),
+      NavigationTabModel(
+        label: 'Pending',
+        child: TaskListing(
+          showOnlyPending: true,
+        ),
         icon: _buildCounterIcon(
           stream: context.watch<AppViewModel>().nAllReqs,
-          icon: Symbols.task_alt,
-          fillIcon: context.read<TabsViewModel>().index == 0,
+          icon: Symbols.pending_actions,
+          fillIcon: context.read<TabsViewModel>().index == 1,
         ),
       ),
       NavigationTabModel(
@@ -142,7 +149,7 @@ class _HomePageViewState extends State<HomePageView> {
         icon: _buildCounterIcon(
           stream: context.watch<AppViewModel>().nGroupReqs,
           icon: Symbols.group,
-          fillIcon: context.read<TabsViewModel>().index == 1,
+          fillIcon: context.read<TabsViewModel>().index == 2,
         ),
       ),
       NavigationTabModel(

@@ -29,6 +29,7 @@ class GroupsListingPage extends StatelessWidget {
                 tasks: model.groupTasks,
                 emptyView: _buildEmptyGroups(context),
                 showArchived: model.showArchived,
+                showAllTypes: true,
                 taskBuilder: (context, task) {
                   final group = task.info;
                   return GroupTaskTile(task: task, group: group);

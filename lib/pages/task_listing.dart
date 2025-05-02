@@ -3,13 +3,8 @@ import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
 import '../enums/fab_type.dart';
-import '../enums/task_type.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
-import '../util/actions/challenge_creator.dart';
-import '../util/actions/document_signer.dart';
-import '../util/actions/encrypt_data.dart';
-import '../util/actions/task_type_selector.dart';
 import '../view_model/app_view_model.dart';
 import '../view_model/tabs_view_model.dart';
 import '../widget/controlled_lottie_animation.dart';
@@ -18,9 +13,12 @@ import '../widget/task_list_view.dart';
 import '../widget/task_tiles/challenge_task_tile.dart';
 import '../widget/task_tiles/decrypt_task_tile.dart';
 import '../widget/task_tiles/signing_task_tile.dart';
+import 'new_task_page.dart';
 
 class TaskListing extends StatelessWidget {
-  const TaskListing({super.key});
+  const TaskListing({super.key, this.showOnlyPending = false});
+
+  final bool showOnlyPending;
 
   @override
   Widget build(BuildContext context) {
@@ -33,8 +31,12 @@ class TaskListing extends StatelessWidget {
             floatingActionButton: _buildFab(context, model),
             body: TaskListView(
               tasks: model.allTasks,
-              emptyView: _buildEmptySignTasks(context, model),
+              emptyView: showOnlyPending
+                  ? _buildNoPendingTasks(context, model)
+                  : _buildEmptySignTasks(context, model),
               showArchived: model.showArchived,
+              showOnlyPending: showOnlyPending,
+              mergeCompletedFailed: true,
               taskBuilder: (context, task) {
                 // Signing tasks
                 if (task is Task<File>) {
@@ -101,13 +103,64 @@ class TaskListing extends StatelessWidget {
                   final tabViewModel =
                       Provider.of<TabsViewModel>(context, listen: false);
 
-                  tabViewModel.setIndex(1);
+                  tabViewModel.setIndex(2);
                 },
                 child: const Text('Create group'),
               ),
               const SizedBox(height: MEDIUM_GAP),
               ElevatedButton(
                 onPressed: () async {
+                  Navigator.of(context, rootNavigator: false).push(
+                    MaterialPageRoute(builder: (context) => NewTaskPage()),
+                  );
+                },
+                child: const Text('Create new task'),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNoPendingTasks(BuildContext context, AppViewModel viewModel) {
+    return Center(
+      child: SingleChildScrollView(
+        child: SizedBox(
+          width: double.infinity,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(bottom: MEDIUM_PADDING),
+                child: ControlledLottieAnimation(
+                  startAtTabIndex: 0,
+                  assetName: 'assets/lottie/sign.json',
+                  stopAtPercentage: 0.2,
+                  width: 400,
+                  fit: BoxFit.fitWidth,
+                ),
+              ),
+              const Text(
+                'All tasks are completed',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: SMALL_GAP),
+              const Text(
+                'Once there is something to sign, we will let you know.',
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: LARGE_GAP),
+              ElevatedButton(
+                onPressed: () async {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (context) => NewTaskPage(),
+                    ),
+                  );
+
+                  /*
                   TaskType? result = await showTaskTypeDialog(context);
 
                   if (context.mounted) {
@@ -119,6 +172,7 @@ class TaskListing extends StatelessWidget {
                       createChallenge(context, context);
                     }
                   }
+                   */
                 },
                 child: const Text('Create new task'),
               )

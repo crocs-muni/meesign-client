@@ -10,6 +10,9 @@ class TaskListView<T> extends StatelessWidget {
   final Widget emptyView;
   final Widget Function(BuildContext, Task<T>) taskBuilder;
   final bool showArchived;
+  final bool showOnlyPending;
+  final bool showAllTypes;
+  final bool mergeCompletedFailed;
 
   const TaskListView({
     super.key,
@@ -17,6 +20,9 @@ class TaskListView<T> extends StatelessWidget {
     required this.emptyView,
     required this.taskBuilder,
     this.showArchived = false,
+    this.showOnlyPending = false,
+    this.showAllTypes = false,
+    this.mergeCompletedFailed = false,
   });
 
   @override
@@ -27,20 +33,25 @@ class TaskListView<T> extends StatelessWidget {
       return switch (task.state) {
         TaskState.finished => TaskListSection.finished,
         TaskState.failed => switch (task.error) {
-            TaskError.rejected => TaskListSection.rejected,
+            TaskError.rejected => mergeCompletedFailed
+                ? TaskListSection.finished
+                : TaskListSection.rejected,
             _ => TaskListSection.failed,
           },
         _ => TaskListSection.requests,
       };
     });
 
-    final sections = [
-      TaskListSection.requests,
-      TaskListSection.finished,
-      TaskListSection.rejected,
-      if (taskGroups[TaskListSection.failed] != null) TaskListSection.failed,
-      if (showArchived) TaskListSection.archived,
-    ];
+    var sections = showOnlyPending
+        ? [TaskListSection.requests]
+        : [
+            if (showAllTypes) TaskListSection.requests,
+            TaskListSection.finished,
+            if (showAllTypes) TaskListSection.rejected,
+            if (taskGroups[TaskListSection.failed] != null)
+              TaskListSection.failed,
+            if (showArchived) TaskListSection.archived,
+          ];
 
     final taskCount = sections.map((s) => (taskGroups[s] ?? []).length).sum;
 
@@ -174,7 +185,7 @@ class TaskListView<T> extends StatelessWidget {
     } else if (T == File) {
       return 'Joined signings';
     } else {
-      return 'Signed or decrypted';
+      return 'Signed, decrypted or rejected';
     }
   }
 
