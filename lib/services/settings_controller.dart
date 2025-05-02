@@ -83,6 +83,7 @@ class SettingsController {
     sharedPreferences.setString("$deviceName/$host", id);
   }
 
+  // Used to check if provided name on provided server is already registered
   Future<String?> getSavedUserId(String deviceName, String host) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     return sharedPreferences.getString("$deviceName/$host");
