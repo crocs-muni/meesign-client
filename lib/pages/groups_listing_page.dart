@@ -56,7 +56,7 @@ class GroupsListingPage extends StatelessWidget {
             Padding(
               padding: EdgeInsets.only(bottom: MEDIUM_PADDING),
               child: ControlledLottieAnimation(
-                startAtTabIndex: 1,
+                startAtTabIndex: 2,
                 assetName: Theme.of(context).brightness == Brightness.light
                     ? 'assets/lottie/groups_light_mode.json'
                     : 'assets/lottie/groups_dark_mode.json',

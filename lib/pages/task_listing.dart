@@ -32,8 +32,18 @@ class TaskListing extends StatelessWidget {
             body: TaskListView(
               tasks: model.allTasks,
               emptyView: showOnlyPending
-                  ? _buildNoPendingTasks(context, model)
-                  : _buildEmptySignTasks(context, model),
+                  ? _buildEmptyTasks(
+                      context,
+                      model,
+                      'All tasks are completed',
+                      'Once there is something to sign, we will let you know.',
+                      1)
+                  : _buildEmptyTasks(
+                      context,
+                      model,
+                      'No tasks available',
+                      'Start by creating a challenge, decrypt or signing group.',
+                      0),
               showArchived: model.showArchived,
               showOnlyPending: showOnlyPending,
               mergeCompletedFailed: true,
@@ -70,7 +80,8 @@ class TaskListing extends StatelessWidget {
         fabType: FabType.newTaskFab, buildContext: context, viewModel: model);
   }
 
-  Widget _buildEmptySignTasks(BuildContext context, AppViewModel viewModel) {
+  Widget _buildEmptyTasks(BuildContext context, AppViewModel viewModel,
+      String heading, String subheading, int animationStartIndex) {
     return Center(
       child: SingleChildScrollView(
         child: SizedBox(
@@ -81,20 +92,20 @@ class TaskListing extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(bottom: MEDIUM_PADDING),
                 child: ControlledLottieAnimation(
-                  startAtTabIndex: 0,
+                  startAtTabIndex: animationStartIndex,
                   assetName: 'assets/lottie/sign.json',
                   stopAtPercentage: 0.2,
                   width: 400,
                   fit: BoxFit.fitWidth,
                 ),
               ),
-              const Text(
-                'No tasks available',
+              Text(
+                heading,
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: SMALL_GAP),
-              const Text(
-                'Start by creating a challenge, decrypt or signing group.',
+              Text(
+                subheading,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: LARGE_GAP),
@@ -113,66 +124,6 @@ class TaskListing extends StatelessWidget {
                   Navigator.of(context, rootNavigator: false).push(
                     MaterialPageRoute(builder: (context) => NewTaskPage()),
                   );
-                },
-                child: const Text('Create new task'),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNoPendingTasks(BuildContext context, AppViewModel viewModel) {
-    return Center(
-      child: SingleChildScrollView(
-        child: SizedBox(
-          width: double.infinity,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: EdgeInsets.only(bottom: MEDIUM_PADDING),
-                child: ControlledLottieAnimation(
-                  startAtTabIndex: 0,
-                  assetName: 'assets/lottie/sign.json',
-                  stopAtPercentage: 0.2,
-                  width: 400,
-                  fit: BoxFit.fitWidth,
-                ),
-              ),
-              const Text(
-                'All tasks are completed',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: SMALL_GAP),
-              const Text(
-                'Once there is something to sign, we will let you know.',
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: LARGE_GAP),
-              ElevatedButton(
-                onPressed: () async {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (context) => NewTaskPage(),
-                    ),
-                  );
-
-                  /*
-                  TaskType? result = await showTaskTypeDialog(context);
-
-                  if (context.mounted) {
-                    if (result == TaskType.sign) {
-                      signDocument(context, context);
-                    } else if (result == TaskType.decrypt) {
-                      encryptData(context, context);
-                    } else if (result == TaskType.challenge) {
-                      createChallenge(context, context);
-                    }
-                  }
-                   */
                 },
                 child: const Text('Create new task'),
               )

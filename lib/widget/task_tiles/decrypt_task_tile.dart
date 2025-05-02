@@ -64,12 +64,16 @@ class DecryptTaskTile extends StatelessWidget {
     final countdown =
         Stream.periodic(refreshInterval, (i) => max(0, steps - i));
     final countdownSubject = BehaviorSubject<int>();
+    bool isDialogOpen = true;
     final sub = countdown.listen((value) {
       countdownSubject.add(value);
 
-      if (value == 0) {
+      // We need to check if isDialogOpen, to avoid closing the dialog multiple times
+      // and jumping out of the navigator stack
+      if (value == 0 && isDialogOpen) {
+        isDialogOpen = false;
         if (context.mounted) {
-          Navigator.pop(context);
+          Navigator.of(context, rootNavigator: true).pop();
         }
       }
     });
