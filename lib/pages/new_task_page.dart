@@ -19,9 +19,11 @@ import '../widget/group_suggestion_tile.dart';
 import '../widget/option_tile.dart';
 
 class NewTaskPage extends StatefulWidget {
-  const NewTaskPage({super.key, this.initialTaskType});
+  const NewTaskPage(
+      {super.key, this.initialTaskType, this.showTaskTypeSelector = false});
 
   final KeyType? initialTaskType;
+  final bool showTaskTypeSelector;
   @override
   State<NewTaskPage> createState() => _NewTaskPageState();
 }
@@ -62,7 +64,9 @@ class _NewTaskPageState extends State<NewTaskPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildTaskTypeSelector(),
+          if (widget.showTaskTypeSelector) ...[
+            _buildTaskTypeSelector(),
+          ],
           _buildGroupSelector(context),
           Divider(
             height: 1,
