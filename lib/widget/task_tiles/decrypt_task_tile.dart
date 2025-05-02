@@ -33,6 +33,7 @@ class DecryptTaskTile extends StatelessWidget {
     return TaskTile(
       task: task,
       name: task.info.name,
+      showDetailRow: false,
       desc: StatusMessage.getStatusMessage(task),
       actionChip: GroupChip(group: task.info.group),
       approveActions: [

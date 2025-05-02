@@ -28,6 +28,7 @@ class ChallengeTaskTile extends StatelessWidget {
     return TaskTile(
       task: task,
       name: task.info.name,
+      showDetailRow: false,
       actionChip: GroupChip(group: task.info.group),
       approveActions: [
         FilledButton.tonal(

@@ -25,6 +25,7 @@ class SigningTaskTile extends StatelessWidget {
     return TaskTile(
       task: task,
       name: task.info.basename,
+      showDetailRow: false,
       actionChip: GroupChip(group: task.info.group),
       actions: <Widget>[
         FilledButton.tonal(

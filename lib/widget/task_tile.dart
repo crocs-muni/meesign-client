@@ -21,6 +21,7 @@ class TaskTile<T> extends StatelessWidget {
   final List<Widget> children;
   final void Function(bool)? onArchiveChange;
   final bool showTaskTypeInfo;
+  final bool showDetailRow;
 
   const TaskTile({
     super.key,
@@ -36,6 +37,7 @@ class TaskTile<T> extends StatelessWidget {
     this.children = const [],
     this.onArchiveChange,
     this.showTaskTypeInfo = true,
+    this.showDetailRow = true,
   });
 
   @override
@@ -162,23 +164,33 @@ class TaskTile<T> extends StatelessWidget {
       taskGroup = task.info.group;
     }
 
+    if (task is Task<Group>) {
+      text = "Group";
+      taskGroup = task.info;
+    }
+
     return Row(
       children: [
         _buildGroupMetaDataRow(Symbols.flag, text, context),
-        LayoutBuilder(builder: (context, constraints) {
-          return Row(
-            children: [
-              if (MediaQuery.sizeOf(context).width > minLaptopLayoutWidth) ...[
-                SizedBox(width: LARGE_GAP),
-                _buildGroupMetaDataRow(Symbols.code,
-                    taskGroup?.protocol.name.toUpperCase() ?? "", context),
-                SizedBox(width: LARGE_GAP),
-                _buildGroupMetaDataRow(Symbols.donut_large,
-                    '${taskGroup?.threshold} / ${taskGroup?.shares}', context),
-              ]
-            ],
-          );
-        }),
+        if (showDetailRow) ...[
+          LayoutBuilder(builder: (context, constraints) {
+            return Row(
+              children: [
+                if (MediaQuery.sizeOf(context).width >
+                    minLaptopLayoutWidth) ...[
+                  SizedBox(width: LARGE_GAP),
+                  _buildGroupMetaDataRow(Symbols.code,
+                      taskGroup?.protocol.name.toUpperCase() ?? "", context),
+                  SizedBox(width: LARGE_GAP),
+                  _buildGroupMetaDataRow(
+                      Symbols.donut_large,
+                      '${taskGroup?.threshold} / ${taskGroup?.shares}',
+                      context),
+                ]
+              ],
+            );
+          })
+        ]
       ],
     );
   }
