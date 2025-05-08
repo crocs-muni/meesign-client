@@ -110,9 +110,11 @@ flutter:
     - assets/ca-cert.pem
     - assets/lottie/groups_dark_mode.json
     - assets/lottie/groups_light_mode.json
-    - assets/lottie/sign.json
-    - assets/lottie/challenge.json
-    - assets/lottie/decrypt.json
+    - assets/lottie/sign_light_mode.json
+    - assets/lottie/sign_dark_mode.json
+    - assets/lottie/challenge_universal.json
+    - assets/lottie/decrypt_light_mode.json
+    - assets/lottie/decrypt_dark_mode.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

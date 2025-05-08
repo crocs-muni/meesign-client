@@ -63,8 +63,9 @@ class DecryptListingPage extends StatelessWidget {
                 padding: EdgeInsets.only(bottom: MEDIUM_PADDING),
                 child: ControlledLottieAnimation(
                   startAtTabIndex: 2,
-                  assetName: 'assets/lottie/decrypt.json',
-                  stopAtPercentage: 0.5,
+                  assetName: Theme.of(context).brightness == Brightness.light
+                      ? 'assets/lottie/decrypt_light_mode.json'
+                      : 'assets/lottie/decrypt_dark_mode.json',
                   width: 400,
                   fit: BoxFit.fitWidth,
                 ),
