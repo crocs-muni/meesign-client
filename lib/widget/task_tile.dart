@@ -165,7 +165,11 @@ class TaskTile<T> extends StatelessWidget {
     }
 
     if (task is Task<Group>) {
-      text = "Group";
+      text = switch (task.info.keyType) {
+        KeyType.signPdf => 'Sign PDF',
+        KeyType.signChallenge => 'Challenge',
+        KeyType.decrypt => 'Decrypt',
+      };
       taskGroup = task.info;
     }
 
