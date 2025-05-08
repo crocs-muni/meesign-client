@@ -190,10 +190,14 @@ class TaskTile<T> extends StatelessWidget {
                       Symbols.donut_large,
                       '${taskGroup?.threshold} / ${taskGroup?.shares}',
                       context),
-                ]
+                ],
               ],
             );
           })
+        ],
+        if (task.archived) ...[
+          SizedBox(width: LARGE_GAP),
+          _buildGroupMetaDataRow(Symbols.archive, 'Archived', context),
         ]
       ],
     );
