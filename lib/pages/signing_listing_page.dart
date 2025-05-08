@@ -62,7 +62,9 @@ class SigningListingPage extends StatelessWidget {
                 padding: EdgeInsets.only(bottom: MEDIUM_PADDING),
                 child: ControlledLottieAnimation(
                   startAtTabIndex: 0,
-                  assetName: 'assets/lottie/sign.json',
+                  assetName: Theme.of(context).brightness == Brightness.light
+                      ? 'assets/lottie/sign_light_mode.json'
+                      : 'assets/lottie/sign_dark_mode.json',
                   stopAtPercentage: 0.2,
                   width: 400,
                   fit: BoxFit.fitWidth,
