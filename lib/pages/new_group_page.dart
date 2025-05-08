@@ -198,7 +198,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
           ),
           onPressed: _tryCreate,
           label: const Text('Create'),
-          icon: Icon(Icons.create_new_folder)),
+          icon: Icon(Icons.send_rounded)),
     );
   }
 

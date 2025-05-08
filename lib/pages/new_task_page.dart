@@ -5,7 +5,6 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:mime/mime.dart';
 import 'package:provider/provider.dart';
@@ -59,7 +58,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
   Widget build(BuildContext context) {
     return DefaultPageTemplate(
       showAppBar: true,
-      appBarTitle: "Create new task 🚀",
+      appBarTitle: "Create new task",
       wrapInScroll: true,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -409,7 +408,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
           child: Text('Create ${_getTaskTypeDescription()} task'),
         ),
         icon: const Icon(
-          Symbols.create_new_folder,
+          Icons.send_rounded,
         ),
         style: ButtonStyle(
           shape: WidgetStateProperty.all<RoundedRectangleBorder>(

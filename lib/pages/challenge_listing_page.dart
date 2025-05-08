@@ -51,6 +51,10 @@ class ChallengeListingPage extends StatelessWidget {
   }
 
   Widget _buildEmptyChallengeTasks(BuildContext context) {
+    bool groupForTaskExists = context
+        .read<AppViewModel>()
+        .joinedGroupForTaskTypeExists(KeyType.signChallenge);
+
     return Center(
       child: SingleChildScrollView(
         child: SizedBox(
@@ -73,31 +77,32 @@ class ChallengeListingPage extends StatelessWidget {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: SMALL_GAP),
-              const Text(
-                'Start by creating a group for challenges.',
+              Text(
+                groupForTaskExists
+                    ? 'Start by creating a new challenge.'
+                    : 'Start by creating a group for challenges.',
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: LARGE_GAP),
-              ElevatedButton(
-                onPressed: () {
-                  final tabViewModel =
-                      Provider.of<TabsViewModel>(context, listen: false);
+              if (!groupForTaskExists) ...[
+                ElevatedButton(
+                  onPressed: () {
+                    final tabViewModel =
+                        Provider.of<TabsViewModel>(context, listen: false);
 
-                  tabViewModel.setIndex(3);
-                },
-                child: const Text('Create a challenge group'),
-              ),
-              if (context
-                  .read<AppViewModel>()
-                  .joinedGroupForTaskTypeExists(KeyType.signChallenge)) ...[
-                const SizedBox(height: MEDIUM_GAP),
+                    tabViewModel.setIndex(3,
+                        postNavigationAction: 'createGroup');
+                  },
+                  child: const Text('Create a challenge group'),
+                ),
+              ] else ...[
                 ElevatedButton(
                   onPressed: () {
                     createChallenge(context, context);
                   },
                   child: const Text('Create a challenge'),
                 )
-              ],
+              ]
             ],
           ),
         ),

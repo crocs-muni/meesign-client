@@ -48,6 +48,10 @@ class DecryptListingPage extends StatelessWidget {
   }
 
   Widget _buildEmptyDecryptTasks(BuildContext context) {
+    bool groupForTaskExists = context
+        .read<AppViewModel>()
+        .joinedGroupForTaskTypeExists(KeyType.decrypt);
+
     return Center(
       child: SingleChildScrollView(
         child: SizedBox(
@@ -70,31 +74,32 @@ class DecryptListingPage extends StatelessWidget {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: SMALL_GAP),
-              const Text(
-                'Start by creating a group for decryption.',
+              Text(
+                groupForTaskExists
+                    ? 'Start by creating a new encryption task.'
+                    : 'Start by creating a group for encryption.',
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: LARGE_GAP),
-              ElevatedButton(
-                onPressed: () {
-                  final tabViewModel =
-                      Provider.of<TabsViewModel>(context, listen: false);
+              if (!groupForTaskExists) ...[
+                ElevatedButton(
+                  onPressed: () {
+                    final tabViewModel =
+                        Provider.of<TabsViewModel>(context, listen: false);
 
-                  tabViewModel.setIndex(3);
-                },
-                child: const Text('Create a decrypt group'),
-              ),
-              if (context
-                  .read<AppViewModel>()
-                  .joinedGroupForTaskTypeExists(KeyType.decrypt)) ...[
-                const SizedBox(height: MEDIUM_GAP),
+                    tabViewModel.setIndex(3,
+                        postNavigationAction: 'createGroup');
+                  },
+                  child: const Text('Create an encryption group'),
+                )
+              ] else ...[
                 ElevatedButton(
                   onPressed: () {
                     encryptData(context, context);
                   },
-                  child: const Text('Decrypt message'),
+                  child: const Text('Encrypt message'),
                 )
-              ],
+              ]
             ],
           ),
         ),

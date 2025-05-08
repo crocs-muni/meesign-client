@@ -216,11 +216,6 @@ class AppViewModel with ChangeNotifier {
   }
 
   bool joinedGroupForTaskTypeExists(KeyType type) {
-    if (showArchived) {
-      return groupTasks.any((task) =>
-          task.info.keyType == type && task.state == TaskState.finished);
-    }
-
     return groupTasks
         .where((task) =>
             task.info.keyType == type && task.state == TaskState.finished)

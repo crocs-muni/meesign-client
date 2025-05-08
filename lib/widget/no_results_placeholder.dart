@@ -23,7 +23,7 @@ class NoResultsPlaceholder extends StatelessWidget {
           Icon(
             icon,
             size: 120,
-            color: Theme.of(context).colorScheme.onSecondary,
+            color: Theme.of(context).colorScheme.onSecondaryFixedVariant,
           ),
           SizedBox(height: SMALL_GAP),
           customLabel ??

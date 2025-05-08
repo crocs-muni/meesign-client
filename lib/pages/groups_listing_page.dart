@@ -12,8 +12,40 @@ import '../widget/fab_configurator.dart';
 import '../widget/task_tiles/group_task_tile.dart';
 import '../widget/task_list_view.dart';
 
-class GroupsListingPage extends StatelessWidget {
+import '../view_model/tabs_view_model.dart';
+
+class GroupsListingPage extends StatefulWidget {
   const GroupsListingPage({super.key});
+
+  @override
+  State<GroupsListingPage> createState() => _GroupsListingPageState();
+}
+
+class _GroupsListingPageState extends State<GroupsListingPage> {
+  late TabsViewModel _tabsViewModel;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabsViewModel = Provider.of<TabsViewModel>(context, listen: false);
+    _tabsViewModel.addListener(_onTabChanged);
+  }
+
+  @override
+  void dispose() {
+    _tabsViewModel.removeListener(_onTabChanged);
+    super.dispose();
+  }
+
+  void _onTabChanged() {
+    if (_tabsViewModel.index == 3) {
+      if (_tabsViewModel.postNavigationAction == 'createGroup') {
+        if (!_tabsViewModel.newGroupPageActive) {
+          createGroup(context, context);
+        }
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

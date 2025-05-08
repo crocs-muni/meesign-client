@@ -166,13 +166,13 @@ class TaskListView<T> extends StatelessWidget {
 
   String _getJoinedSectionHeading() {
     if (T == Group) {
-      return 'Joined groups';
+      return 'Accepted groups';
     } else if (T == Challenge) {
-      return 'Joined challenges';
+      return 'Accepted challenges';
     } else if (T == Decrypt) {
-      return 'Joined decryptions';
+      return 'Accepted decryptions';
     } else if (T == File) {
-      return 'Joined signings';
+      return 'Accepted signings';
     } else {
       return 'Signed or decrypted';
     }

@@ -47,6 +47,10 @@ class SigningListingPage extends StatelessWidget {
   }
 
   Widget _buildEmptySignTasks(BuildContext context) {
+    bool groupForTaskExists = context
+        .read<AppViewModel>()
+        .joinedGroupForTaskTypeExists(KeyType.signPdf);
+
     return Center(
       child: SingleChildScrollView(
         child: SizedBox(
@@ -69,24 +73,25 @@ class SigningListingPage extends StatelessWidget {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: SMALL_GAP),
-              const Text(
-                'Start by creating a group for signing.',
+              Text(
+                groupForTaskExists
+                    ? 'Start by creating a new signing task.'
+                    : 'Start by creating a group for signing',
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: LARGE_GAP),
-              ElevatedButton(
-                onPressed: () {
-                  final tabViewModel =
-                      Provider.of<TabsViewModel>(context, listen: false);
+              if (!groupForTaskExists) ...[
+                ElevatedButton(
+                  onPressed: () {
+                    final tabViewModel =
+                        Provider.of<TabsViewModel>(context, listen: false);
 
-                  tabViewModel.setIndex(3);
-                },
-                child: const Text('Create a signing group'),
-              ),
-              if (context
-                  .read<AppViewModel>()
-                  .joinedGroupForTaskTypeExists(KeyType.signPdf)) ...[
-                const SizedBox(height: MEDIUM_GAP),
+                    tabViewModel.setIndex(3,
+                        postNavigationAction: 'createGroup');
+                  },
+                  child: const Text('Create a signing group'),
+                ),
+              ] else ...[
                 ElevatedButton(
                   onPressed: () {
                     signDocument(context, context);
