@@ -2,7 +2,7 @@
 //  Generated code. Do not modify.
 //  source: meesign.proto
 //
-// @dart = 3.3
+// @dart = 2.12
 
 // ignore_for_file: annotate_overrides, camel_case_types, comment_references
 // ignore_for_file: constant_identifier_names, library_prefixes
@@ -271,74 +271,74 @@ abstract class MeeSignServiceBase extends $grpc.Service {
         ($0.Task value) => value.writeToBuffer()));
   }
 
-  $async.Future<$0.ServerInfo> getServerInfo_Pre($grpc.ServiceCall $call,
-      $async.Future<$0.ServerInfoRequest> $request) async {
-    return getServerInfo($call, await $request);
+  $async.Future<$0.ServerInfo> getServerInfo_Pre($grpc.ServiceCall call,
+      $async.Future<$0.ServerInfoRequest> request) async {
+    return getServerInfo(call, await request);
   }
 
-  $async.Future<$0.RegistrationResponse> register_Pre($grpc.ServiceCall $call,
-      $async.Future<$0.RegistrationRequest> $request) async {
-    return register($call, await $request);
+  $async.Future<$0.RegistrationResponse> register_Pre($grpc.ServiceCall call,
+      $async.Future<$0.RegistrationRequest> request) async {
+    return register(call, await request);
   }
 
   $async.Future<$0.Task> sign_Pre(
-      $grpc.ServiceCall $call, $async.Future<$0.SignRequest> $request) async {
-    return sign($call, await $request);
+      $grpc.ServiceCall call, $async.Future<$0.SignRequest> request) async {
+    return sign(call, await request);
   }
 
   $async.Future<$0.Task> group_Pre(
-      $grpc.ServiceCall $call, $async.Future<$0.GroupRequest> $request) async {
-    return group($call, await $request);
+      $grpc.ServiceCall call, $async.Future<$0.GroupRequest> request) async {
+    return group(call, await request);
   }
 
-  $async.Future<$0.Task> decrypt_Pre($grpc.ServiceCall $call,
-      $async.Future<$0.DecryptRequest> $request) async {
-    return decrypt($call, await $request);
+  $async.Future<$0.Task> decrypt_Pre(
+      $grpc.ServiceCall call, $async.Future<$0.DecryptRequest> request) async {
+    return decrypt(call, await request);
   }
 
   $async.Future<$0.Task> getTask_Pre(
-      $grpc.ServiceCall $call, $async.Future<$0.TaskRequest> $request) async {
-    return getTask($call, await $request);
+      $grpc.ServiceCall call, $async.Future<$0.TaskRequest> request) async {
+    return getTask(call, await request);
   }
 
   $async.Future<$0.Resp> updateTask_Pre(
-      $grpc.ServiceCall $call, $async.Future<$0.TaskUpdate> $request) async {
-    return updateTask($call, await $request);
+      $grpc.ServiceCall call, $async.Future<$0.TaskUpdate> request) async {
+    return updateTask(call, await request);
   }
 
   $async.Future<$0.Resp> decideTask_Pre(
-      $grpc.ServiceCall $call, $async.Future<$0.TaskDecision> $request) async {
-    return decideTask($call, await $request);
+      $grpc.ServiceCall call, $async.Future<$0.TaskDecision> request) async {
+    return decideTask(call, await request);
   }
 
-  $async.Future<$0.Resp> acknowledgeTask_Pre($grpc.ServiceCall $call,
-      $async.Future<$0.TaskAcknowledgement> $request) async {
-    return acknowledgeTask($call, await $request);
+  $async.Future<$0.Resp> acknowledgeTask_Pre($grpc.ServiceCall call,
+      $async.Future<$0.TaskAcknowledgement> request) async {
+    return acknowledgeTask(call, await request);
   }
 
   $async.Future<$0.Tasks> getTasks_Pre(
-      $grpc.ServiceCall $call, $async.Future<$0.TasksRequest> $request) async {
-    return getTasks($call, await $request);
+      $grpc.ServiceCall call, $async.Future<$0.TasksRequest> request) async {
+    return getTasks(call, await request);
   }
 
   $async.Future<$0.Groups> getGroups_Pre(
-      $grpc.ServiceCall $call, $async.Future<$0.GroupsRequest> $request) async {
-    return getGroups($call, await $request);
+      $grpc.ServiceCall call, $async.Future<$0.GroupsRequest> request) async {
+    return getGroups(call, await request);
   }
 
-  $async.Future<$0.Devices> getDevices_Pre($grpc.ServiceCall $call,
-      $async.Future<$0.DevicesRequest> $request) async {
-    return getDevices($call, await $request);
+  $async.Future<$0.Devices> getDevices_Pre(
+      $grpc.ServiceCall call, $async.Future<$0.DevicesRequest> request) async {
+    return getDevices(call, await request);
   }
 
   $async.Future<$0.Resp> log_Pre(
-      $grpc.ServiceCall $call, $async.Future<$0.LogRequest> $request) async {
-    return log($call, await $request);
+      $grpc.ServiceCall call, $async.Future<$0.LogRequest> request) async {
+    return log(call, await request);
   }
 
-  $async.Stream<$0.Task> subscribeUpdates_Pre($grpc.ServiceCall $call,
-      $async.Future<$0.SubscribeRequest> $request) async* {
-    yield* subscribeUpdates($call, await $request);
+  $async.Stream<$0.Task> subscribeUpdates_Pre($grpc.ServiceCall call,
+      $async.Future<$0.SubscribeRequest> request) async* {
+    yield* subscribeUpdates(call, await request);
   }
 
   $async.Future<$0.ServerInfo> getServerInfo(
