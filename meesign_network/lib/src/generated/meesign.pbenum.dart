@@ -2,7 +2,7 @@
 //  Generated code. Do not modify.
 //  source: meesign.proto
 //
-// @dart = 3.3
+// @dart = 2.12
 
 // ignore_for_file: annotate_overrides, camel_case_types, comment_references
 // ignore_for_file: constant_identifier_names, library_prefixes
@@ -34,7 +34,7 @@ class ProtocolType extends $pb.ProtobufEnum {
       $pb.ProtobufEnum.initByValue(values);
   static ProtocolType? valueOf($core.int value) => _byValue[value];
 
-  const ProtocolType._(super.v, super.n);
+  const ProtocolType._($core.int v, $core.String n) : super(v, n);
 }
 
 class KeyType extends $pb.ProtobufEnum {
@@ -53,7 +53,7 @@ class KeyType extends $pb.ProtobufEnum {
       $pb.ProtobufEnum.initByValue(values);
   static KeyType? valueOf($core.int value) => _byValue[value];
 
-  const KeyType._(super.v, super.n);
+  const KeyType._($core.int v, $core.String n) : super(v, n);
 }
 
 class TaskType extends $pb.ProtobufEnum {
@@ -76,7 +76,7 @@ class TaskType extends $pb.ProtobufEnum {
       $pb.ProtobufEnum.initByValue(values);
   static TaskType? valueOf($core.int value) => _byValue[value];
 
-  const TaskType._(super.v, super.n);
+  const TaskType._($core.int v, $core.String n) : super(v, n);
 }
 
 class DeviceKind extends $pb.ProtobufEnum {
@@ -92,7 +92,7 @@ class DeviceKind extends $pb.ProtobufEnum {
       $pb.ProtobufEnum.initByValue(values);
   static DeviceKind? valueOf($core.int value) => _byValue[value];
 
-  const DeviceKind._(super.v, super.n);
+  const DeviceKind._($core.int v, $core.String n) : super(v, n);
 }
 
 class Task_TaskState extends $pb.ProtobufEnum {
@@ -116,7 +116,7 @@ class Task_TaskState extends $pb.ProtobufEnum {
       $pb.ProtobufEnum.initByValue(values);
   static Task_TaskState? valueOf($core.int value) => _byValue[value];
 
-  const Task_TaskState._(super.v, super.n);
+  const Task_TaskState._($core.int v, $core.String n) : super(v, n);
 }
 
 const _omitEnumNames = $core.bool.fromEnvironment('protobuf.omit_enum_names');
