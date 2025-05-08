@@ -5,7 +5,6 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
 import '../../pages/settings_page.dart';
-import '../../pages/task_listing.dart';
 import '../../ui_constants.dart';
 import '../../util/layout_getter.dart';
 import '../../view_model/app_view_model.dart';
@@ -170,15 +169,6 @@ class _HomePageViewState extends State<HomePageView> {
           label: 'Settings',
           child: SettingsPage(),
           icon: Icon(Symbols.settings)),
-      NavigationTabModel(
-        label: 'All Tasks',
-        child: TaskListing(),
-        icon: _buildCounterIcon(
-          stream: context.watch<AppViewModel>().nAllReqs,
-          icon: Symbols.task_alt,
-          fillIcon: context.read<TabsViewModel>().index == 5,
-        ),
-      ),
     ];
   }
 
