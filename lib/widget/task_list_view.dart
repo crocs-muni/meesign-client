@@ -5,7 +5,7 @@ import 'package:meesign_core/meesign_core.dart';
 import '../enums/task_status.dart';
 import '../ui_constants.dart';
 
-class TaskListView<T> extends StatelessWidget {
+class TaskListView<T> extends StatefulWidget {
   final List<Task<T>> tasks;
   final Widget emptyView;
   final Widget Function(BuildContext, Task<T>) taskBuilder;
@@ -20,9 +20,108 @@ class TaskListView<T> extends StatelessWidget {
   });
 
   @override
+  State<TaskListView<T>> createState() => _TaskListViewState<T>();
+}
+
+class _TaskListViewState<T> extends State<TaskListView<T>> {
+  final _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(() {
+      setState(() {
+        _searchQuery = _searchController.text;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Group tasks by section
-    final taskGroups = tasks.groupListsBy((task) {
+    final taskGroups = groupTasks();
+
+    final sections = [
+      TaskListSection.requests,
+      TaskListSection.finished,
+      TaskListSection.rejected,
+      if (taskGroups[TaskListSection.failed] != null) TaskListSection.failed,
+      if (widget.showArchived) TaskListSection.archived,
+    ];
+
+    final taskCount = sections.map((s) => (taskGroups[s] ?? []).length).sum;
+
+    if (taskCount == 0 && _searchQuery.isEmpty) {
+      return widget.emptyView;
+    } else if (taskCount == 0 && _searchQuery.isNotEmpty) {
+      return Column(
+        children: [
+          _buildTaskListHeader(),
+          const SizedBox(height: SMALL_GAP),
+          Text(
+            'No tasks found for "$_searchQuery".',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+        ],
+      );
+    } else if (!widget.showArchived) {
+      // Check if there is any non-archived task
+      final nonArchivedTaskCount = taskGroups.entries
+          .where((entry) => entry.key != TaskListSection.archived)
+          .map((entry) => entry.value.length)
+          .sum;
+
+      if (nonArchivedTaskCount == 0 && _searchQuery.isEmpty) {
+        return widget.emptyView;
+      } else if (nonArchivedTaskCount == 0 && _searchQuery.isNotEmpty) {
+        return Column(
+          children: [
+            _buildTaskListHeader(),
+            const SizedBox(height: SMALL_GAP),
+            Text(
+              'No tasks found for "$_searchQuery".',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ],
+        );
+      }
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildTaskListHeader(),
+        Expanded(
+          child: ListView(
+            children: sections.map((section) {
+              final sectionTasks = taskGroups[section] ?? <Task<T>>[];
+              if (sectionTasks.isEmpty) return const SizedBox.shrink();
+
+              return Theme(
+                  // This is to remove the default divider color of ExpansionTile
+                  data: Theme.of(context)
+                      .copyWith(dividerColor: Colors.transparent),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        for (final task in sectionTasks)
+                          widget.taskBuilder(context, task),
+                      ]));
+            }).toList(),
+          ),
+        )
+      ],
+    );
+  }
+
+  Map<TaskListSection, List<Task<T>>> groupTasks() {
+    return filterTasks().groupListsBy((task) {
       if (task.archived) return TaskListSection.archived;
       return switch (task.state) {
         TaskState.finished => TaskListSection.finished,
@@ -33,205 +132,72 @@ class TaskListView<T> extends StatelessWidget {
         _ => TaskListSection.requests,
       };
     });
+  }
 
-    final sections = [
-      TaskListSection.requests,
-      TaskListSection.finished,
-      TaskListSection.rejected,
-      if (taskGroups[TaskListSection.failed] != null) TaskListSection.failed,
-      if (showArchived) TaskListSection.archived,
-    ];
+  List<Task<T>> filterTasks() {
+    return widget.tasks.where((task) {
+      if (_searchQuery.isEmpty) return true;
 
-    final taskCount = sections.map((s) => (taskGroups[s] ?? []).length).sum;
-
-    if (taskCount == 0) {
-      return emptyView;
-    } else if (!showArchived) {
-      // Check if there is any non-archived task
-      final nonArchivedTaskCount = taskGroups.entries
-          .where((entry) => entry.key != TaskListSection.archived)
-          .map((entry) => entry.value.length)
-          .sum;
-
-      if (nonArchivedTaskCount == 0) {
-        return emptyView;
+      String? taskName;
+      final info = task.info;
+      if (info is Group) {
+        taskName = info.name;
+      } else if (info is Challenge) {
+        taskName = info.name;
+      } else if (info is Decrypt) {
+        taskName = info.name;
+      } else if (info is File) {
+        taskName = info.path; // Files are identified by path
       }
-    }
 
-    return ListView(
-      children: sections.map((section) {
-        final sectionTasks = taskGroups[section] ?? <Task<T>>[];
-        return Column(children: [
-          Theme(
-              // This is to remove the default divider color of ExpansionTile
-              data:
-                  Theme.of(context).copyWith(dividerColor: Colors.transparent),
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 0),
-                child: ExpansionTile(
-                  maintainState: true,
-                  initiallyExpanded: true,
-                  childrenPadding: EdgeInsets.only(top: SMALL_GAP),
-                  iconColor: Theme.of(context).iconTheme.color,
-                  collapsedIconColor: Theme.of(context).iconTheme.color,
-                  title:
-                      _buildSectionTitle(context, section, sectionTasks.length),
-                  children: sectionTasks.isEmpty
-                      ? [
-                          Padding(
-                              padding: EdgeInsets.only(left: MEDIUM_GAP),
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Container(
-                                  padding:
-                                      EdgeInsets.only(bottom: SMALL_PADDING),
-                                  child: Text("No items in this section"),
-                                ),
-                              ))
-                        ]
-                      : sectionTasks
-                          .map((task) => taskBuilder(context, task))
-                          .toList(),
-                ),
-              )),
-          if (section != sections.last) const Divider()
-        ]);
-      }).toList(),
-    );
+      return taskName?.toLowerCase().contains(_searchQuery.toLowerCase()) ??
+          false;
+    }).toList();
   }
 
-  Widget _buildSectionTitle(
-      BuildContext context, TaskListSection section, int taskCount) {
-    return Row(
-      children: [
-        _getSectionIcon(section, context),
-        SizedBox(width: MEDIUM_GAP),
-        Expanded(
-          child: Text(
-            _getSectionTitle(section),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-                fontWeight: FontWeight.w900,
-                fontSize: Theme.of(context).textTheme.bodyLarge?.fontSize),
-          ),
+  String _getGeneralHeading() {
+    if (T == Group) {
+      return 'Groups';
+    } else if (T == Challenge) {
+      return 'Challenges';
+    } else if (T == Decrypt) {
+      return 'Decryptions';
+    } else if (T == File) {
+      return 'Signings';
+    } else {
+      return 'Tasks';
+    }
+  }
+
+  Widget _buildTaskSearchBar() {
+    return TextField(
+      controller: _searchController,
+      decoration: InputDecoration(
+        hintText: 'Search tasks by name...',
+        prefixIcon: const Icon(Icons.search),
+        fillColor: Theme.of(context).colorScheme.onInverseSurface,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
         ),
-        SizedBox(width: SMALL_GAP),
-        Text(
-          '($taskCount)',
-          style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: Theme.of(context).textTheme.titleMedium?.fontSize,
-              color: Theme.of(context).colorScheme.primary),
-        )
-      ],
+        filled: true,
+      ),
     );
   }
 
-  String _getSectionTitle(TaskListSection section) {
-    return switch (section) {
-      TaskListSection.requests => _getRequiredSectionHeading(),
-      TaskListSection.finished => _getJoinedSectionHeading(),
-      TaskListSection.rejected => _getRejectedSectionHeading(),
-      TaskListSection.failed => _getFailedSectionHeading(),
-      TaskListSection.archived => _getArchivedSectionHeading(),
-    };
+  Widget _buildTaskListHeader() {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(
+        _getGeneralHeading(),
+        style: TextStyle(
+          fontSize: Theme.of(context).textTheme.titleLarge?.fontSize,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+      const SizedBox(height: SMALL_GAP),
+      _buildTaskSearchBar(),
+      const SizedBox(height: SMALL_GAP),
+      Divider(),
+      const SizedBox(height: SMALL_GAP),
+    ]);
   }
-
-  Widget _getSectionIcon(TaskListSection section, BuildContext context) {
-    double iconSize = Theme.of(context).textTheme.headlineSmall?.fontSize ?? 24;
-
-    return switch (section) {
-      TaskListSection.requests => Icon(Icons.group_add, size: iconSize),
-      TaskListSection.finished => Icon(Icons.check_circle, size: iconSize),
-      TaskListSection.rejected => Icon(Icons.cancel, size: iconSize),
-      TaskListSection.failed => Icon(Icons.error, size: iconSize),
-      TaskListSection.archived => Icon(Icons.archive, size: iconSize),
-    };
-  }
-
-  String _getRequiredSectionHeading() {
-    if (T == Group) {
-      return 'Group invitations';
-    } else if (T == Challenge) {
-      return 'Challenge invitations';
-    } else if (T == Decrypt) {
-      return 'Decryption invitations';
-    } else if (T == File) {
-      return 'Signing invitations';
-    } else {
-      return 'Pending requests';
-    }
-  }
-
-  String _getJoinedSectionHeading() {
-    if (T == Group) {
-      return 'Accepted groups';
-    } else if (T == Challenge) {
-      return 'Accepted challenges';
-    } else if (T == Decrypt) {
-      return 'Accepted decryptions';
-    } else if (T == File) {
-      return 'Accepted signings';
-    } else {
-      return 'Signed or decrypted';
-    }
-  }
-
-  String _getRejectedSectionHeading() {
-    if (T == Group) {
-      return 'Rejected groups';
-    } else if (T == Challenge) {
-      return 'Rejected challenges';
-    } else if (T == Decrypt) {
-      return 'Rejected decryptions';
-    } else if (T == File) {
-      return 'Rejected signings';
-    } else {
-      return 'Rejected';
-    }
-  }
-
-  String _getFailedSectionHeading() {
-    if (T == Group) {
-      return 'Failed groups';
-    } else if (T == Challenge) {
-      return 'Failed challenges';
-    } else if (T == Decrypt) {
-      return 'Failed decryptions';
-    } else if (T == File) {
-      return 'Failed signings';
-    } else {
-      return 'Failed';
-    }
-  }
-
-  String _getArchivedSectionHeading() {
-    if (T == Group) {
-      return 'Archived groups';
-    } else if (T == Challenge) {
-      return 'Archived challenges';
-    } else if (T == Decrypt) {
-      return 'Archived decryptions';
-    } else if (T == File) {
-      return 'Archived signings';
-    } else {
-      return 'Archived';
-    }
-  }
-}
-
-Widget buildTaskListView<T>(
-  List<Task<T>> tasks, {
-  required BuildContext context,
-  required Widget emptyView,
-  required Widget Function(BuildContext, Task<T>) taskBuilder,
-  bool showArchived = false,
-}) {
-  return TaskListView<T>(
-    tasks: tasks,
-    emptyView: emptyView,
-    taskBuilder: taskBuilder,
-    showArchived: showArchived,
-  );
 }
