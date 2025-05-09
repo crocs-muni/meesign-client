@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../app_container.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
+import '../util/confirm_device_change.dart';
 import '../util/fade_black_page_transition.dart';
 import '../view_model/app_view_model.dart';
 import '../widget/change_device_section.dart';
-import '../widget/confirmation_dialog.dart';
+import '../widget/danger_zone_section.dart';
 import 'register_page.dart';
 
 class DeviceSettingsPage extends StatefulWidget {
@@ -67,50 +67,6 @@ class _DeviceSettingsPageState extends State<DeviceSettingsPage> {
     );
   }
 
-  void _showDeleteDialog() {
-    return showConfirmationDialog(
-      context,
-      'Confirm deletion',
-      'Are you sure you want to delete this device?',
-      'Delete',
-      () async {
-        confirmDeviceChange(deleteData: true);
-      },
-    );
-  }
-
-  void _showChangeServerDialog() {
-    return showConfirmationDialog(
-      context,
-      'Confirm profile change',
-      'Are you sure you want to change server or device?',
-      'Confirm',
-      () {
-        confirmDeviceChange(deleteData: false);
-      },
-    );
-  }
-
-  void confirmDeviceChange({bool deleteData = false}) {
-    final appContainer = context.read<AppContainer>();
-
-    appContainer.recreate(deleteData: deleteData);
-
-    if (deleteData) {
-      appContainer.settingsController.deleteHostData();
-    }
-
-    // This is to ensure that the app is recreated before navigating
-    Future.delayed(const Duration(milliseconds: 0), () {
-      if (mounted) {
-        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-          FadeBlackPageTransition.fadeBlack(destination: RegisterPage()),
-          (route) => false,
-        );
-      }
-    });
-  }
-
   Widget _buildDeviceNameSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,48 +118,25 @@ class _DeviceSettingsPageState extends State<DeviceSettingsPage> {
   }
 
   Widget _buildChangeServerSection() {
-    return ChangeDeviceSection(onChangeServer: () {
-      _showChangeServerDialog();
+    return ChangeDeviceSection(onChangeServer: () async {
+      var res = await showChangeServerDialog(context, mounted);
+
+      if (res == null || res == false) {
+        return;
+      }
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+            FadeBlackPageTransition.fadeBlack(destination: RegisterPage()),
+            (route) => false,
+          );
+        }
+      });
     });
   }
 
   Widget _buildDangerZone() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Danger zone",
-          style: Theme.of(context).textTheme.bodyLarge,
-        ),
-        SizedBox(height: SMALL_GAP),
-        Text(
-          "This action will effectively delete your device and all associated data. After deletion, you will need to re-register your device to continue using the app.",
-          style: TextStyle(color: Theme.of(context).colorScheme.outline),
-        ),
-        SizedBox(height: MEDIUM_GAP),
-        FilledButton.icon(
-          onPressed: () {
-            _showDeleteDialog();
-          },
-          label: Padding(
-            padding: EdgeInsets.symmetric(vertical: 15),
-            child: Text('Delete device',
-                style: TextStyle(
-                    color: Theme.of(context).colorScheme.onErrorContainer)),
-          ),
-          icon: Icon(Icons.delete,
-              color: Theme.of(context).colorScheme.onErrorContainer),
-          style: ButtonStyle(
-            backgroundColor: WidgetStateProperty.all<Color>(
-                Theme.of(context).colorScheme.errorContainer),
-            shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
+    return DangerZoneSection();
   }
 }
