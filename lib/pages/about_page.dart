@@ -8,7 +8,7 @@ import '../ui_constants.dart';
 import '../widget/smart_logo.dart';
 
 class AboutPage extends StatelessWidget {
-  static const version = '0.5.0';
+  static const version = '0.5.1';
 
   static const crocsAuth = 'crocs.fi.muni.cz';
   static const meesignAuth = 'meesign.$crocsAuth';

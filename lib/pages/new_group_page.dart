@@ -420,30 +420,48 @@ class _NewGroupPageState extends State<NewGroupPage> {
         'of the group can proceed with a given task.',
       ),
       children: [
-        Row(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(Symbols.person),
-            Expanded(
-              child: Slider(
-                value: (_protocol.thresholdType == ThresholdType.nOfN
-                        ? _shareCount
-                        : min(_threshold, _shareCount))
-                    .toDouble(),
-                min: 0,
-                max: _shareCount.toDouble(),
-                divisions: max(1, _shareCount),
-                label: '$_threshold',
-                onChanged: (_protocol.thresholdType == ThresholdType.nOfN ||
-                        _shareCount <= _minThreshold)
-                    ? null
-                    : (value) => setState(() {
-                          _setThreshold(value.round());
-                        }),
-              ),
+            Row(
+              children: [
+                const Icon(Symbols.person),
+                Expanded(
+                  child: Slider(
+                    value: (_protocol.thresholdType == ThresholdType.nOfN
+                            ? _shareCount
+                            : min(_threshold, _shareCount))
+                        .toDouble(),
+                    min: 0,
+                    max: _shareCount.toDouble(),
+                    divisions: max(1, _shareCount),
+                    label: '$_threshold',
+                    onChanged: (_protocol.thresholdType == ThresholdType.nOfN ||
+                            _shareCount <= _minThreshold)
+                        ? null
+                        : (value) => setState(() {
+                              _setThreshold(value.round());
+                            }),
+                  ),
+                ),
+                const Icon(Symbols.people),
+              ],
             ),
-            const Icon(Symbols.people),
+            if (_protocol.thresholdType == ThresholdType.nOfN)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Important:",
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  SizedBox(width: SMALL_GAP),
+                  Text(
+                      "When using MUSIG2 protocol the threshold is always set to max number of shares. Therefore, it is not possible to use the slider.",
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary)),
+                ],
+              )
           ],
-        ),
+        )
       ],
     );
   }
