@@ -73,6 +73,7 @@ class GroupRepository extends TaskRepository<Group> {
           id: tid,
           did: did.bytes,
           state: TaskState.created,
+          createdAt: DateTime.now(),
         ),
       );
 

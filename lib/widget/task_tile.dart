@@ -4,6 +4,7 @@ import 'package:meesign_core/meesign_core.dart';
 
 import '../theme.dart';
 import '../ui_constants.dart';
+import '../util/date_formatter.dart';
 import '../util/extensions/list_intersperse.dart';
 import '../util/status_message.dart';
 import '../util/extensions/task_approvable.dart';
@@ -22,6 +23,7 @@ class TaskTile<T> extends StatelessWidget {
   final void Function(bool)? onArchiveChange;
   final bool showTaskTypeInfo;
   final bool showDetailRow;
+  final bool showDate;
 
   const TaskTile({
     super.key,
@@ -38,6 +40,7 @@ class TaskTile<T> extends StatelessWidget {
     this.onArchiveChange,
     this.showTaskTypeInfo = true,
     this.showDetailRow = true,
+    this.showDate = true,
   });
 
   @override
@@ -194,6 +197,11 @@ class TaskTile<T> extends StatelessWidget {
               ],
             );
           })
+        ],
+        if (showDate) ...[
+          SizedBox(width: LARGE_GAP),
+          _buildGroupMetaDataRow(
+              Icons.calendar_month, formatDate(task.createdAt), context),
         ],
         if (task.archived) ...[
           SizedBox(width: LARGE_GAP),

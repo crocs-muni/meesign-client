@@ -34,6 +34,7 @@ class Tasks extends Table {
   IntColumn get attempt => integer().withDefault(const Constant(0))();
   BlobColumn get context => blob().nullable()();
   BlobColumn get data => blob().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
 
   @override
   Set<Column> get primaryKey => {id, did};
