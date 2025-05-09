@@ -15,10 +15,12 @@ import 'register_page.dart';
 
 class DevicePage extends StatefulWidget {
   final Device device;
+  final bool showActionButtons;
 
   const DevicePage({
     super.key,
     required this.device,
+    this.showActionButtons = true,
   });
 
   @override
@@ -48,37 +50,39 @@ class _DevicePageState extends State<DevicePage> {
                   child: DeviceIdentity(device: widget.device),
                 ),
               ),
-              const SizedBox(height: XLARGE_GAP),
-              Center(
-                  child: ChangeDeviceSection(
-                onChangeServer: () async {
-                  var res = await showChangeServerDialog(context, mounted);
+              if (widget.showActionButtons) ...[
+                const SizedBox(height: XLARGE_GAP),
+                Center(
+                    child: ChangeDeviceSection(
+                  onChangeServer: () async {
+                    var res = await showChangeServerDialog(context, mounted);
 
-                  if (res == null || res == false) {
-                    return;
-                  }
-
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (mounted) {
-                      Navigator.of(context, rootNavigator: true)
-                          .pushAndRemoveUntil(
-                        FadeBlackPageTransition.fadeBlack(
-                            destination: RegisterPage()),
-                        (route) => false,
-                      );
+                    if (res == null || res == false) {
+                      return;
                     }
-                  });
-                },
-                centerContent: true,
-                showText: false,
-              )),
-              const SizedBox(height: LARGE_GAP),
-              Center(
-                child: DangerZoneSection(
+
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (mounted) {
+                        Navigator.of(context, rootNavigator: true)
+                            .pushAndRemoveUntil(
+                          FadeBlackPageTransition.fadeBlack(
+                              destination: RegisterPage()),
+                          (route) => false,
+                        );
+                      }
+                    });
+                  },
                   centerContent: true,
                   showText: false,
-                ),
-              )
+                )),
+                const SizedBox(height: LARGE_GAP),
+                Center(
+                  child: DangerZoneSection(
+                    centerContent: true,
+                    showText: false,
+                  ),
+                )
+              ]
             ],
           ),
         ],
