@@ -78,7 +78,7 @@ class DecryptListingPage extends StatelessWidget {
               Text(
                 groupForTaskExists
                     ? 'Start by creating a new encryption task.'
-                    : 'Start by creating a group for encryption.',
+                    : 'Start by creating a group for decryption.',
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: LARGE_GAP),
@@ -91,7 +91,7 @@ class DecryptListingPage extends StatelessWidget {
                     tabViewModel.setIndex(3,
                         postNavigationAction: 'createGroup');
                   },
-                  child: const Text('Create an encryption group'),
+                  child: const Text('Create a decryption group'),
                 )
               ] else ...[
                 ElevatedButton(
