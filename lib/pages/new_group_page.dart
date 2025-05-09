@@ -106,8 +106,13 @@ class _NewGroupPageState extends State<NewGroupPage> {
     _devices.add(await session.deviceRepository.getDevice(session.user.did));
   }
 
-  void _setThreshold(int value) =>
+  void _setThreshold(int value) {
+    if (_protocol.thresholdType == ThresholdType.nOfN) {
+      _threshold = _shareCount;
+    } else {
       _threshold = max(_minThreshold, min(value, _shareCount));
+    }
+  }
 
   void _addMembers(Object? devices) {
     if (devices is! List<Device>) return;
@@ -117,6 +122,9 @@ class _NewGroupPageState extends State<NewGroupPage> {
         _members.add(Member(device, 1));
       }
       _sharesErr = null;
+      if (_protocol.thresholdType == ThresholdType.nOfN) {
+        _threshold = _shareCount;
+      }
     });
   }
 
@@ -365,6 +373,9 @@ class _NewGroupPageState extends State<NewGroupPage> {
                       if (newWeight > 0) {
                         _members[i] = Member(member.device, newWeight);
                         _sharesErr = null;
+                        if (_protocol.thresholdType == ThresholdType.nOfN) {
+                          _threshold = _shareCount;
+                        }
                       }
                     });
                   },
@@ -380,6 +391,13 @@ class _NewGroupPageState extends State<NewGroupPage> {
                       _members.removeAt(i);
 
                       _sharesErr = null;
+                      if (_protocol.thresholdType == ThresholdType.nOfN) {
+                        _threshold = _shareCount;
+                      }
+                      // Adjust threshold if it's now too high
+                      if (_threshold > _shareCount) {
+                        _setThreshold(_shareCount);
+                      }
                     });
                   },
                   icon: const Icon(Symbols.delete),
@@ -407,16 +425,20 @@ class _NewGroupPageState extends State<NewGroupPage> {
             const Icon(Symbols.person),
             Expanded(
               child: Slider(
-                value: min(_threshold, _shareCount).toDouble(),
+                value: (_protocol.thresholdType == ThresholdType.nOfN
+                        ? _shareCount
+                        : min(_threshold, _shareCount))
+                    .toDouble(),
                 min: 0,
                 max: _shareCount.toDouble(),
                 divisions: max(1, _shareCount),
                 label: '$_threshold',
-                onChanged: _shareCount > _minThreshold
-                    ? (value) => setState(() {
+                onChanged: (_protocol.thresholdType == ThresholdType.nOfN ||
+                        _shareCount <= _minThreshold)
+                    ? null
+                    : (value) => setState(() {
                           _setThreshold(value.round());
-                        })
-                    : null,
+                        }),
               ),
             ),
             const Icon(Symbols.people),
@@ -436,6 +458,9 @@ class _NewGroupPageState extends State<NewGroupPage> {
             setState(() {
               _protocol = value.first.supportedProtocols.first;
               _keyType = value.first;
+              if (_protocol.thresholdType == ThresholdType.nOfN) {
+                _threshold = _shareCount;
+              }
             });
           },
           segments: const [
@@ -546,7 +571,12 @@ class _NewGroupPageState extends State<NewGroupPage> {
             SegmentedButton<Protocol>(
               selected: {_protocol},
               onSelectionChanged: (value) {
-                setState(() => _protocol = value.first);
+                setState(() {
+                  _protocol = value.first;
+                  if (_protocol.thresholdType == ThresholdType.nOfN) {
+                    _threshold = _shareCount;
+                  }
+                });
               },
               segments: [
                 for (var protocol in _keyType.supportedProtocols)
