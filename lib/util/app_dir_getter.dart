@@ -8,9 +8,11 @@ class AppDirGetter {
     if (Platform.isIOS || Platform.isMacOS) {
       return getLibraryDirectory();
     }
-    if (Platform.isAndroid) {
+
+    if (Platform.isAndroid || Platform.isLinux || Platform.isWindows) {
       return getApplicationSupportDirectory();
     }
+
     final path = path_pkg.join(
       path_pkg.dirname(Platform.resolvedExecutable),
       'app',
