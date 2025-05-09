@@ -93,14 +93,32 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
       }
     }
 
+    final requestsTasks = taskGroups[TaskListSection.requests] ?? <Task<T>>[];
+    final remainingTasks = <Task<T>>[];
+
+    taskGroups.forEach((section, tasks) {
+      if (section != TaskListSection.requests &&
+          (widget.showArchived || section != TaskListSection.archived)) {
+        remainingTasks.addAll(tasks);
+      }
+    });
+
+    remainingTasks.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    var categories = ["requests", "remaining"];
+    Map<String, List<Task<T>>> orderedCategorizedTasks = {
+      categories[0]: requestsTasks,
+      categories[1]: remainingTasks,
+    };
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildTaskListHeader(),
         Expanded(
           child: ListView(
-            children: sections.map((section) {
-              final sectionTasks = taskGroups[section] ?? <Task<T>>[];
+            children: categories.map((taskCategory) {
+              final sectionTasks =
+                  orderedCategorizedTasks[taskCategory] ?? <Task<T>>[];
               if (sectionTasks.isEmpty) return const SizedBox.shrink();
 
               return Theme(
@@ -131,6 +149,9 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
           },
         _ => TaskListSection.requests,
       };
+    }).map((key, value) {
+      value.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return MapEntry(key, value);
     });
   }
 

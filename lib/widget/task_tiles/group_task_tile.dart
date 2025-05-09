@@ -30,6 +30,7 @@ class GroupTaskTile extends StatelessWidget {
       leading: CircleAvatar(
         child: Text(group.name.initials),
       ),
+      showDate: false,
       approveActions: [
         FilledButton.tonal(
           child: const Text('Join'),

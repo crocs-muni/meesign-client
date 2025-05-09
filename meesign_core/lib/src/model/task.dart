@@ -19,6 +19,7 @@ class Task<T> {
   final int nRounds;
   final int attempt;
   final T info;
+  final int createdAt;
 
   const Task({
     required this.id,
@@ -30,6 +31,7 @@ class Task<T> {
     required this.nRounds,
     this.attempt = 0,
     required this.info,
+    required this.createdAt,
   });
 
   // TODO: implement comparison, hash
@@ -46,5 +48,6 @@ class TaskConversion {
         nRounds: nRounds,
         attempt: entity.attempt,
         info: info,
+        createdAt: entity.createdAt.millisecondsSinceEpoch,
       );
 }

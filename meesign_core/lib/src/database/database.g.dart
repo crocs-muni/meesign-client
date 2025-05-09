@@ -18,7 +18,6 @@ class $DevicesTable extends Devices with TableInfo<$DevicesTable, Device> {
   late final GeneratedColumn<String> name = GeneratedColumn<String>(
       'name', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
   @override
   late final GeneratedColumnWithTypeConverter<DeviceKind, String> kind =
       GeneratedColumn<String>('kind', aliasedName, false,
@@ -47,7 +46,6 @@ class $DevicesTable extends Devices with TableInfo<$DevicesTable, Device> {
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
-    context.handle(_kindMeta, const VerificationResult.success());
     return context;
   }
 
@@ -125,6 +123,14 @@ class Device extends DataClass implements Insertable<Device> {
         name: name ?? this.name,
         kind: kind ?? this.kind,
       );
+  Device copyWithCompanion(DevicesCompanion data) {
+    return Device(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      kind: data.kind.present ? data.kind.value : this.kind,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('Device(')
@@ -326,6 +332,13 @@ class User extends DataClass implements Insertable<User> {
         id: id ?? this.id,
         host: host ?? this.host,
       );
+  User copyWithCompanion(UsersCompanion data) {
+    return User(
+      id: data.id.present ? data.id.value : this.id,
+      host: data.host.present ? data.host.value : this.host,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('User(')
@@ -438,15 +451,11 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
   late final GeneratedColumn<int> threshold = GeneratedColumn<int>(
       'threshold', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _protocolMeta =
-      const VerificationMeta('protocol');
   @override
   late final GeneratedColumnWithTypeConverter<Protocol, String> protocol =
       GeneratedColumn<String>('protocol', aliasedName, false,
               type: DriftSqlType.string, requiredDuringInsert: true)
           .withConverter<Protocol>($GroupsTable.$converterprotocol);
-  static const VerificationMeta _keyTypeMeta =
-      const VerificationMeta('keyType');
   @override
   late final GeneratedColumnWithTypeConverter<KeyType, String> keyType =
       GeneratedColumn<String>('key_type', aliasedName, false,
@@ -530,8 +539,6 @@ class $GroupsTable extends Groups with TableInfo<$GroupsTable, Group> {
     } else if (isInserting) {
       context.missing(_thresholdMeta);
     }
-    context.handle(_protocolMeta, const VerificationResult.success());
-    context.handle(_keyTypeMeta, const VerificationResult.success());
     if (data.containsKey('with_card')) {
       context.handle(_withCardMeta,
           withCard.isAcceptableOrUnknown(data['with_card']!, _withCardMeta));
@@ -735,6 +742,24 @@ class Group extends DataClass implements Insertable<Group> {
             certificates.present ? certificates.value : this.certificates,
         note: note.present ? note.value : this.note,
       );
+  Group copyWithCompanion(GroupsCompanion data) {
+    return Group(
+      id: data.id.present ? data.id.value : this.id,
+      tid: data.tid.present ? data.tid.value : this.tid,
+      did: data.did.present ? data.did.value : this.did,
+      name: data.name.present ? data.name.value : this.name,
+      threshold: data.threshold.present ? data.threshold.value : this.threshold,
+      protocol: data.protocol.present ? data.protocol.value : this.protocol,
+      keyType: data.keyType.present ? data.keyType.value : this.keyType,
+      withCard: data.withCard.present ? data.withCard.value : this.withCard,
+      context: data.context.present ? data.context.value : this.context,
+      certificates: data.certificates.present
+          ? data.certificates.value
+          : this.certificates,
+      note: data.note.present ? data.note.value : this.note,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('Group(')
@@ -976,13 +1001,11 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
       requiredDuringInsert: false,
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('REFERENCES "groups" (id)'));
-  static const VerificationMeta _stateMeta = const VerificationMeta('state');
   @override
   late final GeneratedColumnWithTypeConverter<TaskState, String> state =
       GeneratedColumn<String>('state', aliasedName, false,
               type: DriftSqlType.string, requiredDuringInsert: true)
           .withConverter<TaskState>($TasksTable.$converterstate);
-  static const VerificationMeta _errorMeta = const VerificationMeta('error');
   @override
   late final GeneratedColumnWithTypeConverter<TaskError?, String> error =
       GeneratedColumn<String>('error', aliasedName, true,
@@ -1034,6 +1057,12 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
   late final GeneratedColumn<Uint8List> data = GeneratedColumn<Uint8List>(
       'data', aliasedName, true,
       type: DriftSqlType.blob, requiredDuringInsert: false);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -1046,7 +1075,8 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
         round,
         attempt,
         context,
-        data
+        data,
+        createdAt
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1073,8 +1103,6 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
       context.handle(
           _gidMeta, gid.isAcceptableOrUnknown(data['gid']!, _gidMeta));
     }
-    context.handle(_stateMeta, const VerificationResult.success());
-    context.handle(_errorMeta, const VerificationResult.success());
     if (data.containsKey('approved')) {
       context.handle(_approvedMeta,
           approved.isAcceptableOrUnknown(data['approved']!, _approvedMeta));
@@ -1098,6 +1126,12 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
     if (data.containsKey('data')) {
       context.handle(
           _dataMeta, this.data.isAcceptableOrUnknown(data['data']!, _dataMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
     }
     return context;
   }
@@ -1130,6 +1164,8 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
           .read(DriftSqlType.blob, data['${effectivePrefix}context']),
       data: attachedDatabase.typeMapping
           .read(DriftSqlType.blob, data['${effectivePrefix}data']),
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
     );
   }
 
@@ -1158,6 +1194,7 @@ class Task extends DataClass implements Insertable<Task> {
   final int attempt;
   final Uint8List? context;
   final Uint8List? data;
+  final DateTime createdAt;
   const Task(
       {required this.id,
       required this.did,
@@ -1169,7 +1206,8 @@ class Task extends DataClass implements Insertable<Task> {
       required this.round,
       required this.attempt,
       this.context,
-      this.data});
+      this.data,
+      required this.createdAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1195,6 +1233,7 @@ class Task extends DataClass implements Insertable<Task> {
     if (!nullToAbsent || data != null) {
       map['data'] = Variable<Uint8List>(data);
     }
+    map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
 
@@ -1214,6 +1253,7 @@ class Task extends DataClass implements Insertable<Task> {
           ? const Value.absent()
           : Value(context),
       data: data == null && nullToAbsent ? const Value.absent() : Value(data),
+      createdAt: Value(createdAt),
     );
   }
 
@@ -1234,6 +1274,7 @@ class Task extends DataClass implements Insertable<Task> {
       attempt: serializer.fromJson<int>(json['attempt']),
       context: serializer.fromJson<Uint8List?>(json['context']),
       data: serializer.fromJson<Uint8List?>(json['data']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
   @override
@@ -1253,6 +1294,7 @@ class Task extends DataClass implements Insertable<Task> {
       'attempt': serializer.toJson<int>(attempt),
       'context': serializer.toJson<Uint8List?>(context),
       'data': serializer.toJson<Uint8List?>(data),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
 
@@ -1267,7 +1309,8 @@ class Task extends DataClass implements Insertable<Task> {
           int? round,
           int? attempt,
           Value<Uint8List?> context = const Value.absent(),
-          Value<Uint8List?> data = const Value.absent()}) =>
+          Value<Uint8List?> data = const Value.absent(),
+          DateTime? createdAt}) =>
       Task(
         id: id ?? this.id,
         did: did ?? this.did,
@@ -1280,7 +1323,25 @@ class Task extends DataClass implements Insertable<Task> {
         attempt: attempt ?? this.attempt,
         context: context.present ? context.value : this.context,
         data: data.present ? data.value : this.data,
+        createdAt: createdAt ?? this.createdAt,
       );
+  Task copyWithCompanion(TasksCompanion data) {
+    return Task(
+      id: data.id.present ? data.id.value : this.id,
+      did: data.did.present ? data.did.value : this.did,
+      gid: data.gid.present ? data.gid.value : this.gid,
+      state: data.state.present ? data.state.value : this.state,
+      error: data.error.present ? data.error.value : this.error,
+      approved: data.approved.present ? data.approved.value : this.approved,
+      archived: data.archived.present ? data.archived.value : this.archived,
+      round: data.round.present ? data.round.value : this.round,
+      attempt: data.attempt.present ? data.attempt.value : this.attempt,
+      context: data.context.present ? data.context.value : this.context,
+      data: data.data.present ? data.data.value : this.data,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('Task(')
@@ -1294,7 +1355,8 @@ class Task extends DataClass implements Insertable<Task> {
           ..write('round: $round, ')
           ..write('attempt: $attempt, ')
           ..write('context: $context, ')
-          ..write('data: $data')
+          ..write('data: $data, ')
+          ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
   }
@@ -1311,7 +1373,8 @@ class Task extends DataClass implements Insertable<Task> {
       round,
       attempt,
       $driftBlobEquality.hash(context),
-      $driftBlobEquality.hash(data));
+      $driftBlobEquality.hash(data),
+      createdAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1326,7 +1389,8 @@ class Task extends DataClass implements Insertable<Task> {
           other.round == this.round &&
           other.attempt == this.attempt &&
           $driftBlobEquality.equals(other.context, this.context) &&
-          $driftBlobEquality.equals(other.data, this.data));
+          $driftBlobEquality.equals(other.data, this.data) &&
+          other.createdAt == this.createdAt);
 }
 
 class TasksCompanion extends UpdateCompanion<Task> {
@@ -1341,6 +1405,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
   final Value<int> attempt;
   final Value<Uint8List?> context;
   final Value<Uint8List?> data;
+  final Value<DateTime> createdAt;
   final Value<int> rowid;
   const TasksCompanion({
     this.id = const Value.absent(),
@@ -1354,6 +1419,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.attempt = const Value.absent(),
     this.context = const Value.absent(),
     this.data = const Value.absent(),
+    this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   TasksCompanion.insert({
@@ -1368,10 +1434,12 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.attempt = const Value.absent(),
     this.context = const Value.absent(),
     this.data = const Value.absent(),
+    required DateTime createdAt,
     this.rowid = const Value.absent(),
   })  : id = Value(id),
         did = Value(did),
-        state = Value(state);
+        state = Value(state),
+        createdAt = Value(createdAt);
   static Insertable<Task> custom({
     Expression<Uint8List>? id,
     Expression<Uint8List>? did,
@@ -1384,6 +1452,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     Expression<int>? attempt,
     Expression<Uint8List>? context,
     Expression<Uint8List>? data,
+    Expression<DateTime>? createdAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -1398,6 +1467,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       if (attempt != null) 'attempt': attempt,
       if (context != null) 'context': context,
       if (data != null) 'data': data,
+      if (createdAt != null) 'created_at': createdAt,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -1414,6 +1484,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       Value<int>? attempt,
       Value<Uint8List?>? context,
       Value<Uint8List?>? data,
+      Value<DateTime>? createdAt,
       Value<int>? rowid}) {
     return TasksCompanion(
       id: id ?? this.id,
@@ -1427,6 +1498,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       attempt: attempt ?? this.attempt,
       context: context ?? this.context,
       data: data ?? this.data,
+      createdAt: createdAt ?? this.createdAt,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1469,6 +1541,9 @@ class TasksCompanion extends UpdateCompanion<Task> {
     if (data.present) {
       map['data'] = Variable<Uint8List>(data.value);
     }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -1489,6 +1564,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
           ..write('attempt: $attempt, ')
           ..write('context: $context, ')
           ..write('data: $data, ')
+          ..write('createdAt: $createdAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1624,6 +1700,14 @@ class GroupMember extends DataClass implements Insertable<GroupMember> {
         did: did ?? this.did,
         shares: shares ?? this.shares,
       );
+  GroupMember copyWithCompanion(GroupMembersCompanion data) {
+    return GroupMember(
+      tid: data.tid.present ? data.tid.value : this.tid,
+      did: data.did.present ? data.did.value : this.did,
+      shares: data.shares.present ? data.shares.value : this.shares,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('GroupMember(')
@@ -1842,6 +1926,14 @@ class File extends DataClass implements Insertable<File> {
         did: did ?? this.did,
         name: name ?? this.name,
       );
+  File copyWithCompanion(FilesCompanion data) {
+    return File(
+      tid: data.tid.present ? data.tid.value : this.tid,
+      did: data.did.present ? data.did.value : this.did,
+      name: data.name.present ? data.name.value : this.name,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('File(')
@@ -2086,6 +2178,15 @@ class Challenge extends DataClass implements Insertable<Challenge> {
         name: name ?? this.name,
         data: data ?? this.data,
       );
+  Challenge copyWithCompanion(ChallengesCompanion data) {
+    return Challenge(
+      tid: data.tid.present ? data.tid.value : this.tid,
+      did: data.did.present ? data.did.value : this.did,
+      name: data.name.present ? data.name.value : this.name,
+      data: data.data.present ? data.data.value : this.data,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('Challenge(')
@@ -2368,6 +2469,16 @@ class Decrypt extends DataClass implements Insertable<Decrypt> {
         dataType: dataType ?? this.dataType,
         data: data ?? this.data,
       );
+  Decrypt copyWithCompanion(DecryptsCompanion data) {
+    return Decrypt(
+      tid: data.tid.present ? data.tid.value : this.tid,
+      did: data.did.present ? data.did.value : this.did,
+      name: data.name.present ? data.name.value : this.name,
+      dataType: data.dataType.present ? data.dataType.value : this.dataType,
+      data: data.data.present ? data.data.value : this.data,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('Decrypt(')
@@ -2500,6 +2611,7 @@ class DecryptsCompanion extends UpdateCompanion<Decrypt> {
 
 abstract class _$Database extends GeneratedDatabase {
   _$Database(QueryExecutor e) : super(e);
+  $DatabaseManager get managers => $DatabaseManager(this);
   late final $DevicesTable devices = $DevicesTable(this);
   late final $UsersTable users = $UsersTable(this);
   late final $GroupsTable groups = $GroupsTable(this);
@@ -2525,4 +2637,2092 @@ abstract class _$Database extends GeneratedDatabase {
         challenges,
         decrypts
       ];
+}
+
+typedef $$DevicesTableCreateCompanionBuilder = DevicesCompanion Function({
+  required Uint8List id,
+  required String name,
+  required DeviceKind kind,
+  Value<int> rowid,
+});
+typedef $$DevicesTableUpdateCompanionBuilder = DevicesCompanion Function({
+  Value<Uint8List> id,
+  Value<String> name,
+  Value<DeviceKind> kind,
+  Value<int> rowid,
+});
+
+final class $$DevicesTableReferences
+    extends BaseReferences<_$Database, $DevicesTable, Device> {
+  $$DevicesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$UsersTable, List<User>> _usersRefsTable(
+          _$Database db) =>
+      MultiTypedResultKey.fromTable(db.users,
+          aliasName: $_aliasNameGenerator(db.devices.id, db.users.id));
+
+  $$UsersTableProcessedTableManager get usersRefs {
+    final manager = $$UsersTableTableManager($_db, $_db.users)
+        .filter((f) => f.id.id.sqlEquals($_itemColumn<Uint8List>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_usersRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+
+  static MultiTypedResultKey<$GroupMembersTable, List<GroupMember>>
+      _groupMembersRefsTable(_$Database db) => MultiTypedResultKey.fromTable(
+          db.groupMembers,
+          aliasName: $_aliasNameGenerator(db.devices.id, db.groupMembers.did));
+
+  $$GroupMembersTableProcessedTableManager get groupMembersRefs {
+    final manager = $$GroupMembersTableTableManager($_db, $_db.groupMembers)
+        .filter((f) => f.did.id.sqlEquals($_itemColumn<Uint8List>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_groupMembersRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+}
+
+class $$DevicesTableFilterComposer extends Composer<_$Database, $DevicesTable> {
+  $$DevicesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<Uint8List> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnWithTypeConverterFilters<DeviceKind, DeviceKind, String> get kind =>
+      $composableBuilder(
+          column: $table.kind,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  Expression<bool> usersRefs(
+      Expression<bool> Function($$UsersTableFilterComposer f) f) {
+    final $$UsersTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.users,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$UsersTableFilterComposer(
+              $db: $db,
+              $table: $db.users,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<bool> groupMembersRefs(
+      Expression<bool> Function($$GroupMembersTableFilterComposer f) f) {
+    final $$GroupMembersTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.groupMembers,
+        getReferencedColumn: (t) => t.did,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$GroupMembersTableFilterComposer(
+              $db: $db,
+              $table: $db.groupMembers,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+}
+
+class $$DevicesTableOrderingComposer
+    extends Composer<_$Database, $DevicesTable> {
+  $$DevicesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<Uint8List> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+      column: $table.kind, builder: (column) => ColumnOrderings(column));
+}
+
+class $$DevicesTableAnnotationComposer
+    extends Composer<_$Database, $DevicesTable> {
+  $$DevicesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<Uint8List> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<DeviceKind, String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  Expression<T> usersRefs<T extends Object>(
+      Expression<T> Function($$UsersTableAnnotationComposer a) f) {
+    final $$UsersTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.users,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$UsersTableAnnotationComposer(
+              $db: $db,
+              $table: $db.users,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<T> groupMembersRefs<T extends Object>(
+      Expression<T> Function($$GroupMembersTableAnnotationComposer a) f) {
+    final $$GroupMembersTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.groupMembers,
+        getReferencedColumn: (t) => t.did,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$GroupMembersTableAnnotationComposer(
+              $db: $db,
+              $table: $db.groupMembers,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+}
+
+class $$DevicesTableTableManager extends RootTableManager<
+    _$Database,
+    $DevicesTable,
+    Device,
+    $$DevicesTableFilterComposer,
+    $$DevicesTableOrderingComposer,
+    $$DevicesTableAnnotationComposer,
+    $$DevicesTableCreateCompanionBuilder,
+    $$DevicesTableUpdateCompanionBuilder,
+    (Device, $$DevicesTableReferences),
+    Device,
+    PrefetchHooks Function({bool usersRefs, bool groupMembersRefs})> {
+  $$DevicesTableTableManager(_$Database db, $DevicesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DevicesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DevicesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DevicesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<Uint8List> id = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<DeviceKind> kind = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              DevicesCompanion(
+            id: id,
+            name: name,
+            kind: kind,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required Uint8List id,
+            required String name,
+            required DeviceKind kind,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              DevicesCompanion.insert(
+            id: id,
+            name: name,
+            kind: kind,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) =>
+                  (e.readTable(table), $$DevicesTableReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: (
+              {usersRefs = false, groupMembersRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (usersRefs) db.users,
+                if (groupMembersRefs) db.groupMembers
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (usersRefs)
+                    await $_getPrefetchedData<Device, $DevicesTable, User>(
+                        currentTable: table,
+                        referencedTable:
+                            $$DevicesTableReferences._usersRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$DevicesTableReferences(db, table, p0).usersRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) =>
+                                referencedItems.where((e) => e.id == item.id),
+                        typedResults: items),
+                  if (groupMembersRefs)
+                    await $_getPrefetchedData<Device, $DevicesTable,
+                            GroupMember>(
+                        currentTable: table,
+                        referencedTable:
+                            $$DevicesTableReferences._groupMembersRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$DevicesTableReferences(db, table, p0)
+                                .groupMembersRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) =>
+                                referencedItems.where((e) => e.did == item.id),
+                        typedResults: items)
+                ];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$DevicesTableProcessedTableManager = ProcessedTableManager<
+    _$Database,
+    $DevicesTable,
+    Device,
+    $$DevicesTableFilterComposer,
+    $$DevicesTableOrderingComposer,
+    $$DevicesTableAnnotationComposer,
+    $$DevicesTableCreateCompanionBuilder,
+    $$DevicesTableUpdateCompanionBuilder,
+    (Device, $$DevicesTableReferences),
+    Device,
+    PrefetchHooks Function({bool usersRefs, bool groupMembersRefs})>;
+typedef $$UsersTableCreateCompanionBuilder = UsersCompanion Function({
+  required Uint8List id,
+  required String host,
+  Value<int> rowid,
+});
+typedef $$UsersTableUpdateCompanionBuilder = UsersCompanion Function({
+  Value<Uint8List> id,
+  Value<String> host,
+  Value<int> rowid,
+});
+
+final class $$UsersTableReferences
+    extends BaseReferences<_$Database, $UsersTable, User> {
+  $$UsersTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $DevicesTable _idTable(_$Database db) =>
+      db.devices.createAlias($_aliasNameGenerator(db.users.id, db.devices.id));
+
+  $$DevicesTableProcessedTableManager get id {
+    final $_column = $_itemColumn<Uint8List>('id')!;
+
+    final manager = $$DevicesTableTableManager($_db, $_db.devices)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_idTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
+class $$UsersTableFilterComposer extends Composer<_$Database, $UsersTable> {
+  $$UsersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get host => $composableBuilder(
+      column: $table.host, builder: (column) => ColumnFilters(column));
+
+  $$DevicesTableFilterComposer get id {
+    final $$DevicesTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.devices,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$DevicesTableFilterComposer(
+              $db: $db,
+              $table: $db.devices,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$UsersTableOrderingComposer extends Composer<_$Database, $UsersTable> {
+  $$UsersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get host => $composableBuilder(
+      column: $table.host, builder: (column) => ColumnOrderings(column));
+
+  $$DevicesTableOrderingComposer get id {
+    final $$DevicesTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.devices,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$DevicesTableOrderingComposer(
+              $db: $db,
+              $table: $db.devices,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$UsersTableAnnotationComposer extends Composer<_$Database, $UsersTable> {
+  $$UsersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get host =>
+      $composableBuilder(column: $table.host, builder: (column) => column);
+
+  $$DevicesTableAnnotationComposer get id {
+    final $$DevicesTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.devices,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$DevicesTableAnnotationComposer(
+              $db: $db,
+              $table: $db.devices,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$UsersTableTableManager extends RootTableManager<
+    _$Database,
+    $UsersTable,
+    User,
+    $$UsersTableFilterComposer,
+    $$UsersTableOrderingComposer,
+    $$UsersTableAnnotationComposer,
+    $$UsersTableCreateCompanionBuilder,
+    $$UsersTableUpdateCompanionBuilder,
+    (User, $$UsersTableReferences),
+    User,
+    PrefetchHooks Function({bool id})> {
+  $$UsersTableTableManager(_$Database db, $UsersTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$UsersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$UsersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$UsersTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<Uint8List> id = const Value.absent(),
+            Value<String> host = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              UsersCompanion(
+            id: id,
+            host: host,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required Uint8List id,
+            required String host,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              UsersCompanion.insert(
+            id: id,
+            host: host,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) =>
+                  (e.readTable(table), $$UsersTableReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: ({id = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (id) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.id,
+                    referencedTable: $$UsersTableReferences._idTable(db),
+                    referencedColumn: $$UsersTableReferences._idTable(db).id,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$UsersTableProcessedTableManager = ProcessedTableManager<
+    _$Database,
+    $UsersTable,
+    User,
+    $$UsersTableFilterComposer,
+    $$UsersTableOrderingComposer,
+    $$UsersTableAnnotationComposer,
+    $$UsersTableCreateCompanionBuilder,
+    $$UsersTableUpdateCompanionBuilder,
+    (User, $$UsersTableReferences),
+    User,
+    PrefetchHooks Function({bool id})>;
+typedef $$GroupsTableCreateCompanionBuilder = GroupsCompanion Function({
+  Value<Uint8List?> id,
+  required Uint8List tid,
+  required Uint8List did,
+  required String name,
+  required int threshold,
+  required Protocol protocol,
+  required KeyType keyType,
+  Value<bool> withCard,
+  required Uint8List context,
+  Value<Uint8List?> certificates,
+  Value<String?> note,
+  Value<int> rowid,
+});
+typedef $$GroupsTableUpdateCompanionBuilder = GroupsCompanion Function({
+  Value<Uint8List?> id,
+  Value<Uint8List> tid,
+  Value<Uint8List> did,
+  Value<String> name,
+  Value<int> threshold,
+  Value<Protocol> protocol,
+  Value<KeyType> keyType,
+  Value<bool> withCard,
+  Value<Uint8List> context,
+  Value<Uint8List?> certificates,
+  Value<String?> note,
+  Value<int> rowid,
+});
+
+final class $$GroupsTableReferences
+    extends BaseReferences<_$Database, $GroupsTable, Group> {
+  $$GroupsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$TasksTable, List<Task>> _tasksRefsTable(
+          _$Database db) =>
+      MultiTypedResultKey.fromTable(db.tasks,
+          aliasName: $_aliasNameGenerator(db.groups.id, db.tasks.gid));
+
+  $$TasksTableProcessedTableManager get tasksRefs {
+    final manager = $$TasksTableTableManager($_db, $_db.tasks).filter((f) =>
+        f.gid.id.sqlEquals($_itemColumn<Uint8List>('id') ?? Uint8List(0)));
+
+    final cache = $_typedResult.readTableOrNull(_tasksRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+
+  static MultiTypedResultKey<$GroupMembersTable, List<GroupMember>>
+      _groupMembersRefsTable(_$Database db) => MultiTypedResultKey.fromTable(
+          db.groupMembers,
+          aliasName: $_aliasNameGenerator(db.groups.id, db.groupMembers.tid));
+
+  $$GroupMembersTableProcessedTableManager get groupMembersRefs {
+    final manager = $$GroupMembersTableTableManager($_db, $_db.groupMembers)
+        .filter((f) =>
+            f.tid.id.sqlEquals($_itemColumn<Uint8List>('id') ?? Uint8List(0)));
+
+    final cache = $_typedResult.readTableOrNull(_groupMembersRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+}
+
+class $$GroupsTableFilterComposer extends Composer<_$Database, $GroupsTable> {
+  $$GroupsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<Uint8List> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<Uint8List> get tid => $composableBuilder(
+      column: $table.tid, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<Uint8List> get did => $composableBuilder(
+      column: $table.did, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get threshold => $composableBuilder(
+      column: $table.threshold, builder: (column) => ColumnFilters(column));
+
+  ColumnWithTypeConverterFilters<Protocol, Protocol, String> get protocol =>
+      $composableBuilder(
+          column: $table.protocol,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  ColumnWithTypeConverterFilters<KeyType, KeyType, String> get keyType =>
+      $composableBuilder(
+          column: $table.keyType,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  ColumnFilters<bool> get withCard => $composableBuilder(
+      column: $table.withCard, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<Uint8List> get context => $composableBuilder(
+      column: $table.context, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<Uint8List> get certificates => $composableBuilder(
+      column: $table.certificates, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get note => $composableBuilder(
+      column: $table.note, builder: (column) => ColumnFilters(column));
+
+  Expression<bool> tasksRefs(
+      Expression<bool> Function($$TasksTableFilterComposer f) f) {
+    final $$TasksTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.tasks,
+        getReferencedColumn: (t) => t.gid,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$TasksTableFilterComposer(
+              $db: $db,
+              $table: $db.tasks,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<bool> groupMembersRefs(
+      Expression<bool> Function($$GroupMembersTableFilterComposer f) f) {
+    final $$GroupMembersTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.groupMembers,
+        getReferencedColumn: (t) => t.tid,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$GroupMembersTableFilterComposer(
+              $db: $db,
+              $table: $db.groupMembers,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+}
+
+class $$GroupsTableOrderingComposer extends Composer<_$Database, $GroupsTable> {
+  $$GroupsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<Uint8List> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<Uint8List> get tid => $composableBuilder(
+      column: $table.tid, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<Uint8List> get did => $composableBuilder(
+      column: $table.did, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get threshold => $composableBuilder(
+      column: $table.threshold, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get protocol => $composableBuilder(
+      column: $table.protocol, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get keyType => $composableBuilder(
+      column: $table.keyType, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get withCard => $composableBuilder(
+      column: $table.withCard, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<Uint8List> get context => $composableBuilder(
+      column: $table.context, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<Uint8List> get certificates => $composableBuilder(
+      column: $table.certificates,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get note => $composableBuilder(
+      column: $table.note, builder: (column) => ColumnOrderings(column));
+}
+
+class $$GroupsTableAnnotationComposer
+    extends Composer<_$Database, $GroupsTable> {
+  $$GroupsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<Uint8List> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get tid =>
+      $composableBuilder(column: $table.tid, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get did =>
+      $composableBuilder(column: $table.did, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get threshold =>
+      $composableBuilder(column: $table.threshold, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Protocol, String> get protocol =>
+      $composableBuilder(column: $table.protocol, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<KeyType, String> get keyType =>
+      $composableBuilder(column: $table.keyType, builder: (column) => column);
+
+  GeneratedColumn<bool> get withCard =>
+      $composableBuilder(column: $table.withCard, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get context =>
+      $composableBuilder(column: $table.context, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get certificates => $composableBuilder(
+      column: $table.certificates, builder: (column) => column);
+
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+
+  Expression<T> tasksRefs<T extends Object>(
+      Expression<T> Function($$TasksTableAnnotationComposer a) f) {
+    final $$TasksTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.tasks,
+        getReferencedColumn: (t) => t.gid,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$TasksTableAnnotationComposer(
+              $db: $db,
+              $table: $db.tasks,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<T> groupMembersRefs<T extends Object>(
+      Expression<T> Function($$GroupMembersTableAnnotationComposer a) f) {
+    final $$GroupMembersTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.groupMembers,
+        getReferencedColumn: (t) => t.tid,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$GroupMembersTableAnnotationComposer(
+              $db: $db,
+              $table: $db.groupMembers,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+}
+
+class $$GroupsTableTableManager extends RootTableManager<
+    _$Database,
+    $GroupsTable,
+    Group,
+    $$GroupsTableFilterComposer,
+    $$GroupsTableOrderingComposer,
+    $$GroupsTableAnnotationComposer,
+    $$GroupsTableCreateCompanionBuilder,
+    $$GroupsTableUpdateCompanionBuilder,
+    (Group, $$GroupsTableReferences),
+    Group,
+    PrefetchHooks Function({bool tasksRefs, bool groupMembersRefs})> {
+  $$GroupsTableTableManager(_$Database db, $GroupsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$GroupsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$GroupsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$GroupsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<Uint8List?> id = const Value.absent(),
+            Value<Uint8List> tid = const Value.absent(),
+            Value<Uint8List> did = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<int> threshold = const Value.absent(),
+            Value<Protocol> protocol = const Value.absent(),
+            Value<KeyType> keyType = const Value.absent(),
+            Value<bool> withCard = const Value.absent(),
+            Value<Uint8List> context = const Value.absent(),
+            Value<Uint8List?> certificates = const Value.absent(),
+            Value<String?> note = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              GroupsCompanion(
+            id: id,
+            tid: tid,
+            did: did,
+            name: name,
+            threshold: threshold,
+            protocol: protocol,
+            keyType: keyType,
+            withCard: withCard,
+            context: context,
+            certificates: certificates,
+            note: note,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            Value<Uint8List?> id = const Value.absent(),
+            required Uint8List tid,
+            required Uint8List did,
+            required String name,
+            required int threshold,
+            required Protocol protocol,
+            required KeyType keyType,
+            Value<bool> withCard = const Value.absent(),
+            required Uint8List context,
+            Value<Uint8List?> certificates = const Value.absent(),
+            Value<String?> note = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              GroupsCompanion.insert(
+            id: id,
+            tid: tid,
+            did: did,
+            name: name,
+            threshold: threshold,
+            protocol: protocol,
+            keyType: keyType,
+            withCard: withCard,
+            context: context,
+            certificates: certificates,
+            note: note,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) =>
+                  (e.readTable(table), $$GroupsTableReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: (
+              {tasksRefs = false, groupMembersRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (tasksRefs) db.tasks,
+                if (groupMembersRefs) db.groupMembers
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (tasksRefs)
+                    await $_getPrefetchedData<Group, $GroupsTable, Task>(
+                        currentTable: table,
+                        referencedTable:
+                            $$GroupsTableReferences._tasksRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$GroupsTableReferences(db, table, p0).tasksRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) =>
+                                referencedItems.where((e) => e.gid == item.id),
+                        typedResults: items),
+                  if (groupMembersRefs)
+                    await $_getPrefetchedData<Group, $GroupsTable, GroupMember>(
+                        currentTable: table,
+                        referencedTable:
+                            $$GroupsTableReferences._groupMembersRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$GroupsTableReferences(db, table, p0)
+                                .groupMembersRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) =>
+                                referencedItems.where((e) => e.tid == item.id),
+                        typedResults: items)
+                ];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$GroupsTableProcessedTableManager = ProcessedTableManager<
+    _$Database,
+    $GroupsTable,
+    Group,
+    $$GroupsTableFilterComposer,
+    $$GroupsTableOrderingComposer,
+    $$GroupsTableAnnotationComposer,
+    $$GroupsTableCreateCompanionBuilder,
+    $$GroupsTableUpdateCompanionBuilder,
+    (Group, $$GroupsTableReferences),
+    Group,
+    PrefetchHooks Function({bool tasksRefs, bool groupMembersRefs})>;
+typedef $$TasksTableCreateCompanionBuilder = TasksCompanion Function({
+  required Uint8List id,
+  required Uint8List did,
+  Value<Uint8List?> gid,
+  required TaskState state,
+  Value<TaskError?> error,
+  Value<bool> approved,
+  Value<bool> archived,
+  Value<int> round,
+  Value<int> attempt,
+  Value<Uint8List?> context,
+  Value<Uint8List?> data,
+  required DateTime createdAt,
+  Value<int> rowid,
+});
+typedef $$TasksTableUpdateCompanionBuilder = TasksCompanion Function({
+  Value<Uint8List> id,
+  Value<Uint8List> did,
+  Value<Uint8List?> gid,
+  Value<TaskState> state,
+  Value<TaskError?> error,
+  Value<bool> approved,
+  Value<bool> archived,
+  Value<int> round,
+  Value<int> attempt,
+  Value<Uint8List?> context,
+  Value<Uint8List?> data,
+  Value<DateTime> createdAt,
+  Value<int> rowid,
+});
+
+final class $$TasksTableReferences
+    extends BaseReferences<_$Database, $TasksTable, Task> {
+  $$TasksTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $GroupsTable _gidTable(_$Database db) =>
+      db.groups.createAlias($_aliasNameGenerator(db.tasks.gid, db.groups.id));
+
+  $$GroupsTableProcessedTableManager? get gid {
+    final $_column = $_itemColumn<Uint8List>('gid');
+    if ($_column == null) return null;
+    final manager = $$GroupsTableTableManager($_db, $_db.groups)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_gidTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
+class $$TasksTableFilterComposer extends Composer<_$Database, $TasksTable> {
+  $$TasksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<Uint8List> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<Uint8List> get did => $composableBuilder(
+      column: $table.did, builder: (column) => ColumnFilters(column));
+
+  ColumnWithTypeConverterFilters<TaskState, TaskState, String> get state =>
+      $composableBuilder(
+          column: $table.state,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  ColumnWithTypeConverterFilters<TaskError?, TaskError, String> get error =>
+      $composableBuilder(
+          column: $table.error,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  ColumnFilters<bool> get approved => $composableBuilder(
+      column: $table.approved, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get archived => $composableBuilder(
+      column: $table.archived, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get round => $composableBuilder(
+      column: $table.round, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get attempt => $composableBuilder(
+      column: $table.attempt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<Uint8List> get context => $composableBuilder(
+      column: $table.context, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<Uint8List> get data => $composableBuilder(
+      column: $table.data, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  $$GroupsTableFilterComposer get gid {
+    final $$GroupsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.gid,
+        referencedTable: $db.groups,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$GroupsTableFilterComposer(
+              $db: $db,
+              $table: $db.groups,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$TasksTableOrderingComposer extends Composer<_$Database, $TasksTable> {
+  $$TasksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<Uint8List> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<Uint8List> get did => $composableBuilder(
+      column: $table.did, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get state => $composableBuilder(
+      column: $table.state, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get error => $composableBuilder(
+      column: $table.error, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get approved => $composableBuilder(
+      column: $table.approved, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get archived => $composableBuilder(
+      column: $table.archived, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get round => $composableBuilder(
+      column: $table.round, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get attempt => $composableBuilder(
+      column: $table.attempt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<Uint8List> get context => $composableBuilder(
+      column: $table.context, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<Uint8List> get data => $composableBuilder(
+      column: $table.data, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  $$GroupsTableOrderingComposer get gid {
+    final $$GroupsTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.gid,
+        referencedTable: $db.groups,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$GroupsTableOrderingComposer(
+              $db: $db,
+              $table: $db.groups,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$TasksTableAnnotationComposer extends Composer<_$Database, $TasksTable> {
+  $$TasksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<Uint8List> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get did =>
+      $composableBuilder(column: $table.did, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<TaskState, String> get state =>
+      $composableBuilder(column: $table.state, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<TaskError?, String> get error =>
+      $composableBuilder(column: $table.error, builder: (column) => column);
+
+  GeneratedColumn<bool> get approved =>
+      $composableBuilder(column: $table.approved, builder: (column) => column);
+
+  GeneratedColumn<bool> get archived =>
+      $composableBuilder(column: $table.archived, builder: (column) => column);
+
+  GeneratedColumn<int> get round =>
+      $composableBuilder(column: $table.round, builder: (column) => column);
+
+  GeneratedColumn<int> get attempt =>
+      $composableBuilder(column: $table.attempt, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get context =>
+      $composableBuilder(column: $table.context, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get data =>
+      $composableBuilder(column: $table.data, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$GroupsTableAnnotationComposer get gid {
+    final $$GroupsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.gid,
+        referencedTable: $db.groups,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$GroupsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.groups,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$TasksTableTableManager extends RootTableManager<
+    _$Database,
+    $TasksTable,
+    Task,
+    $$TasksTableFilterComposer,
+    $$TasksTableOrderingComposer,
+    $$TasksTableAnnotationComposer,
+    $$TasksTableCreateCompanionBuilder,
+    $$TasksTableUpdateCompanionBuilder,
+    (Task, $$TasksTableReferences),
+    Task,
+    PrefetchHooks Function({bool gid})> {
+  $$TasksTableTableManager(_$Database db, $TasksTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TasksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TasksTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TasksTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<Uint8List> id = const Value.absent(),
+            Value<Uint8List> did = const Value.absent(),
+            Value<Uint8List?> gid = const Value.absent(),
+            Value<TaskState> state = const Value.absent(),
+            Value<TaskError?> error = const Value.absent(),
+            Value<bool> approved = const Value.absent(),
+            Value<bool> archived = const Value.absent(),
+            Value<int> round = const Value.absent(),
+            Value<int> attempt = const Value.absent(),
+            Value<Uint8List?> context = const Value.absent(),
+            Value<Uint8List?> data = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              TasksCompanion(
+            id: id,
+            did: did,
+            gid: gid,
+            state: state,
+            error: error,
+            approved: approved,
+            archived: archived,
+            round: round,
+            attempt: attempt,
+            context: context,
+            data: data,
+            createdAt: createdAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required Uint8List id,
+            required Uint8List did,
+            Value<Uint8List?> gid = const Value.absent(),
+            required TaskState state,
+            Value<TaskError?> error = const Value.absent(),
+            Value<bool> approved = const Value.absent(),
+            Value<bool> archived = const Value.absent(),
+            Value<int> round = const Value.absent(),
+            Value<int> attempt = const Value.absent(),
+            Value<Uint8List?> context = const Value.absent(),
+            Value<Uint8List?> data = const Value.absent(),
+            required DateTime createdAt,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              TasksCompanion.insert(
+            id: id,
+            did: did,
+            gid: gid,
+            state: state,
+            error: error,
+            approved: approved,
+            archived: archived,
+            round: round,
+            attempt: attempt,
+            context: context,
+            data: data,
+            createdAt: createdAt,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) =>
+                  (e.readTable(table), $$TasksTableReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: ({gid = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (gid) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.gid,
+                    referencedTable: $$TasksTableReferences._gidTable(db),
+                    referencedColumn: $$TasksTableReferences._gidTable(db).id,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$TasksTableProcessedTableManager = ProcessedTableManager<
+    _$Database,
+    $TasksTable,
+    Task,
+    $$TasksTableFilterComposer,
+    $$TasksTableOrderingComposer,
+    $$TasksTableAnnotationComposer,
+    $$TasksTableCreateCompanionBuilder,
+    $$TasksTableUpdateCompanionBuilder,
+    (Task, $$TasksTableReferences),
+    Task,
+    PrefetchHooks Function({bool gid})>;
+typedef $$GroupMembersTableCreateCompanionBuilder = GroupMembersCompanion
+    Function({
+  required Uint8List tid,
+  required Uint8List did,
+  required int shares,
+  Value<int> rowid,
+});
+typedef $$GroupMembersTableUpdateCompanionBuilder = GroupMembersCompanion
+    Function({
+  Value<Uint8List> tid,
+  Value<Uint8List> did,
+  Value<int> shares,
+  Value<int> rowid,
+});
+
+final class $$GroupMembersTableReferences
+    extends BaseReferences<_$Database, $GroupMembersTable, GroupMember> {
+  $$GroupMembersTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $GroupsTable _tidTable(_$Database db) => db.groups
+      .createAlias($_aliasNameGenerator(db.groupMembers.tid, db.groups.id));
+
+  $$GroupsTableProcessedTableManager get tid {
+    final $_column = $_itemColumn<Uint8List>('tid')!;
+
+    final manager = $$GroupsTableTableManager($_db, $_db.groups)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_tidTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+
+  static $DevicesTable _didTable(_$Database db) => db.devices
+      .createAlias($_aliasNameGenerator(db.groupMembers.did, db.devices.id));
+
+  $$DevicesTableProcessedTableManager get did {
+    final $_column = $_itemColumn<Uint8List>('did')!;
+
+    final manager = $$DevicesTableTableManager($_db, $_db.devices)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_didTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
+class $$GroupMembersTableFilterComposer
+    extends Composer<_$Database, $GroupMembersTable> {
+  $$GroupMembersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get shares => $composableBuilder(
+      column: $table.shares, builder: (column) => ColumnFilters(column));
+
+  $$GroupsTableFilterComposer get tid {
+    final $$GroupsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.tid,
+        referencedTable: $db.groups,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$GroupsTableFilterComposer(
+              $db: $db,
+              $table: $db.groups,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  $$DevicesTableFilterComposer get did {
+    final $$DevicesTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.did,
+        referencedTable: $db.devices,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$DevicesTableFilterComposer(
+              $db: $db,
+              $table: $db.devices,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$GroupMembersTableOrderingComposer
+    extends Composer<_$Database, $GroupMembersTable> {
+  $$GroupMembersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get shares => $composableBuilder(
+      column: $table.shares, builder: (column) => ColumnOrderings(column));
+
+  $$GroupsTableOrderingComposer get tid {
+    final $$GroupsTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.tid,
+        referencedTable: $db.groups,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$GroupsTableOrderingComposer(
+              $db: $db,
+              $table: $db.groups,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  $$DevicesTableOrderingComposer get did {
+    final $$DevicesTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.did,
+        referencedTable: $db.devices,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$DevicesTableOrderingComposer(
+              $db: $db,
+              $table: $db.devices,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$GroupMembersTableAnnotationComposer
+    extends Composer<_$Database, $GroupMembersTable> {
+  $$GroupMembersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get shares =>
+      $composableBuilder(column: $table.shares, builder: (column) => column);
+
+  $$GroupsTableAnnotationComposer get tid {
+    final $$GroupsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.tid,
+        referencedTable: $db.groups,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$GroupsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.groups,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  $$DevicesTableAnnotationComposer get did {
+    final $$DevicesTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.did,
+        referencedTable: $db.devices,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$DevicesTableAnnotationComposer(
+              $db: $db,
+              $table: $db.devices,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$GroupMembersTableTableManager extends RootTableManager<
+    _$Database,
+    $GroupMembersTable,
+    GroupMember,
+    $$GroupMembersTableFilterComposer,
+    $$GroupMembersTableOrderingComposer,
+    $$GroupMembersTableAnnotationComposer,
+    $$GroupMembersTableCreateCompanionBuilder,
+    $$GroupMembersTableUpdateCompanionBuilder,
+    (GroupMember, $$GroupMembersTableReferences),
+    GroupMember,
+    PrefetchHooks Function({bool tid, bool did})> {
+  $$GroupMembersTableTableManager(_$Database db, $GroupMembersTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$GroupMembersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$GroupMembersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$GroupMembersTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<Uint8List> tid = const Value.absent(),
+            Value<Uint8List> did = const Value.absent(),
+            Value<int> shares = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              GroupMembersCompanion(
+            tid: tid,
+            did: did,
+            shares: shares,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required Uint8List tid,
+            required Uint8List did,
+            required int shares,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              GroupMembersCompanion.insert(
+            tid: tid,
+            did: did,
+            shares: shares,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable(table),
+                    $$GroupMembersTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: ({tid = false, did = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (tid) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.tid,
+                    referencedTable:
+                        $$GroupMembersTableReferences._tidTable(db),
+                    referencedColumn:
+                        $$GroupMembersTableReferences._tidTable(db).id,
+                  ) as T;
+                }
+                if (did) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.did,
+                    referencedTable:
+                        $$GroupMembersTableReferences._didTable(db),
+                    referencedColumn:
+                        $$GroupMembersTableReferences._didTable(db).id,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$GroupMembersTableProcessedTableManager = ProcessedTableManager<
+    _$Database,
+    $GroupMembersTable,
+    GroupMember,
+    $$GroupMembersTableFilterComposer,
+    $$GroupMembersTableOrderingComposer,
+    $$GroupMembersTableAnnotationComposer,
+    $$GroupMembersTableCreateCompanionBuilder,
+    $$GroupMembersTableUpdateCompanionBuilder,
+    (GroupMember, $$GroupMembersTableReferences),
+    GroupMember,
+    PrefetchHooks Function({bool tid, bool did})>;
+typedef $$FilesTableCreateCompanionBuilder = FilesCompanion Function({
+  required Uint8List tid,
+  required Uint8List did,
+  required String name,
+  Value<int> rowid,
+});
+typedef $$FilesTableUpdateCompanionBuilder = FilesCompanion Function({
+  Value<Uint8List> tid,
+  Value<Uint8List> did,
+  Value<String> name,
+  Value<int> rowid,
+});
+
+class $$FilesTableFilterComposer extends Composer<_$Database, $FilesTable> {
+  $$FilesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<Uint8List> get tid => $composableBuilder(
+      column: $table.tid, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<Uint8List> get did => $composableBuilder(
+      column: $table.did, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+}
+
+class $$FilesTableOrderingComposer extends Composer<_$Database, $FilesTable> {
+  $$FilesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<Uint8List> get tid => $composableBuilder(
+      column: $table.tid, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<Uint8List> get did => $composableBuilder(
+      column: $table.did, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+}
+
+class $$FilesTableAnnotationComposer extends Composer<_$Database, $FilesTable> {
+  $$FilesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<Uint8List> get tid =>
+      $composableBuilder(column: $table.tid, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get did =>
+      $composableBuilder(column: $table.did, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+}
+
+class $$FilesTableTableManager extends RootTableManager<
+    _$Database,
+    $FilesTable,
+    File,
+    $$FilesTableFilterComposer,
+    $$FilesTableOrderingComposer,
+    $$FilesTableAnnotationComposer,
+    $$FilesTableCreateCompanionBuilder,
+    $$FilesTableUpdateCompanionBuilder,
+    (File, BaseReferences<_$Database, $FilesTable, File>),
+    File,
+    PrefetchHooks Function()> {
+  $$FilesTableTableManager(_$Database db, $FilesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FilesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FilesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FilesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<Uint8List> tid = const Value.absent(),
+            Value<Uint8List> did = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              FilesCompanion(
+            tid: tid,
+            did: did,
+            name: name,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required Uint8List tid,
+            required Uint8List did,
+            required String name,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              FilesCompanion.insert(
+            tid: tid,
+            did: did,
+            name: name,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$FilesTableProcessedTableManager = ProcessedTableManager<
+    _$Database,
+    $FilesTable,
+    File,
+    $$FilesTableFilterComposer,
+    $$FilesTableOrderingComposer,
+    $$FilesTableAnnotationComposer,
+    $$FilesTableCreateCompanionBuilder,
+    $$FilesTableUpdateCompanionBuilder,
+    (File, BaseReferences<_$Database, $FilesTable, File>),
+    File,
+    PrefetchHooks Function()>;
+typedef $$ChallengesTableCreateCompanionBuilder = ChallengesCompanion Function({
+  required Uint8List tid,
+  required Uint8List did,
+  required String name,
+  required Uint8List data,
+  Value<int> rowid,
+});
+typedef $$ChallengesTableUpdateCompanionBuilder = ChallengesCompanion Function({
+  Value<Uint8List> tid,
+  Value<Uint8List> did,
+  Value<String> name,
+  Value<Uint8List> data,
+  Value<int> rowid,
+});
+
+class $$ChallengesTableFilterComposer
+    extends Composer<_$Database, $ChallengesTable> {
+  $$ChallengesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<Uint8List> get tid => $composableBuilder(
+      column: $table.tid, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<Uint8List> get did => $composableBuilder(
+      column: $table.did, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<Uint8List> get data => $composableBuilder(
+      column: $table.data, builder: (column) => ColumnFilters(column));
+}
+
+class $$ChallengesTableOrderingComposer
+    extends Composer<_$Database, $ChallengesTable> {
+  $$ChallengesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<Uint8List> get tid => $composableBuilder(
+      column: $table.tid, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<Uint8List> get did => $composableBuilder(
+      column: $table.did, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<Uint8List> get data => $composableBuilder(
+      column: $table.data, builder: (column) => ColumnOrderings(column));
+}
+
+class $$ChallengesTableAnnotationComposer
+    extends Composer<_$Database, $ChallengesTable> {
+  $$ChallengesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<Uint8List> get tid =>
+      $composableBuilder(column: $table.tid, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get did =>
+      $composableBuilder(column: $table.did, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get data =>
+      $composableBuilder(column: $table.data, builder: (column) => column);
+}
+
+class $$ChallengesTableTableManager extends RootTableManager<
+    _$Database,
+    $ChallengesTable,
+    Challenge,
+    $$ChallengesTableFilterComposer,
+    $$ChallengesTableOrderingComposer,
+    $$ChallengesTableAnnotationComposer,
+    $$ChallengesTableCreateCompanionBuilder,
+    $$ChallengesTableUpdateCompanionBuilder,
+    (Challenge, BaseReferences<_$Database, $ChallengesTable, Challenge>),
+    Challenge,
+    PrefetchHooks Function()> {
+  $$ChallengesTableTableManager(_$Database db, $ChallengesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ChallengesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ChallengesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ChallengesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<Uint8List> tid = const Value.absent(),
+            Value<Uint8List> did = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<Uint8List> data = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ChallengesCompanion(
+            tid: tid,
+            did: did,
+            name: name,
+            data: data,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required Uint8List tid,
+            required Uint8List did,
+            required String name,
+            required Uint8List data,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ChallengesCompanion.insert(
+            tid: tid,
+            did: did,
+            name: name,
+            data: data,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$ChallengesTableProcessedTableManager = ProcessedTableManager<
+    _$Database,
+    $ChallengesTable,
+    Challenge,
+    $$ChallengesTableFilterComposer,
+    $$ChallengesTableOrderingComposer,
+    $$ChallengesTableAnnotationComposer,
+    $$ChallengesTableCreateCompanionBuilder,
+    $$ChallengesTableUpdateCompanionBuilder,
+    (Challenge, BaseReferences<_$Database, $ChallengesTable, Challenge>),
+    Challenge,
+    PrefetchHooks Function()>;
+typedef $$DecryptsTableCreateCompanionBuilder = DecryptsCompanion Function({
+  required Uint8List tid,
+  required Uint8List did,
+  required String name,
+  required String dataType,
+  required Uint8List data,
+  Value<int> rowid,
+});
+typedef $$DecryptsTableUpdateCompanionBuilder = DecryptsCompanion Function({
+  Value<Uint8List> tid,
+  Value<Uint8List> did,
+  Value<String> name,
+  Value<String> dataType,
+  Value<Uint8List> data,
+  Value<int> rowid,
+});
+
+class $$DecryptsTableFilterComposer
+    extends Composer<_$Database, $DecryptsTable> {
+  $$DecryptsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<Uint8List> get tid => $composableBuilder(
+      column: $table.tid, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<Uint8List> get did => $composableBuilder(
+      column: $table.did, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get dataType => $composableBuilder(
+      column: $table.dataType, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<Uint8List> get data => $composableBuilder(
+      column: $table.data, builder: (column) => ColumnFilters(column));
+}
+
+class $$DecryptsTableOrderingComposer
+    extends Composer<_$Database, $DecryptsTable> {
+  $$DecryptsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<Uint8List> get tid => $composableBuilder(
+      column: $table.tid, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<Uint8List> get did => $composableBuilder(
+      column: $table.did, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get dataType => $composableBuilder(
+      column: $table.dataType, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<Uint8List> get data => $composableBuilder(
+      column: $table.data, builder: (column) => ColumnOrderings(column));
+}
+
+class $$DecryptsTableAnnotationComposer
+    extends Composer<_$Database, $DecryptsTable> {
+  $$DecryptsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<Uint8List> get tid =>
+      $composableBuilder(column: $table.tid, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get did =>
+      $composableBuilder(column: $table.did, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get dataType =>
+      $composableBuilder(column: $table.dataType, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get data =>
+      $composableBuilder(column: $table.data, builder: (column) => column);
+}
+
+class $$DecryptsTableTableManager extends RootTableManager<
+    _$Database,
+    $DecryptsTable,
+    Decrypt,
+    $$DecryptsTableFilterComposer,
+    $$DecryptsTableOrderingComposer,
+    $$DecryptsTableAnnotationComposer,
+    $$DecryptsTableCreateCompanionBuilder,
+    $$DecryptsTableUpdateCompanionBuilder,
+    (Decrypt, BaseReferences<_$Database, $DecryptsTable, Decrypt>),
+    Decrypt,
+    PrefetchHooks Function()> {
+  $$DecryptsTableTableManager(_$Database db, $DecryptsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DecryptsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DecryptsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DecryptsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<Uint8List> tid = const Value.absent(),
+            Value<Uint8List> did = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<String> dataType = const Value.absent(),
+            Value<Uint8List> data = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              DecryptsCompanion(
+            tid: tid,
+            did: did,
+            name: name,
+            dataType: dataType,
+            data: data,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required Uint8List tid,
+            required Uint8List did,
+            required String name,
+            required String dataType,
+            required Uint8List data,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              DecryptsCompanion.insert(
+            tid: tid,
+            did: did,
+            name: name,
+            dataType: dataType,
+            data: data,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$DecryptsTableProcessedTableManager = ProcessedTableManager<
+    _$Database,
+    $DecryptsTable,
+    Decrypt,
+    $$DecryptsTableFilterComposer,
+    $$DecryptsTableOrderingComposer,
+    $$DecryptsTableAnnotationComposer,
+    $$DecryptsTableCreateCompanionBuilder,
+    $$DecryptsTableUpdateCompanionBuilder,
+    (Decrypt, BaseReferences<_$Database, $DecryptsTable, Decrypt>),
+    Decrypt,
+    PrefetchHooks Function()>;
+
+class $DatabaseManager {
+  final _$Database _db;
+  $DatabaseManager(this._db);
+  $$DevicesTableTableManager get devices =>
+      $$DevicesTableTableManager(_db, _db.devices);
+  $$UsersTableTableManager get users =>
+      $$UsersTableTableManager(_db, _db.users);
+  $$GroupsTableTableManager get groups =>
+      $$GroupsTableTableManager(_db, _db.groups);
+  $$TasksTableTableManager get tasks =>
+      $$TasksTableTableManager(_db, _db.tasks);
+  $$GroupMembersTableTableManager get groupMembers =>
+      $$GroupMembersTableTableManager(_db, _db.groupMembers);
+  $$FilesTableTableManager get files =>
+      $$FilesTableTableManager(_db, _db.files);
+  $$ChallengesTableTableManager get challenges =>
+      $$ChallengesTableTableManager(_db, _db.challenges);
+  $$DecryptsTableTableManager get decrypts =>
+      $$DecryptsTableTableManager(_db, _db.decrypts);
 }

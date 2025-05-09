@@ -164,7 +164,10 @@ class DecryptTaskTile extends StatelessWidget {
       }
     }
     if (PlatformGroup.isMobile) {
-      await Share.shareXFiles([file], text: decrypt.name);
+      await SharePlus.instance.share(ShareParams(
+        files: [file],
+        text: decrypt.name,
+      ));
     }
   }
 }
