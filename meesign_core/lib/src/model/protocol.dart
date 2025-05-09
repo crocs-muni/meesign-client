@@ -7,9 +7,9 @@ enum ThresholdType {
 }
 
 enum Protocol {
-  gg18(6, 10, ThresholdType.tOfN),
-  elgamal(4, 2, ThresholdType.tOfN),
-  frost(3, 3, ThresholdType.tOfN, aid: '6a6366726f7374617070'),
+  gg18(10, 10, ThresholdType.tOfN),
+  elgamal(6, 2, ThresholdType.tOfN),
+  frost(4, 3, ThresholdType.tOfN, aid: '6a6366726f7374617070'),
   musig2(2, 3, ThresholdType.nOfN, aid: '01ffff04050607081101');
 
   final int keygenRounds;
