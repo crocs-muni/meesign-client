@@ -52,7 +52,7 @@ class AppContainer {
         await deleteDevice(userDid);
       }
 
-      endUserSession();
+      await endUserSession();
       await database.close();
     } catch (e) {
       Logger.root.severe(e.toString(), e);
@@ -86,13 +86,16 @@ class AppContainer {
     return session!;
   }
 
-  void endUserSession() {
+  Future<void> endUserSession() async {
     reporter.stop();
-    session?.dispose();
-    session = null;
+    if (session != null) {
+      await session!.dispose();
+      session = null;
+    }
   }
 
-  void dispose() {
-    database.close();
+  Future<void> dispose() async {
+    await endUserSession();
+    await database.close();
   }
 }

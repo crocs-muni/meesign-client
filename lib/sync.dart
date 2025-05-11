@@ -10,6 +10,7 @@ class Sync {
   final ValueNotifier<bool> subscribed = ValueNotifier(false);
 
   Timer? _retryTimer;
+  bool _disposed = false;
 
   Future<void> init(
     Uuid did,
@@ -17,11 +18,14 @@ class Sync {
   ) async {
     _did = did;
     _repositories = toSync;
+    _disposed = false;
 
     _subscribe();
   }
 
   Future<void> _subscribe() async {
+    if (_disposed) return;
+
     _retryTimer = null;
 
     Future<void> setUp(TaskRepository r) async {
@@ -40,11 +44,29 @@ class Sync {
   }
 
   void _subscriptionDone() {
+    if (_disposed) return;
+
     subscribed.value = false;
     _retry();
   }
 
   void _retry() {
-    _retryTimer ??= Timer(const Duration(seconds: 2), _subscribe);
+    if (_disposed) return;
+
+    _retryTimer?.cancel();
+    _retryTimer = Timer(const Duration(seconds: 2), _subscribe);
+  }
+
+  Future<void> dispose() async {
+    _disposed = true;
+
+    _retryTimer?.cancel();
+    _retryTimer = null;
+
+    await Future.wait([
+      for (var r in _repositories) r.unsubscribe(_did),
+    ]);
+
+    subscribed.value = false;
   }
 }

@@ -38,7 +38,15 @@ class AnonymousSession {
         DecryptRepository(dispatcher, keyStore, taskSource, taskDao);
   }
 
-  void dispose() {
-    // TODO: cleanup (e.g., close dispatcher connections?)
+  Future<void> dispose() async {
+    final devices = await deviceRepository.getAllLocalDevices();
+    if (devices.isNotEmpty) {
+      for (final device in devices) {
+        await groupRepository.unsubscribe(device.id);
+        await fileRepository.unsubscribe(device.id);
+        await challengeRepository.unsubscribe(device.id);
+        await decryptRepository.unsubscribe(device.id);
+      }
+    }
   }
 }
