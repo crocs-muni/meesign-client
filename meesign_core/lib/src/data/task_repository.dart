@@ -204,7 +204,7 @@ abstract class TaskRepository<T> {
   Future<void> _syncTaskUnsafe(Uuid did, Uuid tid, rpc.Task rpcTask) async {
     var task = await _taskDao.getTask(did.bytes, tid.bytes);
 
-    late final db.Task? newTask;
+    db.Task? newTask;
 
     try {
       if (task == null) {
@@ -216,7 +216,6 @@ abstract class TaskRepository<T> {
       if (task.attempt < rpcTask.attempt) {
         task = _restart(task, rpcTask);
       } else if (task.attempt > rpcTask.attempt) {
-        newTask = null;
         return;
       }
 
@@ -237,7 +236,9 @@ abstract class TaskRepository<T> {
     } on Exception {
       // TODO: some errors need to be reported to the server,
       // sometimes we can rollback (e.g. in case of network errors)
-      newTask = task?.copyWith(context: Value(null), state: TaskState.failed);
+      if (task != null) {
+        newTask = task.copyWith(context: Value(null), state: TaskState.failed);
+      }
       rethrow;
     } finally {
       if (newTask != null) {

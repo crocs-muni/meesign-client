@@ -34,8 +34,8 @@ class UserSession extends AnonymousSession {
   }
 
   @override
-  void dispose() {
-    // TODO: stop sync
+  Future<void> dispose() async {
+    await sync.dispose();
     super.dispose();
   }
 }
