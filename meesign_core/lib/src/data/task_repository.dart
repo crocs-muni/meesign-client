@@ -433,7 +433,6 @@ abstract class TaskRepository<T> {
         do {
           final resp = await card.transceive(data);
           final res = await ProtocolWrapper.advance(context, [resp]);
-          // TODO: save intermediate res to db?
           context = res.context;
           data = res.data.first;
           recipient = res.recipient;

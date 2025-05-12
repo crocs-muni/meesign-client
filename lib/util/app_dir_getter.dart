@@ -9,7 +9,7 @@ class AppDirGetter {
       return getLibraryDirectory();
     }
 
-    if (Platform.isAndroid || Platform.isLinux || Platform.isWindows) {
+    if (Platform.isAndroid) {
       return getApplicationSupportDirectory();
     }
 
