@@ -57,7 +57,6 @@ class DecryptListingPage extends StatelessWidget {
         child: SizedBox(
           width: double.infinity,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Padding(
                 padding: EdgeInsets.only(bottom: MEDIUM_PADDING),
@@ -67,6 +66,7 @@ class DecryptListingPage extends StatelessWidget {
                       ? 'assets/lottie/decrypt_light_mode.json'
                       : 'assets/lottie/decrypt_dark_mode.json',
                   width: 400,
+                  height: 310,
                   fit: BoxFit.fitWidth,
                 ),
               ),
@@ -78,7 +78,7 @@ class DecryptListingPage extends StatelessWidget {
               Text(
                 groupForTaskExists
                     ? 'Start by creating a new encryption task.'
-                    : 'Start by creating a group for encryption.',
+                    : 'Start by creating a group for decryption.',
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: LARGE_GAP),
@@ -91,7 +91,7 @@ class DecryptListingPage extends StatelessWidget {
                     tabViewModel.setIndex(3,
                         postNavigationAction: 'createGroup');
                   },
-                  child: const Text('Create an encryption group'),
+                  child: const Text('Create a decryption group'),
                 )
               ] else ...[
                 ElevatedButton(

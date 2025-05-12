@@ -66,7 +66,9 @@ class ChallengeListingPage extends StatelessWidget {
                 padding: EdgeInsets.only(bottom: MEDIUM_PADDING),
                 child: ControlledLottieAnimation(
                   startAtTabIndex: 1,
-                  assetName: 'assets/lottie/challenge_universal.json',
+                  assetName: Theme.of(context).brightness == Brightness.light
+                      ? 'assets/lottie/challenge_light_mode.json'
+                      : 'assets/lottie/challenge_dark_mode.json',
                   stopAtPercentage: 0.5,
                   width: 400,
                   fit: BoxFit.fitWidth,

@@ -10,7 +10,7 @@ dependencies:
   args: ^2.5.0
   collection: ^1.16.0
   convert: ^3.1.1
-  drift: ^2.5.0
+  drift: ^2.26.1
   meesign_native: {path: ../meesign_native}
   meesign_network: {path: ../meesign_network}
   meta: ^1.7.0
@@ -20,7 +20,7 @@ dependencies:
   synchronized: ^3.0.0+3
 
 dev_dependencies:
-  build_runner: ^2.3.3
-  drift_dev: ^2.5.2
+  build_runner: ^2.4.15
+  drift_dev: ^2.26.1
   lints: ^3.0.0
   test: ^1.16.0
