@@ -199,7 +199,8 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
   Widget _buildCreateGroupButton() {
     return Container(
-      margin: const EdgeInsets.only(bottom: LARGE_GAP),
+      margin: const EdgeInsets.symmetric(
+          vertical: LARGE_GAP, horizontal: SMALL_GAP),
       child: FilledButton.icon(
           style: FilledButton.styleFrom(
             minimumSize: const Size.fromHeight(48),
@@ -244,10 +245,11 @@ class _NewGroupPageState extends State<NewGroupPage> {
               _buildPurposeSection(),
               if (_hasBot) _buildBotSection(),
               _buildAdvancedSection(),
+              SizedBox(height: XLARGE_GAP),
+              _buildCreateGroupButton()
             ],
           ),
         ),
-        _buildCreateGroupButton()
       ],
     );
   }
@@ -421,7 +423,26 @@ class _NewGroupPageState extends State<NewGroupPage> {
                     label: '$_threshold',
                     onChanged: (_protocol.thresholdType == ThresholdType.nOfN ||
                             _shareCount <= _minThreshold)
-                        ? null
+                        ? (value) {
+                            if (_protocol.thresholdType == ThresholdType.nOfN) {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text(
+                                      "Share slider is disabled for this protocol"),
+                                  content: const Text(
+                                      "When using MUSIG2 protocol the threshold is always set to max number of shares. Therefore, it is not possible to use the slider."),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: const Text("OK"),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+                            return;
+                          }
                         : (value) => setState(() {
                               _setThreshold(value.round());
                             }),
@@ -430,19 +451,6 @@ class _NewGroupPageState extends State<NewGroupPage> {
                 const Icon(Symbols.people),
               ],
             ),
-            if (_protocol.thresholdType == ThresholdType.nOfN)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Important:",
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  SizedBox(width: SMALL_GAP),
-                  Text(
-                      "When using MUSIG2 protocol the threshold is always set to max number of shares. Therefore, it is not possible to use the slider.",
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary)),
-                ],
-              )
           ],
         )
       ],
@@ -565,6 +573,9 @@ class _NewGroupPageState extends State<NewGroupPage> {
       collapsedTextColor:
           Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.5),
       expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
+      shape: const Border(),
+      collapsedShape: const Border(),
+      childrenPadding: const EdgeInsets.symmetric(horizontal: 0),
       children: [
         OptionTile(
           title: 'Protocol',
