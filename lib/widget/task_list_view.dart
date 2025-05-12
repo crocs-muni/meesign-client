@@ -1,9 +1,12 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:meesign_core/meesign_core.dart';
+import 'package:provider/provider.dart';
 
 import '../enums/task_status.dart';
+import '../enums/task_type.dart';
 import '../ui_constants.dart';
+import '../view_model/app_view_model.dart';
 
 class TaskListView<T> extends StatefulWidget {
   final List<Task<T>> tasks;
@@ -26,6 +29,21 @@ class TaskListView<T> extends StatefulWidget {
 class _TaskListViewState<T> extends State<TaskListView<T>> {
   final _searchController = TextEditingController();
   String _searchQuery = '';
+  TaskType get taskType {
+    if (T == Group) {
+      return TaskType.group;
+    } else if (T == Challenge) {
+      return TaskType.challenge;
+    } else if (T == Decrypt) {
+      return TaskType.decrypt;
+    } else if (T == File) {
+      return TaskType.sign;
+    } else {
+      throw Exception('Unsupported task type');
+    }
+  }
+
+  bool isReloading = false;
 
   @override
   void initState() {
@@ -56,6 +74,18 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
     ];
 
     final taskCount = sections.map((s) => (taskGroups[s] ?? []).length).sum;
+
+    if (isReloading) {
+      return Column(
+        children: [
+          _buildTaskListHeader(),
+          const SizedBox(height: SMALL_GAP),
+          Center(
+            child: CircularProgressIndicator(),
+          )
+        ],
+      );
+    }
 
     if (taskCount == 0 && _searchQuery.isEmpty) {
       return widget.emptyView;
@@ -104,36 +134,16 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
     });
 
     remainingTasks.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    var categories = ["requests", "remaining"];
-    Map<String, List<Task<T>>> orderedCategorizedTasks = {
-      categories[0]: requestsTasks,
-      categories[1]: remainingTasks,
-    };
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildTaskListHeader(),
         Expanded(
-          child: ListView(
-            children: categories.map((taskCategory) {
-              final sectionTasks =
-                  orderedCategorizedTasks[taskCategory] ?? <Task<T>>[];
-              if (sectionTasks.isEmpty) return const SizedBox.shrink();
-
-              return Theme(
-                  // This is to remove the default divider color of ExpansionTile
-                  data: Theme.of(context)
-                      .copyWith(dividerColor: Colors.transparent),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        for (final task in sectionTasks)
-                          widget.taskBuilder(context, task),
-                      ]));
-            }).toList(),
-          ),
-        )
+            child: _buildTaskList(
+          requestsTasks,
+          remainingTasks,
+        ))
       ],
     );
   }
@@ -176,6 +186,43 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
     }).toList();
   }
 
+  Widget _buildTaskList(
+    List<Task<T>> requestsTasks,
+    List<Task<T>> remainingTasks,
+  ) {
+    var categories = ["requests", "remaining"];
+    Map<String, List<Task<T>>> orderedCategorizedTasks = {
+      categories[0]: requestsTasks,
+      categories[1]: remainingTasks,
+    };
+
+    return RefreshIndicator(
+        child: ListView(
+          children: categories.map((taskCategory) {
+            final sectionTasks =
+                orderedCategorizedTasks[taskCategory] ?? <Task<T>>[];
+            if (sectionTasks.isEmpty) return const SizedBox.shrink();
+
+            return Theme(
+                // This is to remove the default divider color of ExpansionTile
+                data: Theme.of(context)
+                    .copyWith(dividerColor: Colors.transparent),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (final task in sectionTasks)
+                        widget.taskBuilder(context, task),
+                    ]));
+          }).toList(),
+        ),
+        onRefresh: () => _refreshTasks());
+  }
+
+  Future<void> _refreshTasks() async {
+    var model = Provider.of<AppViewModel>(context, listen: false);
+    await model.refetchTasks(taskType);
+  }
+
   String _getGeneralHeading() {
     if (T == Group) {
       return 'Groups';
@@ -207,12 +254,18 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
 
   Widget _buildTaskListHeader() {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(
-        _getGeneralHeading(),
-        style: TextStyle(
-          fontSize: Theme.of(context).textTheme.titleLarge?.fontSize,
-          fontWeight: FontWeight.w900,
-        ),
+      Row(
+        children: [
+          Text(
+            _getGeneralHeading(),
+            style: TextStyle(
+              fontSize: Theme.of(context).textTheme.titleLarge?.fontSize,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          Spacer(),
+          _buildReloadButton()
+        ],
       ),
       const SizedBox(height: SMALL_GAP),
       _buildTaskSearchBar(),
@@ -220,5 +273,26 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
       Divider(),
       const SizedBox(height: SMALL_GAP),
     ]);
+  }
+
+  Widget _buildReloadButton() {
+    return ElevatedButton.icon(
+        onPressed: () {
+          if (isReloading) return;
+
+          setState(() {
+            isReloading = true;
+          });
+
+          Future.delayed(const Duration(seconds: 1), () {
+            setState(() {
+              isReloading = false;
+            });
+          });
+
+          _refreshTasks();
+        },
+        icon: Icon(Icons.refresh),
+        label: Text("Reload"));
   }
 }
