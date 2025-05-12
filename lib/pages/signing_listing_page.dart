@@ -56,7 +56,6 @@ class SigningListingPage extends StatelessWidget {
         child: SizedBox(
           width: double.infinity,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Padding(
                 padding: EdgeInsets.only(bottom: MEDIUM_PADDING),
@@ -67,6 +66,7 @@ class SigningListingPage extends StatelessWidget {
                       : 'assets/lottie/sign_dark_mode.json',
                   stopAtPercentage: 0.2,
                   width: 400,
+                  height: 300,
                   fit: BoxFit.fitWidth,
                 ),
               ),

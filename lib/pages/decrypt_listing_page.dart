@@ -57,7 +57,6 @@ class DecryptListingPage extends StatelessWidget {
         child: SizedBox(
           width: double.infinity,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Padding(
                 padding: EdgeInsets.only(bottom: MEDIUM_PADDING),
@@ -67,6 +66,7 @@ class DecryptListingPage extends StatelessWidget {
                       ? 'assets/lottie/decrypt_light_mode.json'
                       : 'assets/lottie/decrypt_dark_mode.json',
                   width: 400,
+                  height: 310,
                   fit: BoxFit.fitWidth,
                 ),
               ),
