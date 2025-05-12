@@ -70,20 +70,21 @@ class TaskTile<T> extends StatelessWidget {
           )
         : null;
 
-    return Deletable(
-      dismissibleKey: ObjectKey(task),
-      icon: task.archived ? Symbols.unarchive : Symbols.archive,
-      color: task.archived
-          ? Theme.of(context).colorScheme.surfaceContainerHighest
-          : Theme.of(context).extension<CustomColors>()!.successContainer!,
-      onDeleted: (_) {
-        if (onArchiveChange != null) onArchiveChange!(!task.archived);
-      },
-      child: Container(
-        padding: EdgeInsets.only(bottom: SMALL_PADDING),
-        child: Material(
+    return Container(
+      padding: EdgeInsets.only(bottom: SMALL_PADDING),
+      child: Deletable.builder(
+        dismissibleKey: ObjectKey(task),
+        icon: task.archived ? Symbols.unarchive : Symbols.archive,
+        color: task.archived
+            ? Theme.of(context).colorScheme.surfaceContainerHighest
+            : Theme.of(context).extension<CustomColors>()!.successContainer!,
+        onDeleted: (_) {
+          if (onArchiveChange != null) onArchiveChange!(!task.archived);
+        },
+        childBuilder: (isDragging) => Material(
           color: Theme.of(context).colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius:
+              isDragging ? BorderRadius.zero : BorderRadius.circular(8),
           clipBehavior: Clip.antiAlias,
           child: ExpansionTile(
             title: Row(
