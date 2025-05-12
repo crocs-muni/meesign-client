@@ -91,6 +91,7 @@ class TaskTile<T> extends StatelessWidget {
               children: [
                 Flexible(
                   child: Text(name,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -200,9 +201,18 @@ class TaskTile<T> extends StatelessWidget {
           })
         ],
         if (showDate) ...[
-          SizedBox(width: LARGE_GAP),
-          _buildGroupMetaDataRow(
-              Icons.calendar_month, formatDate(task.createdAt), context),
+          LayoutBuilder(builder: (context, constraints) {
+            return Row(
+              children: [
+                if (MediaQuery.sizeOf(context).width >
+                    minLaptopLayoutWidth) ...[
+                  SizedBox(width: LARGE_GAP),
+                  _buildGroupMetaDataRow(Icons.calendar_month,
+                      formatDate(task.createdAt), context),
+                ],
+              ],
+            );
+          })
         ],
         if (task.archived) ...[
           SizedBox(width: LARGE_GAP),

@@ -49,8 +49,8 @@ void main(List<String> args) async {
 }
 
 Future<void> _prepareWindowManager() async {
-  const double minWidth = 500;
-  const double minHeight = 600;
+  const double minWidth = 600;
+  const double minHeight = 800;
 
   await windowManager.ensureInitialized();
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
