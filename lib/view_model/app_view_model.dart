@@ -35,6 +35,10 @@ class AppViewModel with ChangeNotifier {
   final DecryptRepository _decryptRepository;
   final SettingsController _settingsController;
 
+  // Timer for periodic polling
+  Timer? _pollingTimer;
+  late Uuid _userDid;
+
   Stream<int> nGroupReqs = const Stream.empty();
   Stream<int> nSignReqs = const Stream.empty();
   Stream<int> nChallengeReqs = const Stream.empty();
@@ -111,11 +115,32 @@ class AppViewModel with ChangeNotifier {
     this._decryptRepository,
     this._settingsController,
   ) {
+    _userDid = user.did;
     _listen(user.did);
     deviceRepository.getDevice(user.did).then((value) {
       device = value;
       notifyListeners();
     });
+    _startPolling();
+  }
+
+  void _startPolling() {
+    // Cancel any existing timer
+    _pollingTimer?.cancel();
+
+    // Start a new timer that polls every 5 seconds
+    _pollingTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+      _pollForNewTasks();
+    });
+  }
+
+  Future<void> _pollForNewTasks() async {
+    try {
+      // Fetch new group tasks (new invites etc)
+      await _groupRepository.sync(_userDid);
+    } catch (e) {
+      debugPrint('Polling error: $e');
+    }
   }
 
   void _listen(Uuid did) {
@@ -162,6 +187,13 @@ class AppViewModel with ChangeNotifier {
       allTasks.addAll(allTaskStream.signTasks);
       allTasks.addAll(allTaskStream.challengeTasks);
     });
+  }
+
+  @override
+  void dispose() {
+    _pollingTimer?.cancel();
+    _pollingTimer = null;
+    super.dispose();
   }
 
   bool hasGroup(KeyType type, {bool? inclArchived}) => groupTasks.any((task) =>

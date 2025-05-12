@@ -4,6 +4,7 @@ import 'dart:collection';
 import 'package:collection/collection.dart';
 import 'package:convert/convert.dart';
 import 'package:drift/drift.dart';
+import 'package:drift/native.dart';
 import 'package:meesign_core/src/database/daos.dart';
 import 'package:meesign_native/meesign_native.dart';
 import 'package:meesign_network/meesign_network.dart'
@@ -201,65 +202,132 @@ abstract class TaskRepository<T> {
     );
   }
 
+  // Helper method to run database operations with retries for lock errors
+  Future<R> _withDbRetry<R>(
+    Future<R> Function() operation, {
+    int maxRetries = 10,
+    Duration initialDelay = const Duration(milliseconds: 200),
+  }) async {
+    int retryCount = 0;
+    Duration delay = initialDelay;
+
+    while (true) {
+      try {
+        return await operation();
+      } catch (e) {
+        // Check if it's a database lock error (SQLite error code 5)
+        bool isLockError = e.toString().contains('database is locked') ||
+            (e is SqliteException && e.extendedResultCode == 5);
+
+        // If it's not a lock error or we've reached max retries, rethrow
+        if (!isLockError || retryCount >= maxRetries) {
+          rethrow;
+        }
+
+        // Log the retry attempt
+        print(
+            'Database locked, retrying in ${delay.inMilliseconds}ms (attempt ${retryCount + 1}/$maxRetries)');
+
+        // Wait before retrying with exponential backoff
+        await Future.delayed(delay);
+        retryCount++;
+        delay *= 2; // Exponential backoff
+      }
+    }
+  }
+
   Future<void> _syncTaskUnsafe(Uuid did, Uuid tid, rpc.Task rpcTask) async {
-    var task = await _taskDao.getTask(did.bytes, tid.bytes);
+    // Use the retry mechanism for all database operations
+    return _withDbRetry(() async {
+      var task = await _taskDao.getTask(did.bytes, tid.bytes);
 
-    db.Task? newTask;
+      db.Task? newTask;
 
-    try {
-      if (task == null) {
-        rpcTask = await _taskSource.fetch(did, tid);
-        await createTask(did, rpcTask);
-        task = (await _taskDao.getTask(did.bytes, tid.bytes))!;
-      }
+      try {
+        if (task == null) {
+          rpcTask = await _taskSource.fetch(did, tid);
+          await createTask(did, rpcTask);
+          task = (await _taskDao.getTask(did.bytes, tid.bytes))!;
+        }
 
-      if (task.attempt < rpcTask.attempt) {
-        task = _restart(task, rpcTask);
-      } else if (task.attempt > rpcTask.attempt) {
-        return;
-      }
+        if (task.attempt < rpcTask.attempt) {
+          task = _restart(task, rpcTask);
+        } else if (task.attempt > rpcTask.attempt) {
+          return;
+        }
 
-      switch (rpcTask.state) {
-        case rpc.Task_TaskState.CREATED:
-          newTask = await _syncCreated(did, task, rpcTask);
-          break;
-        case rpc.Task_TaskState.FAILED:
-          newTask = await _syncFailed(did, task, rpcTask);
-          break;
-        case rpc.Task_TaskState.FINISHED:
-          newTask = await _syncFinished(did, task, rpcTask);
-          break;
-        case rpc.Task_TaskState.RUNNING:
-          newTask = await _syncRunning(did, task, rpcTask);
-          break;
+        switch (rpcTask.state) {
+          case rpc.Task_TaskState.CREATED:
+            newTask = await _syncCreated(did, task, rpcTask);
+            break;
+          case rpc.Task_TaskState.FAILED:
+            newTask = await _syncFailed(did, task, rpcTask);
+            break;
+          case rpc.Task_TaskState.FINISHED:
+            newTask = await _syncFinished(did, task, rpcTask);
+            break;
+          case rpc.Task_TaskState.RUNNING:
+            newTask = await _syncRunning(did, task, rpcTask);
+            break;
+        }
+      } on Exception {
+        // TODO: some errors need to be reported to the server,
+        // sometimes we can rollback (e.g. in case of network errors)
+        if (task != null) {
+          newTask =
+              task.copyWith(context: Value(null), state: TaskState.failed);
+        }
+        rethrow;
+      } finally {
+        if (newTask != null) {
+          await _taskDao.upsertTask(newTask.toCompanion(true));
+        }
       }
-    } on Exception {
-      // TODO: some errors need to be reported to the server,
-      // sometimes we can rollback (e.g. in case of network errors)
-      if (task != null) {
-        newTask = task.copyWith(context: Value(null), state: TaskState.failed);
-      }
-      rethrow;
-    } finally {
-      if (newTask != null) {
-        await _taskDao.upsertTask(newTask.toCompanion(true));
+    });
+  }
+
+  // Helper method to clean up locks
+  void _cleanupLock(Uuid did, Uuid tid) {
+    if (taskLocks.containsKey(did) &&
+        taskLocks[did].containsKey(tid) &&
+        !taskLocks[did][tid].locked) {
+      taskLocks[did].remove(tid);
+
+      // Clean up the did entry if it's empty
+      if (taskLocks[did].isEmpty) {
+        taskLocks.remove(did);
       }
     }
   }
 
   Future<void> _syncTask(Uuid did, rpc.Task rpcTask) async {
     final tid = Uuid(rpcTask.id);
-    await taskLocks[did][tid].synchronized(
-      () => _syncTaskUnsafe(did, tid, rpcTask),
-    );
-    // FIXME: when to remove task lock?
+    try {
+      // Use a timeout to prevent indefinite locks
+      await taskLocks[did][tid].synchronized(
+        () => _syncTaskUnsafe(did, tid, rpcTask),
+        timeout: const Duration(seconds: 5),
+      );
+    } catch (e) {
+      // Log the error but don't rethrow to allow the app to continue
+      print('Error syncing task $tid: $e');
+    } finally {
+      // Clear the lock for this specific task if it's no longer needed
+      _cleanupLock(did, tid);
+    }
   }
 
   Future<void> sync(Uuid did) async {
-    final rpcTasks = await _taskSource.fetchAll(did);
-    await Future.wait(
-      rpcTasks.where((t) => t.type == _taskType).map((t) => _syncTask(did, t)),
-    );
+    try {
+      final rpcTasks = await _taskSource.fetchAll(did);
+      await Future.wait(
+        rpcTasks
+            .where((t) => t.type == _taskType)
+            .map((t) => _syncTask(did, t)),
+      );
+    } catch (e) {
+      print('Error syncing tasks for device $did: $e');
+    }
   }
 
   Future<void> subscribe(
@@ -291,27 +359,46 @@ abstract class TaskRepository<T> {
 
   @protected
   Future<void> approveTaskUnsafe(Uuid did, Uuid tid, bool agree) async {
-    final task = await _taskDao.getTask(did.bytes, tid.bytes);
-    if (task == null) throw StateException();
-    if (task.approved) return;
+    return _withDbRetry(() async {
+      final task = await _taskDao.getTask(did.bytes, tid.bytes);
+      if (task == null) throw StateException();
+      if (task.approved) return;
 
-    await _taskSource.approve(did, tid, agree: agree);
-    await _taskDao.upsertTask(task.copyWith(approved: true).toCompanion(true));
+      await _taskSource.approve(did, tid, agree: agree);
+      await _taskDao
+          .upsertTask(task.copyWith(approved: true).toCompanion(true));
+    });
   }
 
-  Future<void> approveTask(Uuid did, Uuid tid, {required bool agree}) =>
-      taskLocks[did][tid].synchronized(
+  Future<void> approveTask(Uuid did, Uuid tid, {required bool agree}) async {
+    try {
+      await taskLocks[did][tid].synchronized(
         () => approveTaskUnsafe(did, tid, agree),
+        timeout: const Duration(seconds: 5),
       );
+    } catch (e) {
+      print('Error approving task $tid: $e');
+    } finally {
+      _cleanupLock(did, tid);
+    }
+  }
 
-  Future<void> archiveTask(Uuid did, Uuid tid, {required bool archive}) =>
-      taskLocks[did][tid].synchronized(
-        () => _taskDao.updateTask(db.TasksCompanion(
-          id: Value(tid.bytes),
-          did: Value(did.bytes),
-          archived: Value(archive),
-        )),
+  Future<void> archiveTask(Uuid did, Uuid tid, {required bool archive}) async {
+    try {
+      await taskLocks[did][tid].synchronized(
+        () => _withDbRetry(() => _taskDao.updateTask(db.TasksCompanion(
+              id: Value(tid.bytes),
+              did: Value(did.bytes),
+              archived: Value(archive),
+            ))),
+        timeout: const Duration(seconds: 5),
       );
+    } catch (e) {
+      print('Error archiving task $tid: $e');
+    } finally {
+      _cleanupLock(did, tid);
+    }
+  }
 
   Stream<List<Task<T>>> observeTasks(Uuid did);
 
@@ -324,50 +411,52 @@ abstract class TaskRepository<T> {
   // TODO: provide finer control? expose just list of task ids?
 
   Future<void> _advanceTaskWithCardUnsafe(Uuid did, Uuid tid, Card card) async {
-    final task = await _taskDao.getTask(did.bytes, tid.bytes);
-    if (task == null || task.state != TaskState.needsCard) {
-      throw StateException();
-    }
-    final group = await _getAssociatedGroup(did, task);
+    return _withDbRetry(() async {
+      final task = await _taskDao.getTask(did.bytes, tid.bytes);
+      if (task == null || task.state != TaskState.needsCard) {
+        throw StateException();
+      }
+      final group = await _getAssociatedGroup(did, task);
 
-    final aid = hex.decode(group.protocol.aid!);
-    final resp = await card.send(CommandApdu(
-      Iso7816.claIso7816,
-      Iso7816.insSelect,
-      p1: 0x04,
-      data: aid,
-    ));
-    if (resp.status != Iso7816.swNoError) throw SelectException();
+      final aid = hex.decode(group.protocol.aid!);
+      final resp = await card.send(CommandApdu(
+        Iso7816.claIso7816,
+        Iso7816.insSelect,
+        p1: 0x04,
+        data: aid,
+      ));
+      if (resp.status != Iso7816.swNoError) throw SelectException();
 
-    try {
-      Uint8List context = task.context!, data = task.data!;
-      int recipient;
-      do {
-        final resp = await card.transceive(data);
-        final res = await ProtocolWrapper.advance(context, [resp]);
-        // TODO: save intermediate res to db?
-        context = res.context;
-        data = res.data.first;
-        recipient = res.recipient;
-      } while (recipient != Recipient.Server);
+      try {
+        Uint8List context = task.context!, data = task.data!;
+        int recipient;
+        do {
+          final resp = await card.transceive(data);
+          final res = await ProtocolWrapper.advance(context, [resp]);
+          // TODO: save intermediate res to db?
+          context = res.context;
+          data = res.data.first;
+          recipient = res.recipient;
+        } while (recipient != Recipient.Server);
 
-      await _taskSource.update(did, task.id, [data], task.attempt);
+        await _taskSource.update(did, task.id, [data], task.attempt);
 
-      final newTask = task.copyWith(
-        state: TaskState.running,
-        context: Value(context),
-        data: Value(null),
-      );
-      await _taskDao.upsertTask(newTask.toCompanion(true));
-    } on Exception {
-      final newTask = task.copyWith(
-        state: TaskState.failed,
-        context: Value(null),
-        data: Value(null),
-      );
-      await _taskDao.upsertTask(newTask.toCompanion(true));
-      rethrow;
-    }
+        final newTask = task.copyWith(
+          state: TaskState.running,
+          context: Value(context),
+          data: Value(null),
+        );
+        await _taskDao.upsertTask(newTask.toCompanion(true));
+      } on Exception {
+        final newTask = task.copyWith(
+          state: TaskState.failed,
+          context: Value(null),
+          data: Value(null),
+        );
+        await _taskDao.upsertTask(newTask.toCompanion(true));
+        rethrow;
+      }
+    });
   }
 
   Future<void> advanceTaskWithCard(Uuid did, Uuid tid, Card card) =>
