@@ -429,40 +429,30 @@ class _NewGroupPageState extends State<NewGroupPage> {
               children: [
                 const Icon(Symbols.person),
                 Expanded(
-                  child: Slider(
-                    value: (_protocol.thresholdType == ThresholdType.nOfN
-                            ? _shareCount
-                            : min(_threshold, _shareCount))
-                        .toDouble(),
-                    min: 0,
-                    max: _shareCount.toDouble(),
-                    divisions: max(1, _shareCount),
-                    label: '$_threshold',
-                    onChanged: (_protocol.thresholdType == ThresholdType.nOfN ||
-                            _shareCount <= _minThreshold)
-                        ? (value) {
-                            if (_protocol.thresholdType == ThresholdType.nOfN) {
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: const Text(
-                                      "Share slider is disabled for this protocol"),
-                                  content: const Text(
-                                      "When using MUSIG2 protocol the threshold is always set to max number of shares. Therefore, it is not possible to use the slider."),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: const Text("OK"),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }
-                            return;
-                          }
-                        : (value) => setState(() {
-                              _setThreshold(value.round());
-                            }),
+                  child: GestureDetector(
+                    onTap: (_protocol.thresholdType == ThresholdType.nOfN)
+                        ? () => displayWarningDialog()
+                        : null,
+                    behavior: HitTestBehavior.translucent,
+                    onHorizontalDragStart:
+                        (_protocol.thresholdType == ThresholdType.nOfN)
+                            ? (_) => displayWarningDialog()
+                            : null,
+                    child: Slider(
+                      value: (_protocol.thresholdType == ThresholdType.nOfN
+                              ? _shareCount
+                              : min(_threshold, _shareCount))
+                          .toDouble(),
+                      min: 0,
+                      max: _shareCount.toDouble(),
+                      divisions: max(1, _shareCount),
+                      label: '$_threshold',
+                      onChanged: (_protocol.thresholdType == ThresholdType.nOfN)
+                          ? null
+                          : (value) => setState(() {
+                                _setThreshold(value.round());
+                              }),
+                    ),
                   ),
                 ),
                 const Icon(Symbols.people),
@@ -471,6 +461,23 @@ class _NewGroupPageState extends State<NewGroupPage> {
           ],
         )
       ],
+    );
+  }
+
+  void displayWarningDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Share slider is disabled for this protocol"),
+        content: const Text(
+            "When using MUSIG2 protocol the threshold is always set to max number of shares. Therefore, it is not possible to use the slider."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
     );
   }
 
