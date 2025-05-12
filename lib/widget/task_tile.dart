@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:meesign_core/meesign_core.dart';
 
-import '../theme.dart';
 import '../ui_constants.dart';
 import '../util/date_formatter.dart';
 import '../util/extensions/list_intersperse.dart';
@@ -75,16 +74,13 @@ class TaskTile<T> extends StatelessWidget {
       child: Deletable.builder(
         dismissibleKey: ObjectKey(task),
         icon: task.archived ? Symbols.unarchive : Symbols.archive,
-        color: task.archived
-            ? Theme.of(context).colorScheme.surfaceContainerHighest
-            : Theme.of(context).extension<CustomColors>()!.successContainer!,
+        color: Colors.transparent,
         onDeleted: (_) {
           if (onArchiveChange != null) onArchiveChange!(!task.archived);
         },
         childBuilder: (isDragging) => Material(
           color: Theme.of(context).colorScheme.surfaceContainerHighest,
-          borderRadius:
-              isDragging ? BorderRadius.zero : BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(8),
           clipBehavior: Clip.antiAlias,
           child: ExpansionTile(
             title: Row(
