@@ -39,8 +39,7 @@ class SigningListingPage extends StatelessWidget {
 
   Widget _buildFab(BuildContext context, AppViewModel model) {
     // Don't show Fab if the list is empty - placeholder with CTA is shown instead
-    if (model.signTasks.where((task) => !task.archived).isEmpty ||
-        !model.joinedGroupForTaskTypeExists(KeyType.signPdf)) {
+    if (!model.joinedGroupForTaskTypeExists(KeyType.signPdf)) {
       return SizedBox();
     }
     return FabConfigurator(fabType: FabType.signFab, buildContext: context);
@@ -89,7 +88,7 @@ class SigningListingPage extends StatelessWidget {
                         Provider.of<TabsViewModel>(context, listen: false);
 
                     tabViewModel.setIndex(3,
-                        postNavigationAction: 'createGroup');
+                        postNavigationAction: 'createSignGroup');
                   },
                   child: const Text('Create a signing group'),
                 ),

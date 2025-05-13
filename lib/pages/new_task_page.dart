@@ -199,7 +199,17 @@ class _NewTaskPageState extends State<NewTaskPage> {
                 });
               },
             ),
-            Flexible(child: const Text('Decrypt a message')),
+            MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _showImageSelector = false;
+                  });
+                },
+                child: Text('Decrypt a message'),
+              ),
+            ),
             SizedBox(width: LARGE_GAP),
             Radio<bool>(
               value: true,
@@ -210,7 +220,17 @@ class _NewTaskPageState extends State<NewTaskPage> {
                 });
               },
             ),
-            Flexible(child: const Text('Decrypt an image')),
+            MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _showImageSelector = true;
+                  });
+                },
+                child: Text('Decrypt an image'),
+              ),
+            )
           ],
         ),
         SizedBox(height: LARGE_GAP),
@@ -309,6 +329,9 @@ class _NewTaskPageState extends State<NewTaskPage> {
             task.info.keyType == _taskType &&
             !task.archived)
         .map((task) => task.info);
+
+    // Select the first group of task type if none is selected
+    _selectedGroup ??= groups.isNotEmpty ? groups.first : null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

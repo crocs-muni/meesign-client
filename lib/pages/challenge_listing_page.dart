@@ -41,8 +41,7 @@ class ChallengeListingPage extends StatelessWidget {
 
   Widget _buildFab(BuildContext context, AppViewModel model) {
     // Don't show Fab if the list is empty - placeholder with CTA is shown instead
-    if (model.challengeTasks.where((task) => !task.archived).isEmpty ||
-        !model.joinedGroupForTaskTypeExists(KeyType.signChallenge)) {
+    if (!model.joinedGroupForTaskTypeExists(KeyType.signChallenge)) {
       return SizedBox();
     }
 
@@ -93,7 +92,7 @@ class ChallengeListingPage extends StatelessWidget {
                         Provider.of<TabsViewModel>(context, listen: false);
 
                     tabViewModel.setIndex(3,
-                        postNavigationAction: 'createGroup');
+                        postNavigationAction: 'createChallengeGroup');
                   },
                   child: const Text('Create a challenge group'),
                 ),

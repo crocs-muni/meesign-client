@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'dart:io';
 
 import '../app_container.dart';
+import '../enums/task_type.dart';
 import '../routes.dart';
 import '../sessions/user_session.dart';
 import '../templates/default_page_template.dart';
@@ -25,7 +26,9 @@ import '../widget/weighted_avatar.dart';
 import 'search_peer_page.dart';
 
 class NewGroupPage extends StatefulWidget {
-  const NewGroupPage({super.key});
+  const NewGroupPage({super.key, this.initialGroupType});
+
+  final TaskType? initialGroupType;
 
   @override
   State<NewGroupPage> createState() => _NewGroupPageState();
@@ -76,6 +79,20 @@ class _NewGroupPageState extends State<NewGroupPage> {
         .then((device) => setState(() => _members.add(Member(device, 1))));
 
     setInitialDevices(session);
+
+    // Set initial purpose
+    setState(() {
+      if (widget.initialGroupType == TaskType.decrypt) {
+        _keyType = KeyType.decrypt;
+        _protocol = KeyType.decrypt.supportedProtocols.first;
+      } else if (widget.initialGroupType == TaskType.sign) {
+        _keyType = KeyType.signPdf;
+        _protocol = KeyType.signPdf.supportedProtocols.first;
+      } else if (widget.initialGroupType == TaskType.challenge) {
+        _keyType = KeyType.signChallenge;
+        _protocol = KeyType.signChallenge.supportedProtocols.first;
+      }
+    });
   }
 
   @override
