@@ -39,8 +39,7 @@ class DecryptListingPage extends StatelessWidget {
 
   Widget _buildFab(BuildContext context, AppViewModel model) {
     // Don't show Fab if the list is empty - placeholder with CTA is shown instead
-    if (model.decryptTasks.where((task) => !task.archived).isEmpty ||
-        !model.joinedGroupForTaskTypeExists(KeyType.decrypt)) {
+    if (!model.joinedGroupForTaskTypeExists(KeyType.decrypt)) {
       return SizedBox();
     }
 
@@ -89,7 +88,7 @@ class DecryptListingPage extends StatelessWidget {
                         Provider.of<TabsViewModel>(context, listen: false);
 
                     tabViewModel.setIndex(3,
-                        postNavigationAction: 'createGroup');
+                        postNavigationAction: 'createDecryptGroup');
                   },
                   child: const Text('Create a decryption group'),
                 )

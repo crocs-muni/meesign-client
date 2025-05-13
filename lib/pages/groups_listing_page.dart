@@ -3,6 +3,7 @@ import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
 import '../enums/fab_type.dart';
+import '../enums/task_type.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
 import '../util/actions/group_creator.dart';
@@ -39,9 +40,21 @@ class _GroupsListingPageState extends State<GroupsListingPage> {
 
   void _onTabChanged() {
     if (_tabsViewModel.index == 3) {
-      if (_tabsViewModel.postNavigationAction == 'createGroup') {
-        if (!_tabsViewModel.newGroupPageActive) {
-          createGroup(context, context);
+      if (!_tabsViewModel.newGroupPageActive) {
+        if (_tabsViewModel.postNavigationAction == 'createChallengeGroup') {
+          createGroup(context, context, groupType: TaskType.challenge);
+        }
+
+        if (_tabsViewModel.postNavigationAction == 'createSignGroup') {
+          createGroup(context, context, groupType: TaskType.sign);
+        }
+
+        if (_tabsViewModel.postNavigationAction == 'createEncryptGroup') {
+          createGroup(context, context, groupType: TaskType.encrypt);
+        }
+
+        if (_tabsViewModel.postNavigationAction == 'createDecryptGroup') {
+          createGroup(context, context, groupType: TaskType.decrypt);
         }
       }
     }
@@ -70,6 +83,13 @@ class _GroupsListingPageState extends State<GroupsListingPage> {
   }
 
   Widget _buildFab(BuildContext context, AppViewModel model) {
+    if (model.groupTasks.where((task) => task.archived).isNotEmpty) {
+      if (context.read<AppViewModel>().showArchived) {
+        return FabConfigurator(
+            fabType: FabType.groupFab, buildContext: context);
+      }
+    }
+
     // Don't show Fab if the list is empty - placeholder with CTA is shown instead
     if (model.groupTasks.where((task) => !task.archived).isEmpty) {
       return SizedBox();
