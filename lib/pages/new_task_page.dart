@@ -324,10 +324,11 @@ class _NewTaskPageState extends State<NewTaskPage> {
   Widget _buildGroupSelector(BuildContext buildContext) {
     final state = buildContext.read<AppViewModel>();
     final groups = state.groupTasks
-        .where((task) =>
-            task.state == TaskState.finished &&
-            task.info.keyType == _taskType &&
-            !task.archived)
+        .where((task) => task.state == TaskState.finished &&
+                task.info.keyType == _taskType &&
+                state.showArchived
+            ? true
+            : !task.archived)
         .map((task) => task.info);
 
     // Select the first group of task type if none is selected
