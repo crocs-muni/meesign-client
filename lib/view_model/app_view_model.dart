@@ -239,9 +239,13 @@ class AppViewModel with ChangeNotifier {
   }
 
   bool joinedGroupForTaskTypeExists(KeyType type) {
-    return groupTasks
-        .where((task) =>
-            task.info.keyType == type && task.state == TaskState.finished)
-        .any((task) => !task.archived);
+    var temp = groupTasks.where((task) =>
+        task.info.keyType == type && task.state == TaskState.finished);
+
+    if (showArchived) {
+      return temp.isNotEmpty;
+    } else {
+      return temp.any((task) => !task.archived);
+    }
   }
 }
