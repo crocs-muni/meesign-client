@@ -215,12 +215,15 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
                     ]));
           }).toList(),
         ),
-        onRefresh: () => _refreshTasks());
+        onRefresh: () {
+          _triggerReloadAnimation();
+          return _refreshTasks();
+        });
   }
 
   Future<void> _refreshTasks() async {
     var model = Provider.of<AppViewModel>(context, listen: false);
-    await model.refetchTasks(taskType);
+    return model.refetchTasks(taskType);
   }
 
   String _getGeneralHeading() {
@@ -275,20 +278,29 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
     ]);
   }
 
+  void _triggerReloadAnimation() {
+    if (isReloading) return;
+
+    setState(() {
+      isReloading = true;
+    });
+
+    Future.delayed(const Duration(seconds: 1), () {
+      setState(() {
+        isReloading = false;
+      });
+    });
+  }
+
   Widget _buildReloadButton() {
+    // Small screen uses pull to refresh, not reload button
+    if (MediaQuery.sizeOf(context).width < minTabletLayoutWidth) {
+      return const SizedBox.shrink();
+    }
+
     return ElevatedButton.icon(
         onPressed: () {
-          if (isReloading) return;
-
-          setState(() {
-            isReloading = true;
-          });
-
-          Future.delayed(const Duration(seconds: 1), () {
-            setState(() {
-              isReloading = false;
-            });
-          });
+          _triggerReloadAnimation();
 
           _refreshTasks();
         },
