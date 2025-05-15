@@ -32,7 +32,10 @@ class DeviceChip extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute<void>(
-            builder: (context) => DevicePage(device: device),
+            builder: (context) => DevicePage(
+              device: device,
+              showActionButtons: false,
+            ),
           ),
         );
       },

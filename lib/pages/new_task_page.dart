@@ -19,8 +19,11 @@ import '../widget/group_suggestion_tile.dart';
 import '../widget/option_tile.dart';
 
 class NewTaskPage extends StatefulWidget {
-  const NewTaskPage({super.key});
+  const NewTaskPage(
+      {super.key, this.initialTaskType, this.showTaskTypeSelector = false});
 
+  final KeyType? initialTaskType;
+  final bool showTaskTypeSelector;
   @override
   State<NewTaskPage> createState() => _NewTaskPageState();
 }
@@ -37,6 +40,14 @@ class _NewTaskPageState extends State<NewTaskPage> {
   final ScrollController _groupScrollController = ScrollController();
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.initialTaskType != null) {
+      _taskType = widget.initialTaskType!;
+    }
+  }
+
+  @override
   void dispose() {
     _descController.dispose();
     _messageController.dispose();
@@ -48,12 +59,14 @@ class _NewTaskPageState extends State<NewTaskPage> {
   Widget build(BuildContext context) {
     return DefaultPageTemplate(
       showAppBar: true,
-      appBarTitle: "Create new task 🚀",
+      appBarTitle: "Create new task",
       wrapInScroll: true,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildTaskTypeSelector(),
+          if (widget.showTaskTypeSelector) ...[
+            _buildTaskTypeSelector(),
+          ],
           _buildGroupSelector(context),
           Divider(
             height: 1,
@@ -187,7 +200,17 @@ class _NewTaskPageState extends State<NewTaskPage> {
                 });
               },
             ),
-            Flexible(child: const Text('Decrypt a message')),
+            MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _showImageSelector = false;
+                  });
+                },
+                child: Text('Decrypt a message'),
+              ),
+            ),
             SizedBox(width: LARGE_GAP),
             Radio<bool>(
               value: true,
@@ -198,7 +221,17 @@ class _NewTaskPageState extends State<NewTaskPage> {
                 });
               },
             ),
-            Flexible(child: const Text('Decrypt an image')),
+            MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _showImageSelector = true;
+                  });
+                },
+                child: Text('Decrypt an image'),
+              ),
+            )
           ],
         ),
         SizedBox(height: LARGE_GAP),
@@ -295,8 +328,11 @@ class _NewTaskPageState extends State<NewTaskPage> {
         .where((task) =>
             task.state == TaskState.finished &&
             task.info.keyType == _taskType &&
-            !task.archived)
+            (state.showArchived ? true : !task.archived))
         .map((task) => task.info);
+
+    // Select the first group of task type if none is selected
+    _selectedGroup ??= groups.isNotEmpty ? groups.first : null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -396,7 +432,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
           child: Text('Create ${_getTaskTypeDescription()} task'),
         ),
         icon: const Icon(
-          Symbols.create_new_folder,
+          Icons.send_rounded,
         ),
         style: ButtonStyle(
           shape: WidgetStateProperty.all<RoundedRectangleBorder>(

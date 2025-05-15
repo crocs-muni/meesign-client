@@ -49,6 +49,7 @@ class ChallengeRepository extends TaskRepository<Challenge> {
           did: did.bytes,
           gid: Value(req.groupId as Uint8List),
           state: TaskState.created,
+          createdAt: DateTime.now(),
         ),
       );
 

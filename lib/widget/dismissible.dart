@@ -53,18 +53,28 @@ Future<bool?> showConfirmationDialog({
   );
 }
 
-class Deletable extends StatelessWidget {
+class Deletable extends StatefulWidget {
   final Key dismissibleKey;
-  final Widget child;
+  final Widget Function(bool isDragging) childBuilder;
   final Color color;
   final IconData icon;
   final Future<bool?> Function(DismissDirection)? confirmDismiss;
   final void Function(DismissDirection)? onDeleted;
 
-  const Deletable({
+  Deletable({
     super.key,
     required this.dismissibleKey,
-    required this.child,
+    required Widget child,
+    this.color = Colors.red,
+    this.icon = Icons.delete,
+    this.confirmDismiss,
+    this.onDeleted,
+  }) : childBuilder = ((isDragging) => child);
+
+  const Deletable.builder({
+    super.key,
+    required this.dismissibleKey,
+    required this.childBuilder,
     this.color = Colors.red,
     this.icon = Icons.delete,
     this.confirmDismiss,
@@ -72,22 +82,39 @@ class Deletable extends StatelessWidget {
   });
 
   @override
+  State<Deletable> createState() => _DeletableState();
+}
+
+class _DeletableState extends State<Deletable> {
+  bool _isDragging = false;
+
+  @override
   Widget build(BuildContext context) {
     return Dismissible(
-      key: dismissibleKey,
+      key: widget.dismissibleKey,
       background: DismissibleBackground(
         alignment: Alignment.centerLeft,
-        color: color,
-        icon: icon,
+        color: widget.color,
+        icon: widget.icon,
       ),
       secondaryBackground: DismissibleBackground(
         alignment: Alignment.centerRight,
-        color: color,
-        icon: icon,
+        color: widget.color,
+        icon: widget.icon,
       ),
-      confirmDismiss: confirmDismiss,
-      onDismissed: onDeleted,
-      child: child,
+      confirmDismiss: widget.confirmDismiss ??
+          (_) async {
+            setState(() => _isDragging = false);
+            return true;
+          },
+      onUpdate: (details) {
+        final newIsDragging = details.progress > 0;
+        if (newIsDragging != _isDragging) {
+          setState(() => _isDragging = newIsDragging);
+        }
+      },
+      onDismissed: widget.onDeleted,
+      child: widget.childBuilder(_isDragging),
     );
   }
 }

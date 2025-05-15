@@ -6,6 +6,7 @@ import 'package:meesign_core/meesign_card.dart';
 import 'package:meesign_core/meesign_data.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../enums/task_type.dart';
 import '../services/settings_controller.dart';
 import '../util/extensions/task_approvable.dart';
 
@@ -34,6 +35,8 @@ class AppViewModel with ChangeNotifier {
   final ChallengeRepository _challengeRepository;
   final DecryptRepository _decryptRepository;
   final SettingsController _settingsController;
+
+  late Uuid _userDid;
 
   Stream<int> nGroupReqs = const Stream.empty();
   Stream<int> nSignReqs = const Stream.empty();
@@ -111,6 +114,7 @@ class AppViewModel with ChangeNotifier {
     this._decryptRepository,
     this._settingsController,
   ) {
+    _userDid = user.did;
     _listen(user.did);
     deviceRepository.getDevice(user.did).then((value) {
       device = value;
@@ -162,6 +166,25 @@ class AppViewModel with ChangeNotifier {
       allTasks.addAll(allTaskStream.signTasks);
       allTasks.addAll(allTaskStream.challengeTasks);
     });
+  }
+
+  Future<void> refetchTasks(TaskType poolTarget) async {
+    try {
+      if (poolTarget == TaskType.group) {
+        await _groupRepository.sync(_userDid);
+      }
+      if (poolTarget == TaskType.sign) {
+        await _fileRepository.sync(_userDid);
+      }
+      if (poolTarget == TaskType.challenge) {
+        await _challengeRepository.sync(_userDid);
+      }
+      if (poolTarget == TaskType.decrypt) {
+        await _decryptRepository.sync(_userDid);
+      }
+    } catch (e) {
+      debugPrint('Polling error: $e');
+    }
   }
 
   bool hasGroup(KeyType type, {bool? inclArchived}) => groupTasks.any((task) =>
@@ -216,14 +239,13 @@ class AppViewModel with ChangeNotifier {
   }
 
   bool joinedGroupForTaskTypeExists(KeyType type) {
-    if (showArchived) {
-      return groupTasks.any((task) =>
-          task.info.keyType == type && task.state == TaskState.finished);
-    }
+    var temp = groupTasks.where((task) =>
+        task.info.keyType == type && task.state == TaskState.finished);
 
-    return groupTasks
-        .where((task) =>
-            task.info.keyType == type && task.state == TaskState.finished)
-        .any((task) => !task.archived);
+    if (showArchived) {
+      return temp.isNotEmpty;
+    } else {
+      return temp.any((task) => !task.archived);
+    }
   }
 }

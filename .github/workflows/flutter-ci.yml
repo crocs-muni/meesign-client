@@ -43,7 +43,9 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install pdfsig
-        run: sudo apt-get install -y poppler-utils
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils
 
       - name: Install native
         run: |

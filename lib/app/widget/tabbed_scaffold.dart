@@ -15,7 +15,10 @@ import '../model/navigation_tab_model.dart';
 import '../../app_container.dart';
 import '../../widget/counter_badge.dart';
 import '../../widget/main_app_bar.dart';
+import '../../pages/challenge_listing_page.dart';
+import '../../pages/decrypt_listing_page.dart';
 import '../../pages/groups_listing_page.dart';
+import '../../pages/signing_listing_page.dart';
 import 'offstage_navigator.dart';
 
 class TabbedScaffold extends StatelessWidget {

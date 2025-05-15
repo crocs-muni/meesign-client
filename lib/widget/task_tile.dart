@@ -4,6 +4,8 @@ import 'package:meesign_core/meesign_core.dart';
 
 import '../theme.dart';
 import '../ui_constants.dart';
+import '../ui_constants.dart';
+import '../util/date_formatter.dart';
 import '../util/extensions/list_intersperse.dart';
 import '../util/status_message.dart';
 import '../util/extensions/task_approvable.dart';
@@ -22,6 +24,9 @@ class TaskTile<T> extends StatelessWidget {
   final void Function(bool)? onArchiveChange;
   final bool showTaskTypeInfo;
   final bool showDetailRow;
+  final bool showTaskTypeInfo;
+  final bool showDetailRow;
+  final bool showDate;
 
   const TaskTile({
     super.key,
@@ -38,6 +43,7 @@ class TaskTile<T> extends StatelessWidget {
     this.onArchiveChange,
     this.showTaskTypeInfo = true,
     this.showDetailRow = true,
+    this.showDate = true,
   });
 
   @override
@@ -67,18 +73,16 @@ class TaskTile<T> extends StatelessWidget {
           )
         : null;
 
-    return Deletable(
-      dismissibleKey: ObjectKey(task),
-      icon: task.archived ? Symbols.unarchive : Symbols.archive,
-      color: task.archived
-          ? Theme.of(context).colorScheme.surfaceContainerHighest
-          : Theme.of(context).extension<CustomColors>()!.successContainer!,
-      onDeleted: (_) {
-        if (onArchiveChange != null) onArchiveChange!(!task.archived);
-      },
-      child: Container(
-        padding: EdgeInsets.only(bottom: SMALL_PADDING),
-        child: Material(
+    return Container(
+      padding: EdgeInsets.only(bottom: SMALL_PADDING),
+      child: Deletable.builder(
+        dismissibleKey: ObjectKey(task),
+        icon: task.archived ? Symbols.unarchive : Symbols.archive,
+        color: Colors.transparent,
+        onDeleted: (_) {
+          if (onArchiveChange != null) onArchiveChange!(!task.archived);
+        },
+        childBuilder: (isDragging) => Material(
           color: Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(8),
           clipBehavior: Clip.antiAlias,
@@ -87,6 +91,7 @@ class TaskTile<T> extends StatelessWidget {
               children: [
                 Flexible(
                   child: Text(name,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -165,7 +170,11 @@ class TaskTile<T> extends StatelessWidget {
     }
 
     if (task is Task<Group>) {
-      text = "Group";
+      text = switch (task.info.keyType) {
+        KeyType.signPdf => 'Sign PDF',
+        KeyType.signChallenge => 'Challenge',
+        KeyType.decrypt => 'Decrypt',
+      };
       taskGroup = task.info;
     }
 
@@ -186,10 +195,28 @@ class TaskTile<T> extends StatelessWidget {
                       Symbols.donut_large,
                       '${taskGroup?.threshold} / ${taskGroup?.shares}',
                       context),
-                ]
+                ],
               ],
             );
           })
+        ],
+        if (showDate) ...[
+          LayoutBuilder(builder: (context, constraints) {
+            return Row(
+              children: [
+                if (MediaQuery.sizeOf(context).width >
+                    minLaptopLayoutWidth) ...[
+                  SizedBox(width: LARGE_GAP),
+                  _buildGroupMetaDataRow(Icons.calendar_month,
+                      formatDate(task.createdAt), context),
+                ],
+              ],
+            );
+          })
+        ],
+        if (task.archived) ...[
+          SizedBox(width: LARGE_GAP),
+          _buildGroupMetaDataRow(Symbols.archive, 'Archived', context),
         ]
       ],
     );
