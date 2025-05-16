@@ -3,13 +3,8 @@ import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
 import '../enums/fab_type.dart';
-import '../enums/task_type.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
-import '../util/actions/challenge_creator.dart';
-import '../util/actions/document_signer.dart';
-import '../util/actions/encrypt_data.dart';
-import '../util/actions/task_type_selector.dart';
 import '../view_model/app_view_model.dart';
 import '../view_model/tabs_view_model.dart';
 import '../widget/controlled_lottie_animation.dart';
@@ -21,9 +16,10 @@ import '../widget/task_tiles/signing_task_tile.dart';
 import 'new_task_page.dart';
 
 class TaskListing extends StatelessWidget {
-  const TaskListing({super.key, this.showOnlyPending = false});
-
+  const TaskListing(
+      {super.key, this.showOnlyPending = false, this.hidePending = false});
   final bool showOnlyPending;
+  final bool hidePending;
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +31,7 @@ class TaskListing extends StatelessWidget {
           return DefaultPageTemplate(
             floatingActionButton: _buildFab(context, model),
             body: TaskListView(
+              showAllTypes: !hidePending,
               tasks: model.allTasks,
               emptyView: showOnlyPending
                   ? _buildEmptyTasks(
@@ -51,7 +48,6 @@ class TaskListing extends StatelessWidget {
                       0),
               showArchived: model.showArchived,
               showOnlyPending: showOnlyPending,
-              mergeCompletedFailed: true,
               taskBuilder: (context, task) {
                 // Signing tasks
                 if (task is Task<File>) {
@@ -78,9 +74,22 @@ class TaskListing extends StatelessWidget {
 
   Widget _buildFab(BuildContext context, AppViewModel model) {
     // Don't show Fab if the list is empty - placeholder with CTA is shown instead
-    if (model.allTasks.where((task) => !task.archived).isEmpty) {
+
+    if (showOnlyPending) {
+      if (model.allTasks
+          .where((task) =>
+              task.state != TaskState.finished &&
+              task.state != TaskState.failed &&
+              (model.showArchived ? true : task.archived == false))
+          .isEmpty) {
+        return SizedBox();
+      }
+    }
+
+    if (!model.anyGroupJoined()) {
       return SizedBox();
     }
+
     return FabConfigurator(
         fabType: FabType.newTaskFab, buildContext: context, viewModel: model);
   }
@@ -119,27 +128,22 @@ class TaskListing extends StatelessWidget {
                   final tabViewModel =
                       Provider.of<TabsViewModel>(context, listen: false);
 
-                  tabViewModel.setIndex(2);
+                  tabViewModel.setIndex(2, postNavigationAction: 'createGroup');
                 },
                 child: const Text('Create group'),
               ),
-              if (context
-                  .read<AppViewModel>()
-                  .joinedGroupForTaskTypeExists(KeyType.signPdf)) ...[
+              if (context.read<AppViewModel>().anyGroupJoined()) ...[
                 const SizedBox(height: MEDIUM_GAP),
                 ElevatedButton(
                   onPressed: () async {
-                    TaskType? result = await showTaskTypeDialog(context);
-
-                    if (context.mounted) {
-                      if (result == TaskType.sign) {
-                        signDocument(context, context);
-                      } else if (result == TaskType.decrypt) {
-                        encryptData(context, context);
-                      } else if (result == TaskType.challenge) {
-                        createChallenge(context, context);
-                      }
-                    }
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (context) => NewTaskPage(
+                          showTaskTypeSelector: true,
+                        ),
+                      ),
+                    );
                   },
                   child: const Text('Create new task'),
                 )

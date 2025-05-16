@@ -39,7 +39,7 @@ class _GroupsListingPageState extends State<GroupsListingPage> {
   }
 
   void _onTabChanged() {
-    if (_tabsViewModel.index == 3) {
+    if (_tabsViewModel.index == 2) {
       if (!_tabsViewModel.newGroupPageActive) {
         if (_tabsViewModel.postNavigationAction == 'createChallengeGroup') {
           createGroup(context, context, groupType: TaskType.challenge);
@@ -55,6 +55,10 @@ class _GroupsListingPageState extends State<GroupsListingPage> {
 
         if (_tabsViewModel.postNavigationAction == 'createDecryptGroup') {
           createGroup(context, context, groupType: TaskType.decrypt);
+        }
+
+        if (_tabsViewModel.postNavigationAction == 'createGroup') {
+          createGroup(context, context);
         }
       }
     }

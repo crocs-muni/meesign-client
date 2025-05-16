@@ -36,7 +36,10 @@ class FabConfigurator extends StatelessWidget {
       heroTag: key,
       onPressed: () async {
         Navigator.of(context, rootNavigator: false).push(
-          MaterialPageRoute(builder: (context) => NewTaskPage()),
+          MaterialPageRoute(
+              builder: (context) => NewTaskPage(
+                    showTaskTypeSelector: true,
+                  )),
         );
       },
       label: const Text('New task'),

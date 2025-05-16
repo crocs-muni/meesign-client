@@ -113,6 +113,7 @@ flutter:
     - assets/lottie/groups_light_mode.json
     - assets/lottie/sign_light_mode.json
     - assets/lottie/sign_dark_mode.json
+    - assets/lottie/sign.json
     - assets/lottie/challenge_light_mode.json
     - assets/lottie/challenge_dark_mode.json
     - assets/lottie/decrypt_light_mode.json

@@ -248,4 +248,14 @@ class AppViewModel with ChangeNotifier {
       return temp.any((task) => !task.archived);
     }
   }
+
+  bool anyGroupJoined() {
+    var temp = groupTasks.where((task) => task.state == TaskState.finished);
+
+    if (showArchived) {
+      return temp.isNotEmpty;
+    } else {
+      return temp.any((task) => !task.archived);
+    }
+  }
 }

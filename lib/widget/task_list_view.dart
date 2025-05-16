@@ -15,7 +15,6 @@ class TaskListView<T> extends StatefulWidget {
   final bool showArchived;
   final bool showOnlyPending;
   final bool showAllTypes;
-  final bool mergeCompletedFailed;
 
   const TaskListView({
     super.key,
@@ -25,7 +24,6 @@ class TaskListView<T> extends StatefulWidget {
     this.showArchived = false,
     this.showOnlyPending = false,
     this.showAllTypes = false,
-    this.mergeCompletedFailed = false,
   });
 
   @override
@@ -71,13 +69,19 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
   Widget build(BuildContext context) {
     final taskGroups = groupTasks();
 
-    final sections = [
-      TaskListSection.requests,
-      TaskListSection.finished,
-      TaskListSection.rejected,
-      if (taskGroups[TaskListSection.failed] != null) TaskListSection.failed,
-      if (widget.showArchived) TaskListSection.archived,
-    ];
+    final sections = widget.showOnlyPending
+        ? [
+            TaskListSection.requests,
+            if (widget.showArchived) TaskListSection.archivedPending
+          ]
+        : [
+            TaskListSection.requests,
+            TaskListSection.finished,
+            TaskListSection.rejected,
+            if (taskGroups[TaskListSection.failed] != null)
+              TaskListSection.failed,
+            if (widget.showArchived) TaskListSection.archived,
+          ];
 
     final taskCount = sections.map((s) => (taskGroups[s] ?? []).length).sum;
 
@@ -94,8 +98,10 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
     }
 
     if (taskCount == 0 && _searchQuery.isEmpty) {
+      // No tasks and no search query
       return widget.emptyView;
     } else if (taskCount == 0 && _searchQuery.isNotEmpty) {
+      // No tasks for given search query
       return Column(
         children: [
           _buildTaskListHeader(),
@@ -129,16 +135,27 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
       }
     }
 
-    final requestsTasks = taskGroups[TaskListSection.requests] ?? <Task<T>>[];
+    final requestsTasks = <Task<T>>[];
     final remainingTasks = <Task<T>>[];
 
     taskGroups.forEach((section, tasks) {
+      if (section == TaskListSection.requests ||
+          (widget.showArchived
+              ? section == TaskListSection.archivedPending
+              : false)) {
+        requestsTasks.addAll(tasks);
+      }
+    });
+
+    taskGroups.forEach((section, tasks) {
       if (section != TaskListSection.requests &&
+          section != TaskListSection.archivedPending &&
           (widget.showArchived || section != TaskListSection.archived)) {
         remainingTasks.addAll(tasks);
       }
     });
 
+    requestsTasks.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     remainingTasks.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
     return Column(
@@ -156,7 +173,14 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
 
   Map<TaskListSection, List<Task<T>>> groupTasks() {
     return filterTasks().groupListsBy((task) {
-      if (task.archived) return TaskListSection.archived;
+      if (task.archived) {
+        if (task.state != TaskState.finished &&
+            task.state != TaskState.failed) {
+          return TaskListSection.archivedPending;
+        }
+        return TaskListSection.archived;
+      }
+
       return switch (task.state) {
         TaskState.finished => TaskListSection.finished,
         TaskState.failed => switch (task.error) {
@@ -198,8 +222,8 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
   ) {
     var categories = ["requests", "remaining"];
     Map<String, List<Task<T>>> orderedCategorizedTasks = {
-      categories[0]: requestsTasks,
-      categories[1]: remainingTasks,
+      categories[0]: widget.showAllTypes ? requestsTasks : [],
+      categories[1]: widget.showOnlyPending ? [] : remainingTasks,
     };
 
     return RefreshIndicator(
