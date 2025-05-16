@@ -75,7 +75,6 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
             if (widget.showArchived) TaskListSection.archivedPending
           ]
         : [
-            TaskListSection.requests,
             TaskListSection.finished,
             TaskListSection.rejected,
             if (taskGroups[TaskListSection.failed] != null)

@@ -84,6 +84,15 @@ class TaskListing extends StatelessWidget {
           .isEmpty) {
         return SizedBox();
       }
+    } else {
+      if (model.allTasks
+          .where((task) =>
+              (task.state == TaskState.finished ||
+                  task.state == TaskState.failed) &&
+              (model.showArchived ? true : task.archived == false))
+          .isEmpty) {
+        return SizedBox();
+      }
     }
 
     if (!model.anyGroupJoined()) {
@@ -122,16 +131,19 @@ class TaskListing extends StatelessWidget {
                 subheading,
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: LARGE_GAP),
-              ElevatedButton(
-                onPressed: () {
-                  final tabViewModel =
-                      Provider.of<TabsViewModel>(context, listen: false);
+              if (!context.read<AppViewModel>().anyGroupJoined()) ...[
+                const SizedBox(height: LARGE_GAP),
+                ElevatedButton(
+                  onPressed: () {
+                    final tabViewModel =
+                        Provider.of<TabsViewModel>(context, listen: false);
 
-                  tabViewModel.setIndex(2, postNavigationAction: 'createGroup');
-                },
-                child: const Text('Create group'),
-              ),
+                    tabViewModel.setIndex(2,
+                        postNavigationAction: 'createGroup');
+                  },
+                  child: const Text('Create group'),
+                ),
+              ],
               if (context.read<AppViewModel>().anyGroupJoined()) ...[
                 const SizedBox(height: MEDIUM_GAP),
                 ElevatedButton(
