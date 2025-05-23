@@ -116,7 +116,14 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
                   // TODO: don't recompute this?
                   selected: _selection.any((elem) => elem.id == device.id),
                   onChanged: device.id == widget.currentDevice.id
-                      ? null
+                      ? _selection
+                              .any((elem) => elem.id == widget.currentDevice.id)
+                          ? null
+                          : (value) {
+                              if (value != null) {
+                                _changeSelection(device, value);
+                              }
+                            }
                       : (value) {
                           if (value != null) _changeSelection(device, value);
                         },
