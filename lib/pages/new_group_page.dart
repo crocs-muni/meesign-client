@@ -383,31 +383,49 @@ class _NewGroupPageState extends State<NewGroupPage> {
                   },
                 ),
                 const SizedBox(width: 8),
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      // 1. Remove the selected device
-                      _devices.removeWhere((d) => d.id == member.device.id);
-
-                      // 2. Remove the member from the group
-                      _members.removeAt(i);
-
-                      _sharesErr = null;
-                      if (_protocol.thresholdType == ThresholdType.nOfN) {
-                        _threshold = _shareCount;
-                      }
-                      // Adjust threshold if it's now too high
-                      if (_threshold > _shareCount) {
-                        _setThreshold(_shareCount);
-                      }
-                    });
+                FutureBuilder<Widget>(
+                  future: _buildDeleteIcon(member, i, context),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return snapshot.data!;
+                    }
+                    return const SizedBox.shrink();
                   },
-                  icon: const Icon(Symbols.delete),
-                )
+                ),
               ],
             ),
           ),
       ],
+    );
+  }
+
+  Future<Widget> _buildDeleteIcon(
+      Member member, int i, BuildContext context) async {
+    final session = context.read<AppContainer>().session!;
+    Device device = await session.deviceRepository.getDevice(session.user.did);
+
+    return IconButton(
+      onPressed: member.device.id == device.id
+          ? null
+          : () {
+              setState(() {
+                // 1. Remove the selected device
+                _devices.removeWhere((d) => d.id == member.device.id);
+
+                // 2. Remove the member from the group
+                _members.removeAt(i);
+
+                _sharesErr = null;
+                if (_protocol.thresholdType == ThresholdType.nOfN) {
+                  _threshold = _shareCount;
+                }
+                // Adjust threshold if it's now too high
+                if (_threshold > _shareCount) {
+                  _setThreshold(_shareCount);
+                }
+              });
+            },
+      icon: const Icon(Symbols.delete),
     );
   }
 
