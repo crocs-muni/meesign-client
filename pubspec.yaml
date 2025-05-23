@@ -77,7 +77,7 @@ dependencies:
   window_manager: ^0.4.3
   flutter_slidable: ^4.0.0
   lottie: ^3.3.0
-  skeletonizer: ^1.4.3
+  skeletonizer: ^2.0.1
 
 dev_dependencies:
   flutter_test:
