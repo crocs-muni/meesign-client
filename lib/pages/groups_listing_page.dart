@@ -22,8 +22,12 @@ class GroupsListingPage extends StatefulWidget {
   State<GroupsListingPage> createState() => _GroupsListingPageState();
 }
 
-class _GroupsListingPageState extends State<GroupsListingPage> {
+class _GroupsListingPageState extends State<GroupsListingPage>
+    with AutomaticKeepAliveClientMixin {
   late TabsViewModel _tabsViewModel;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -66,6 +70,7 @@ class _GroupsListingPageState extends State<GroupsListingPage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final model = Provider.of<AppViewModel>(context, listen: false);
 
     return StreamBuilder<TaskStream>(
@@ -76,6 +81,8 @@ class _GroupsListingPageState extends State<GroupsListingPage> {
               body: TaskListView<Group>(
                 key: ValueKey('group_task_list'),
                 tasks: model.groupTasks,
+                showHeading: false,
+                customSearchBarHint: 'Search groups by name...',
                 emptyView: _buildEmptyGroups(context),
                 showArchived: model.showArchived,
                 showAllTypes: true,

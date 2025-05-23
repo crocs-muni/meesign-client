@@ -11,14 +11,13 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultPageTemplate(
+      showAppBar: true,
+      appBarTitle: "Application settings",
       wrapInScroll: true,
       body: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("What do you want to do?",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          SizedBox(height: 10),
           _buildMenuItems(context),
         ],
       ),

@@ -1,8 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:lottie/lottie.dart';
-import 'package:provider/provider.dart';
-
-import '../view_model/tabs_view_model.dart';
 
 class ControlledLottieAnimation extends StatefulWidget {
   final String assetName;
@@ -55,20 +52,8 @@ class _ControlledLottieAnimationState extends State<ControlledLottieAnimation>
   }
 
   void _checkAnimationStart() {
-    final tabIndex = context.watch<TabsViewModel>().index;
-    const allTasksTabIndex = 1;
-
     if (_loaded && !_controller.isAnimating) {
-      if (widget.startAtTabIndex == null ||
-          tabIndex == widget.startAtTabIndex ||
-          tabIndex == allTasksTabIndex) {
-        // This replays the animation when the tab is selected.
-        // Remove the reset() if you want to keep the animation state.
-        _controller.reset();
-
-        // Start the animation if the tab index matches
-        _controller.forward();
-      }
+      _controller.forward();
     }
   }
 

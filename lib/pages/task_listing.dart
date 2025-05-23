@@ -5,8 +5,8 @@ import 'package:provider/provider.dart';
 import '../enums/fab_type.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
+import '../util/actions/group_creator.dart';
 import '../view_model/app_view_model.dart';
-import '../view_model/tabs_view_model.dart';
 import '../widget/controlled_lottie_animation.dart';
 import '../widget/fab_configurator.dart';
 import '../widget/task_list_view.dart';
@@ -14,15 +14,33 @@ import '../widget/task_tiles/challenge_task_tile.dart';
 import '../widget/task_tiles/decrypt_task_tile.dart';
 import '../widget/task_tiles/signing_task_tile.dart';
 import 'new_task_page.dart';
+import 'tabbed_task_page.dart';
 
-class TaskListing extends StatelessWidget {
+class TaskListing extends StatefulWidget {
   const TaskListing(
-      {super.key, this.showOnlyPending = false, this.hidePending = false});
+      {super.key,
+      this.showOnlyPending = false,
+      this.hidePending = false,
+      this.showHeading = true,
+      this.customSearchBarHint});
   final bool showOnlyPending;
   final bool hidePending;
+  final bool showHeading;
+  final String? customSearchBarHint;
+
+  @override
+  State<TaskListing> createState() => _TaskListingState();
+}
+
+class _TaskListingState extends State<TaskListing>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
+    super.build(
+        context); // Important: Must call super.build for AutomaticKeepAliveClientMixin
     final model = Provider.of<AppViewModel>(context, listen: false);
 
     return StreamBuilder(
@@ -31,23 +49,14 @@ class TaskListing extends StatelessWidget {
           return DefaultPageTemplate(
             floatingActionButton: _buildFab(context, model),
             body: TaskListView(
-              showAllTypes: !hidePending,
+              key: ValueKey('general_task_list'),
+              customSearchBarHint: widget.customSearchBarHint,
+              showAllTypes: true,
+              showHeading: widget.showHeading,
               tasks: model.allTasks,
-              emptyView: showOnlyPending
-                  ? _buildEmptyTasks(
-                      context,
-                      model,
-                      'All tasks are completed',
-                      'Once there is something to sign, we will let you know.',
-                      1)
-                  : _buildEmptyTasks(
-                      context,
-                      model,
-                      'No tasks available',
-                      'Start by creating a challenge, decrypt or signing group.',
-                      0),
+              emptyView: _buildEmptyTasks(context, model, 'No tasks available',
+                  'Join a group and create a new task to get started.', 0),
               showArchived: model.showArchived,
-              showOnlyPending: showOnlyPending,
               taskBuilder: (context, task) {
                 // Signing tasks
                 if (task is Task<File>) {
@@ -75,7 +84,7 @@ class TaskListing extends StatelessWidget {
   Widget _buildFab(BuildContext context, AppViewModel model) {
     // Don't show Fab if the list is empty - placeholder with CTA is shown instead
 
-    if (showOnlyPending) {
+    if (widget.showOnlyPending) {
       if (model.allTasks
           .where((task) =>
               task.state != TaskState.finished &&
@@ -116,9 +125,11 @@ class TaskListing extends StatelessWidget {
                 padding: EdgeInsets.only(bottom: MEDIUM_PADDING),
                 child: ControlledLottieAnimation(
                   startAtTabIndex: animationStartIndex,
-                  assetName: 'assets/lottie/sign.json',
+                  assetName: Theme.of(context).brightness == Brightness.light
+                      ? 'assets/lottie/sign_light_mode.json'
+                      : 'assets/lottie/sign_dark_mode.json',
                   stopAtPercentage: 0.2,
-                  width: 400,
+                  height: 350,
                   fit: BoxFit.fitWidth,
                 ),
               ),
@@ -135,11 +146,8 @@ class TaskListing extends StatelessWidget {
                 const SizedBox(height: LARGE_GAP),
                 ElevatedButton(
                   onPressed: () {
-                    final tabViewModel =
-                        Provider.of<TabsViewModel>(context, listen: false);
-
-                    tabViewModel.setIndex(2,
-                        postNavigationAction: 'createGroup');
+                    TabbedTasksPage.switchToTab(context, 1);
+                    createGroup(context, context);
                   },
                   child: const Text('Create group'),
                 ),

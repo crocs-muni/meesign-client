@@ -14,27 +14,29 @@ class TabSelectorItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (MediaQuery.sizeOf(context).width > 525) ...[
-            tabIcon,
-            SizedBox(width: SMALL_GAP)
+    return Tab(
+      child: LayoutBuilder(builder: (context, constraints) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (MediaQuery.sizeOf(context).width > 525) ...[
+              tabIcon,
+              SizedBox(width: SMALL_GAP)
+            ],
+            if (constraints.maxWidth > 100) ...[
+              Flexible(
+                  child: Text(
+                title,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              )),
+              SizedBox(width: SMALL_GAP),
+            ],
+            _buildCounterBadge()
           ],
-          if (constraints.maxWidth > 100) ...[
-            Flexible(
-                child: Text(
-              title,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            )),
-            SizedBox(width: SMALL_GAP),
-          ],
-          _buildCounterBadge()
-        ],
-      );
-    });
+        );
+      }),
+    );
   }
 
   Widget _buildCounterBadge() {

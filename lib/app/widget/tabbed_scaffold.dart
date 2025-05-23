@@ -5,7 +5,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
 import '../../pages/settings_page.dart';
-import '../../pages/task_listing.dart';
+import '../../pages/tabbed_task_page.dart';
 import '../../ui_constants.dart';
 import '../../util/layout_getter.dart';
 import '../../view_model/app_view_model.dart';
@@ -13,9 +13,7 @@ import '../../view_model/tabs_view_model.dart';
 import '../../widget/fluid_gradient.dart';
 import '../model/navigation_tab_model.dart';
 import '../../app_container.dart';
-import '../../widget/counter_badge.dart';
 import '../../widget/main_app_bar.dart';
-import '../../pages/groups_listing_page.dart';
 import 'offstage_navigator.dart';
 
 class TabbedScaffold extends StatelessWidget {
@@ -39,6 +37,37 @@ class TabbedScaffold extends StatelessWidget {
         ),
       ),
     ], child: const HomePageView());
+  }
+
+  static void openSettingsInContext(BuildContext context) {
+    final tabsViewModel = Provider.of<TabsViewModel>(context, listen: false);
+    final currentIndex = tabsViewModel.index;
+    final tabsState = context.findAncestorStateOfType<_HomePageViewState>();
+
+    if (tabsState != null && tabsState._tabs.isNotEmpty) {
+      final navigatorKey = tabsState._tabs[currentIndex].navigatorKey;
+      bool isSettingsOpen = false;
+      navigatorKey.currentState?.popUntil((route) {
+        if (route.settings.name == 'settings' ||
+            (route is MaterialPageRoute &&
+                route.builder(context) is SettingsPage)) {
+          isSettingsOpen = true;
+        }
+        return true;
+      });
+
+      // Only open settings if not already open
+      if (!isSettingsOpen) {
+        navigatorKey.currentState?.push(
+          MaterialPageRoute<void>(
+            builder: (context) => SettingsPage(),
+            fullscreenDialog: false,
+            maintainState: true,
+            settings: const RouteSettings(name: 'settings'),
+          ),
+        );
+      }
+    }
   }
 }
 
@@ -102,11 +131,8 @@ class _HomePageViewState extends State<HomePageView> {
                   child: Scaffold(
                     appBar: buildAppBar(context,
                         LayoutGetter.getCurLayout(constraints.maxWidth)),
-                    body: _buildResponsiveLayout(
-                        _buildIndexedStack(), constraints.maxWidth),
+                    body: _buildIndexedStack(),
                     floatingActionButton: null,
-                    bottomNavigationBar:
-                        _buildBottomNavigation(constraints.maxWidth),
                   ),
                 ),
               ),
@@ -128,36 +154,10 @@ class _HomePageViewState extends State<HomePageView> {
 
     _tabs = <NavigationTabModel>[
       NavigationTabModel(
-        label: 'Completed',
-        child: TaskListing(
-          hidePending: true,
-        ),
+        label: 'Tabs',
+        child: TabbedTasksPage(),
         icon: Icon(Symbols.task_alt),
       ),
-      NavigationTabModel(
-        label: 'Pending',
-        child: TaskListing(
-          showOnlyPending: true,
-        ),
-        icon: _buildCounterIcon(
-          stream: context.watch<AppViewModel>().nAllReqs,
-          icon: Symbols.pending_actions,
-          fillIcon: context.read<TabsViewModel>().index == 1,
-        ),
-      ),
-      NavigationTabModel(
-        label: 'Groups',
-        child: GroupsListingPage(),
-        icon: _buildCounterIcon(
-          stream: context.watch<AppViewModel>().nGroupReqs,
-          icon: Symbols.group,
-          fillIcon: context.read<TabsViewModel>().index == 2,
-        ),
-      ),
-      NavigationTabModel(
-          label: 'Settings',
-          child: SettingsPage(),
-          icon: Icon(Symbols.settings))
     ];
   }
 
@@ -175,104 +175,6 @@ class _HomePageViewState extends State<HomePageView> {
         },
       ).toList(),
     ));
-  }
-
-  Widget _buildResponsiveLayout(Widget child, double width) {
-    if (width > minLaptopLayoutWidth) {
-      return Center(
-        child: Container(
-          constraints: BoxConstraints(maxWidth: minLaptopLayoutWidth),
-          child: Row(
-            children: <Widget>[
-              NavigationRail(
-                selectedIndex: context.read<TabsViewModel>().index,
-                onDestinationSelected: _onItemTapped,
-                extended: true,
-                destinations: _tabs.map<NavigationRailDestination>(
-                  (NavigationTabModel destination) {
-                    return NavigationRailDestination(
-                      icon: destination.icon,
-                      label: Text(destination.label),
-                    );
-                  },
-                ).toList(),
-              ),
-              const VerticalDivider(thickness: 1, width: 1),
-              Expanded(
-                child: child,
-              ),
-            ],
-          ),
-        ),
-      );
-    } else if (width > minTabletLayoutWidth) {
-      // Show the navigation rail and the child widget from the tab
-      return Row(
-        children: <Widget>[
-          NavigationRail(
-            selectedIndex: context.read<TabsViewModel>().index,
-            onDestinationSelected: _onItemTapped,
-            extended: true,
-            destinations: _tabs.map<NavigationRailDestination>(
-              (NavigationTabModel destination) {
-                return NavigationRailDestination(
-                  icon: destination.icon,
-                  label: Text(destination.label),
-                );
-              },
-            ).toList(),
-          ),
-          const VerticalDivider(thickness: 1, width: 1),
-          Expanded(
-            child: child,
-          ),
-        ],
-      );
-    } else {
-      // Show only the child widget from the tab. This will be followed by the bottom navigation bar
-      return child;
-    }
-  }
-
-  void _onItemTapped(int index) {
-    if (context.read<TabsViewModel>().index == index) {
-      // If the user taps the current tab again, pop to the root of that tab
-      var navigatorKey = _tabs[index].navigatorKey;
-      navigatorKey.currentState?.popUntil((route) => route.isFirst);
-    } else {
-      setState(() {
-        context.read<TabsViewModel>().setIndex(index);
-      });
-    }
-  }
-
-  Widget _buildBottomNavigation(double width) {
-    if (width > minTabletLayoutWidth) {
-      return const SizedBox.shrink();
-    } else {
-      return NavigationBar(
-        selectedIndex: context.watch<TabsViewModel>().index,
-        onDestinationSelected: _onItemTapped,
-        destinations: _tabs.map<NavigationDestination>(
-          (NavigationTabModel destination) {
-            return NavigationDestination(
-              icon: destination.icon,
-              label: destination.label,
-            );
-          },
-        ).toList(),
-      );
-    }
-  }
-
-  Widget _buildCounterIcon(
-      {required Stream<int> stream,
-      required IconData icon,
-      bool fillIcon = false}) {
-    return CounterBadge(
-      stream: stream,
-      child: Icon(icon, fill: fillIcon ? 1 : 0),
-    );
   }
 
   Widget _buildPageTransitionSwitcher(Widget child) {
