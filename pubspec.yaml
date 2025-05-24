@@ -16,8 +16,8 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 
-# Do not forget to update lib/ui/about_page.dart as well!
-version: 0.4.2
+# Do not forget to update lib/pages/about_page.dart as well!
+version: 0.5.1
 
 environment:
   sdk: ^3.0.0
