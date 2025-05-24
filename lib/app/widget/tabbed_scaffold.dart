@@ -88,7 +88,10 @@ class _HomePageViewState extends State<HomePageView> {
                           : 0),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(LARGE_BORDER_RADIUS),
+                    borderRadius: BorderRadius.circular(
+                        constraints.maxWidth > minTabletLayoutWidth
+                            ? LARGE_BORDER_RADIUS
+                            : 0),
                     border: Border.all(
                         color: borderColor.withValues(alpha: borderOpacity),
                         width: borderWidth),

@@ -66,6 +66,7 @@ class GroupPage extends StatelessWidget {
               MaterialPageRoute<void>(
                 builder: (context) => DevicePage(
                   device: member.device,
+                  showActionButtons: false,
                 ),
               ),
             );
