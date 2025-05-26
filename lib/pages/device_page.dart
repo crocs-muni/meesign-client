@@ -8,7 +8,6 @@ import '../util/confirm_device_change.dart';
 import '../util/fade_black_page_transition.dart';
 import '../widget/avatar_app_bar.dart';
 import '../widget/change_device_section.dart';
-import '../widget/danger_zone_section.dart';
 import '../widget/device_identity.dart';
 import '../widget/device_name.dart';
 import 'register_page.dart';
@@ -75,13 +74,6 @@ class _DevicePageState extends State<DevicePage> {
                   centerContent: true,
                   showText: false,
                 )),
-                const SizedBox(height: LARGE_GAP),
-                Center(
-                  child: DangerZoneSection(
-                    centerContent: true,
-                    showText: false,
-                  ),
-                )
               ]
             ],
           ),
