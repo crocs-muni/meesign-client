@@ -6,6 +6,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../app/model/settings.dart';
 
 class SettingsController {
+  static const autoJoinGroupKey = 'autoJoinGroups';
+  static const autoRejectGroupKey = 'autoRejectGroups';
+  static const showArchivedItemsKey = 'showArchivedItems';
+  static const currentUserIdKey = 'currentUserId';
+  static const themeModeKey = 'themeMode';
+  static const defaultThemeMode = ThemeMode.system;
+
   // Seed settings controller stream with default settings
   final _settingsController = BehaviorSubject<Settings>.seeded(
     Settings(
@@ -14,6 +21,7 @@ class SettingsController {
   );
 
   Stream<Settings> get settingsStream => _settingsController.stream;
+  Settings get currentSettings => _settingsController.value;
 
   SettingsController() {
     setup();
@@ -22,7 +30,22 @@ class SettingsController {
   void setup() async {
     _initThemeSettings();
     _initShowArchivedItemsSettings();
+    _initGroupAutomation();
     _initCurrentUserIdSettings();
+  }
+
+  void updateAutoJoinGroups(bool autoJoin) {
+    _updateSettingsStream(autoJoinGroups: autoJoin);
+    if (autoJoin) {
+      updateAutoRejectGroups(false);
+    }
+  }
+
+  void updateAutoRejectGroups(bool autoReject) {
+    _updateSettingsStream(autoRejectGroups: autoReject);
+    if (autoReject) {
+      updateAutoJoinGroups(false);
+    }
   }
 
   void updateThemeMode(ThemeMode themeMode) =>
@@ -33,49 +56,71 @@ class SettingsController {
       _updateSettingsStream(currentUserId: currentUserId);
 
   void _updateSettingsStream(
-      {ThemeMode? themeMode, bool? showArchivedItems, String? currentUserId}) {
+      {ThemeMode? themeMode,
+      bool? showArchivedItems,
+      String? currentUserId,
+      bool? autoJoinGroups,
+      bool? autoRejectGroups}) {
     final currentSettings = _settingsController.value;
     final updatedSettings = currentSettings.copyWith(
-      themeMode: themeMode ?? currentSettings.themeMode,
-      showArchivedItems: showArchivedItems ?? currentSettings.showArchivedItems,
-      currentUserId: currentUserId ?? currentSettings.currentUserId,
-    );
+        themeMode: themeMode ?? currentSettings.themeMode,
+        showArchivedItems:
+            showArchivedItems ?? currentSettings.showArchivedItems,
+        currentUserId: currentUserId ?? currentSettings.currentUserId,
+        autoJoinGroups: autoJoinGroups ?? currentSettings.autoJoinGroups,
+        autoRejectGroups: autoRejectGroups ?? currentSettings.autoRejectGroups);
     _settingsController.add(updatedSettings);
 
     SharedPreferences.getInstance().then((sharedPreferences) {
       sharedPreferences.setString(
-          'themeMode', getThemeIdentifier(updatedSettings.themeMode));
+          themeModeKey, getThemeIdentifier(updatedSettings.themeMode));
       sharedPreferences.setBool(
-          'showArchivedItems', updatedSettings.showArchivedItems);
+          showArchivedItemsKey, updatedSettings.showArchivedItems);
       sharedPreferences.setString(
-          'currentUserId', updatedSettings.currentUserId);
+          currentUserIdKey, updatedSettings.currentUserId);
+      sharedPreferences.setBool(
+          autoJoinGroupKey, updatedSettings.autoJoinGroups);
+      sharedPreferences.setBool(
+          autoRejectGroupKey, updatedSettings.autoRejectGroups);
     });
   }
 
   void _initThemeSettings() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String? themeModeIdentifier =
-        sharedPreferences.getString('themeMode') ?? 'system';
+        sharedPreferences.getString(themeModeKey) ?? 'system';
 
     updateThemeMode(getThemeModeFromIdentifier(themeModeIdentifier));
-    sharedPreferences.setString('themeMode', themeModeIdentifier);
+    sharedPreferences.setString(themeModeKey, themeModeIdentifier);
   }
 
   void _initShowArchivedItemsSettings() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     bool? showArchivedItems =
-        sharedPreferences.getBool('showArchivedItems') ?? false;
+        sharedPreferences.getBool(showArchivedItemsKey) ?? false;
 
     updateShowArchivedItems(showArchivedItems);
-    sharedPreferences.setBool('showArchivedItems', showArchivedItems);
+    sharedPreferences.setBool(showArchivedItemsKey, showArchivedItems);
   }
 
   void _initCurrentUserIdSettings() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String? currentUserId = sharedPreferences.getString('currentUserId') ?? '';
+    String? currentUserId = sharedPreferences.getString(currentUserIdKey) ?? '';
 
     updateCurrentUserId(currentUserId);
-    sharedPreferences.setString('currentUserId', currentUserId);
+    sharedPreferences.setString(currentUserIdKey, currentUserId);
+  }
+
+  void _initGroupAutomation() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    bool? autoJoinGroups = sharedPreferences.getBool(autoJoinGroupKey) ?? false;
+    bool? autoRejectGroups =
+        sharedPreferences.getBool(autoRejectGroupKey) ?? false;
+
+    updateAutoJoinGroups(autoJoinGroups);
+    updateAutoRejectGroups(autoRejectGroups);
+    sharedPreferences.setBool(autoJoinGroupKey, autoJoinGroups);
+    sharedPreferences.setBool(autoRejectGroupKey, autoRejectGroups);
   }
 
   void saveUserIdentifier(String deviceName, String host, String id) async {

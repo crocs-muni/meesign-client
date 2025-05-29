@@ -6,6 +6,7 @@ import 'package:meesign_core/meesign_card.dart';
 import 'package:meesign_core/meesign_data.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../app/model/settings.dart';
 import '../enums/task_type.dart';
 import '../services/settings_controller.dart';
 import '../util/extensions/task_approvable.dart';
@@ -142,6 +143,17 @@ class AppViewModel with ChangeNotifier {
 
     groupTasksStream.listen((tasks) {
       _groupTasksController.add(tasks);
+      Settings currentSettings = _settingsController.currentSettings;
+
+      for (var task in tasks) {
+        if (task.approvable) {
+          if (currentSettings.autoJoinGroups) {
+            _groupRepository.approveTask(device!.id, task.id, agree: true);
+          } else if (currentSettings.autoRejectGroups) {
+            _groupRepository.approveTask(device!.id, task.id, agree: false);
+          }
+        }
+      }
     });
 
     signTasksStream.listen((tasks) {

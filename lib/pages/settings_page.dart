@@ -4,6 +4,7 @@ import '../templates/default_page_template.dart';
 import 'about_page.dart';
 import 'device_settings_page.dart';
 import 'general_settings_page.dart';
+import 'group_settings_page.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -36,6 +37,11 @@ class SettingsPage extends StatelessWidget {
         "icon": Icons.devices,
         "text": "Device and server",
         "page": DeviceSettingsPage()
+      },
+      {
+        "icon": Icons.group,
+        "text": "Group settings",
+        "page": GroupSettingsPage()
       },
       {
         "icon": Icons.question_mark,
