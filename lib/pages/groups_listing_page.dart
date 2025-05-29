@@ -77,6 +77,7 @@ class _GroupsListingPageState extends State<GroupsListingPage>
         stream: model.combinedTaskStream,
         builder: (context, snapshot) {
           return DefaultPageTemplate(
+              showAppBar: true,
               floatingActionButton: _buildFab(context, model),
               body: TaskListView<Group>(
                 key: ValueKey('group_task_list'),

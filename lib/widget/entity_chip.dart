@@ -57,7 +57,7 @@ class GroupChip extends StatelessWidget {
           style: Theme.of(context).textTheme.labelLarge,
         ),
       ),
-      label: Text(group.name),
+      label: Text(trimGroupName(group.name, 20)),
       onPressed: () {
         Navigator.push(
           context,
@@ -67,5 +67,12 @@ class GroupChip extends StatelessWidget {
         );
       },
     );
+  }
+
+  String trimGroupName(String name, int maxLength) {
+    if (name.length <= maxLength) {
+      return name;
+    }
+    return '${name.substring(0, maxLength - 3)}...';
   }
 }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../enums/screen_layout.dart';
 import '../ui_constants.dart';
 import '../app/widget/tabbed_scaffold.dart';
+import '../view_model/tabs_view_model.dart';
 import 'device_icon.dart';
 import 'smart_logo.dart';
 
@@ -17,13 +19,18 @@ PreferredSizeWidget buildAppBar(
     actions: [
       DeviceIcon(),
       Padding(
-        padding: const EdgeInsets.only(right: SMALL_GAP),
-        child: IconButton(
-            onPressed: () {
-              TabbedScaffold.openSettingsInContext(context);
+          padding: const EdgeInsets.only(right: SMALL_GAP),
+          child: Consumer<TabsViewModel>(
+            builder: (context, model, child) {
+              return IconButton(
+                  onPressed: model.settingsPageInStack
+                      ? null
+                      : () {
+                          TabbedScaffold.openSettingsInContext(context);
+                        },
+                  icon: Icon(Icons.settings));
             },
-            icon: Icon(Icons.settings)),
-      )
+          ))
     ],
   );
 }

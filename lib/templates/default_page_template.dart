@@ -13,6 +13,7 @@ class DefaultPageTemplate extends StatelessWidget {
   final bool includePadding;
   final bool transparentBackground;
   final Widget? floatingActionButton;
+  final Function? onBackButtonPressed;
 
   const DefaultPageTemplate({
     super.key,
@@ -26,6 +27,7 @@ class DefaultPageTemplate extends StatelessWidget {
     this.includePadding = true,
     this.transparentBackground = false,
     this.appBarActions = const [],
+    this.onBackButtonPressed,
   });
 
   @override
@@ -68,6 +70,9 @@ class DefaultPageTemplate extends StatelessWidget {
             child: TextButton.icon(
               onPressed: () {
                 Navigator.pop(context);
+                if (onBackButtonPressed != null) {
+                  onBackButtonPressed!();
+                }
               },
               label: Text(backButtonText),
               icon: Icon(Icons.arrow_back),

@@ -6,8 +6,10 @@ import 'package:open_filex/open_filex.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../ui_constants.dart';
 import '../../view_model/app_view_model.dart';
 import '../entity_chip.dart';
+import '../large_square_button.dart';
 import '../task_tile.dart';
 
 class SigningTaskTile extends StatelessWidget {
@@ -26,22 +28,45 @@ class SigningTaskTile extends StatelessWidget {
       task: task,
       name: task.info.basename,
       showDetailRow: false,
-      actionChip: GroupChip(group: task.info.group),
-      actions: <Widget>[
-        FilledButton.tonal(
-          child: const Text('View'),
-          onPressed: () => _openFile(task.info.path),
-        ),
-      ],
+      actionChip: Row(
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GroupChip(group: task.info.group),
+          SizedBox(
+            width: SMALL_GAP,
+          ),
+          if (task.state == TaskState.finished) ...[
+            FilledButton.tonal(
+              style: FilledButton.styleFrom(
+                side: const BorderSide(
+                  color: Colors.grey,
+                  width: 1.0,
+                ),
+              ),
+              onPressed: () => _openFile(task.info.path),
+              child: const Text('View'),
+            )
+          ]
+        ],
+      ),
+      actions: const [],
       approveActions: [
-        FilledButton.tonal(
-          child: const Text('Sign'),
-          onPressed: () => model.joinSign(task, agree: true),
+        LargeSquareButton(
+          text: "Sign",
+          icon: Icons.check,
+          onPressed: () {
+            model.joinSign(task, agree: true);
+          },
+          color: Color(0xFF298E29),
         ),
-        OutlinedButton(
-          child: const Text('Decline'),
-          onPressed: () => model.joinSign(task, agree: false),
-        ),
+        LargeSquareButton(
+            text: "Decline",
+            icon: Icons.close,
+            onPressed: () {
+              model.joinSign(task, agree: false);
+            },
+            color: Color(0xFFAA3026)),
       ],
       onArchiveChange: (archive) => model.archiveTask(task, archive: archive),
     );

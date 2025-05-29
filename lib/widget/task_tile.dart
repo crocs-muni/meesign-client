@@ -83,6 +83,7 @@ class TaskTile<T> extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
           clipBehavior: Clip.antiAlias,
           child: ExpansionTile(
+            minTileHeight: 60,
             title: Row(
               children: [
                 Flexible(
@@ -110,10 +111,8 @@ class TaskTile<T> extends StatelessWidget {
                 task.state != TaskState.failed,
             leading: leading,
             trailing: trailing,
-            childrenPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 8,
-            ),
+            childrenPadding:
+                const EdgeInsets.only(right: 16, left: 16, bottom: 8, top: 4),
             children: [
               ...children,
               if (actionRow != null) actionRow,

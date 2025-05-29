@@ -7,10 +7,12 @@ import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
 import '../../enums/data_view.dart';
+import '../../ui_constants.dart';
 import '../../util/card_reader_launcher.dart';
 import '../../util/chars.dart';
 import '../../view_model/app_view_model.dart';
 import '../entity_chip.dart';
+import '../large_square_button.dart';
 import '../task_tile.dart';
 
 class ChallengeTaskTile extends StatelessWidget {
@@ -29,16 +31,44 @@ class ChallengeTaskTile extends StatelessWidget {
       task: task,
       name: task.info.name,
       showDetailRow: false,
-      actionChip: GroupChip(group: task.info.group),
+      actionChip: Row(
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GroupChip(group: task.info.group),
+          SizedBox(
+            width: SMALL_GAP,
+          ),
+          if (task.state == TaskState.finished) ...[
+            FilledButton.tonal(
+              style: FilledButton.styleFrom(
+                side: const BorderSide(
+                  color: Colors.grey,
+                  width: 1.0,
+                ),
+              ),
+              onPressed: () => showChallengeDialog(context, task.info),
+              child: const Text('View'),
+            )
+          ]
+        ],
+      ),
       approveActions: [
-        FilledButton.tonal(
-          child: const Text('Sign'),
-          onPressed: () => model.joinChallenge(task, agree: true),
+        LargeSquareButton(
+          text: "Sign",
+          icon: Icons.check,
+          onPressed: () {
+            model.joinChallenge(task, agree: true);
+          },
+          color: Color(0xFF298E29),
         ),
-        OutlinedButton(
-          child: const Text('Decline'),
-          onPressed: () => model.joinChallenge(task, agree: false),
-        )
+        LargeSquareButton(
+            text: "Decline",
+            icon: Icons.close,
+            onPressed: () {
+              model.joinChallenge(task, agree: false);
+            },
+            color: Color(0xFFAA3026)),
       ],
       cardActions: [
         FilledButton.tonal(
@@ -47,12 +77,7 @@ class ChallengeTaskTile extends StatelessWidget {
           child: const Text('Read card'),
         ),
       ],
-      actions: [
-        FilledButton.tonal(
-          onPressed: () => showChallengeDialog(context, task.info),
-          child: const Text('View'),
-        )
-      ],
+      actions: const [],
       onArchiveChange: (archive) => model.archiveTask(task, archive: archive),
     );
   }

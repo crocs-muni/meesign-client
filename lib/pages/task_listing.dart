@@ -13,8 +13,8 @@ import '../widget/task_list_view.dart';
 import '../widget/task_tiles/challenge_task_tile.dart';
 import '../widget/task_tiles/decrypt_task_tile.dart';
 import '../widget/task_tiles/signing_task_tile.dart';
+import 'groups_listing_page.dart';
 import 'new_task_page.dart';
-import 'tabbed_task_page.dart';
 
 class TaskListing extends StatefulWidget {
   const TaskListing(
@@ -83,7 +83,6 @@ class _TaskListingState extends State<TaskListing>
 
   Widget _buildFab(BuildContext context, AppViewModel model) {
     // Don't show Fab if the list is empty - placeholder with CTA is shown instead
-
     if (widget.showOnlyPending) {
       if (model.allTasks
           .where((task) =>
@@ -95,10 +94,7 @@ class _TaskListingState extends State<TaskListing>
       }
     } else {
       if (model.allTasks
-          .where((task) =>
-              (task.state == TaskState.finished ||
-                  task.state == TaskState.failed) &&
-              (model.showArchived ? true : task.archived == false))
+          .where((task) => (model.showArchived ? true : task.archived == false))
           .isEmpty) {
         return SizedBox();
       }
@@ -146,7 +142,12 @@ class _TaskListingState extends State<TaskListing>
                 const SizedBox(height: LARGE_GAP),
                 ElevatedButton(
                   onPressed: () {
-                    TabbedTasksPage.switchToTab(context, 1);
+                    // 1. Navigate to groups listing page
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => GroupsListingPage(),
+                    ));
+
+                    // 2. Create a new group
                     createGroup(context, context);
                   },
                   child: const Text('Create group'),

@@ -12,10 +12,12 @@ import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../ui_constants.dart';
 import '../../util/platform.dart';
 import '../../util/status_message.dart';
 import '../../view_model/app_view_model.dart';
 import '../entity_chip.dart';
+import '../large_square_button.dart';
 import '../task_tile.dart';
 
 class DecryptTaskTile extends StatelessWidget {
@@ -35,24 +37,46 @@ class DecryptTaskTile extends StatelessWidget {
       name: task.info.name,
       showDetailRow: false,
       desc: StatusMessage.getStatusMessage(task),
-      actionChip: GroupChip(group: task.info.group),
+      actionChip: Row(
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GroupChip(group: task.info.group),
+          SizedBox(
+            width: SMALL_GAP,
+          ),
+          if (task.state == TaskState.finished) ...[
+            FilledButton.tonal(
+              style: FilledButton.styleFrom(
+                side: const BorderSide(
+                  color: Colors.grey,
+                  width: 1.0,
+                ),
+              ),
+              onPressed: () => showDecryptDialog(context, task.info),
+              child: const Text('View'),
+            )
+          ]
+        ],
+      ),
       approveActions: [
-        FilledButton.tonal(
-          child: const Text('Decrypt'),
-          onPressed: () => model.joinDecrypt(task, agree: true),
+        LargeSquareButton(
+          text: "Decrypt",
+          icon: Icons.check,
+          onPressed: () {
+            model.joinDecrypt(task, agree: true);
+          },
+          color: Color(0xFF298E29),
         ),
-        OutlinedButton(
-          child: const Text('Decline'),
-          onPressed: () => model.joinDecrypt(task, agree: false),
-        )
+        LargeSquareButton(
+            text: "Decline",
+            icon: Icons.close,
+            onPressed: () {
+              model.joinDecrypt(task, agree: false);
+            },
+            color: Color(0xFFAA3026)),
       ],
-      actions: [
-        if (task.state == TaskState.finished)
-          FilledButton.tonal(
-            onPressed: () => showDecryptDialog(context, task.info),
-            child: const Text('View'),
-          )
-      ],
+      actions: const [],
       onArchiveChange: (archive) => model.archiveTask(task, archive: archive),
     );
   }

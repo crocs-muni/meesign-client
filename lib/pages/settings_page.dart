@@ -1,19 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../templates/default_page_template.dart';
+import '../view_model/tabs_view_model.dart';
 import 'about_page.dart';
 import 'device_settings_page.dart';
 import 'general_settings_page.dart';
+import 'group_settings_page.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
   @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  @override
+  void initState() {
+    super.initState();
+    // Ensure the settings page is in the stack when this widget is created
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<TabsViewModel>().setSettingsPageInStack(true);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    TabsViewModel model = context.read<TabsViewModel>();
+
     return DefaultPageTemplate(
       showAppBar: true,
       appBarTitle: "Application settings",
       wrapInScroll: true,
+      onBackButtonPressed: () {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          model.setSettingsPageInStack(false);
+        });
+      },
       body: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,6 +59,11 @@ class SettingsPage extends StatelessWidget {
         "icon": Icons.devices,
         "text": "Device and server",
         "page": DeviceSettingsPage()
+      },
+      {
+        "icon": Icons.group,
+        "text": "Group settings",
+        "page": GroupSettingsPage()
       },
       {
         "icon": Icons.question_mark,
