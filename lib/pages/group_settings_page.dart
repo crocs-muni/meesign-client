@@ -61,19 +61,19 @@ class GroupSettingsPage extends StatelessWidget {
         ),
         SizedBox(height: SMALL_GAP),
         Text(
-            "By default all group invitations you receive must be manually accepted. You can change this behaviour in the section bellow to automatically accept or reject each invitation.",
+            "By default all group invitations you receive must be manually accepted. You can change this behaviour in the section bellow to automatically accept each invitation.",
             style: theme.textTheme.bodyMedium
                 ?.copyWith(color: theme.colorScheme.outline)),
         SizedBox(height: SMALL_GAP),
         SwitchListTile(
-          title: Text('Auto-accept group invitations',
+          title: Text('Automatically accept group invitations',
               style: theme.textTheme.bodyMedium),
           value: settings.autoJoinGroups,
           onChanged: (value) {
             controller.updateAutoJoinGroups(value);
           },
         ),
-        if (settings.themeMode != ThemeMode.system) ...[
+        /*
           SwitchListTile(
             title: Text('Auto-reject group invitations',
                 style: theme.textTheme.bodyMedium),
@@ -82,7 +82,7 @@ class GroupSettingsPage extends StatelessWidget {
               controller.updateAutoRejectGroups(value);
             },
           ),
-        ]
+        */
       ],
     );
   }
