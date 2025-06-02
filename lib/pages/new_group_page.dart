@@ -378,6 +378,10 @@ class _NewGroupPageState extends State<NewGroupPage> {
                         if (_protocol.thresholdType == ThresholdType.nOfN) {
                           _threshold = _shareCount;
                         }
+
+                        if (_threshold > _shareCount) {
+                          _setThreshold(_shareCount);
+                        }
                       }
                     });
                   },

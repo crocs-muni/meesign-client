@@ -67,7 +67,12 @@ class _ControlledLottieAnimationState extends State<ControlledLottieAnimation>
         _controller.reset();
 
         // Start the animation if the tab index matches
-        _controller.forward();
+        // Wait 250ms before starting the animation to ensure the widget is fully built
+        Future.delayed(const Duration(milliseconds: 250), () {
+          if (mounted) {
+            _controller.forward();
+          }
+        });
       }
     }
   }
