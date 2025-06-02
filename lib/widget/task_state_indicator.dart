@@ -17,17 +17,8 @@ class _TaskStateIndicatorState extends State<TaskStateIndicator> {
   @override
   Widget build(BuildContext context) {
     return switch (widget.task.state) {
-      TaskState.created => const Icon(Symbols.arrow_drop_down),
-      TaskState.running => SizedBox(
-          height: 24,
-          width: 24,
-          // TODO: add animation
-          child: CircularProgressIndicator(
-            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-            value: widget.task.round / widget.task.nRounds,
-            strokeWidth: 2.0,
-          ),
-        ),
+      TaskState.created => SizedBox(),
+      TaskState.running => _buildProgressIndicator(),
       TaskState.needsCard => const Icon(Symbols.payment),
       TaskState.finished => Icon(
           Symbols.check,
@@ -41,5 +32,18 @@ class _TaskStateIndicatorState extends State<TaskStateIndicator> {
           color: Theme.of(context).colorScheme.error,
         ),
     };
+  }
+
+  Widget _buildProgressIndicator() {
+    return SizedBox(
+      height: 24,
+      width: 24,
+      // TODO: add animation
+      child: CircularProgressIndicator(
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        value: widget.task.round / widget.task.nRounds,
+        strokeWidth: 2.0,
+      ),
+    );
   }
 }

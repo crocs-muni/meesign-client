@@ -23,11 +23,12 @@ PreferredSizeWidget buildAppBar(
           child: Consumer<TabsViewModel>(
             builder: (context, model, child) {
               return IconButton(
-                  onPressed: model.settingsPageInStack
-                      ? null
-                      : () {
-                          TabbedScaffold.openSettingsInContext(context);
-                        },
+                  onPressed:
+                      model.settingsPageInStack || model.newGroupPageInStack
+                          ? null
+                          : () {
+                              TabbedScaffold.openSettingsInContext(context);
+                            },
                   icon: Icon(Icons.settings));
             },
           ))

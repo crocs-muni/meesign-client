@@ -18,6 +18,7 @@ import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
 import '../util/chars.dart';
 import '../util/get_shares_warning.dart';
+import '../view_model/tabs_view_model.dart';
 import '../widget/device_name.dart';
 import '../widget/number_input.dart';
 import '../widget/option_tile.dart';
@@ -57,6 +58,10 @@ class _NewGroupPageState extends State<NewGroupPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<TabsViewModel>().setNewGroupPageInStack(true);
+    });
+
     _nameController.addListener(() {
       if (_nameErr != null) {
         setState(() {
@@ -199,6 +204,11 @@ class _NewGroupPageState extends State<NewGroupPage> {
     }
     if (_nameErr != null || _sharesErr != null || _policyErr != null) return;
 
+    TabsViewModel model = context.read<TabsViewModel>();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      model.setNewGroupPageInStack(false);
+    });
+
     // Pass the new created group back to the previous screen where its handled
     Navigator.pop(
       context,
@@ -239,9 +249,16 @@ class _NewGroupPageState extends State<NewGroupPage> {
           protocol: _protocol,
         );
 
+    TabsViewModel model = context.read<TabsViewModel>();
+
     return DefaultPageTemplate(
         showAppBar: true,
         appBarTitle: 'New group',
+        onBackButtonPressed: () {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            model.setNewGroupPageInStack(false);
+          });
+        },
         body: _buildPageBody(sharesIssue));
   }
 
@@ -377,6 +394,10 @@ class _NewGroupPageState extends State<NewGroupPage> {
                         _sharesErr = null;
                         if (_protocol.thresholdType == ThresholdType.nOfN) {
                           _threshold = _shareCount;
+                        }
+
+                        if (_threshold > _shareCount) {
+                          _setThreshold(_shareCount);
                         }
                       }
                     });

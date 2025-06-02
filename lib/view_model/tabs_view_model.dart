@@ -5,11 +5,13 @@ class TabsViewModel extends ChangeNotifier {
   String _postNavigationAction = '';
   bool _newGroupPageActive = false;
   bool _settingsPageInStack = false;
+  bool _newGroupPageInStack = false;
 
   int get index => _index;
   String get postNavigationAction => _postNavigationAction;
   bool get newGroupPageActive => _newGroupPageActive;
   bool get settingsPageInStack => _settingsPageInStack;
+  bool get newGroupPageInStack => _newGroupPageInStack;
 
   void setIndex(int newIndex, {String postNavigationAction = ''}) {
     if (_index != newIndex) {
@@ -25,6 +27,11 @@ class TabsViewModel extends ChangeNotifier {
 
   void setSettingsPageInStack(bool isInStack) {
     _settingsPageInStack = isInStack;
+    notifyListeners();
+  }
+
+  void setNewGroupPageInStack(bool isInStack) {
+    _newGroupPageInStack = isInStack;
     notifyListeners();
   }
 }

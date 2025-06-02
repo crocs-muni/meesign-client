@@ -46,29 +46,154 @@ class TaskTile<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final desc = this.desc ?? StatusMessage.getStatusMessage(task);
     final trailing = TaskStateIndicator(task);
-    final allActions = actions +
-        (task.approvable ? approveActions : []) +
-        (task.state == TaskState.needsCard ? cardActions : []);
+    final allActions =
+        actions + (task.state == TaskState.needsCard ? cardActions : []);
+    final actionRow = _buildActionRow(allActions);
 
-    final actionRow = allActions.isNotEmpty || actionChip != null
-        ? Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (actionChip != null) actionChip!,
-              Expanded(
-                child: Wrap(
-                  alignment: WrapAlignment.end,
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: allActions,
-                ),
-              ),
-            ].intersperse(
-              const SizedBox(width: 8),
+    return _buildArchiveContainer(
+      context,
+      Padding(
+        padding: const EdgeInsets.all(SMALL_PADDING),
+        child: Column(
+          children: [
+            _buildHeader(context, desc,
+                actionRow: actionRow, trailing: trailing),
+            // ...children,
+          ].intersperse(
+            const SizedBox(width: 8),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context, String? desc,
+      {Widget? actionRow, Widget? trailing}) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            SizedBox(width: SMALL_GAP),
+            Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: SMALL_GAP),
+                    Text(name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        )),
+                    if (showTaskTypeInfo) ...[
+                      SizedBox(height: SMALL_GAP),
+                      _buildTaskTypeInfo(task, context),
+                    ],
+                    if (desc != null) ...[
+                      SizedBox(height: SMALL_GAP),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.access_time_outlined,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 16,
+                          ),
+                          SizedBox(
+                            width: SMALL_GAP,
+                          ),
+                          Expanded(
+                            child: Text(desc,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
+                                )),
+                          ),
+                        ],
+                      )
+                    ],
+                    if (actionRow != null) actionRow,
+                    SizedBox(height: SMALL_GAP)
+                  ]),
             ),
-          )
-        : null;
+            if (task.approvable) ...[
+              LayoutBuilder(builder: (context, constraints) {
+                return Row(
+                  children: [
+                    if (MediaQuery.sizeOf(context).width >=
+                        minTabletLayoutWidth) ...[
+                      Row(
+                        children: [
+                          SizedBox(height: XLARGE_GAP),
+                          ...approveActions
+                        ],
+                      ),
+                    ] else ...[
+                      Padding(
+                        padding: const EdgeInsets.only(right: LARGE_GAP),
+                        child: _buildNotificationCircle(context),
+                      )
+                    ]
+                  ],
+                );
+              })
+            ] else ...[
+              if (trailing != null) ...[
+                Padding(
+                  padding: const EdgeInsets.only(right: LARGE_GAP),
+                  child: trailing,
+                )
+              ],
+            ],
+          ],
+        ),
+        if (task.approvable) ...[
+          LayoutBuilder(builder: (context, constraints) {
+            return Container(
+              padding: EdgeInsets.only(top: SMALL_GAP, left: SMALL_GAP),
+              child: Row(
+                children: [
+                  if (MediaQuery.sizeOf(context).width <
+                      minTabletLayoutWidth) ...[
+                    Row(
+                      children: [
+                        SizedBox(height: XLARGE_GAP),
+                        ...approveActions
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            );
+          })
+        ]
+      ],
+    );
+  }
 
+  Widget _buildNotificationCircle(BuildContext context) {
+    return Row(
+      children: [
+        Text("Waiting",
+            style: TextStyle(
+              fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            )),
+        SizedBox(width: SMALL_GAP),
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget _buildArchiveContainer(BuildContext context, Widget child) {
     return Container(
       padding: EdgeInsets.only(bottom: SMALL_PADDING),
       child: Deletable.builder(
@@ -82,47 +207,28 @@ class TaskTile<T> extends StatelessWidget {
           color: Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(8),
           clipBehavior: Clip.antiAlias,
-          child: ExpansionTile(
-            minTileHeight: 60,
-            title: Row(
-              children: [
-                Flexible(
-                  child: Text(name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      )),
-                ),
-                if (showTaskTypeInfo) ...[
-                  SizedBox(width: LARGE_GAP * 1.5),
-                  _buildTaskTypeInfo(task, context),
-                ],
-              ],
-            ),
-            subtitle: desc != null
-                ? Padding(
-                    padding: EdgeInsets.only(top: SMALL_PADDING),
-                    child: Text(desc),
-                  )
-                : null,
-            initiallyExpanded: !task.archived &&
-                task.state != TaskState.finished &&
-                task.state != TaskState.failed,
-            leading: leading,
-            trailing: trailing,
-            childrenPadding:
-                const EdgeInsets.only(right: 16, left: 16, bottom: 8, top: 4),
-            children: [
-              ...children,
-              if (actionRow != null) actionRow,
-            ].intersperse(
-              const SizedBox(height: 8),
-            ),
-          ),
+          child: child,
         ),
       ),
     );
+  }
+
+  Widget? _buildActionRow(List<Widget> allActions) {
+    final actionRow = allActions.isNotEmpty || actionChip != null
+        ? Container(
+            padding: EdgeInsets.only(top: SMALL_GAP),
+            child: Wrap(
+              spacing: SMALL_GAP,
+              runSpacing: SMALL_GAP,
+              children: [
+                if (actionChip != null) actionChip!,
+                ...allActions,
+              ],
+            ),
+          )
+        : null;
+
+    return actionRow;
   }
 
   Widget _buildGroupMetaDataRow(
@@ -181,7 +287,7 @@ class TaskTile<T> extends StatelessWidget {
             return Row(
               children: [
                 if (MediaQuery.sizeOf(context).width >
-                    minLaptopLayoutWidth) ...[
+                    minTabletLayoutWidth + 100) ...[
                   SizedBox(width: LARGE_GAP),
                   _buildGroupMetaDataRow(Symbols.code,
                       taskGroup?.protocol.name.toUpperCase() ?? "", context),

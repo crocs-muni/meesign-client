@@ -53,7 +53,12 @@ class _ControlledLottieAnimationState extends State<ControlledLottieAnimation>
 
   void _checkAnimationStart() {
     if (_loaded && !_controller.isAnimating) {
-      _controller.forward();
+      // Wait 1.5s before starting the animation to ensure the widget is fully built
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        if (mounted) {
+          _controller.forward();
+        }
+      });
     }
   }
 
