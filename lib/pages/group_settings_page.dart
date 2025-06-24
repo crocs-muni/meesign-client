@@ -7,6 +7,7 @@ import '../services/settings_controller.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
 import 'groups_listing_page.dart';
+import '../widget/number_input.dart';
 
 class GroupSettingsPage extends StatelessWidget {
   const GroupSettingsPage({super.key});
@@ -75,6 +76,17 @@ class GroupSettingsPage extends StatelessWidget {
           onChanged: (value) {
             controller.updateAutoJoinGroups(value);
           },
+        ),
+        ListTile(
+          title: Text('Minimum number of members to create a group',
+              style: theme.textTheme.bodyMedium),
+          trailing: NumberInput(
+            value: settings.minGroupMembers,
+            onUpdate: (newValue) {
+              if (newValue < 1) return;
+              controller.updateMinGroupMembers(newValue);
+            },
+          ),
         ),
       ],
     );

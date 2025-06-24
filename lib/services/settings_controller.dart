@@ -12,6 +12,7 @@ class SettingsController {
   static const currentUserIdKey = 'currentUserId';
   static const themeModeKey = 'themeMode';
   static const defaultThemeMode = ThemeMode.system;
+  static const minGroupMembersKey = 'minGroupMembers';
 
   // Seed settings controller stream with default settings
   final _settingsController = BehaviorSubject<Settings>.seeded(
@@ -32,6 +33,7 @@ class SettingsController {
     _initShowArchivedItemsSettings();
     _initGroupAutomation();
     _initCurrentUserIdSettings();
+    _initMinGroupMembers();
   }
 
   void updateAutoJoinGroups(bool autoJoin) {
@@ -54,13 +56,17 @@ class SettingsController {
       _updateSettingsStream(showArchivedItems: showArchivedItems);
   void updateCurrentUserId(String currentUserId) =>
       _updateSettingsStream(currentUserId: currentUserId);
+  void updateMinGroupMembers(int minGroupMembers) {
+    _updateSettingsStream(minGroupMembers: minGroupMembers);
+  }
 
   void _updateSettingsStream(
       {ThemeMode? themeMode,
       bool? showArchivedItems,
       String? currentUserId,
       bool? autoJoinGroups,
-      bool? autoRejectGroups}) {
+      bool? autoRejectGroups,
+      int? minGroupMembers}) {
     final currentSettings = _settingsController.value;
     final updatedSettings = currentSettings.copyWith(
         themeMode: themeMode ?? currentSettings.themeMode,
@@ -68,7 +74,8 @@ class SettingsController {
             showArchivedItems ?? currentSettings.showArchivedItems,
         currentUserId: currentUserId ?? currentSettings.currentUserId,
         autoJoinGroups: autoJoinGroups ?? currentSettings.autoJoinGroups,
-        autoRejectGroups: autoRejectGroups ?? currentSettings.autoRejectGroups);
+        autoRejectGroups: autoRejectGroups ?? currentSettings.autoRejectGroups,
+        minGroupMembers: minGroupMembers ?? currentSettings.minGroupMembers);
     _settingsController.add(updatedSettings);
 
     SharedPreferences.getInstance().then((sharedPreferences) {
@@ -82,6 +89,8 @@ class SettingsController {
           autoJoinGroupKey, updatedSettings.autoJoinGroups);
       sharedPreferences.setBool(
           autoRejectGroupKey, updatedSettings.autoRejectGroups);
+      sharedPreferences.setInt(
+          minGroupMembersKey, updatedSettings.minGroupMembers);
     });
   }
 
@@ -121,6 +130,13 @@ class SettingsController {
     updateAutoRejectGroups(autoRejectGroups);
     sharedPreferences.setBool(autoJoinGroupKey, autoJoinGroups);
     sharedPreferences.setBool(autoRejectGroupKey, autoRejectGroups);
+  }
+
+  void _initMinGroupMembers() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    int? minGroupMembers = sharedPreferences.getInt(minGroupMembersKey) ?? 2;
+    updateMinGroupMembers(minGroupMembers);
+    sharedPreferences.setInt(minGroupMembersKey, minGroupMembers);
   }
 
   void saveUserIdentifier(String deviceName, String host, String id) async {

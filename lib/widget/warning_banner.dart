@@ -42,7 +42,7 @@ class WarningBanner extends StatelessWidget {
     );
 
     return Container(
-      padding: const EdgeInsets.all(XLARGE_PADDING),
+      padding: const EdgeInsets.all(LARGE_PADDING),
       decoration: BoxDecoration(
         color: colorScheme.errorContainer,
         borderRadius:

@@ -33,17 +33,29 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
 
   void _query(String query) async {
     Iterable<Device> results = [];
+    Iterable<Device> localResults = [];
+    Iterable<Device> remoteResults = [];
     try {
       final deviceRepository =
           context.read<AppContainer>().session!.deviceRepository;
       // TODO: allow searching by id?
 
       // Fetch devices from server
-      results = await deviceRepository.search(_queryController.text);
-      _loaded = true;
+      remoteResults = await deviceRepository.search(_queryController.text);
 
       // Fetch devices from local db
-      // results = await deviceRepository.getAllLocalDevices();
+      localResults = await deviceRepository.getAllLocalDevices();
+
+      // Keep only remote devices that are also not in the local results
+      // This is to avoid creating groups that cant be confirmed by all devices
+      // since user would have to logout and login multiple times for each device
+      results = remoteResults.where((dev) =>
+          !localResults.any((localDev) => localDev.id == dev.id) ||
+          dev.id == widget.currentDevice.id);
+
+      await Future.delayed(const Duration(milliseconds: 1000), () {
+        setState(() => _loaded = true);
+      });
     } catch (_) {}
 
     _pivot = DateTime.now().subtract(activeThreshold);
@@ -103,7 +115,7 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
           )),
       body: _queryResults.isEmpty
           ? !_loaded
-              ? const Center(child: CircularProgressIndicator())
+              ? LinearProgressIndicator()
               : NoResultsPlaceholder(
                   label: "No peers with such a name found", icon: Icons.devices)
           : ListView.builder(

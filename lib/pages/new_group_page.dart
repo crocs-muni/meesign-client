@@ -44,6 +44,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
   final List<Device> _devices = [];
   final _nameController = TextEditingController();
   final _policyController = TextEditingController();
+  String? _membersErr;
   String? _nameErr, _policyErr;
   ({String title, String text})? _sharesErr;
   KeyType _keyType = KeyType.signPdf;
@@ -127,6 +128,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
         _members.add(Member(device, 1));
       }
       _sharesErr = null;
+      _membersErr = null;
       if (_protocol.thresholdType == ThresholdType.nOfN) {
         _threshold = _shareCount;
       }
@@ -190,6 +192,16 @@ class _NewGroupPageState extends State<NewGroupPage> {
       });
     }
 
+    final AppContainer container = context.read<AppContainer>();
+    final minGroupMembers =
+        container.settingsController.currentSettings.minGroupMembers;
+    if (_members.length < minGroupMembers) {
+      setState(() {
+        _membersErr =
+            'At least $minGroupMembers members are required to create a group. You can change this in the application settings.';
+      });
+    }
+
     Map<String, dynamic> policy = _buildPolicy();
 
     if (_policyController.text.trim().isNotEmpty) {
@@ -202,7 +214,13 @@ class _NewGroupPageState extends State<NewGroupPage> {
         });
       }
     }
-    if (_nameErr != null || _sharesErr != null || _policyErr != null) return;
+
+    if (_nameErr != null ||
+        _sharesErr != null ||
+        _policyErr != null ||
+        _membersErr != null) {
+      return;
+    }
 
     TabsViewModel model = context.read<TabsViewModel>();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -270,6 +288,11 @@ class _NewGroupPageState extends State<NewGroupPage> {
             children: [
               _buildNameInput(),
               _buildMembersSection(),
+              if (_membersErr != null)
+                WarningBanner(
+                  title: 'More group members required',
+                  text: _membersErr!,
+                ),
               _buildTresholdSection(),
               if (sharesIssue != null)
                 WarningBanner(
