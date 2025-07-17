@@ -270,7 +270,26 @@ class _RegistrationFormState extends State<RegistrationForm> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => ExistingUserList()),
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    ExistingUserList(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  return ClipRRect(
+                    borderRadius: BorderRadius.circular(LARGE_BORDER_RADIUS),
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(1.0, 0.0),
+                        end: Offset.zero,
+                      ).animate(CurvedAnimation(
+                        parent: animation,
+                        curve: Curves.easeInOut,
+                      )),
+                      child: child,
+                    ),
+                  );
+                },
+              ),
             );
           },
           style: ElevatedButton.styleFrom(

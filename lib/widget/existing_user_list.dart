@@ -47,6 +47,7 @@ class ExistingUserListState extends State<ExistingUserList> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      color: Theme.of(context).colorScheme.surface,
       padding: EdgeInsets.only(top: MEDIUM_PADDING, bottom: LARGE_PADDING),
       child: DefaultPageTemplate(
         transparentBackground: true,
