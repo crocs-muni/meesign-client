@@ -23,8 +23,18 @@ class $DevicesTable extends Devices with TableInfo<$DevicesTable, Device> {
       GeneratedColumn<String>('kind', aliasedName, false,
               type: DriftSqlType.string, requiredDuringInsert: true)
           .withConverter<DeviceKind>($DevicesTable.$converterkind);
+  static const VerificationMeta _isLocalMeta =
+      const VerificationMeta('isLocal');
   @override
-  List<GeneratedColumn> get $columns => [id, name, kind];
+  late final GeneratedColumn<bool> isLocal = GeneratedColumn<bool>(
+      'is_local', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_local" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  @override
+  List<GeneratedColumn> get $columns => [id, name, kind, isLocal];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -46,6 +56,10 @@ class $DevicesTable extends Devices with TableInfo<$DevicesTable, Device> {
     } else if (isInserting) {
       context.missing(_nameMeta);
     }
+    if (data.containsKey('is_local')) {
+      context.handle(_isLocalMeta,
+          isLocal.isAcceptableOrUnknown(data['is_local']!, _isLocalMeta));
+    }
     return context;
   }
 
@@ -61,6 +75,8 @@ class $DevicesTable extends Devices with TableInfo<$DevicesTable, Device> {
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       kind: $DevicesTable.$converterkind.fromSql(attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}kind'])!),
+      isLocal: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_local'])!,
     );
   }
 
@@ -77,7 +93,12 @@ class Device extends DataClass implements Insertable<Device> {
   final Uint8List id;
   final String name;
   final DeviceKind kind;
-  const Device({required this.id, required this.name, required this.kind});
+  final bool isLocal;
+  const Device(
+      {required this.id,
+      required this.name,
+      required this.kind,
+      required this.isLocal});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -86,6 +107,7 @@ class Device extends DataClass implements Insertable<Device> {
     {
       map['kind'] = Variable<String>($DevicesTable.$converterkind.toSql(kind));
     }
+    map['is_local'] = Variable<bool>(isLocal);
     return map;
   }
 
@@ -94,6 +116,7 @@ class Device extends DataClass implements Insertable<Device> {
       id: Value(id),
       name: Value(name),
       kind: Value(kind),
+      isLocal: Value(isLocal),
     );
   }
 
@@ -105,6 +128,7 @@ class Device extends DataClass implements Insertable<Device> {
       name: serializer.fromJson<String>(json['name']),
       kind: $DevicesTable.$converterkind
           .fromJson(serializer.fromJson<String>(json['kind'])),
+      isLocal: serializer.fromJson<bool>(json['isLocal']),
     );
   }
   @override
@@ -115,19 +139,24 @@ class Device extends DataClass implements Insertable<Device> {
       'name': serializer.toJson<String>(name),
       'kind':
           serializer.toJson<String>($DevicesTable.$converterkind.toJson(kind)),
+      'isLocal': serializer.toJson<bool>(isLocal),
     };
   }
 
-  Device copyWith({Uint8List? id, String? name, DeviceKind? kind}) => Device(
+  Device copyWith(
+          {Uint8List? id, String? name, DeviceKind? kind, bool? isLocal}) =>
+      Device(
         id: id ?? this.id,
         name: name ?? this.name,
         kind: kind ?? this.kind,
+        isLocal: isLocal ?? this.isLocal,
       );
   Device copyWithCompanion(DevicesCompanion data) {
     return Device(
       id: data.id.present ? data.id.value : this.id,
       name: data.name.present ? data.name.value : this.name,
       kind: data.kind.present ? data.kind.value : this.kind,
+      isLocal: data.isLocal.present ? data.isLocal.value : this.isLocal,
     );
   }
 
@@ -136,37 +165,43 @@ class Device extends DataClass implements Insertable<Device> {
     return (StringBuffer('Device(')
           ..write('id: $id, ')
           ..write('name: $name, ')
-          ..write('kind: $kind')
+          ..write('kind: $kind, ')
+          ..write('isLocal: $isLocal')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash($driftBlobEquality.hash(id), name, kind);
+  int get hashCode =>
+      Object.hash($driftBlobEquality.hash(id), name, kind, isLocal);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Device &&
           $driftBlobEquality.equals(other.id, this.id) &&
           other.name == this.name &&
-          other.kind == this.kind);
+          other.kind == this.kind &&
+          other.isLocal == this.isLocal);
 }
 
 class DevicesCompanion extends UpdateCompanion<Device> {
   final Value<Uint8List> id;
   final Value<String> name;
   final Value<DeviceKind> kind;
+  final Value<bool> isLocal;
   final Value<int> rowid;
   const DevicesCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.kind = const Value.absent(),
+    this.isLocal = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   DevicesCompanion.insert({
     required Uint8List id,
     required String name,
     required DeviceKind kind,
+    this.isLocal = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : id = Value(id),
         name = Value(name),
@@ -175,12 +210,14 @@ class DevicesCompanion extends UpdateCompanion<Device> {
     Expression<Uint8List>? id,
     Expression<String>? name,
     Expression<String>? kind,
+    Expression<bool>? isLocal,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (kind != null) 'kind': kind,
+      if (isLocal != null) 'is_local': isLocal,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -189,11 +226,13 @@ class DevicesCompanion extends UpdateCompanion<Device> {
       {Value<Uint8List>? id,
       Value<String>? name,
       Value<DeviceKind>? kind,
+      Value<bool>? isLocal,
       Value<int>? rowid}) {
     return DevicesCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       kind: kind ?? this.kind,
+      isLocal: isLocal ?? this.isLocal,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -211,6 +250,9 @@ class DevicesCompanion extends UpdateCompanion<Device> {
       map['kind'] =
           Variable<String>($DevicesTable.$converterkind.toSql(kind.value));
     }
+    if (isLocal.present) {
+      map['is_local'] = Variable<bool>(isLocal.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -223,6 +265,7 @@ class DevicesCompanion extends UpdateCompanion<Device> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('kind: $kind, ')
+          ..write('isLocal: $isLocal, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2643,12 +2686,14 @@ typedef $$DevicesTableCreateCompanionBuilder = DevicesCompanion Function({
   required Uint8List id,
   required String name,
   required DeviceKind kind,
+  Value<bool> isLocal,
   Value<int> rowid,
 });
 typedef $$DevicesTableUpdateCompanionBuilder = DevicesCompanion Function({
   Value<Uint8List> id,
   Value<String> name,
   Value<DeviceKind> kind,
+  Value<bool> isLocal,
   Value<int> rowid,
 });
 
@@ -2703,6 +2748,9 @@ class $$DevicesTableFilterComposer extends Composer<_$Database, $DevicesTable> {
       $composableBuilder(
           column: $table.kind,
           builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  ColumnFilters<bool> get isLocal => $composableBuilder(
+      column: $table.isLocal, builder: (column) => ColumnFilters(column));
 
   Expression<bool> usersRefs(
       Expression<bool> Function($$UsersTableFilterComposer f) f) {
@@ -2764,6 +2812,9 @@ class $$DevicesTableOrderingComposer
 
   ColumnOrderings<String> get kind => $composableBuilder(
       column: $table.kind, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isLocal => $composableBuilder(
+      column: $table.isLocal, builder: (column) => ColumnOrderings(column));
 }
 
 class $$DevicesTableAnnotationComposer
@@ -2783,6 +2834,9 @@ class $$DevicesTableAnnotationComposer
 
   GeneratedColumnWithTypeConverter<DeviceKind, String> get kind =>
       $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<bool> get isLocal =>
+      $composableBuilder(column: $table.isLocal, builder: (column) => column);
 
   Expression<T> usersRefs<T extends Object>(
       Expression<T> Function($$UsersTableAnnotationComposer a) f) {
@@ -2853,24 +2907,28 @@ class $$DevicesTableTableManager extends RootTableManager<
             Value<Uint8List> id = const Value.absent(),
             Value<String> name = const Value.absent(),
             Value<DeviceKind> kind = const Value.absent(),
+            Value<bool> isLocal = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               DevicesCompanion(
             id: id,
             name: name,
             kind: kind,
+            isLocal: isLocal,
             rowid: rowid,
           ),
           createCompanionCallback: ({
             required Uint8List id,
             required String name,
             required DeviceKind kind,
+            Value<bool> isLocal = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               DevicesCompanion.insert(
             id: id,
             name: name,
             kind: kind,
+            isLocal: isLocal,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
@@ -3190,8 +3248,8 @@ final class $$GroupsTableReferences
           aliasName: $_aliasNameGenerator(db.groups.id, db.tasks.gid));
 
   $$TasksTableProcessedTableManager get tasksRefs {
-    final manager = $$TasksTableTableManager($_db, $_db.tasks).filter((f) =>
-        f.gid.id.sqlEquals($_itemColumn<Uint8List>('id') ?? Uint8List(0)));
+    final manager = $$TasksTableTableManager($_db, $_db.tasks).filter(
+        (f) => f.gid.id.sqlEquals($_itemColumn<Uint8List>('id') as Uint8List));
 
     final cache = $_typedResult.readTableOrNull(_tasksRefsTable($_db));
     return ProcessedTableManager(
@@ -3206,7 +3264,7 @@ final class $$GroupsTableReferences
   $$GroupMembersTableProcessedTableManager get groupMembersRefs {
     final manager = $$GroupMembersTableTableManager($_db, $_db.groupMembers)
         .filter((f) =>
-            f.tid.id.sqlEquals($_itemColumn<Uint8List>('id') ?? Uint8List(0)));
+            f.tid.id.sqlEquals($_itemColumn<Uint8List>('id') as Uint8List));
 
     final cache = $_typedResult.readTableOrNull(_groupMembersRefsTable($_db));
     return ProcessedTableManager(
