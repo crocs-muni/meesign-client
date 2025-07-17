@@ -38,6 +38,10 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
   final _searchController = TextEditingController();
   String _searchQuery = '';
   TaskType get taskType {
+    if (widget.showAllTypes) {
+      return TaskType.mix;
+    }
+
     if (T == Group) {
       return TaskType.group;
     } else if (T == Challenge) {
@@ -278,10 +282,25 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
 
   Future<void> _refreshTasks() async {
     var model = Provider.of<AppViewModel>(context, listen: false);
-    return model.refetchTasks(taskType);
+
+    if (widget.showAllTypes) {
+      // Refresh all task types when showing mixed tasks
+      await Future.wait([
+        model.refetchTasks(TaskType.group),
+        model.refetchTasks(TaskType.sign),
+        model.refetchTasks(TaskType.challenge),
+        model.refetchTasks(TaskType.decrypt),
+      ]);
+    } else {
+      return model.refetchTasks(taskType);
+    }
   }
 
   String _getGeneralHeading() {
+    if (widget.showAllTypes) {
+      return 'Tasks';
+    }
+
     if (T == Group) {
       return 'Groups';
     } else if (T == Challenge) {
@@ -365,7 +384,8 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
           _refreshTasks();
         },
         icon: Icon(Icons.refresh),
-        label: Text("Reload ${T == Group ? "groups" : "tasks"}"));
+        label: Text(
+            "Reload ${widget.showAllTypes ? "tasks" : (T == Group ? "groups" : "tasks")}"));
   }
 
   Widget _buildFilterSection() {
