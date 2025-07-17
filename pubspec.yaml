@@ -39,9 +39,6 @@ dependencies:
   cupertino_icons: ^1.0.2
   qr_flutter: ^4.0.0
   animations: ^2.0.2
-  # TODO: fully migrate to file_selector,
-  # file_picker has suboptimal linux impl
-  file_picker: ^8.0.0+1
   flutter_nfc_kit: ^3.1.0
   path_provider: ^2.0.8
   # FIXME: find an alternative, open_file seems to be
@@ -63,7 +60,7 @@ dependencies:
   rxdart: ^0.27.7
   sqlite3_flutter_libs: ^0.5.13
   logging: ^1.2.0
-  file_selector: ^1.0.0
+  file_selector: ^1.0.3
   collection: ^1.17.1
   mime: ^1.0.4
   share_plus: ^11.0.0

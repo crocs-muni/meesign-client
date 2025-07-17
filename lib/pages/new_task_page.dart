@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
@@ -15,6 +16,7 @@ import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
 import '../util/actions/group_creator.dart';
 import '../util/pick_pdf_file.dart';
+import '../util/platform.dart';
 import '../view_model/app_view_model.dart';
 import '../widget/error_dialog.dart';
 import '../widget/group_suggestion_tile.dart';
@@ -87,7 +89,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
           _buildGroupSelector(context),
           Divider(
             height: 1,
-            thickness: 0.5,
+            thickness: 1,
             indent: MEDIUM_PADDING,
           ),
           SizedBox(height: MEDIUM_GAP),
@@ -661,7 +663,23 @@ class _NewTaskPageState extends State<NewTaskPage> {
   }
 
   Future<void> _selectImage(BuildContext context) async {
-    final file = await ImagePicker().pickImage(source: ImageSource.gallery);
+    XFile? file;
+
+    if (PlatformGroup.isMobile) {
+      // Use ImagePicker for mobile platforms (iOS/Android)
+      file = await ImagePicker().pickImage(source: ImageSource.gallery);
+    } else {
+      // Use file_selector for desktop/web platforms (better Linux support)
+      file = await openFile(
+        acceptedTypeGroups: const [
+          XTypeGroup(
+            label: 'Images',
+            extensions: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'],
+          ),
+        ],
+      );
+    }
+
     if (file == null) return;
 
     final bytes = await file.readAsBytes();
