@@ -31,6 +31,12 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
 
   bool _isActive(Device device) => device.lastActive.isAfter(_pivot);
 
+  List<Device> filterCurrentDevice({required List<Device> devices}) {
+    return devices
+        .where((device) => device.id != widget.currentDevice.id)
+        .toList();
+  }
+
   void _query(String query) async {
     Iterable<Device> results = [];
     Iterable<Device> localResults = [];
@@ -53,14 +59,14 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
           !localResults.any((localDev) => localDev.id == dev.id) ||
           dev.id == widget.currentDevice.id);
 
-      await Future.delayed(const Duration(milliseconds: 1000), () {
-        setState(() => _loaded = true);
-      });
+      setState(() => _loaded = true);
     } catch (_) {}
 
     _pivot = DateTime.now().subtract(activeThreshold);
-    final active = results.where(_isActive).toList();
-    final inactive = results.where((dev) => !_isActive(dev)).toList();
+    final active =
+        filterCurrentDevice(devices: results.where(_isActive).toList());
+    final inactive = filterCurrentDevice(
+        devices: results.where((dev) => !_isActive(dev)).toList());
 
     // TODO: consider moving this computation to a separate isolate
     cmp(Device a, Device b) => a.name.compareTo(b.name);
@@ -109,15 +115,24 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
       customAppBar: AppBar(
           title: _buildDeviceSearchBar(),
           actions: [_buildAddButton()],
-          bottom: DeviceSelectionBar(
-            devices: _selection,
-            onDeleted: (device) => _changeSelection(device, false),
-          )),
+          bottom: _queryResults.isNotEmpty
+              ? DeviceSelectionBar(
+                  showNoPeerSelected: _queryResults.isNotEmpty,
+                  devices: filterCurrentDevice(devices: _selection),
+                  onDeleted: (device) => _changeSelection(device, false),
+                )
+              : null),
       body: _queryResults.isEmpty
           ? !_loaded
               ? LinearProgressIndicator()
               : NoResultsPlaceholder(
-                  label: "No peers with such a name found", icon: Icons.devices)
+                  label: _queryController.text.isEmpty
+                      ? 'No peers exist on this server'
+                      : 'No peers with such a name found',
+                  icon: _queryController.text.isEmpty
+                      ? Icons.device_unknown
+                      : Icons.search_off,
+                )
           : ListView.builder(
               itemCount: _queryResults.length,
               itemBuilder: (context, index) {
@@ -149,7 +164,7 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: MEDIUM_PADDING),
       child: FilledButton(
-        onPressed: _selection.isEmpty
+        onPressed: filterCurrentDevice(devices: _selection).isEmpty
             ? null
             : () => Navigator.pop(context, _selection),
         child: const Text('Add'),
@@ -160,6 +175,11 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
   Widget _buildDeviceSearchBar() {
     return TextField(
       controller: _queryController,
+      maxLength: 50,
+      buildCounter: (_,
+          {required int currentLength, required bool isFocused, maxLength}) {
+        return null; // Disable the counter
+      },
       decoration: const InputDecoration.collapsed(
         hintText: 'Search for peer',
       ),

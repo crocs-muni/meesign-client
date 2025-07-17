@@ -31,7 +31,16 @@ class _SettingsPageState extends State<SettingsPage> {
 
     return DefaultPageTemplate(
       showAppBar: true,
-      appBarTitle: "Application settings",
+      customAppBar: AppBar(
+        title: Text('Application Settings'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            model.setSettingsPageInStack(false);
+            Navigator.of(context).pop();
+          },
+        ),
+      ),
       wrapInScroll: true,
       onBackButtonPressed: () {
         WidgetsBinding.instance.addPostFrameCallback((_) {

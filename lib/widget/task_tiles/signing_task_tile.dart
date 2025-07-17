@@ -1,11 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:meesign_core/meesign_core.dart';
-import 'package:open_filex/open_filex.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
+import '../../pages/task_detail_page.dart';
 import '../../ui_constants.dart';
 import '../../view_model/app_view_model.dart';
 import '../entity_chip.dart';
@@ -44,7 +41,16 @@ class SigningTaskTile extends StatelessWidget {
                   width: 1.0,
                 ),
               ),
-              onPressed: () => _openFile(task.info.path),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (context) => TaskDetailPage(
+                    group: task.info.group,
+                    title: task.info.basename,
+                    filePath: task.info.path,
+                  ),
+                ),
+              ),
               child: const Text('View'),
             )
           ]
@@ -70,15 +76,5 @@ class SigningTaskTile extends StatelessWidget {
       ],
       onArchiveChange: (archive) => model.archiveTask(task, archive: archive),
     );
-  }
-
-  void _openFile(String path) {
-    if (Platform.isLinux) {
-      launchUrl(Uri.file(path));
-    } else {
-      // FIXME: try to avoid open_file package,
-      // it seems to be of low quality
-      OpenFilex.open(path);
-    }
   }
 }

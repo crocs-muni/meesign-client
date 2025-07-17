@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
@@ -9,13 +10,16 @@ import 'package:meesign_core/meesign_core.dart';
 import 'package:mime/mime.dart';
 import 'package:provider/provider.dart';
 
+import '../enums/task_type.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
+import '../util/actions/group_creator.dart';
 import '../util/pick_pdf_file.dart';
 import '../view_model/app_view_model.dart';
 import '../widget/error_dialog.dart';
 import '../widget/group_suggestion_tile.dart';
 import '../widget/option_tile.dart';
+import 'groups_listing_page.dart';
 
 class NewTaskPage extends StatefulWidget {
   const NewTaskPage(
@@ -34,9 +38,11 @@ class _NewTaskPageState extends State<NewTaskPage> {
   MimeType? _imageMimeType;
   XFile? _pdfFile;
   bool _showImageSelector = false;
+  bool _isRefreshingGroups = false;
   final TextEditingController _descController = TextEditingController();
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _groupScrollController = ScrollController();
+  Timer? _refreshTimer;
 
   @override
   void initState() {
@@ -44,10 +50,21 @@ class _NewTaskPageState extends State<NewTaskPage> {
     if (widget.initialTaskType != null) {
       _taskType = widget.initialTaskType!;
     }
+
+    // Start periodic refresh every second
+    _refreshTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() {
+          final state = context.read<AppViewModel>();
+          state.refetchTasks(TaskType.group);
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
+    _refreshTimer?.cancel();
     _descController.dispose();
     _messageController.dispose();
     _groupScrollController.dispose();
@@ -60,6 +77,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
       showAppBar: true,
       appBarTitle: "Create new task",
       wrapInScroll: true,
+      includePadding: false,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -75,6 +93,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
           SizedBox(height: MEDIUM_GAP),
           _buildTaskBuilder(),
           _buildSubmitButton(context),
+          SizedBox(height: XLARGE_GAP * 2)
         ],
       ),
     );
@@ -85,6 +104,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
       title: 'Type of task',
       children: [
         SegmentedButton<KeyType>(
+          showSelectedIcon: false,
           selected: {_taskType},
           onSelectionChanged: (value) {
             setState(() {
@@ -146,12 +166,23 @@ class _NewTaskPageState extends State<NewTaskPage> {
     );
   }
 
+  String _getTaskNameHeader() {
+    switch (_taskType) {
+      case KeyType.signPdf:
+        return "Name of the PDF signing task";
+      case KeyType.signChallenge:
+        return "Name of the challenge task";
+      case KeyType.decrypt:
+        return "Name of the decryption task";
+    }
+  }
+
   Widget _buildTaskDesc() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Enter description",
+          _getTaskNameHeader(),
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         SizedBox(height: SMALL_GAP),
@@ -160,10 +191,12 @@ class _NewTaskPageState extends State<NewTaskPage> {
           children: [
             TextField(
               controller: _descController,
+              maxLength: 100,
               onChanged: (value) {
                 setState(() {});
               },
               decoration: InputDecoration(
+                counterText: '',
                 filled: true,
                 hintText:
                     'Enter description of the ${_getTaskTypeDescription()} task',
@@ -184,53 +217,63 @@ class _NewTaskPageState extends State<NewTaskPage> {
     );
   }
 
+  Widget _buildContentTypeRadio({
+    required ValueChanged<bool> onChanged,
+    required String label,
+    required bool initValue,
+  }) {
+    return Row(
+      children: [
+        Radio<bool>(
+          value: initValue,
+          groupValue: _showImageSelector,
+          onChanged: (value) {
+            onChanged(false);
+          },
+        ),
+        MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: GestureDetector(
+            onTap: () {
+              onChanged(false);
+            },
+            child: Text(label),
+          ),
+        )
+      ],
+    );
+  }
+
   Widget _buildContentTypeSelector() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
+        Text(
+          'Select decryption type',
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+        Wrap(
+          spacing: LARGE_GAP,
+          runSpacing: SMALL_GAP,
           children: [
-            Radio<bool>(
-              value: false,
-              groupValue: _showImageSelector,
+            _buildContentTypeRadio(
+              initValue: false,
               onChanged: (value) {
                 setState(() {
-                  _showImageSelector = value!;
+                  _showImageSelector = value;
                 });
               },
+              label: 'Decrypt a message',
             ),
-            MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _showImageSelector = false;
-                  });
-                },
-                child: Text('Decrypt a message'),
-              ),
-            ),
-            SizedBox(width: LARGE_GAP),
-            Radio<bool>(
-              value: true,
-              groupValue: _showImageSelector,
+            _buildContentTypeRadio(
+              initValue: true,
               onChanged: (value) {
                 setState(() {
-                  _showImageSelector = value!;
+                  _showImageSelector = !value;
                 });
               },
+              label: 'Decrypt an image',
             ),
-            MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _showImageSelector = true;
-                  });
-                },
-                child: Text('Decrypt an image'),
-              ),
-            )
           ],
         ),
         SizedBox(height: LARGE_GAP),
@@ -282,12 +325,23 @@ class _NewTaskPageState extends State<NewTaskPage> {
     ];
   }
 
+  String _getMessageFieldHeader() {
+    switch (_taskType) {
+      case KeyType.signChallenge:
+        return "Enter message to be signed";
+      case KeyType.decrypt:
+        return "Enter message to be decrypted";
+      default:
+        return "Enter message";
+    }
+  }
+
   Widget _buildTaskMessage() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Enter message",
+          _getMessageFieldHeader(),
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         SizedBox(height: SMALL_GAP),
@@ -298,6 +352,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
               controller: _messageController,
               maxLines: 5,
               minLines: 3,
+              maxLength: 100000,
               onChanged: (value) {
                 setState(() {});
               },
@@ -322,69 +377,164 @@ class _NewTaskPageState extends State<NewTaskPage> {
   }
 
   Widget _buildGroupSelector(BuildContext buildContext) {
-    final state = buildContext.read<AppViewModel>();
-    final groups = state.groupTasks
-        .where((task) =>
-            task.state == TaskState.finished &&
-            task.info.keyType == _taskType &&
-            (state.showArchived ? true : !task.archived))
-        .map((task) => task.info);
+    return Consumer<AppViewModel>(
+      builder: (context, state, child) {
+        final groups = state.groupTasks
+            .where((task) =>
+                task.state == TaskState.finished &&
+                task.info.keyType == _taskType &&
+                (state.showArchived ? true : !task.archived))
+            .map((task) => task.info)
+            .toList();
 
-    // Select the first group of task type if none is selected
-    _selectedGroup ??= groups.isNotEmpty ? groups.first : null;
+        // Select the first group of task type if none is selected
+        if (_selectedGroup == null && groups.isNotEmpty) {
+          _selectedGroup = groups.first;
+        }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding:
-              const EdgeInsets.only(left: MEDIUM_PADDING, top: LARGE_PADDING),
-          child: Text(
-            'Select group for the new task',
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
-        ),
-        if (groups.isEmpty)
-          Padding(
-            padding:
-                const EdgeInsets.only(left: MEDIUM_PADDING, top: SMALL_PADDING),
-            child: Text(
-              'No groups available for this type of task yet.',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+        // If the currently selected group is no longer available, reset it
+        if (_selectedGroup != null && !groups.contains(_selectedGroup)) {
+          _selectedGroup = groups.isNotEmpty ? groups.first : null;
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(
+                  left: MEDIUM_PADDING, top: LARGE_PADDING),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Select group for the new task',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
                   ),
+                  IconButton(
+                    onPressed: _isRefreshingGroups
+                        ? null
+                        : () async {
+                            setState(() {
+                              _isRefreshingGroups = true;
+                            });
+
+                            try {
+                              await state.refetchTasks(TaskType.group);
+                              // Wait a bit for the database to update
+                              await Future.delayed(
+                                  const Duration(milliseconds: 500));
+                              // Force UI refresh
+                              if (mounted) {
+                                setState(() {});
+                              }
+                            } finally {
+                              if (mounted) {
+                                setState(() {
+                                  _isRefreshingGroups = false;
+                                });
+                              }
+                            }
+                          },
+                    icon: _isRefreshingGroups
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.refresh),
+                    tooltip: 'Refresh groups',
+                  ),
+                ],
+              ),
             ),
-          ),
-        SizedBox(
-          height: 100,
-          child: Scrollbar(
-            thumbVisibility: true,
-            controller: _groupScrollController,
-            child: ListView.builder(
-              controller: _groupScrollController,
-              itemCount: groups.length,
-              itemBuilder: (context, index) {
-                final group = groups.elementAt(index);
-                return GroupSuggestionTile(
-                  group: group,
-                  active: true,
-                  selected: _selectedGroup == group,
-                  onChanged: (value) {
-                    setState(() {
-                      if (value == true) {
-                        _selectedGroup = group;
-                      } else {
-                        _selectedGroup = null;
-                      }
-                    });
+            if (groups.isEmpty) ...[
+              Padding(
+                  padding: const EdgeInsets.only(
+                      left: MEDIUM_PADDING, top: SMALL_PADDING),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'No groups available for this type of task yet.',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
+                      ),
+                      SizedBox(height: SMALL_GAP),
+                      FilledButton.icon(
+                        onPressed: () async {
+                          // 1. Navigate to groups listing page
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => GroupsListingPage(),
+                          ));
+
+                          // 2. Create a new group
+                          await createGroup(context, context,
+                              groupType: _getTaskType());
+                        },
+                        icon: const Icon(Icons.add_rounded),
+                        label: Text(_getCreateGroupButtonText()),
+                      ),
+                    ],
+                  )),
+            ],
+            SizedBox(
+              height: 100,
+              child: Scrollbar(
+                thumbVisibility: true,
+                controller: _groupScrollController,
+                child: ListView.builder(
+                  controller: _groupScrollController,
+                  itemCount: groups.length,
+                  itemBuilder: (context, index) {
+                    final group = groups.elementAt(index);
+                    return GroupSuggestionTile(
+                      group: group,
+                      active: true,
+                      selected: _selectedGroup == group,
+                      onChanged: (value) {
+                        setState(() {
+                          if (value == true) {
+                            _selectedGroup = group;
+                          } else {
+                            _selectedGroup = null;
+                          }
+                        });
+                      },
+                    );
                   },
-                );
-              },
+                ),
+              ),
             ),
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
+  }
+
+  TaskType _getTaskType() {
+    switch (_taskType) {
+      case KeyType.signPdf:
+        return TaskType.sign;
+      case KeyType.signChallenge:
+        return TaskType.challenge;
+      case KeyType.decrypt:
+        return TaskType.decrypt;
+    }
+  }
+
+  String _getCreateGroupButtonText() {
+    switch (_taskType) {
+      case KeyType.signPdf:
+        return 'Create group for PDF signing';
+      case KeyType.signChallenge:
+        return 'Create group for challenges';
+      case KeyType.decrypt:
+        return 'Create group for decryption';
+    }
   }
 
   Widget _buildSubmitButton(BuildContext context) {

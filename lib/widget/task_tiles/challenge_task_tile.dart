@@ -2,14 +2,12 @@ import 'dart:convert';
 
 import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
-import '../../enums/data_view.dart';
+import '../../pages/task_detail_page.dart';
 import '../../ui_constants.dart';
 import '../../util/card_reader_launcher.dart';
-import '../../util/chars.dart';
 import '../../view_model/app_view_model.dart';
 import '../entity_chip.dart';
 import '../large_square_button.dart';
@@ -47,7 +45,17 @@ class ChallengeTaskTile extends StatelessWidget {
                   width: 1.0,
                 ),
               ),
-              onPressed: () => showChallengeDialog(context, task.info),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (context) => TaskDetailPage(
+                    title: task.info.name,
+                    group: task.info.group,
+                    textValue: _decodeHexToString(task.info.data),
+                    hexValue: hex.encode(task.info.data),
+                  ),
+                ),
+              ),
               child: const Text('View'),
             )
           ]
@@ -82,82 +90,11 @@ class ChallengeTaskTile extends StatelessWidget {
     );
   }
 
-  Future<void> showChallengeDialog(
-    BuildContext context,
-    Challenge challenge,
-  ) async {
-    final dataHex = hex.encode(challenge.data);
-    String? dataStr;
+  String _decodeHexToString(List<int> data) {
     try {
-      dataStr = utf8.decode(
-        challenge.data,
-        allowMalformed: false,
-      );
+      return utf8.decode(data, allowMalformed: false);
     } on FormatException {
-      dataStr = null;
+      return hex.encode(data);
     }
-
-    await showDialog(
-      context: context,
-      builder: (context) {
-        final supportedViews = {
-          if (dataStr != null) DataView.text,
-          DataView.hex,
-        };
-        DataView view = supportedViews.first;
-
-        return AlertDialog(
-          icon: const Icon(Symbols.quiz),
-          title: Text(challenge.name),
-          content: SingleChildScrollView(
-            child: StatefulBuilder(
-              builder: (context, setState) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (supportedViews.length > 1) ...[
-                      SegmentedButton<DataView>(
-                        segments: [
-                          for (final view in supportedViews)
-                            ButtonSegment(
-                              value: view,
-                              label: Text(view.name.capitalize()),
-                            ),
-                        ],
-                        selected: {view},
-                        onSelectionChanged: (newView) {
-                          setState(() => view = newView.first);
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-                    Center(
-                      child: switch (view) {
-                        DataView.hex => Text(
-                            dataHex,
-                            style: const TextStyle(
-                              fontFamily: 'RobotoMono',
-                            ),
-                          ),
-                        DataView.text => Text(
-                            dataStr!,
-                          ),
-                      },
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Hide'),
-            ),
-          ],
-        );
-      },
-    );
   }
 }

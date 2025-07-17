@@ -1,0 +1,288 @@
+import 'dart:async';
+import 'dart:io';
+import 'dart:math';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:meesign_core/meesign_core.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:rxdart/rxdart.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../templates/default_page_template.dart';
+import '../ui_constants.dart';
+import '../widget/copy_button.dart';
+import '../widget/entity_chip.dart';
+import '../widget/share_button.dart';
+
+class TaskDetailPage extends StatefulWidget {
+  const TaskDetailPage(
+      {super.key,
+      required this.title,
+      required this.group,
+      this.textValue,
+      this.hexValue,
+      this.imageDecrypt,
+      this.timedAutoClose = false,
+      this.autoCloseDurationInSeconds = 5,
+      this.filePath});
+
+  final String title;
+  final String? textValue;
+  final String? hexValue;
+  final Decrypt? imageDecrypt;
+  final bool timedAutoClose;
+  final int autoCloseDurationInSeconds;
+  final String? filePath;
+  final Group group;
+
+  @override
+  State<TaskDetailPage> createState() => _TaskDetailPageState();
+}
+
+class _TaskDetailPageState extends State<TaskDetailPage> {
+  late final Duration duration;
+  final refreshInterval = Duration(milliseconds: 20);
+  final countdownSubject = BehaviorSubject<int>();
+  late final int steps;
+  late final StreamSubscription<int> sub;
+  bool wasAutoClosed = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    duration = Duration(seconds: widget.autoCloseDurationInSeconds);
+    steps = duration.inMilliseconds ~/ refreshInterval.inMilliseconds;
+    final countdown =
+        Stream.periodic(refreshInterval, (i) => max(0, steps - i));
+    sub = countdown.listen((value) {
+      countdownSubject.add(value);
+      if (value == 0 && widget.timedAutoClose && !wasAutoClosed) {
+        wasAutoClosed = true;
+        _closePage();
+      }
+    });
+  }
+
+  void _closePage() {
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
+  }
+
+  @override
+  void dispose() {
+    sub.cancel();
+    countdownSubject.close();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultPageTemplate(
+        showAppBar: true,
+        includePadding: true,
+        body: _buildPageBody(context),
+        wrapInScroll: true,
+        customAppBar: AppBar(
+          scrolledUnderElevation: 0,
+          surfaceTintColor: Colors.transparent,
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          foregroundColor: Theme.of(context).colorScheme.onSurface,
+          title: Row(
+            children: [
+              Text('Task Detail'),
+              if (widget.timedAutoClose) ...[
+                SizedBox(width: MEDIUM_GAP),
+                _buildLoadingIndicator(context),
+              ]
+            ],
+          ),
+        ));
+  }
+
+  Widget _buildHeader(BuildContext context, String title) {
+    return Text(
+      title,
+      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+    );
+  }
+
+  Widget _buildLoadingIndicator(BuildContext context) {
+    return StreamBuilder(
+      stream: countdownSubject.stream,
+      builder: (context, snapshot) {
+        return Center(
+          child: SizedBox.square(
+            dimension: 24,
+            child: CircularProgressIndicator(
+              strokeWidth: 3,
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              value: (snapshot.data ?? steps) / steps,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildOpenFileSection({
+    required BuildContext context,
+    required String title,
+  }) {
+    return FilledButton.icon(
+      onPressed: () {
+        _openFile(widget.filePath!);
+      },
+      label: Padding(
+        padding: EdgeInsets.symmetric(vertical: 15),
+        child: Text('Open PDF file'),
+      ),
+      icon: Icon(Icons.open_in_new),
+      style: ButtonStyle(
+        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPageBody(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSection(
+          context: context,
+          title: widget.filePath == null ? 'Task name' : 'File name',
+          content: widget.title,
+          showCopyButton: false,
+        ),
+        if (widget.textValue != null) ...[
+          const SizedBox(height: SMALL_GAP),
+          _buildSection(
+            context: context,
+            title: 'Task value',
+            content: widget.textValue!,
+            showCopyButton: true,
+          ),
+        ],
+        if (widget.imageDecrypt != null) ...[
+          const SizedBox(height: SMALL_GAP),
+          _buildImageSection(
+            context: context,
+            title: 'Task image',
+            imageData: widget.imageDecrypt!.data,
+          ),
+        ],
+        if (widget.filePath != null) ...[
+          const SizedBox(height: SMALL_GAP),
+          _buildOpenFileSection(
+            context: context,
+            title: 'PDF file',
+          ),
+        ],
+        if (widget.hexValue != null) ...[
+          const SizedBox(height: SMALL_GAP),
+          _buildSection(
+            context: context,
+            title: 'Hex value',
+            content: widget.hexValue!,
+            showCopyButton: true,
+          ),
+        ],
+        const SizedBox(height: MEDIUM_GAP),
+        _buildGroupSection(context: context, group: widget.group),
+      ],
+    );
+  }
+
+  Widget _buildImageSection({
+    required BuildContext context,
+    required String title,
+    required List<int> imageData,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            _buildHeader(context, title),
+            Spacer(),
+            if (widget.imageDecrypt != null) ...[
+              ShareButton(
+                imageDecrypt: widget.imageDecrypt,
+                preShareAction: () => sub.pause(),
+                postShareAction: () => sub.resume(),
+              )
+            ]
+          ],
+        ),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(SMALL_BORDER_RADIUS),
+          child: Image.memory(imageData as Uint8List),
+        ),
+        SizedBox(height: SMALL_GAP),
+      ],
+    );
+  }
+
+  Widget _buildSection({
+    required BuildContext context,
+    required String title,
+    required String content,
+    bool showCopyButton = true,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            _buildHeader(context, title),
+            Spacer(),
+            if (showCopyButton) ...[
+              CopyButton(textToCopy: content),
+            ]
+          ],
+        ),
+        Text(
+          content,
+          style: Theme.of(context)
+              .textTheme
+              .bodyLarge
+              ?.copyWith(color: Theme.of(context).colorScheme.secondary),
+        ),
+        SizedBox(
+          height: SMALL_GAP,
+        )
+      ],
+    );
+  }
+
+  Widget _buildGroupSection({
+    required BuildContext context,
+    required Group group,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildHeader(context, 'Task group'),
+        GroupChip(group: group),
+      ],
+    );
+  }
+
+  void _openFile(String path) {
+    if (Platform.isLinux) {
+      launchUrl(Uri.file(path));
+    } else {
+      // FIXME: try to avoid open_file package,
+      // it seems to be of low quality
+      OpenFilex.open(path);
+    }
+  }
+}

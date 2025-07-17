@@ -272,6 +272,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
     return DefaultPageTemplate(
         showAppBar: true,
         appBarTitle: 'New group',
+        includePadding: false,
         onBackButtonPressed: () {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             model.setNewGroupPageInStack(false);
@@ -376,7 +377,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
             Expanded(
               child: FilledButton.tonalIcon(
                 icon: const Icon(Symbols.search),
-                label: const Text('Search'),
+                label: const Text('Add members'),
                 onPressed: () => _selectPeer(Routes.newGroupSearch),
               ),
             ),

@@ -100,7 +100,7 @@ class _TaskListingState extends State<TaskListing>
       }
     }
 
-    if (!model.anyGroupJoined()) {
+    if (model.allTasks.isEmpty) {
       return SizedBox();
     }
 
@@ -140,7 +140,7 @@ class _TaskListingState extends State<TaskListing>
               ),
               if (!context.read<AppViewModel>().anyGroupJoined()) ...[
                 const SizedBox(height: LARGE_GAP),
-                ElevatedButton(
+                FilledButton.icon(
                   onPressed: () {
                     // 1. Navigate to groups listing page
                     Navigator.of(context).push(MaterialPageRoute(
@@ -150,12 +150,13 @@ class _TaskListingState extends State<TaskListing>
                     // 2. Create a new group
                     createGroup(context, context);
                   },
-                  child: const Text('Create group'),
+                  icon: const Icon(Icons.group_add),
+                  label: const Text('Create group'),
                 ),
               ],
               if (context.read<AppViewModel>().anyGroupJoined()) ...[
                 const SizedBox(height: MEDIUM_GAP),
-                ElevatedButton(
+                FilledButton.icon(
                   onPressed: () async {
                     Navigator.push(
                       context,
@@ -166,7 +167,8 @@ class _TaskListingState extends State<TaskListing>
                       ),
                     );
                   },
-                  child: const Text('Create new task'),
+                  icon: const Icon(Icons.add),
+                  label: const Text('Create new task'),
                 )
               ]
             ],

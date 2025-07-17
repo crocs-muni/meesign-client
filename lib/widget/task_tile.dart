@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:meesign_core/meesign_core.dart';
+import 'package:provider/provider.dart';
 
+import '../app_container.dart';
 import '../ui_constants.dart';
 import '../util/date_formatter.dart';
 import '../util/extensions/list_intersperse.dart';
@@ -23,6 +25,7 @@ class TaskTile<T> extends StatelessWidget {
   final bool showDetailRow;
   final bool showTaskTypeInfo;
   final bool showDate;
+  final bool isGroupTask;
 
   const TaskTile({
     super.key,
@@ -40,6 +43,7 @@ class TaskTile<T> extends StatelessWidget {
     this.showTaskTypeInfo = true,
     this.showDetailRow = true,
     this.showDate = true,
+    this.isGroupTask = false,
   });
 
   @override
@@ -53,7 +57,7 @@ class TaskTile<T> extends StatelessWidget {
     return _buildArchiveContainer(
       context,
       Padding(
-        padding: const EdgeInsets.all(SMALL_PADDING),
+        padding: const EdgeInsets.all(4),
         child: Column(
           children: [
             _buildHeader(context, desc,
@@ -84,7 +88,7 @@ class TaskTile<T> extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                          fontSize: 20,
                         )),
                     if (showTaskTypeInfo) ...[
                       SizedBox(height: SMALL_GAP),
@@ -126,7 +130,7 @@ class TaskTile<T> extends StatelessWidget {
                       Row(
                         children: [
                           SizedBox(height: XLARGE_GAP),
-                          ...approveActions
+                          ..._buildConditionalApproveActions(context)
                         ],
                       ),
                     ] else ...[
@@ -159,7 +163,7 @@ class TaskTile<T> extends StatelessWidget {
                     Row(
                       children: [
                         SizedBox(height: XLARGE_GAP),
-                        ...approveActions
+                        ..._buildConditionalApproveActions(context)
                       ],
                     ),
                   ],
@@ -170,6 +174,23 @@ class TaskTile<T> extends StatelessWidget {
         ]
       ],
     );
+  }
+
+  List<Widget> _buildConditionalApproveActions(BuildContext context) {
+    if (isGroupTask) {
+      if (Provider.of<AppContainer>(context, listen: false)
+              .settingsController
+              .currentSettings
+              .autoJoinGroups ==
+          false) {
+        return approveActions;
+      } else {
+        // If auto-join is enabled, we don't show the approve actions
+        return [];
+      }
+    } else {
+      return approveActions;
+    }
   }
 
   Widget _buildNotificationCircle(BuildContext context) {
@@ -237,14 +258,14 @@ class TaskTile<T> extends StatelessWidget {
       children: [
         Icon(
           icon,
-          size: Theme.of(context).textTheme.bodyLarge?.fontSize,
+          size: 15,
           color: Theme.of(context).colorScheme.onSurfaceVariant,
         ),
         const SizedBox(width: SMALL_GAP),
         Text(text,
             overflow: TextOverflow.clip,
             style: TextStyle(
-              fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
+              fontSize: 15,
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             )),
       ],
@@ -261,7 +282,7 @@ class TaskTile<T> extends StatelessWidget {
     }
 
     if (task is Task<File>) {
-      text = "Sign";
+      text = "Sign PDF";
       taskGroup = task.info.group;
     }
 

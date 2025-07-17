@@ -29,6 +29,7 @@ class GroupTaskTile extends StatelessWidget {
     return TaskTile(
       task: task,
       name: group.name,
+      isGroupTask: true,
       leading: CircleAvatar(
         child: Text(group.name.initials),
       ),

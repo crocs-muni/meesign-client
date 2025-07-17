@@ -298,7 +298,9 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
   Widget _buildTaskSearchBar() {
     return TextField(
       controller: _searchController,
+      maxLength: 100,
       decoration: InputDecoration(
+        counterText: '',
         hintText: widget.customSearchBarHint,
         prefixIcon: const Icon(Icons.search),
         fillColor: Theme.of(context).colorScheme.onInverseSurface,
@@ -356,7 +358,7 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
     //   return const SizedBox.shrink();
     // }
 
-    return ElevatedButton.icon(
+    return FilledButton.icon(
         onPressed: () {
           _triggerReloadAnimation();
 

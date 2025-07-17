@@ -79,6 +79,7 @@ class _GroupsListingPageState extends State<GroupsListingPage>
           return DefaultPageTemplate(
               showAppBar: true,
               floatingActionButton: _buildFab(context, model),
+              appBarTitle: 'Groups',
               body: TaskListView<Group>(
                 key: ValueKey('group_task_list'),
                 tasks: model.groupTasks,

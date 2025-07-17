@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../ui_constants.dart';
+import '../util/layout_getter.dart';
+import '../enums/screen_layout.dart';
 
 class DefaultPageTemplate extends StatelessWidget {
   final Widget body;
@@ -32,34 +34,42 @@ class DefaultPageTemplate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: transparentBackground
-          ? Colors.transparent
-          : Theme.of(context).scaffoldBackgroundColor,
-      appBar: showAppBar
-          ? customAppBar ??
-              AppBar(
-                actions: appBarActions,
-                forceMaterialTransparency: true,
-                surfaceTintColor: Colors.transparent,
-                leadingWidth: 120,
-                leading: _buildCustomBackButton(context),
-                title: Text(appBarTitle),
-              )
-          : null,
-      body: Container(
-        padding: EdgeInsets.all(includePadding ? MEDIUM_PADDING : 0),
-        child: SizedBox(
-          width: double.infinity,
-          child: SafeArea(
-              child: wrapInScroll
-                  ? SingleChildScrollView(
-                      child: body,
-                    )
-                  : body),
-        ),
-      ),
-      floatingActionButton: floatingActionButton,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = LayoutGetter.getCurLayout(constraints.maxWidth) ==
+            ScreenLayout.mobile;
+
+        return Scaffold(
+          backgroundColor: transparentBackground
+              ? Colors.transparent
+              : Theme.of(context).scaffoldBackgroundColor,
+          appBar: showAppBar
+              ? customAppBar ??
+                  AppBar(
+                    actions: appBarActions,
+                    forceMaterialTransparency: true,
+                    surfaceTintColor: Colors.transparent,
+                    leadingWidth: 120,
+                    leading: _buildCustomBackButton(context),
+                    centerTitle: isMobile,
+                    title: Text(appBarTitle),
+                  )
+              : null,
+          body: Container(
+            padding: EdgeInsets.all(includePadding ? MEDIUM_PADDING : 0),
+            child: SizedBox(
+              width: double.infinity,
+              child: SafeArea(
+                  child: wrapInScroll
+                      ? SingleChildScrollView(
+                          child: body,
+                        )
+                      : body),
+            ),
+          ),
+          floatingActionButton: floatingActionButton,
+        );
+      },
     );
   }
 
