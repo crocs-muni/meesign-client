@@ -52,8 +52,8 @@ Future<void> _prepareWindowManager() async {
   const double minWidth = 600;
   const double minHeight = 800;
 
-  await windowManager.ensureInitialized();
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    await windowManager.ensureInitialized();
     WindowManager.instance.setMinimumSize(const Size(minWidth, minHeight));
   }
 }
