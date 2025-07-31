@@ -4,6 +4,7 @@ import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
 import '../app_container.dart';
+import '../l10n/arb/app_localizations.dart';
 import '../services/settings_controller.dart';
 import '../ui_constants.dart';
 import '../util/chars.dart';
@@ -99,7 +100,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
     if (_working) return;
 
     if (_nameController.text.isEmpty) {
-      setState(() => _nameError = 'Name must not be empty');
+      setState(
+          () => _nameError = AppLocalizations.of(context).nameMustNotBeEmpty);
       return;
     }
 
@@ -151,7 +153,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
     } catch (e) {
       setState(() {
         _working = false;
-        _hostError = 'Failed to register';
+        _hostError = AppLocalizations.of(context).failedToRegister;
       });
       rethrow;
     }
@@ -178,7 +180,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
                       });
                     },
                   ),
-            labelText: 'Name',
+            labelText: AppLocalizations.of(context).name,
             filled: true,
             border: const OutlineInputBorder(),
             errorText: _nameError,
@@ -220,7 +222,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
                       });
                     },
                   ),
-            labelText: 'Server',
+            labelText: AppLocalizations.of(context).server,
             filled: true,
             border: const OutlineInputBorder(),
             errorText: _hostError,
@@ -262,7 +264,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
                       strokeWidth: 4,
                     ),
                   )
-                : const Text('Register'),
+                : Text(AppLocalizations.of(context).register),
           ),
         ),
         SizedBox(height: SMALL_GAP),
@@ -296,7 +298,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
               backgroundColor: Colors.transparent,
               shadowColor: Colors.transparent),
           child: Text(
-            "or use an existing account",
+            AppLocalizations.of(context).useExistingAccount,
             style: TextStyle(color: Theme.of(context).colorScheme.secondary),
           ),
         )

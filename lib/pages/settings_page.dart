@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/arb/app_localizations.dart';
 import '../templates/default_page_template.dart';
 import '../view_model/tabs_view_model.dart';
 import 'about_page.dart';
@@ -32,7 +33,7 @@ class _SettingsPageState extends State<SettingsPage> {
     return DefaultPageTemplate(
       showAppBar: true,
       customAppBar: AppBar(
-        title: Text('Application Settings'),
+        title: Text(AppLocalizations.of(context).applicationSettingsTitle),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -61,22 +62,22 @@ class _SettingsPageState extends State<SettingsPage> {
     final List<Map<String, dynamic>> menuItems = [
       {
         "icon": Icons.settings,
-        "text": "General settings",
+        "text": AppLocalizations.of(context).generalSettingsTitle,
         "page": GeneralSettingsPage()
       },
       {
         "icon": Icons.devices,
-        "text": "Device and server",
+        "text": AppLocalizations.of(context).deviceAndServerSettingsTitle,
         "page": DeviceSettingsPage()
       },
       {
         "icon": Icons.group,
-        "text": "Group settings",
+        "text": AppLocalizations.of(context).groupSettingsTitle,
         "page": GroupSettingsPage()
       },
       {
         "icon": Icons.question_mark,
-        "text": "About this project",
+        "text": AppLocalizations.of(context).aboutThisProject,
         "page": AboutPage()
       },
     ];

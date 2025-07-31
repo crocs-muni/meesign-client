@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meesign_core/meesign_core.dart';
+
+import '../../l10n/arb/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../../card/card.dart';
@@ -36,7 +38,7 @@ class GroupTaskTile extends StatelessWidget {
       showDate: false,
       approveActions: [
         LargeSquareButton(
-          text: "Join",
+          text: AppLocalizations.of(context).join,
           icon: Icons.check,
           onPressed: () {
             model.joinGroup(task, agree: true);
@@ -44,7 +46,7 @@ class GroupTaskTile extends StatelessWidget {
           color: Color(0xFF298E29),
         ),
         LargeSquareButton(
-            text: "Decline",
+            text: AppLocalizations.of(context).decline,
             icon: Icons.close,
             onPressed: () {
               model.joinGroup(task, agree: false);
@@ -55,7 +57,7 @@ class GroupTaskTile extends StatelessWidget {
             thisMember.shares == 1)
           FilledButton.tonal(
             onPressed: () => model.joinGroup(task, agree: true, withCard: true),
-            child: const Text('Join with card'),
+            child: Text(AppLocalizations.of(context).joinWithCard),
           ),
       ],
       actions: const [],
@@ -63,7 +65,7 @@ class GroupTaskTile extends StatelessWidget {
         FilledButton.tonal(
           onPressed: () => launchCardReader(
               context, (card) => model.advanceGroupWithCard(task, card)),
-          child: const Text('Read card'),
+          child: Text(AppLocalizations.of(context).readCard),
         ),
       ],
       actionChip: Row(
@@ -99,7 +101,7 @@ class GroupTaskTile extends StatelessWidget {
                   ),
                 );
               },
-              child: const Text('View'),
+              child: Text(AppLocalizations.of(context).view),
             ),
           ]
         ],

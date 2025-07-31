@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/arb/app_localizations.dart';
 import '../ui_constants.dart';
 
 class ChangeDeviceSection extends StatelessWidget {
@@ -20,12 +21,12 @@ class ChangeDeviceSection extends StatelessWidget {
       children: [
         if (showText) ...[
           Text(
-            "Change server or device",
+            AppLocalizations.of(context).changeServerOrDeviceTitle,
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           SizedBox(height: SMALL_GAP),
           Text(
-            "This will take you back to the registration screen where you can change the server or register a new device.",
+            AppLocalizations.of(context).changeServerOrDeviceDescription,
             style: TextStyle(color: Theme.of(context).colorScheme.outline),
           ),
           SizedBox(height: MEDIUM_GAP),
@@ -36,7 +37,7 @@ class ChangeDeviceSection extends StatelessWidget {
           },
           label: Padding(
             padding: EdgeInsets.symmetric(vertical: 15),
-            child: Text('Change device'),
+            child: Text(AppLocalizations.of(context).changeDeviceButton),
           ),
           icon: Icon(Icons.sync),
           style: ButtonStyle(

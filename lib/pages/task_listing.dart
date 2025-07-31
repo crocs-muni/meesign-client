@@ -3,6 +3,7 @@ import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
 import '../enums/fab_type.dart';
+import '../l10n/arb/app_localizations.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
 import '../util/actions/group_creator.dart';
@@ -54,8 +55,12 @@ class _TaskListingState extends State<TaskListing>
               showAllTypes: true,
               showHeading: widget.showHeading,
               tasks: model.allTasks,
-              emptyView: _buildEmptyTasks(context, model, 'No tasks available',
-                  'Join a group and create a new task to get started.', 0),
+              emptyView: _buildEmptyTasks(
+                  context,
+                  model,
+                  AppLocalizations.of(context).noTasksAvailable,
+                  AppLocalizations.of(context).noTasksAvailableDescription,
+                  0),
               showArchived: model.showArchived,
               taskBuilder: (context, task) {
                 // Signing tasks
@@ -151,7 +156,7 @@ class _TaskListingState extends State<TaskListing>
                     createGroup(context, context);
                   },
                   icon: const Icon(Icons.group_add),
-                  label: const Text('Create group'),
+                  label: Text(AppLocalizations.of(context).createGroup),
                 ),
               ],
               if (context.read<AppViewModel>().anyGroupJoined()) ...[
@@ -168,7 +173,7 @@ class _TaskListingState extends State<TaskListing>
                     );
                   },
                   icon: const Icon(Icons.add),
-                  label: const Text('Create new task'),
+                  label: Text(AppLocalizations.of(context).createNewTask),
                 )
               ]
             ],

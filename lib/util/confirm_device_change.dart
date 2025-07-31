@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
 import '../app_container.dart';
+import '../l10n/arb/app_localizations.dart';
 import '../widget/confirmation_dialog.dart';
 
 void confirmDeviceChange(BuildContext context, bool mounted,
@@ -18,9 +19,9 @@ void confirmDeviceChange(BuildContext context, bool mounted,
 Future<bool?> showDeleteDialog(BuildContext context, bool mounted) {
   return showConfirmationDialog(
     context,
-    'Confirm deletion',
-    'Are you sure you want to delete this device?',
-    'Delete',
+    AppLocalizations.of(context).confirmDeletion,
+    AppLocalizations.of(context).confirmDeviceDeletion,
+    AppLocalizations.of(context).delete,
     () {
       confirmDeviceChange(context, mounted, deleteData: true);
     },
@@ -30,9 +31,9 @@ Future<bool?> showDeleteDialog(BuildContext context, bool mounted) {
 Future<bool?> showChangeServerDialog(BuildContext context, bool mounted) {
   return showConfirmationDialog(
     context,
-    'Confirm profile change',
-    'Are you sure you want to change server or device?',
-    'Confirm',
+    AppLocalizations.of(context).confirmProfileChange,
+    AppLocalizations.of(context).confirmServerOrDeviceChange,
+    AppLocalizations.of(context).confirm,
     () {
       confirmDeviceChange(context, mounted, deleteData: false);
     },

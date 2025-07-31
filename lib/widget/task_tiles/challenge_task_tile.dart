@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
 import 'package:meesign_core/meesign_core.dart';
+
+import '../../l10n/arb/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../../pages/task_detail_page.dart';
@@ -56,14 +58,14 @@ class ChallengeTaskTile extends StatelessWidget {
                   ),
                 ),
               ),
-              child: const Text('View'),
+              child: Text(AppLocalizations.of(context).view),
             )
           ]
         ],
       ),
       approveActions: [
         LargeSquareButton(
-          text: "Sign",
+          text: AppLocalizations.of(context).sign,
           icon: Icons.check,
           onPressed: () {
             model.joinChallenge(task, agree: true);
@@ -71,7 +73,7 @@ class ChallengeTaskTile extends StatelessWidget {
           color: Color(0xFF298E29),
         ),
         LargeSquareButton(
-            text: "Decline",
+            text: AppLocalizations.of(context).decline,
             icon: Icons.close,
             onPressed: () {
               model.joinChallenge(task, agree: false);
@@ -82,7 +84,7 @@ class ChallengeTaskTile extends StatelessWidget {
         FilledButton.tonal(
           onPressed: () => launchCardReader(
               context, (card) => model.advanceChallengeWithCard(task, card)),
-          child: const Text('Read card'),
+          child: Text(AppLocalizations.of(context).readCard),
         ),
       ],
       actions: const [],

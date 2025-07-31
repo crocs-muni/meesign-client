@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../enums/task_status.dart';
 import '../enums/task_type.dart';
+import '../l10n/arb/app_localizations.dart';
 import '../ui_constants.dart';
 import '../view_model/app_view_model.dart';
 
@@ -27,7 +28,7 @@ class TaskListView<T> extends StatefulWidget {
     this.showOnlyPending = false,
     this.showAllTypes = false,
     this.showHeading = true,
-    this.customSearchBarHint = 'Search tasks by name...',
+    this.customSearchBarHint,
   });
 
   @override
@@ -115,12 +116,13 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
           const SizedBox(height: SMALL_GAP),
           if (_searchQuery.isNotEmpty) ...[
             Text(
-              'No waiting tasks found for "$_searchQuery".',
+              AppLocalizations.of(context)
+                  .noWaitingTasksFoundForQuery(_searchQuery),
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ] else ...[
             Text(
-              'No waiting tasks found at the moment.',
+              AppLocalizations.of(context).noWaitingTasksFound,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ]
@@ -136,7 +138,7 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
           _buildTaskListHeader(),
           const SizedBox(height: SMALL_GAP),
           Text(
-            'No tasks found for "$_searchQuery".',
+            AppLocalizations.of(context).noTasksFoundForQuery(_searchQuery),
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ],
@@ -156,7 +158,7 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
             _buildTaskListHeader(),
             const SizedBox(height: SMALL_GAP),
             Text(
-              'No tasks found for "$_searchQuery".',
+              AppLocalizations.of(context).noTasksFoundForQuery(_searchQuery),
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ],
@@ -298,19 +300,19 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
 
   String _getGeneralHeading() {
     if (widget.showAllTypes) {
-      return 'Tasks';
+      return AppLocalizations.of(context).tasks;
     }
 
     if (T == Group) {
-      return 'Groups';
+      return AppLocalizations.of(context).groups;
     } else if (T == Challenge) {
-      return 'Challenges';
+      return AppLocalizations.of(context).challenges;
     } else if (T == Decrypt) {
-      return 'Decryptions';
+      return AppLocalizations.of(context).decryptions;
     } else if (T == File) {
-      return 'Signings';
+      return AppLocalizations.of(context).signings;
     } else {
-      return 'Tasks';
+      return AppLocalizations.of(context).tasks;
     }
   }
 
@@ -320,7 +322,8 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
       maxLength: 100,
       decoration: InputDecoration(
         counterText: '',
-        hintText: widget.customSearchBarHint,
+        hintText: widget.customSearchBarHint ??
+            AppLocalizations.of(context).searchTasksByName,
         prefixIcon: const Icon(Icons.search),
         fillColor: Theme.of(context).colorScheme.onInverseSurface,
         border: OutlineInputBorder(
@@ -384,8 +387,11 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
           _refreshTasks();
         },
         icon: Icon(Icons.refresh),
-        label: Text(
-            "Reload ${widget.showAllTypes ? "tasks" : (T == Group ? "groups" : "tasks")}"));
+        label: Text(widget.showAllTypes
+            ? AppLocalizations.of(context).reloadTasks
+            : (T == Group
+                ? AppLocalizations.of(context).reloadGroups
+                : AppLocalizations.of(context).reloadTasks)));
   }
 
   Widget _buildFilterSection() {
@@ -394,7 +400,7 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
       child: Row(
         children: [
           _buildCheckboxContainer(
-              title: "Show only pending",
+              title: AppLocalizations.of(context).showOnlyPending,
               value: showOnlyPending,
               onChanged: (value) {
                 setState(() {

@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
 import 'package:meesign_core/meesign_core.dart';
+
+import '../../l10n/arb/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../../pages/task_detail_page.dart';
@@ -29,7 +31,7 @@ class DecryptTaskTile extends StatelessWidget {
       task: task,
       name: task.info.name,
       showDetailRow: false,
-      desc: StatusMessage.getStatusMessage(task),
+      desc: StatusMessage.getStatusMessage(task, context),
       actionChip: Row(
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,14 +66,14 @@ class DecryptTaskTile extends StatelessWidget {
                   ),
                 ),
               ),
-              child: const Text('View'),
+              child: Text(AppLocalizations.of(context).view),
             )
           ]
         ],
       ),
       approveActions: [
         LargeSquareButton(
-          text: "Decrypt",
+          text: AppLocalizations.of(context).decrypt,
           icon: Icons.check,
           onPressed: () {
             model.joinDecrypt(task, agree: true);
@@ -79,7 +81,7 @@ class DecryptTaskTile extends StatelessWidget {
           color: Color(0xFF298E29),
         ),
         LargeSquareButton(
-            text: "Decline",
+            text: AppLocalizations.of(context).decline,
             icon: Icons.close,
             onPressed: () {
               model.joinDecrypt(task, agree: false);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/arb/app_localizations.dart';
 import '../pages/register_page.dart';
 import '../ui_constants.dart';
 import '../util/confirm_device_change.dart';
@@ -25,12 +26,12 @@ class _DangerZoneSectionState extends State<DangerZoneSection> {
       children: [
         if (widget.showText) ...[
           Text(
-            "Danger zone",
+            AppLocalizations.of(context).dangerZoneTitle,
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           SizedBox(height: SMALL_GAP),
           Text(
-            "This action will effectively delete your device and all associated data. After deletion, you will need to re-register your device to continue using the app.",
+            AppLocalizations.of(context).dangerZoneDescription,
             style: TextStyle(color: Theme.of(context).colorScheme.outline),
           ),
           SizedBox(height: MEDIUM_GAP),
@@ -55,7 +56,7 @@ class _DangerZoneSectionState extends State<DangerZoneSection> {
           },
           label: Padding(
             padding: EdgeInsets.symmetric(vertical: 15),
-            child: Text('Delete device',
+            child: Text(AppLocalizations.of(context).deleteDeviceButton,
                 style: TextStyle(
                     color: Theme.of(context).colorScheme.onErrorContainer)),
           ),

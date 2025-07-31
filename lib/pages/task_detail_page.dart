@@ -9,6 +9,7 @@ import 'package:open_filex/open_filex.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../l10n/arb/app_localizations.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
 import '../widget/copy_button.dart';
@@ -92,7 +93,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
           foregroundColor: Theme.of(context).colorScheme.onSurface,
           title: Row(
             children: [
-              Text('Task Detail'),
+              Text(AppLocalizations.of(context).taskDetail),
               if (widget.timedAutoClose) ...[
                 SizedBox(width: MEDIUM_GAP),
                 _buildLoadingIndicator(context),
@@ -139,7 +140,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
       },
       label: Padding(
         padding: EdgeInsets.symmetric(vertical: 15),
-        child: Text('Open PDF file'),
+        child: Text(AppLocalizations.of(context).openPdfFile),
       ),
       icon: Icon(Icons.open_in_new),
       style: ButtonStyle(
@@ -158,7 +159,9 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
       children: [
         _buildSection(
           context: context,
-          title: widget.filePath == null ? 'Task name' : 'File name',
+          title: widget.filePath == null
+              ? AppLocalizations.of(context).taskName
+              : AppLocalizations.of(context).fileName,
           content: widget.title,
           showCopyButton: false,
         ),
@@ -166,7 +169,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
           const SizedBox(height: SMALL_GAP),
           _buildSection(
             context: context,
-            title: 'Task value',
+            title: AppLocalizations.of(context).taskValue,
             content: widget.textValue!,
             showCopyButton: true,
           ),
@@ -175,7 +178,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
           const SizedBox(height: SMALL_GAP),
           _buildImageSection(
             context: context,
-            title: 'Task image',
+            title: AppLocalizations.of(context).taskImage,
             imageData: widget.imageDecrypt!.data,
           ),
         ],
@@ -190,7 +193,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
           const SizedBox(height: SMALL_GAP),
           _buildSection(
             context: context,
-            title: 'Hex value',
+            title: AppLocalizations.of(context).hexValue,
             content: widget.hexValue!,
             showCopyButton: true,
           ),
@@ -270,7 +273,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildHeader(context, 'Task group'),
+        _buildHeader(context, AppLocalizations.of(context).taskGroup),
         GroupChip(group: group),
       ],
     );

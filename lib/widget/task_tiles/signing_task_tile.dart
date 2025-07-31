@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meesign_core/meesign_core.dart';
+
+import '../../l10n/arb/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../../pages/task_detail_page.dart';
@@ -51,7 +53,7 @@ class SigningTaskTile extends StatelessWidget {
                   ),
                 ),
               ),
-              child: const Text('View'),
+              child: Text(AppLocalizations.of(context).view),
             )
           ]
         ],
@@ -59,7 +61,7 @@ class SigningTaskTile extends StatelessWidget {
       actions: const [],
       approveActions: [
         LargeSquareButton(
-          text: "Sign",
+          text: AppLocalizations.of(context).sign,
           icon: Icons.check,
           onPressed: () {
             model.joinSign(task, agree: true);
@@ -67,7 +69,7 @@ class SigningTaskTile extends StatelessWidget {
           color: Color(0xFF298E29),
         ),
         LargeSquareButton(
-            text: "Decline",
+            text: AppLocalizations.of(context).decline,
             icon: Icons.close,
             onPressed: () {
               model.joinSign(task, agree: false);

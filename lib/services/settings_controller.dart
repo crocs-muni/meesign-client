@@ -13,6 +13,8 @@ class SettingsController {
   static const themeModeKey = 'themeMode';
   static const defaultThemeMode = ThemeMode.system;
   static const minGroupMembersKey = 'minGroupMembers';
+  static const currentLanguageKey = 'currentLanguage';
+  static const defaultLanguage = 'en';
 
   // Seed settings controller stream with default settings
   final _settingsController = BehaviorSubject<Settings>.seeded(
@@ -34,6 +36,7 @@ class SettingsController {
     _initGroupAutomation();
     _initCurrentUserIdSettings();
     _initMinGroupMembers();
+    _initLanguageSettings();
   }
 
   void updateAutoJoinGroups(bool autoJoin) {
@@ -60,13 +63,17 @@ class SettingsController {
     _updateSettingsStream(minGroupMembers: minGroupMembers);
   }
 
+  void updateCurrentLanguage(String currentLanguage) =>
+      _updateSettingsStream(currentLanguage: currentLanguage);
+
   void _updateSettingsStream(
       {ThemeMode? themeMode,
       bool? showArchivedItems,
       String? currentUserId,
       bool? autoJoinGroups,
       bool? autoRejectGroups,
-      int? minGroupMembers}) {
+      int? minGroupMembers,
+      String? currentLanguage}) {
     final currentSettings = _settingsController.value;
     final updatedSettings = currentSettings.copyWith(
         themeMode: themeMode ?? currentSettings.themeMode,
@@ -75,7 +82,8 @@ class SettingsController {
         currentUserId: currentUserId ?? currentSettings.currentUserId,
         autoJoinGroups: autoJoinGroups ?? currentSettings.autoJoinGroups,
         autoRejectGroups: autoRejectGroups ?? currentSettings.autoRejectGroups,
-        minGroupMembers: minGroupMembers ?? currentSettings.minGroupMembers);
+        minGroupMembers: minGroupMembers ?? currentSettings.minGroupMembers,
+        currentLanguage: currentLanguage ?? currentSettings.currentLanguage);
     _settingsController.add(updatedSettings);
 
     SharedPreferences.getInstance().then((sharedPreferences) {
@@ -91,6 +99,8 @@ class SettingsController {
           autoRejectGroupKey, updatedSettings.autoRejectGroups);
       sharedPreferences.setInt(
           minGroupMembersKey, updatedSettings.minGroupMembers);
+      sharedPreferences.setString(
+          currentLanguageKey, updatedSettings.currentLanguage);
     });
   }
 
@@ -137,6 +147,32 @@ class SettingsController {
     int? minGroupMembers = sharedPreferences.getInt(minGroupMembersKey) ?? 2;
     updateMinGroupMembers(minGroupMembers);
     sharedPreferences.setInt(minGroupMembersKey, minGroupMembers);
+  }
+
+  void _initLanguageSettings() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String? savedLanguage = sharedPreferences.getString(currentLanguageKey);
+
+    String currentLanguage;
+    if (savedLanguage != null) {
+      // Use saved language if it exists
+      currentLanguage = savedLanguage;
+    } else {
+      // Detect device locale and use it if supported, otherwise use English
+      String deviceLanguage = _getDeviceLanguage();
+      currentLanguage = isLanguageSupported(deviceLanguage)
+          ? deviceLanguage
+          : defaultLanguage;
+    }
+
+    updateCurrentLanguage(currentLanguage);
+    sharedPreferences.setString(currentLanguageKey, currentLanguage);
+  }
+
+  // Get the device's preferred language code
+  String _getDeviceLanguage() {
+    final locale = SchedulerBinding.instance.platformDispatcher.locale;
+    return locale.languageCode;
   }
 
   void saveUserIdentifier(String deviceName, String host, String id) async {
@@ -211,5 +247,32 @@ class SettingsController {
       default:
         return ThemeMode.system;
     }
+  }
+
+  // Returns a list of available language codes
+  List<String> getAvailableLanguages() {
+    return ['en', 'cs'];
+  }
+
+  // Returns the display name for a language code
+  String getLanguageDisplayName(String languageCode) {
+    switch (languageCode) {
+      case 'en':
+        return 'English';
+      case 'cs':
+        return 'Čeština';
+      default:
+        return languageCode.toUpperCase();
+    }
+  }
+
+  // Validates if a language code is supported
+  bool isLanguageSupported(String languageCode) {
+    return getAvailableLanguages().contains(languageCode);
+  }
+
+  // Gets the current language locale
+  Locale getCurrentLanguageLocale() {
+    return Locale(currentSettings.currentLanguage);
   }
 }

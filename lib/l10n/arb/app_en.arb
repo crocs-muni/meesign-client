@@ -1,0 +1,236 @@
+{
+    "languageSettingsTitle": "Language settings",
+    "languageSettingsDescription": "Choose your preferred language for the application interface.",
+    "archivationSettingsTitle": "Archiving settings",
+    "archivationSettingsDescription": "You can choose whether to display items that have been archived before Archived items will be shown in their corresponding pages.",
+    "showArchivedItems": "Show archived items",
+    "themeSettingsTitle": "Theme settings",
+    "themeSettingsDescription": "You can manually set your preferred theme, or use the system theme to automatically set color scheme based on your OS settings.",
+    "useSystemTheme": "Use system theme",
+    "darkMode": "Dark mode",
+    "generalSettingsTitle": "General settings",
+    "applicationSettingsTitle": "Application settings",
+    "deviceAndServerSettingsTitle": "Device and server",
+    "groupSettingsTitle": "Group settings",
+    "aboutThisProject": "About this project",
+    "deviceSettingsTitle": "Device settings",
+    "deviceName": "Device name",
+    "nameToIdentifyYourselfHint": "Name to identify yourself",
+    "changeServerOrDeviceTitle": "Change server or device",
+    "changeServerOrDeviceDescription": "This will take you back to the registration screen where you can change the server or register a new device.",
+    "changeDeviceButton": "Change device",
+    "dangerZoneTitle": "Danger zone",
+    "dangerZoneDescription": "This action will effectively delete your device and all associated data. After deletion, you will need to re-register your device to continue using the app.",
+    "deleteDeviceButton": "Delete device",
+    "groupAutomationSettingsTitle": "Group automation settings",
+    "groupAutomationSettingsDescription": "By default all group invitations you receive will be automatically accepted. You can change this behaviour in the section bellow to manually asses each invitation.",
+    "automaticallyAcceptGroupInvitations": "Automatically accept group invitations",
+    "minimumNumberOfMembersToCreateGroup": "Minimum number of members to create a group",
+    "manageGroups": "Manage groups",
+    "manageGroupsDescription": "Manage your groups and group invitations",
+    "version": "version",
+    "developedBy": "Developed by",
+    "projectWebsite": "Project website",
+    "crocsWebsite": "CROCS website",
+    "authors": "Authors:",
+    "noTasksAvailable": "No tasks available",
+    "noTasksAvailableDescription": "Join a group and create a new task to get started.",
+    "createGroup": "Create group",
+    "createNewTask": "Create new task",
+    "createNewTaskTitle": "Create new task",
+    "typeOfTask": "Type of task",
+    "signPdf": "Sign PDF",
+    "challenge": "Challenge",
+    "decrypt": "Decrypt",
+    "pdfSigning": "PDF signing",
+    "decryption": "decryption",
+    "nameOfPdfSigningTask": "Name of the PDF signing task",
+    "nameOfChallengeTask": "Name of the challenge task",
+    "nameOfDecryptionTask": "Name of the decryption task",
+    "enterDescriptionOfTask": "Enter description of the {taskType} task",
+    "@enterDescriptionOfTask": {
+        "placeholders": {
+            "taskType": {
+                "type": "String"
+            }
+        }
+    },
+    "selectDecryptionType": "Select decryption type",
+    "decryptAMessage": "Decrypt a message",
+    "decryptAnImage": "Decrypt an image",
+    "selectImage": "Select image",
+    "enterMessageToBeSigned": "Enter message to be signed",
+    "enterMessageToBeDecrypted": "Enter message to be decrypted",
+    "enterMessage": "Enter message",
+    "enterTheMessage": "Enter the message",
+    "selectGroupForNewTask": "Select group for the new task",
+    "refreshGroups": "Refresh groups",
+    "noGroupsAvailableForTaskType": "No groups available for this type of task yet.",
+    "createGroupForPdfSigning": "Create group for PDF signing",
+    "createGroupForChallenges": "Create group for challenges",
+    "createGroupForDecryption": "Create group for decryption",
+    "createTaskButton": "Create {taskType} task",
+    "@createTaskButton": {
+        "placeholders": {
+            "taskType": {
+                "type": "String"
+            }
+        }
+    },
+    "selectPdf": "Select PDF",
+    "chooseFile": "Choose file",
+    "changeFile": "Change file",
+    "fileTooLarge": "File too large",
+    "pleaseSelectSmallerOne": "Please select a smaller one.",
+    "dataTooLarge": "Data too large",
+    "pleaseSelectSmallerImageOrShorterText": "Please select a smaller image or enter a shorter text.",
+    "challengeRequestFailed": "Challenge request failed",
+    "pleaseTryAgain": "Please try again.",
+    "decryptionRequestFailed": "Decryption request failed",
+    "signRequestFailed": "Sign request failed",
+    "newGroupTitle": "New group",
+    "groupName": "Group Name",
+    "enterGroupName": "Enter group name",
+    "members": "Members",
+    "membersHelpText": "By default, each member receives one share of the group's private key. As a result, all members have equal voting rights.\n\nYou can change the number of key shares a given member receives using the arrows next to its name. The circle around user's avatar visualizes its voting power.\n\nFor example, the user below receives one share which amounts to one third of the total number of votes.",
+    "example": "example",
+    "addMembers": "Add members",
+    "scan": "Scan",
+    "threshold": "Threshold",
+    "thresholdHelpText": "No group task can succeed unless at least the specified number of positive votes is gathered from the group's members.\n\nBy carefully setting up the threshold and the number of shares each user receives, you can enforce that only certain subsets of the group can proceed with a given task.",
+    "purpose": "Purpose",
+    "policy": "Policy",
+    "policyHelpText": "If a bot is present in the group, you can set a policy that modifies its behavior (when to approve or decline requests).\n\nDepending on the bot's configuration, it may disregard the user-provided policy.",
+    "time": "Time",
+    "declineIfNotSatisfiedImmediately": "Decline if not satisfied immediately",
+    "advancedOptions": "Advanced options",
+    "protocol": "Protocol",
+    "customPolicy": "Custom policy",
+    "invalidJson": "Invalid JSON",
+    "moreGroupMembersRequired": "More group members required",
+    "atLeastTwoSharesRequired": "At least two shares required",
+    "atLeastTwoSharesRequiredText": "Either add new members to the group or give more shares to the existing members.",
+    "shareSliderDisabledTitle": "Share slider is disabled for this protocol",
+    "shareSliderDisabledText": "When using MUSIG2 protocol the threshold is always set to max number of shares. Therefore, it is not possible to use the slider.",
+    "ok": "OK",
+    "create": "Create",
+    "add": "Add",
+    "searchForPeer": "Search for peer",
+    "noPeersExistOnServer": "No peers exist on this server",
+    "noPeersWithSuchNameFound": "No peers with such a name found",
+    "searchTasksByName": "Search tasks by name...",
+    "tasks": "Tasks",
+    "groups": "Groups",
+    "challenges": "Challenges",
+    "decryptions": "Decryptions",
+    "signings": "Signings",
+    "noWaitingTasksFoundForQuery": "No waiting tasks found for \"{query}\".",
+    "@noWaitingTasksFoundForQuery": {
+        "placeholders": {
+            "query": {
+                "type": "String"
+            }
+        }
+    },
+    "noWaitingTasksFound": "No waiting tasks found at the moment.",
+    "noTasksFoundForQuery": "No tasks found for \"{query}\".",
+    "@noTasksFoundForQuery": {
+        "placeholders": {
+            "query": {
+                "type": "String"
+            }
+        }
+    },
+    "reloadTasks": "Reload tasks",
+    "reloadGroups": "Reload groups",
+    "showOnlyPending": "Show only pending",
+    "membersSubtitle": "{userCount} user{userPlural}, {botCount} bot{botPlural}",
+    "@membersSubtitle": {
+        "placeholders": {
+            "userCount": {
+                "type": "int"
+            },
+            "userPlural": {
+                "type": "String"
+            },
+            "botCount": {
+                "type": "int"
+            },
+            "botPlural": {
+                "type": "String"
+            }
+        }
+    },
+    "selectGroupForNewTask": "Select group for the new task",
+    "refreshGroups": "Refresh groups",
+    "noGroupsAvailableForTaskType": "No groups available for this type of task yet.",
+    "createGroupForPdfSigning": "Create group for PDF signing",
+    "createGroupForChallenges": "Create group for challenges",
+    "createGroupForDecryption": "Create group for decryption",
+    "images": "Images",
+    "view": "View",
+    "sign": "Sign",
+    "decline": "Decline",
+    "readCard": "Read card",
+    "decrypt": "Decrypt",
+    "join": "Join",
+    "joinWithCard": "Join with card",
+    "waitingForConfirmation": "Waiting for confirmation",
+    "waitingForConfirmationByOthers": "Waiting for confirmation by others",
+    "workingOnTask": "Working on task",
+    "needsCardToContinue": "Needs card to continue",
+    "waiting": "Waiting",
+    "newTask": "New task",
+    "newGroup": "New group",
+    "confirmDeletion": "Confirm deletion",
+    "confirmDeviceDeletion": "Are you sure you want to delete this device?",
+    "delete": "Delete",
+    "confirmProfileChange": "Confirm profile change",
+    "confirmServerOrDeviceChange": "Are you sure you want to change server or device?",
+    "confirm": "Confirm",
+    "name": "Name",
+    "server": "Server",
+    "nameMustNotBeEmpty": "Name must not be empty",
+    "failedToRegister": "Failed to register",
+    "register": "Register",
+    "useExistingAccount": "or use an existing account",
+    "selectAccount": "Select account",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "noAccountsFound": "No accounts found",
+    "areYouSureDeleteDevices": "Are you sure you want to delete these devices?",
+    "areYouSureDeleteDevice": "Are you sure you want to delete this device?",
+    "deleteDevicesConfirmation": "This will delete the selected devices and all their communications. This action cannot be undone.",
+    "deleteDeviceConfirmation": "This will delete the selected device and all its communications. This action cannot be undone.",
+    "devicesDeleted": "Deleted {count} devices.",
+    "@devicesDeleted": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "deviceDeleted": "Deleted {count} device.",
+    "@deviceDeleted": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "taskDetail": "Task Detail",
+    "taskName": "Task name",
+    "fileName": "File name",
+    "taskValue": "Task value",
+    "taskImage": "Task image",
+    "openPdfFile": "Open PDF file",
+    "hexValue": "Hex value",
+    "taskGroup": "Task group",
+    "cancel": "Cancel",
+    "ok": "OK",
+    "description": "Description",
+    "message": "Message",
+    "select": "Select",
+    "enterInput": "Enter input",
+    "archived": "Archived"
+}

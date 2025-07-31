@@ -4,6 +4,7 @@ import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
 import '../app_container.dart';
+import '../l10n/arb/app_localizations.dart';
 import '../ui_constants.dart';
 import '../util/date_formatter.dart';
 import '../util/extensions/list_intersperse.dart';
@@ -48,7 +49,7 @@ class TaskTile<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final desc = this.desc ?? StatusMessage.getStatusMessage(task);
+    final desc = this.desc ?? StatusMessage.getStatusMessage(task, context);
     final trailing = TaskStateIndicator(task);
     final allActions =
         actions + (task.state == TaskState.needsCard ? cardActions : []);
@@ -196,7 +197,7 @@ class TaskTile<T> extends StatelessWidget {
   Widget _buildNotificationCircle(BuildContext context) {
     return Row(
       children: [
-        Text("Waiting",
+        Text(AppLocalizations.of(context).waiting,
             style: TextStyle(
               fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
               color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -277,25 +278,25 @@ class TaskTile<T> extends StatelessWidget {
     Group? taskGroup;
 
     if (task is Task<Challenge>) {
-      text = "Challenge";
+      text = AppLocalizations.of(context).challenge;
       taskGroup = task.info.group;
     }
 
     if (task is Task<File>) {
-      text = "Sign PDF";
+      text = AppLocalizations.of(context).signPdf;
       taskGroup = task.info.group;
     }
 
     if (task is Task<Decrypt>) {
-      text = "Decrypt";
+      text = AppLocalizations.of(context).decrypt;
       taskGroup = task.info.group;
     }
 
     if (task is Task<Group>) {
       text = switch (task.info.keyType) {
-        KeyType.signPdf => 'Sign PDF',
-        KeyType.signChallenge => 'Challenge',
-        KeyType.decrypt => 'Decrypt',
+        KeyType.signPdf => AppLocalizations.of(context).signPdf,
+        KeyType.signChallenge => AppLocalizations.of(context).challenge,
+        KeyType.decrypt => AppLocalizations.of(context).decrypt,
       };
       taskGroup = task.info;
     }
@@ -338,7 +339,8 @@ class TaskTile<T> extends StatelessWidget {
         ],
         if (task.archived) ...[
           SizedBox(width: LARGE_GAP),
-          _buildGroupMetaDataRow(Symbols.archive, 'Archived', context),
+          _buildGroupMetaDataRow(
+              Symbols.archive, AppLocalizations.of(context).archived, context),
         ]
       ],
     );

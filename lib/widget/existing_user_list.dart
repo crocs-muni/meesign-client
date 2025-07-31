@@ -4,6 +4,7 @@ import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
 import '../app_container.dart';
+import '../l10n/arb/app_localizations.dart';
 import '../services/settings_controller.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
@@ -51,7 +52,7 @@ class ExistingUserListState extends State<ExistingUserList> {
       padding: EdgeInsets.only(top: MEDIUM_PADDING, bottom: LARGE_PADDING),
       child: DefaultPageTemplate(
         transparentBackground: true,
-        appBarTitle: "Select account",
+        appBarTitle: AppLocalizations.of(context).selectAccount,
         showAppBar: true,
         body: Container(
           padding: EdgeInsets.all(MEDIUM_PADDING),
@@ -77,7 +78,9 @@ class ExistingUserListState extends State<ExistingUserList> {
               });
             },
             label: Text(
-              _selectedUsers.isEmpty ? 'Cancel' : 'Delete',
+              _selectedUsers.isEmpty
+                  ? AppLocalizations.of(context).cancel
+                  : AppLocalizations.of(context).delete,
               style: TextStyle(
                   color: _selectedUsers.isEmpty ? null : Colors.redAccent),
             ),
@@ -96,7 +99,7 @@ class ExistingUserListState extends State<ExistingUserList> {
                   }
                 : null,
             label: Text(
-              "Edit",
+              AppLocalizations.of(context).edit,
             ),
             icon: Icon(Icons.edit),
           );
@@ -111,7 +114,8 @@ class ExistingUserListState extends State<ExistingUserList> {
 
     if (_users.isEmpty) {
       return NoResultsPlaceholder(
-          label: "No accounts found", icon: Icons.supervisor_account);
+          label: AppLocalizations.of(context).noAccountsFound,
+          icon: Icons.supervisor_account);
     }
 
     return SlidableAutoCloseBehavior(
@@ -142,7 +146,7 @@ class ExistingUserListState extends State<ExistingUserList> {
                   backgroundColor: Colors.red,
                   foregroundColor: Colors.white,
                   icon: Icons.delete,
-                  label: 'Delete',
+                  label: AppLocalizations.of(context).delete,
                 ),
               ],
             ),
@@ -179,9 +183,13 @@ class ExistingUserListState extends State<ExistingUserList> {
 
     showConfirmationDialog(
         context,
-        'Are you sure you want to delete ${multiDelete ? 'these devices?' : 'this device?'}',
-        'This will delete the selected ${multiDelete ? 'devices' : 'device'} and all its communications. This action cannot be undone. ',
-        'Delete', () async {
+        multiDelete
+            ? AppLocalizations.of(context).areYouSureDeleteDevices
+            : AppLocalizations.of(context).areYouSureDeleteDevice,
+        multiDelete
+            ? AppLocalizations.of(context).deleteDevicesConfirmation
+            : AppLocalizations.of(context).deleteDeviceConfirmation,
+        AppLocalizations.of(context).delete, () async {
       final container = context.read<AppContainer>();
 
       if (specificUserIndex != null) {
@@ -203,8 +211,11 @@ class ExistingUserListState extends State<ExistingUserList> {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             width: 350,
             behavior: SnackBarBehavior.floating,
-            content: Text(
-                'Deleted ${_selectedUsers.length} ${multiDelete ? 'devices' : 'device'}.'),
+            content: Text(multiDelete
+                ? AppLocalizations.of(context)
+                    .devicesDeleted(_selectedUsers.length)
+                : AppLocalizations.of(context)
+                    .deviceDeleted(_selectedUsers.length)),
           ));
         } catch (e) {
           // ignore: avoid_print

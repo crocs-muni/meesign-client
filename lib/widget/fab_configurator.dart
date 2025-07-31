@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../l10n/arb/app_localizations.dart';
+
 import '../enums/fab_type.dart';
 import '../pages/new_task_page.dart';
 import '../util/actions/group_creator.dart';
@@ -42,7 +44,7 @@ class FabConfigurator extends StatelessWidget {
                   )),
         );
       },
-      label: const Text('New task'),
+      label: Text(AppLocalizations.of(context).newTask),
       icon: const Icon(Symbols.add),
     );
   }
@@ -53,7 +55,7 @@ class FabConfigurator extends StatelessWidget {
       key: ValueKey(key),
       heroTag: key,
       onPressed: () => createGroup(context, buildContext),
-      label: const Text('New group'),
+      label: Text(AppLocalizations.of(context).newGroup),
       icon: const Icon(Symbols.add),
     );
   }

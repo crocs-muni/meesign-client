@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/arb/app_localizations.dart';
 import '../templates/default_page_template.dart';
 import '../view_model/app_view_model.dart';
 import 'task_listing.dart';
@@ -20,7 +21,8 @@ class TabbedTasksPage extends StatelessWidget {
               body: Scaffold(
                 body: TaskListing(
                   showHeading: false,
-                  customSearchBarHint: 'Search tasks by name...',
+                  customSearchBarHint:
+                      AppLocalizations.of(context).searchTasksByName,
                 ),
               ));
         });

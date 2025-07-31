@@ -3,6 +3,7 @@ import 'package:meesign_core/meesign_model.dart';
 import 'package:provider/provider.dart';
 
 import '../app_container.dart';
+import '../l10n/arb/app_localizations.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
 import '../widget/device_selection_bar.dart';
@@ -119,8 +120,8 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
               ? LinearProgressIndicator()
               : NoResultsPlaceholder(
                   label: _queryController.text.isEmpty
-                      ? 'No peers exist on this server'
-                      : 'No peers with such a name found',
+                      ? AppLocalizations.of(context).noPeersExistOnServer
+                      : AppLocalizations.of(context).noPeersWithSuchNameFound,
                   icon: _queryController.text.isEmpty
                       ? Icons.device_unknown
                       : Icons.search_off,
@@ -159,7 +160,7 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
         onPressed: filterCurrentDevice(devices: _selection).isEmpty
             ? null
             : () => Navigator.pop(context, _selection),
-        child: const Text('Add'),
+        child: Text(AppLocalizations.of(context).add),
       ),
     );
   }
@@ -172,8 +173,8 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
           {required int currentLength, required bool isFocused, maxLength}) {
         return null; // Disable the counter
       },
-      decoration: const InputDecoration.collapsed(
-        hintText: 'Search for peer',
+      decoration: InputDecoration.collapsed(
+        hintText: AppLocalizations.of(context).searchForPeer,
       ),
       autofocus: true,
     );

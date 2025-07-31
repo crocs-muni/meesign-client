@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../app/model/settings.dart';
 import '../app_container.dart';
+import '../l10n/arb/app_localizations.dart';
 import '../services/settings_controller.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
@@ -18,7 +19,7 @@ class GroupSettingsPage extends StatelessWidget {
     final SettingsController settingsController = container.settingsController;
 
     return DefaultPageTemplate(
-      appBarTitle: 'Group settings',
+      appBarTitle: AppLocalizations.of(context).groupSettingsTitle,
       showAppBar: true,
       wrapInScroll: true,
       body: Column(
@@ -57,20 +58,20 @@ class GroupSettingsPage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Group automation settings",
+          AppLocalizations.of(context).groupAutomationSettingsTitle,
           style: Theme.of(context)
               .textTheme
               .bodyLarge
               ?.copyWith(fontWeight: FontWeight.bold),
         ),
         SizedBox(height: SMALL_GAP),
-        Text(
-            "By default all group invitations you receive will be automatically accepted. You can change this behaviour in the section bellow to manually asses each invitation.",
+        Text(AppLocalizations.of(context).groupAutomationSettingsDescription,
             style: theme.textTheme.bodyMedium
                 ?.copyWith(color: theme.colorScheme.outline)),
         SizedBox(height: SMALL_GAP),
         SwitchListTile(
-          title: Text('Automatically accept group invitations',
+          title: Text(
+              AppLocalizations.of(context).automaticallyAcceptGroupInvitations,
               style: theme.textTheme.bodyMedium),
           value: settings.autoJoinGroups,
           onChanged: (value) {
@@ -78,7 +79,8 @@ class GroupSettingsPage extends StatelessWidget {
           },
         ),
         ListTile(
-          title: Text('Minimum number of members to create a group',
+          title: Text(
+              AppLocalizations.of(context).minimumNumberOfMembersToCreateGroup,
               style: theme.textTheme.bodyMedium),
           trailing: NumberInput(
             value: settings.minGroupMembers,
@@ -108,9 +110,9 @@ class GroupSettingsPage extends StatelessWidget {
               padding: EdgeInsets.only(right: SMALL_PADDING),
               child: Icon(Icons.group),
             ),
-            title: Text("Manage groups"),
+            title: Text(AppLocalizations.of(context).manageGroups),
             subtitle: Text(
-              "Manage your groups and group invitations",
+              AppLocalizations.of(context).manageGroupsDescription,
               style: TextStyle(color: Theme.of(context).colorScheme.outline),
             ),
             trailing:

@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'app_container.dart';
+import 'l10n/arb/app_localizations.dart';
 import 'pages/register_page.dart';
 import 'routes.dart';
 import 'services/settings_controller.dart';
@@ -105,6 +106,9 @@ class MeeSignClient extends StatelessWidget {
                   prefillName: prefillName ?? '',
                 ),
           },
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: settingsController.getCurrentLanguageLocale(),
         );
       },
     );

@@ -12,6 +12,7 @@ import 'package:mime/mime.dart';
 import 'package:provider/provider.dart';
 
 import '../enums/task_type.dart';
+import '../l10n/arb/app_localizations.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
 import '../util/actions/group_creator.dart';
@@ -77,7 +78,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
   Widget build(BuildContext context) {
     return DefaultPageTemplate(
       showAppBar: true,
-      appBarTitle: "Create new task",
+      appBarTitle: AppLocalizations.of(context).createNewTaskTitle,
       wrapInScroll: true,
       includePadding: false,
       body: Column(
@@ -103,7 +104,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
 
   Widget _buildTaskTypeSelector() {
     return OptionTile(
-      title: 'Type of task',
+      title: AppLocalizations.of(context).typeOfTask,
       children: [
         SegmentedButton<KeyType>(
           showSelectedIcon: false,
@@ -114,18 +115,18 @@ class _NewTaskPageState extends State<NewTaskPage> {
               _selectedGroup = null;
             });
           },
-          segments: const [
+          segments: [
             ButtonSegment<KeyType>(
               value: KeyType.signPdf,
-              label: Text('Sign PDF'),
+              label: Text(AppLocalizations.of(context).signPdf),
             ),
             ButtonSegment<KeyType>(
               value: KeyType.signChallenge,
-              label: Text('Challenge'),
+              label: Text(AppLocalizations.of(context).challenge),
             ),
             ButtonSegment<KeyType>(
               value: KeyType.decrypt,
-              label: Text('Decrypt'),
+              label: Text(AppLocalizations.of(context).decrypt),
             )
           ],
         ),
@@ -136,11 +137,11 @@ class _NewTaskPageState extends State<NewTaskPage> {
   String _getTaskTypeDescription() {
     switch (_taskType) {
       case KeyType.signPdf:
-        return 'PDF signing';
+        return AppLocalizations.of(context).pdfSigning;
       case KeyType.signChallenge:
-        return 'challenge';
+        return AppLocalizations.of(context).challenge;
       case KeyType.decrypt:
-        return 'decryption';
+        return AppLocalizations.of(context).decryption;
     }
   }
 
@@ -171,11 +172,11 @@ class _NewTaskPageState extends State<NewTaskPage> {
   String _getTaskNameHeader() {
     switch (_taskType) {
       case KeyType.signPdf:
-        return "Name of the PDF signing task";
+        return AppLocalizations.of(context).nameOfPdfSigningTask;
       case KeyType.signChallenge:
-        return "Name of the challenge task";
+        return AppLocalizations.of(context).nameOfChallengeTask;
       case KeyType.decrypt:
-        return "Name of the decryption task";
+        return AppLocalizations.of(context).nameOfDecryptionTask;
     }
   }
 
@@ -200,8 +201,8 @@ class _NewTaskPageState extends State<NewTaskPage> {
               decoration: InputDecoration(
                 counterText: '',
                 filled: true,
-                hintText:
-                    'Enter description of the ${_getTaskTypeDescription()} task',
+                hintText: AppLocalizations.of(context)
+                    .enterDescriptionOfTask(_getTaskTypeDescription()),
                 hintStyle: TextStyle(
                   color: Theme.of(context).colorScheme.outline,
                 ),
@@ -251,7 +252,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Select decryption type',
+          AppLocalizations.of(context).selectDecryptionType,
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         Wrap(
@@ -265,7 +266,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
                   _showImageSelector = value;
                 });
               },
-              label: 'Decrypt a message',
+              label: AppLocalizations.of(context).decryptAMessage,
             ),
             _buildContentTypeRadio(
               initValue: true,
@@ -274,7 +275,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
                   _showImageSelector = !value;
                 });
               },
-              label: 'Decrypt an image',
+              label: AppLocalizations.of(context).decryptAnImage,
             ),
           ],
         ),
@@ -288,7 +289,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
       if (_image == null) ...[
         OutlinedButton(
           onPressed: () => _selectImage(context),
-          child: const Text('Select image'),
+          child: Text(AppLocalizations.of(context).selectImage),
         ),
       ],
       if (_image != null) ...[
@@ -330,11 +331,11 @@ class _NewTaskPageState extends State<NewTaskPage> {
   String _getMessageFieldHeader() {
     switch (_taskType) {
       case KeyType.signChallenge:
-        return "Enter message to be signed";
+        return AppLocalizations.of(context).enterMessageToBeSigned;
       case KeyType.decrypt:
-        return "Enter message to be decrypted";
+        return AppLocalizations.of(context).enterMessageToBeDecrypted;
       default:
-        return "Enter message";
+        return AppLocalizations.of(context).enterMessage;
     }
   }
 
@@ -360,7 +361,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
               },
               decoration: InputDecoration(
                 filled: true,
-                hintText: 'Enter the message',
+                hintText: AppLocalizations.of(context).enterTheMessage,
                 hintStyle: TextStyle(
                   color: Theme.of(context).colorScheme.outline,
                 ),
@@ -409,7 +410,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
                 children: [
                   Expanded(
                     child: Text(
-                      'Select group for the new task',
+                      AppLocalizations.of(context).selectGroupForNewTask,
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ),
@@ -445,7 +446,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.refresh),
-                    tooltip: 'Refresh groups',
+                    tooltip: AppLocalizations.of(context).refreshGroups,
                   ),
                 ],
               ),
@@ -458,7 +459,8 @@ class _NewTaskPageState extends State<NewTaskPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'No groups available for this type of task yet.',
+                        AppLocalizations.of(context)
+                            .noGroupsAvailableForTaskType,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Theme.of(context)
                                   .colorScheme
@@ -531,11 +533,11 @@ class _NewTaskPageState extends State<NewTaskPage> {
   String _getCreateGroupButtonText() {
     switch (_taskType) {
       case KeyType.signPdf:
-        return 'Create group for PDF signing';
+        return AppLocalizations.of(context).createGroupForPdfSigning;
       case KeyType.signChallenge:
-        return 'Create group for challenges';
+        return AppLocalizations.of(context).createGroupForChallenges;
       case KeyType.decrypt:
-        return 'Create group for decryption';
+        return AppLocalizations.of(context).createGroupForDecryption;
     }
   }
 
@@ -580,7 +582,8 @@ class _NewTaskPageState extends State<NewTaskPage> {
             : null,
         label: Padding(
           padding: EdgeInsets.symmetric(vertical: 15),
-          child: Text('Create ${_getTaskTypeDescription()} task'),
+          child: Text(AppLocalizations.of(context)
+              .createTaskButton(_getTaskTypeDescription())),
         ),
         icon: const Icon(
           Icons.send_rounded,
@@ -605,12 +608,14 @@ class _NewTaskPageState extends State<NewTaskPage> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text(
-              "Select PDF",
+              AppLocalizations.of(context).selectPdf,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             SizedBox(width: MEDIUM_GAP),
             OutlinedButton(
-              child: Text(_pdfFile == null ? "Choose file" : "Change file"),
+              child: Text(_pdfFile == null
+                  ? AppLocalizations.of(context).chooseFile
+                  : AppLocalizations.of(context).changeFile),
               onPressed: () async {
                 _pdfFile = await PdfPicker.pickPdfFile();
                 setState(() {
@@ -621,8 +626,8 @@ class _NewTaskPageState extends State<NewTaskPage> {
                   if (context.mounted) {
                     showErrorDialog(
                       context: context,
-                      title: 'File too large',
-                      desc: 'Please select a smaller one.',
+                      title: AppLocalizations.of(context).fileTooLarge,
+                      desc: AppLocalizations.of(context).pleaseSelectSmallerOne,
                     );
                   }
                   return;
@@ -671,10 +676,18 @@ class _NewTaskPageState extends State<NewTaskPage> {
     } else {
       // Use file_selector for desktop/web platforms (better Linux support)
       file = await openFile(
-        acceptedTypeGroups: const [
+        acceptedTypeGroups: [
           XTypeGroup(
             label: 'Images',
-            extensions: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'],
+            extensions: const [
+              'jpg',
+              'jpeg',
+              'png',
+              'gif',
+              'bmp',
+              'webp',
+              'svg'
+            ],
           ),
         ],
       );
@@ -692,8 +705,9 @@ class _NewTaskPageState extends State<NewTaskPage> {
       if (context.mounted) {
         showErrorDialog(
           context: context,
-          title: 'Data too large',
-          desc: 'Please select a smaller image or enter a shorter text.',
+          title: AppLocalizations.of(context).dataTooLarge,
+          desc: AppLocalizations.of(context)
+              .pleaseSelectSmallerImageOrShorterText,
         );
       }
       return;
@@ -717,8 +731,8 @@ class _NewTaskPageState extends State<NewTaskPage> {
       if (context.mounted) {
         showErrorDialog(
           context: context,
-          title: 'Challenge request failed',
-          desc: 'Please try again.',
+          title: AppLocalizations.of(context).challengeRequestFailed,
+          desc: AppLocalizations.of(context).pleaseTryAgain,
         );
       }
       rethrow;
@@ -745,8 +759,8 @@ class _NewTaskPageState extends State<NewTaskPage> {
       if (context.mounted) {
         showErrorDialog(
           context: context,
-          title: 'Decryption request failed',
-          desc: 'Please try again.',
+          title: AppLocalizations.of(context).decryptionRequestFailed,
+          desc: AppLocalizations.of(context).pleaseTryAgain,
         );
       }
       rethrow;
@@ -762,8 +776,8 @@ class _NewTaskPageState extends State<NewTaskPage> {
       if (context.mounted) {
         showErrorDialog(
           context: context,
-          title: 'Sign request failed',
-          desc: 'Please try again.',
+          title: AppLocalizations.of(context).signRequestFailed,
+          desc: AppLocalizations.of(context).pleaseTryAgain,
         );
       }
       rethrow;

@@ -12,6 +12,7 @@ import 'dart:io';
 
 import '../app_container.dart';
 import '../enums/task_type.dart';
+import '../l10n/arb/app_localizations.dart';
 import '../routes.dart';
 import '../sessions/user_session.dart';
 import '../templates/default_page_template.dart';
@@ -179,15 +180,14 @@ class _NewGroupPageState extends State<NewGroupPage> {
   void _tryCreate() {
     if (_nameController.text.isEmpty) {
       setState(() {
-        _nameErr = "Enter group name";
+        _nameErr = AppLocalizations.of(context).enterGroupName;
       });
     }
     if (_shareCount < 2) {
       setState(() {
         _sharesErr = (
-          title: 'At least two shares required',
-          text: 'Either add new members to the group or '
-              'give more shares to the existing members.',
+          title: AppLocalizations.of(context).atLeastTwoSharesRequired,
+          text: AppLocalizations.of(context).atLeastTwoSharesRequiredText,
         );
       });
     }
@@ -210,7 +210,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
         policy = {...policy, ...customPolicy};
       } catch (e) {
         setState(() {
-          _policyErr = 'Invalid JSON';
+          _policyErr = AppLocalizations.of(context).invalidJson;
         });
       }
     }
@@ -251,7 +251,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
             minimumSize: const Size.fromHeight(48),
           ),
           onPressed: _tryCreate,
-          label: const Text('Create'),
+          label: Text(AppLocalizations.of(context).create),
           icon: Icon(Icons.send_rounded)),
     );
   }
@@ -271,7 +271,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
     return DefaultPageTemplate(
         showAppBar: true,
-        appBarTitle: 'New group',
+        appBarTitle: AppLocalizations.of(context).newGroupTitle,
         includePadding: false,
         onBackButtonPressed: () {
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -291,7 +291,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
               _buildMembersSection(),
               if (_membersErr != null)
                 WarningBanner(
-                  title: 'More group members required',
+                  title: AppLocalizations.of(context).moreGroupMembersRequired,
                   text: _membersErr!,
                 ),
               _buildTresholdSection(),
@@ -316,7 +316,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
     int maxNameLength = 32;
 
     return OptionTile(
-      title: 'Group Name',
+      title: AppLocalizations.of(context).groupName,
       children: [
         TextField(
           controller: _nameController,
@@ -338,7 +338,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
   Widget _buildMembersSection() {
     return OptionTile(
-      title: 'Members',
+      title: AppLocalizations.of(context).members,
       help: const Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -377,7 +377,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
             Expanded(
               child: FilledButton.tonalIcon(
                 icon: const Icon(Symbols.search),
-                label: const Text('Add members'),
+                label: Text(AppLocalizations.of(context).addMembers),
                 onPressed: () => _selectPeer(Routes.newGroupSearch),
               ),
             ),
@@ -386,7 +386,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
               Expanded(
                 child: FilledButton.tonalIcon(
                   icon: const Icon(Symbols.qr_code),
-                  label: const Text('Scan'),
+                  label: Text(AppLocalizations.of(context).scan),
                   onPressed: () => _selectPeer(Routes.newGroupQr),
                 ),
               ),
@@ -476,13 +476,9 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
   Widget _buildTresholdSection() {
     return OptionTile(
-      title: 'Threshold',
-      help: const Text(
-        'No group task can succeed unless at least the specified number '
-        'of positive votes is gathered from the group\'s members.\n\n'
-        'By carefully setting up the threshold and the number of shares '
-        'each user receives, you can enforce that only certain subsets '
-        'of the group can proceed with a given task.',
+      title: AppLocalizations.of(context).threshold,
+      help: Text(
+        AppLocalizations.of(context).thresholdHelpText,
       ),
       children: [
         Column(
@@ -531,13 +527,12 @@ class _NewGroupPageState extends State<NewGroupPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Share slider is disabled for this protocol"),
-        content: const Text(
-            "When using MUSIG2 protocol the threshold is always set to max number of shares. Therefore, it is not possible to use the slider."),
+        title: Text(AppLocalizations.of(context).shareSliderDisabledTitle),
+        content: Text(AppLocalizations.of(context).shareSliderDisabledText),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("OK"),
+            child: Text(AppLocalizations.of(context).ok),
           ),
         ],
       ),
@@ -546,7 +541,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
   Widget _buildPurposeSection() {
     return OptionTile(
-      title: 'Purpose',
+      title: AppLocalizations.of(context).purpose,
       children: [
         SegmentedButton<KeyType>(
           selected: {_keyType},
@@ -582,12 +577,9 @@ class _NewGroupPageState extends State<NewGroupPage> {
     return OptionTile(
       padding: const EdgeInsets.symmetric(vertical: 12),
       titlePadding: const EdgeInsets.symmetric(horizontal: 16),
-      title: 'Policy',
-      help: const Text(
-        'If a bot is present in the group, you can set a policy that '
-        'modifies its behavior (when to approve or decline requests).\n\n'
-        'Depending on the bot\'s configuration, it may disregard the '
-        'user-provided policy.',
+      title: AppLocalizations.of(context).policy,
+      help: Text(
+        AppLocalizations.of(context).policyHelpText,
       ),
       children: [
         CheckboxListTile(
@@ -600,7 +592,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
           controlAffinity: ListTileControlAffinity.leading,
           title: Row(
             children: [
-              const Text('Time'),
+              Text(AppLocalizations.of(context).time),
               const SizedBox(width: 8),
               FilledButton.tonalIcon(
                 onPressed: _policyTime
@@ -619,7 +611,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                 icon: const Icon(Symbols.access_time),
                 label: Text(_policyAfterTime.format(context)),
               ),
-              const Text(' – '),
+              Text(' — '),
               FilledButton.tonalIcon(
                 onPressed: _policyTime
                     ? () async {
@@ -648,7 +640,8 @@ class _NewGroupPageState extends State<NewGroupPage> {
             });
           },
           controlAffinity: ListTileControlAffinity.leading,
-          title: const Text('Decline if not satisfied immediately'),
+          title: Text(
+              AppLocalizations.of(context).declineIfNotSatisfiedImmediately),
         ),
       ],
     );
@@ -656,7 +649,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
   Widget _buildAdvancedSection() {
     return ExpansionTile(
-      title: const Text('Advanced options'),
+      title: Text(AppLocalizations.of(context).advancedOptions),
       collapsedTextColor:
           Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.5),
       expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
@@ -665,7 +658,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
       childrenPadding: const EdgeInsets.symmetric(horizontal: 0),
       children: [
         OptionTile(
-          title: 'Protocol',
+          title: AppLocalizations.of(context).protocol,
           children: [
             SegmentedButton<Protocol>(
               selected: {_protocol},
@@ -689,7 +682,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
         ),
         if (_hasBot)
           OptionTile(
-            title: 'Custom policy',
+            title: AppLocalizations.of(context).customPolicy,
             children: [
               TextField(
                 controller: _policyController,
