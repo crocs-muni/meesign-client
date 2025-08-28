@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../l10n/arb/app_localizations.dart';
+
 class CopyButton extends StatelessWidget {
   const CopyButton({super.key, required this.textToCopy});
   final String textToCopy;
@@ -17,7 +19,7 @@ class CopyButton extends StatelessWidget {
             ),
           );
         },
-        label: Text('Copy'),
+        label: Text(AppLocalizations.of(context).copy),
         icon: Icon(Icons.copy));
   }
 }

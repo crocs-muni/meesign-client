@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../enums/fab_type.dart';
 import '../enums/task_type.dart';
+import '../l10n/arb/app_localizations.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
 import '../util/actions/group_creator.dart';
@@ -79,7 +80,7 @@ class _GroupsListingPageState extends State<GroupsListingPage>
           return DefaultPageTemplate(
               showAppBar: true,
               floatingActionButton: _buildFab(context, model),
-              appBarTitle: 'Groups',
+              appBarTitle: AppLocalizations.of(context).groups,
               body: TaskListView<Group>(
                 key: ValueKey('group_task_list'),
                 tasks: model.groupTasks,
@@ -130,13 +131,13 @@ class _GroupsListingPageState extends State<GroupsListingPage>
                 fit: BoxFit.fitWidth,
               ),
             ),
-            const Text(
-              'No groups yet!',
+            Text(
+              AppLocalizations.of(context).noGroupsYet,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: SMALL_GAP),
-            const Text(
-              'Create a group to get started.',
+            Text(
+              AppLocalizations.of(context).createGroupToStart,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: LARGE_GAP),
@@ -144,7 +145,7 @@ class _GroupsListingPageState extends State<GroupsListingPage>
               onPressed: () {
                 createGroup(context, context);
               },
-              child: const Text('Create group'),
+              child: Text(AppLocalizations.of(context).createGroup),
             )
           ],
         ),

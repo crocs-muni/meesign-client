@@ -293,7 +293,7 @@ abstract class AppLocalizations {
   /// No description provided for @crocsWebsite.
   ///
   /// In en, this message translates to:
-  /// **'CROCS website'**
+  /// **'CRoCS website'**
   String get crocsWebsite;
 
   /// No description provided for @authors.
@@ -1100,6 +1100,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Archived'**
   String get archived;
+
+  /// No description provided for @noGroupsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No groups yet'**
+  String get noGroupsYet;
+
+  /// No description provided for @createGroupToStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a group to get started.'**
+  String get createGroupToStart;
+
+  /// No description provided for @createGroupButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create group'**
+  String get createGroupButton;
+
+  /// No description provided for @back.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back;
+
+  /// No description provided for @useTemplateForGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Use as a template for new group'**
+  String get useTemplateForGroup;
+
+  /// No description provided for @useTemplateForTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Use as a template for new task'**
+  String get useTemplateForTask;
+
+  /// No description provided for @copy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get copy;
+
+  /// No description provided for @copyNoun.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get copyNoun;
+
+  /// No description provided for @taskState.
+  ///
+  /// In en, this message translates to:
+  /// **'Task state'**
+  String get taskState;
 }
 
 class _AppLocalizationsDelegate

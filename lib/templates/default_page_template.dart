@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/arb/app_localizations.dart';
 import '../ui_constants.dart';
 import '../util/layout_getter.dart';
 import '../enums/screen_layout.dart';
@@ -24,7 +25,7 @@ class DefaultPageTemplate extends StatelessWidget {
     this.customAppBar,
     this.showAppBar = false,
     this.appBarTitle = '',
-    this.backButtonText = 'Back',
+    this.backButtonText = '',
     this.wrapInScroll = false,
     this.includePadding = true,
     this.transparentBackground = false,
@@ -84,7 +85,9 @@ class DefaultPageTemplate extends StatelessWidget {
                   onBackButtonPressed!();
                 }
               },
-              label: Text(backButtonText),
+              label: Text(backButtonText == ''
+                  ? AppLocalizations.of(context).back
+                  : backButtonText),
               icon: Icon(Icons.arrow_back),
             ),
           )

@@ -123,26 +123,11 @@ class TaskTile<T> extends StatelessWidget {
                   ]),
             ),
             if (task.approvable) ...[
-              LayoutBuilder(builder: (context, constraints) {
-                return Row(
-                  children: [
-                    if (MediaQuery.sizeOf(context).width >=
-                        minTabletLayoutWidth) ...[
-                      Row(
-                        children: [
-                          SizedBox(height: XLARGE_GAP),
-                          ..._buildConditionalApproveActions(context)
-                        ],
-                      ),
-                    ] else ...[
-                      Padding(
-                        padding: const EdgeInsets.only(right: LARGE_GAP),
-                        child: _buildNotificationCircle(context),
-                      )
-                    ]
-                  ],
-                );
-              })
+              Padding(
+                  padding: const EdgeInsets.only(right: SMALL_GAP),
+                  child: Column(
+                    children: [..._buildConditionalApproveActions(context)],
+                  )),
             ] else ...[
               if (trailing != null) ...[
                 Padding(
@@ -153,26 +138,6 @@ class TaskTile<T> extends StatelessWidget {
             ],
           ],
         ),
-        if (task.approvable) ...[
-          LayoutBuilder(builder: (context, constraints) {
-            return Container(
-              padding: EdgeInsets.only(top: SMALL_GAP, left: SMALL_GAP),
-              child: Row(
-                children: [
-                  if (MediaQuery.sizeOf(context).width <
-                      minTabletLayoutWidth) ...[
-                    Row(
-                      children: [
-                        SizedBox(height: XLARGE_GAP),
-                        ..._buildConditionalApproveActions(context)
-                      ],
-                    ),
-                  ],
-                ],
-              ),
-            );
-          })
-        ]
       ],
     );
   }
@@ -192,27 +157,6 @@ class TaskTile<T> extends StatelessWidget {
     } else {
       return approveActions;
     }
-  }
-
-  Widget _buildNotificationCircle(BuildContext context) {
-    return Row(
-      children: [
-        Text(AppLocalizations.of(context).waiting,
-            style: TextStyle(
-              fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            )),
-        SizedBox(width: SMALL_GAP),
-        Container(
-          width: 8,
-          height: 8,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        )
-      ],
-    );
   }
 
   Widget _buildArchiveContainer(BuildContext context, Widget child) {

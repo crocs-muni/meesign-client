@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:collection/collection.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -26,9 +27,13 @@ import 'groups_listing_page.dart';
 
 class NewTaskPage extends StatefulWidget {
   const NewTaskPage(
-      {super.key, this.initialTaskType, this.showTaskTypeSelector = false});
+      {super.key,
+      this.initialTaskType,
+      this.showTaskTypeSelector = false,
+      this.templateTask});
 
   final KeyType? initialTaskType;
+  final Task? templateTask;
   final bool showTaskTypeSelector;
   @override
   State<NewTaskPage> createState() => _NewTaskPageState();
@@ -42,6 +47,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
   XFile? _pdfFile;
   bool _showImageSelector = false;
   bool _isRefreshingGroups = false;
+  bool _isFromTemplate = false;
   final TextEditingController _descController = TextEditingController();
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _groupScrollController = ScrollController();
@@ -61,6 +67,51 @@ class _NewTaskPageState extends State<NewTaskPage> {
           final state = context.read<AppViewModel>();
           state.refetchTasks(TaskType.group);
         });
+      }
+    });
+
+    if (widget.templateTask != null) {
+      _createTaskFromTemplate();
+    }
+  }
+
+  void _createTaskFromTemplate() {
+    if (widget.templateTask == null) {
+      return;
+    }
+
+    final template = widget.templateTask!;
+    setState(() {
+      _isFromTemplate = true;
+      // Set task type based on template group's key type
+      _taskType = template.info.group.keyType;
+      _selectedGroup = template.info.group;
+
+      // Restore task-specific data based on type
+      if (template.info is Challenge) {
+        final challengeInfo = template.info as Challenge;
+        _descController.text =
+            '${challengeInfo.name} ${AppLocalizations.of(context).copyNoun}';
+        _messageController.text = utf8.decode(challengeInfo.data);
+      } else if (template.info is Decrypt) {
+        final decryptInfo = template.info as Decrypt;
+        _descController.text =
+            '${decryptInfo.name} ${AppLocalizations.of(context).copyNoun}';
+
+        if (decryptInfo.dataType.isImage) {
+          _showImageSelector = true;
+          _image = Uint8List.fromList(decryptInfo.data);
+          _imageMimeType = decryptInfo.dataType;
+        } else {
+          _showImageSelector = false;
+          _messageController.text = utf8.decode(decryptInfo.data);
+        }
+      } else if (template.info is File) {
+        final fileInfo = template.info as File;
+        _descController.text =
+            '${fileInfo.basename} ${AppLocalizations.of(context).copyNoun}';
+        // Note: We can't restore the actual PDF file since we only have the path
+        // The user will need to select the file again
       }
     });
   }
@@ -391,12 +442,14 @@ class _NewTaskPageState extends State<NewTaskPage> {
             .toList();
 
         // Select the first group of task type if none is selected
-        if (_selectedGroup == null && groups.isNotEmpty) {
+        if (_selectedGroup == null && groups.isNotEmpty && !_isFromTemplate) {
           _selectedGroup = groups.first;
         }
 
         // If the currently selected group is no longer available, reset it
-        if (_selectedGroup != null && !groups.contains(_selectedGroup)) {
+        if (_selectedGroup != null &&
+            !groups.contains(_selectedGroup) &&
+            !_isFromTemplate) {
           _selectedGroup = groups.isNotEmpty ? groups.first : null;
         }
 
@@ -495,14 +548,21 @@ class _NewTaskPageState extends State<NewTaskPage> {
                   itemCount: groups.length,
                   itemBuilder: (context, index) {
                     final group = groups.elementAt(index);
+                    final isSelected = _selectedGroup != null &&
+                        const ListEquality()
+                            .equals(_selectedGroup!.id, group.id);
                     return GroupSuggestionTile(
                       group: group,
                       active: true,
-                      selected: _selectedGroup == group,
+                      selected: isSelected,
                       onChanged: (value) {
                         setState(() {
                           if (value == true) {
                             _selectedGroup = group;
+                            // Reset template flag after manual selection
+                            if (_isFromTemplate) {
+                              _isFromTemplate = false;
+                            }
                           } else {
                             _selectedGroup = null;
                           }
@@ -726,7 +786,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
     try {
       final state = context.read<AppViewModel>();
       state.challenge(description, data, _selectedGroup!);
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     } catch (e) {
       if (context.mounted) {
         showErrorDialog(
@@ -753,7 +813,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
           state.encrypt(description, MimeType.textUtf8, data, _selectedGroup!);
         }
 
-        Navigator.pop(context);
+        Navigator.pop(context, true);
       }
     } catch (e) {
       if (context.mounted) {
@@ -771,7 +831,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
     try {
       final state = context.read<AppViewModel>();
       state.sign(_pdfFile!, _selectedGroup!);
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     } catch (e) {
       if (context.mounted) {
         showErrorDialog(

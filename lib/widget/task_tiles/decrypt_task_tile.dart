@@ -56,6 +56,9 @@ class DecryptTaskTile extends StatelessWidget {
                     group: task.info.group,
                     timedAutoClose: true,
                     autoCloseDurationInSeconds: 5,
+                    isArchived: task.archived,
+                    keyType: KeyType.decrypt,
+                    task: task,
                     imageDecrypt: task.info.dataType.isImage ? task.info : null,
                     textValue: task.info.dataType.isText
                         ? utf8.decode(task.info.data, allowMalformed: true)
@@ -67,8 +70,8 @@ class DecryptTaskTile extends StatelessWidget {
                 ),
               ),
               child: Text(AppLocalizations.of(context).view),
-            )
-          ]
+            ),
+          ],
         ],
       ),
       approveActions: [
@@ -78,7 +81,7 @@ class DecryptTaskTile extends StatelessWidget {
           onPressed: () {
             model.joinDecrypt(task, agree: true);
           },
-          color: Color(0xFF298E29),
+          color: Color(0xFF438743),
         ),
         LargeSquareButton(
             text: AppLocalizations.of(context).decline,
@@ -86,7 +89,7 @@ class DecryptTaskTile extends StatelessWidget {
             onPressed: () {
               model.joinDecrypt(task, agree: false);
             },
-            color: Color(0xFFAA3026)),
+            color: Color(0xFF753732)),
       ],
       actions: const [],
       onArchiveChange: (archive) => model.archiveTask(task, archive: archive),

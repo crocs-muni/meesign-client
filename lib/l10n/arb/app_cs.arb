@@ -31,23 +31,23 @@
     "version": "verze",
     "developedBy": "Vyvinuto skupinou",
     "projectWebsite": "Web projektu",
-    "crocsWebsite": "Web CROCS",
+    "crocsWebsite": "Web CRoCS",
     "authors": "Autoři:",
-    "noTasksAvailable": "Žádné úkoly k dispozici",
-    "noTasksAvailableDescription": "Připojte se ke skupině a vytvořte váš první úkol.",
+    "noTasksAvailable": "Žádné úlohy k dispozici",
+    "noTasksAvailableDescription": "Připojte se ke skupině a vytvořte váši první úlohu.",
     "createGroup": "Vytvořit skupinu",
-    "createNewTask": "Vytvořit nový úkol",
-    "createNewTaskTitle": "Vytvořit nový úkol",
-    "typeOfTask": "Typ úkolu",
+    "createNewTask": "Vytvořit novou úlohu",
+    "createNewTaskTitle": "Vytvořit novou úlohu",
+    "typeOfTask": "Typ úlohy",
     "signPdf": "Podepsat PDF",
     "challenge": "Výzva",
     "decrypt": "Dešifrovat",
     "pdfSigning": "podepisování PDF",
     "decryption": "dešifrování",
-    "nameOfPdfSigningTask": "Název úkolu pro podepisování PDF",
-    "nameOfChallengeTask": "Název úkolu pro výzvu",
-    "nameOfDecryptionTask": "Název úkolu pro dešifrování",
-    "enterDescriptionOfTask": "Zadejte popis úkolu {taskType}",
+    "nameOfPdfSigningTask": "Název úlohy pro podepisování PDF",
+    "nameOfChallengeTask": "Název úlohy pro výzvu",
+    "nameOfDecryptionTask": "Název úlohy pro dešifrování",
+    "enterDescriptionOfTask": "Zadejte popis úlohy {taskType}",
     "@enterDescriptionOfTask": {
         "placeholders": {
             "taskType": {
@@ -63,13 +63,13 @@
     "enterMessageToBeDecrypted": "Zadejte zprávu k dešifrování",
     "enterMessage": "Zadejte zprávu",
     "enterTheMessage": "Zadejte zprávu",
-    "selectGroupForNewTask": "Vyberte skupinu pro nový úkol",
+    "selectGroupForNewTask": "Vyberte skupinu pro novou úlohu",
     "refreshGroups": "Obnovit skupiny",
-    "noGroupsAvailableForTaskType": "Pro tento typ úkolu zatím nejsou k dispozici žádné skupiny.",
+    "noGroupsAvailableForTaskType": "Pro tento typ úlohy zatím nejsou k dispozici žádné skupiny.",
     "createGroupForPdfSigning": "Vytvořit skupinu pro podepisování PDF",
     "createGroupForChallenges": "Vytvořit skupinu pro výzvy",
     "createGroupForDecryption": "Vytvořit skupinu pro dešifrování",
-    "createTaskButton": "Vytvořit úkol {taskType}",
+    "createTaskButton": "Vytvořit úlohu {taskType}",
     "@createTaskButton": {
         "placeholders": {
             "taskType": {
@@ -97,7 +97,7 @@
     "addMembers": "Přidat členy",
     "scan": "Skenovat",
     "threshold": "Práh",
-    "thresholdHelpText": "Žádný úkol skupiny nemůže uspět, pokud není shromážděn alespoň stanovený počet pozitivních hlasů od členů skupiny. Nastavením prahu a počtu podílů, které každý uživatel obdrží, můžete vynutit, aby pouze určité podmnožiny skupiny mohly pokračovat v daném úkolu.",
+    "thresholdHelpText": "Žádná úloha skupiny nemůže uspět, pokud není shromážděn alespoň stanovený počet pozitivních hlasů od členů skupiny. Nastavením prahu a počtu podílů, které každý uživatel obdrží, můžete vynutit, aby pouze určité podmnožiny skupiny mohly pokračovat v dané úloze.",
     "purpose": "Účel",
     "policy": "Zásady",
     "policyHelpText": "Pokud je ve skupině přítomen bot, můžete nastavit pravidla, které upravují jeho chování (kdy schválit nebo zamítnout požadavky).\n\nV závislosti na konfiguraci bota může ignorovat uživatelsky poskytované pravidla.",
@@ -118,13 +118,13 @@
     "searchForPeer": "Hledat členy",
     "noPeersExistOnServer": "Na tomto serveru neexistují žádní jiní členové.",
     "noPeersWithSuchNameFound": "Nebyli nalezeni žádní členové s takovým názvem",
-    "searchTasksByName": "Hledat úkoly podle názvu...",
-    "tasks": "Úkoly",
+    "searchTasksByName": "Hledat úlohy podle názvu...",
+    "tasks": "úlohy",
     "groups": "Skupiny",
     "challenges": "Výzvy",
     "decryptions": "Dešifrování",
     "signings": "Podpisy",
-    "noWaitingTasksFoundForQuery": "Nebyly nalezeny žádné čekající úkoly pro \"{query}\".",
+    "noWaitingTasksFoundForQuery": "Nebyly nalezeny žádné čekající úlohy pro \"{query}\".",
     "@noWaitingTasksFoundForQuery": {
         "placeholders": {
             "query": {
@@ -132,8 +132,8 @@
             }
         }
     },
-    "noWaitingTasksFound": "Momentálně nejsou nalezeny žádné čekající úkoly.",
-    "noTasksFoundForQuery": "Nebyly nalezeny žádné úkoly pro \"{query}\".",
+    "noWaitingTasksFound": "Momentálně nejsou nalezeny žádné čekající úlohy.",
+    "noTasksFoundForQuery": "Nebyly nalezeny žádné úlohy pro \"{query}\".",
     "@noTasksFoundForQuery": {
         "placeholders": {
             "query": {
@@ -141,7 +141,7 @@
             }
         }
     },
-    "reloadTasks": "Obnovit úkoly",
+    "reloadTasks": "Obnovit úlohy",
     "reloadGroups": "Obnovit skupiny",
     "showOnlyPending": "Zobrazit pouze čekající",
     "membersSubtitle": "{userCount} uživatel{userPlural}, {botCount} bot{botPlural}",
@@ -161,9 +161,9 @@
             }
         }
     },
-    "selectGroupForNewTask": "Vyberte skupinu pro nový úkol",
+    "selectGroupForNewTask": "Vyberte skupinu pro novou úlohu",
     "refreshGroups": "Obnovit skupiny",
-    "noGroupsAvailableForTaskType": "Pro tento typ úkolu zatím nejsou k dispozici žádné skupiny.",
+    "noGroupsAvailableForTaskType": "Pro tento typ úlohy zatím nejsou k dispozici žádné skupiny.",
     "createGroupForPdfSigning": "Vytvořit skupinu pro podepisování PDF",
     "createGroupForChallenges": "Vytvořit skupinu pro výzvy",
     "createGroupForDecryption": "Vytvořit skupinu pro dešifrování",
@@ -177,10 +177,10 @@
     "joinWithCard": "Připojit se s kartou",
     "waitingForConfirmation": "Čeká se na potvrzení",
     "waitingForConfirmationByOthers": "Čeká se na potvrzení ostatními",
-    "workingOnTask": "Pracuje se na úkolu",
+    "workingOnTask": "Pracuje se na úloze",
     "needsCardToContinue": "Pro pokračování je potřeba karta",
     "waiting": "Čeká se",
-    "newTask": "Nový úkol",
+    "newTask": "Nová úloha",
     "newGroup": "Nová skupina",
     "confirmDeletion": "Potvrdit smazání",
     "confirmDeviceDeletion": "Opravdu chcete smazat toto zařízení?",
@@ -218,19 +218,29 @@
             }
         }
     },
-    "taskDetail": "Detail úkolu",
-    "taskName": "Název úkolu",
+    "taskDetail": "Detail úlohy",
+    "taskName": "Název úlohy",
     "fileName": "Název souboru",
-    "taskValue": "Hodnota úkolu",
-    "taskImage": "Obrázek úkolu",
+    "taskValue": "Hodnota úlohy",
+    "taskImage": "Obrázek úlohy",
     "openPdfFile": "Otevřít PDF soubor",
     "hexValue": "Hexadecimální hodnota",
-    "taskGroup": "Skupina úkolu",
+    "taskGroup": "Skupina úlohy",
     "cancel": "Zrušit",
     "ok": "OK",
     "description": "Popis",
     "message": "Zpráva",
     "select": "Vybrat",
     "enterInput": "Zadejte vstup",
+    "archived": "Archivováno",
+    "noGroupsYet": "Zatím nejsou vytvořeny žádné skupiny.",
+    "createGroupToStart": "Vytvořte první skupinu pro používání aplikace.",
+    "createGroupButton": "Vytvořit skupinu",
+    "back": "Zpět",
+    "useTemplateForGroup": "Použít jako šablonu pro novou skupinu",
+    "useTemplateForTask": "Použít jako šablonu pro novou úlohu",
+    "copy": "Kopírovat",
+    "copyNoun": "Kopie",
+    "taskState": "Stav úlohy",
     "archived": "Archivováno"
 }

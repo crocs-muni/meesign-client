@@ -12,6 +12,9 @@ import 'package:url_launcher/url_launcher.dart';
 import '../l10n/arb/app_localizations.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
+import '../util/actions/challenge_creator.dart';
+import '../util/actions/document_signer.dart';
+import '../util/actions/encrypt_data.dart';
 import '../widget/copy_button.dart';
 import '../widget/entity_chip.dart';
 import '../widget/share_button.dart';
@@ -19,14 +22,17 @@ import '../widget/share_button.dart';
 class TaskDetailPage extends StatefulWidget {
   const TaskDetailPage(
       {super.key,
+      required this.task,
       required this.title,
       required this.group,
+      required this.keyType,
       this.textValue,
       this.hexValue,
       this.imageDecrypt,
       this.timedAutoClose = false,
       this.autoCloseDurationInSeconds = 5,
-      this.filePath});
+      this.filePath,
+      this.isArchived = false});
 
   final String title;
   final String? textValue;
@@ -36,6 +42,9 @@ class TaskDetailPage extends StatefulWidget {
   final int autoCloseDurationInSeconds;
   final String? filePath;
   final Group group;
+  final bool isArchived;
+  final Task task;
+  final KeyType keyType;
 
   @override
   State<TaskDetailPage> createState() => _TaskDetailPageState();
@@ -199,7 +208,47 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
           ),
         ],
         const SizedBox(height: MEDIUM_GAP),
+        if (widget.isArchived) ...[
+          _buildSection(
+              title: AppLocalizations.of(context).taskState,
+              context: context,
+              content: AppLocalizations.of(context).archived,
+              showCopyButton: false),
+        ],
+        const SizedBox(height: MEDIUM_GAP),
         _buildGroupSection(context: context, group: widget.group),
+        const SizedBox(height: 24),
+        FilledButton.icon(
+          onPressed: () async {
+            bool? redirectBack = false;
+            if (widget.keyType == KeyType.signChallenge) {
+              redirectBack =
+                  await createChallenge(context, context, widget.task);
+            } else if (widget.keyType == KeyType.decrypt) {
+              redirectBack = await encryptData(context, context, widget.task);
+            } else if (widget.keyType == KeyType.signPdf) {
+              redirectBack = await signDocument(context, context, widget.task);
+            }
+
+            if (redirectBack == true && context.mounted) {
+              Navigator.of(context).pop();
+            }
+          },
+          label: Padding(
+            padding: EdgeInsets.symmetric(vertical: 15),
+            child: Text(AppLocalizations.of(context).useTemplateForTask),
+          ),
+          icon: const Icon(
+            Icons.copy,
+          ),
+          style: ButtonStyle(
+            shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -274,6 +323,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildHeader(context, AppLocalizations.of(context).taskGroup),
+        SizedBox(height: SMALL_GAP),
         GroupChip(group: group),
       ],
     );
@@ -283,8 +333,6 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     if (Platform.isLinux) {
       launchUrl(Uri.file(path));
     } else {
-      // FIXME: try to avoid open_file package,
-      // it seems to be of low quality
       OpenFilex.open(path);
     }
   }

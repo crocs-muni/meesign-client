@@ -5,6 +5,8 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:meesign_core/meesign_model.dart';
 
 import '../l10n/arb/app_localizations.dart';
+import '../ui_constants.dart';
+import '../util/actions/group_creator.dart';
 import '../util/chars.dart';
 import '../widget/avatar_app_bar.dart';
 import '../widget/device_name.dart';
@@ -115,6 +117,37 @@ class GroupPage extends StatelessWidget {
           title: Text(AppLocalizations.of(context).policy),
           subtitle: Text(policy),
         ),
+      const SizedBox(height: 24),
+      Align(
+        alignment: Alignment.centerLeft,
+        child: Padding(
+          padding: const EdgeInsets.only(left: LARGE_PADDING),
+          child: FilledButton.icon(
+            onPressed: () async {
+              bool shouldRedirect =
+                  await createGroup(context, context, groupTemplate: group);
+
+              if (context.mounted && shouldRedirect) {
+                Navigator.pop(context);
+              }
+            },
+            label: Padding(
+              padding: EdgeInsets.symmetric(vertical: 15),
+              child: Text(AppLocalizations.of(context).useTemplateForGroup),
+            ),
+            icon: const Icon(
+              Icons.copy,
+            ),
+            style: ButtonStyle(
+              shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     ];
 
     return Scaffold(

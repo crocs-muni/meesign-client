@@ -55,30 +55,37 @@ class ChallengeTaskTile extends StatelessWidget {
                     group: task.info.group,
                     textValue: _decodeHexToString(task.info.data),
                     hexValue: hex.encode(task.info.data),
+                    isArchived: task.archived,
+                    keyType: KeyType.signChallenge,
+                    task: task,
                   ),
                 ),
               ),
               child: Text(AppLocalizations.of(context).view),
-            )
-          ]
+            ),
+          ],
         ],
       ),
       approveActions: [
-        LargeSquareButton(
-          text: AppLocalizations.of(context).sign,
-          icon: Icons.check,
-          onPressed: () {
-            model.joinChallenge(task, agree: true);
-          },
-          color: Color(0xFF298E29),
+        Column(
+          children: [
+            LargeSquareButton(
+              text: AppLocalizations.of(context).sign,
+              icon: Icons.check,
+              onPressed: () {
+                model.joinChallenge(task, agree: true);
+              },
+              color: Color(0xFF438743),
+            ),
+            LargeSquareButton(
+                text: AppLocalizations.of(context).decline,
+                icon: Icons.close,
+                onPressed: () {
+                  model.joinChallenge(task, agree: false);
+                },
+                color: Color(0xFF753732))
+          ],
         ),
-        LargeSquareButton(
-            text: AppLocalizations.of(context).decline,
-            icon: Icons.close,
-            onPressed: () {
-              model.joinChallenge(task, agree: false);
-            },
-            color: Color(0xFFAA3026)),
       ],
       cardActions: [
         FilledButton.tonal(

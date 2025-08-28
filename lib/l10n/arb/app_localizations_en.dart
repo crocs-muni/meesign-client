@@ -114,7 +114,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get projectWebsite => 'Project website';
 
   @override
-  String get crocsWebsite => 'CROCS website';
+  String get crocsWebsite => 'CRoCS website';
 
   @override
   String get authors => 'Authors:';
@@ -549,4 +549,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get archived => 'Archived';
+
+  @override
+  String get noGroupsYet => 'No groups yet';
+
+  @override
+  String get createGroupToStart => 'Create a group to get started.';
+
+  @override
+  String get createGroupButton => 'Create group';
+
+  @override
+  String get back => 'Back';
+
+  @override
+  String get useTemplateForGroup => 'Use as a template for new group';
+
+  @override
+  String get useTemplateForTask => 'Use as a template for new task';
+
+  @override
+  String get copy => 'Copy';
+
+  @override
+  String get copyNoun => 'Copy';
+
+  @override
+  String get taskState => 'Task state';
 }

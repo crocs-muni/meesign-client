@@ -114,29 +114,29 @@ class AppLocalizationsCs extends AppLocalizations {
   String get projectWebsite => 'Web projektu';
 
   @override
-  String get crocsWebsite => 'Web CROCS';
+  String get crocsWebsite => 'Web CRoCS';
 
   @override
   String get authors => 'Autoři:';
 
   @override
-  String get noTasksAvailable => 'Žádné úkoly k dispozici';
+  String get noTasksAvailable => 'Žádné úlohy k dispozici';
 
   @override
   String get noTasksAvailableDescription =>
-      'Připojte se ke skupině a vytvořte váš první úkol.';
+      'Připojte se ke skupině a vytvořte váši první úlohu.';
 
   @override
   String get createGroup => 'Vytvořit skupinu';
 
   @override
-  String get createNewTask => 'Vytvořit nový úkol';
+  String get createNewTask => 'Vytvořit novou úlohu';
 
   @override
-  String get createNewTaskTitle => 'Vytvořit nový úkol';
+  String get createNewTaskTitle => 'Vytvořit novou úlohu';
 
   @override
-  String get typeOfTask => 'Typ úkolu';
+  String get typeOfTask => 'Typ úlohy';
 
   @override
   String get signPdf => 'Podepsat PDF';
@@ -154,17 +154,17 @@ class AppLocalizationsCs extends AppLocalizations {
   String get decryption => 'dešifrování';
 
   @override
-  String get nameOfPdfSigningTask => 'Název úkolu pro podepisování PDF';
+  String get nameOfPdfSigningTask => 'Název úlohy pro podepisování PDF';
 
   @override
-  String get nameOfChallengeTask => 'Název úkolu pro výzvu';
+  String get nameOfChallengeTask => 'Název úlohy pro výzvu';
 
   @override
-  String get nameOfDecryptionTask => 'Název úkolu pro dešifrování';
+  String get nameOfDecryptionTask => 'Název úlohy pro dešifrování';
 
   @override
   String enterDescriptionOfTask(String taskType) {
-    return 'Zadejte popis úkolu $taskType';
+    return 'Zadejte popis úlohy $taskType';
   }
 
   @override
@@ -192,14 +192,14 @@ class AppLocalizationsCs extends AppLocalizations {
   String get enterTheMessage => 'Zadejte zprávu';
 
   @override
-  String get selectGroupForNewTask => 'Vyberte skupinu pro nový úkol';
+  String get selectGroupForNewTask => 'Vyberte skupinu pro novou úlohu';
 
   @override
   String get refreshGroups => 'Obnovit skupiny';
 
   @override
   String get noGroupsAvailableForTaskType =>
-      'Pro tento typ úkolu zatím nejsou k dispozici žádné skupiny.';
+      'Pro tento typ úlohy zatím nejsou k dispozici žádné skupiny.';
 
   @override
   String get createGroupForPdfSigning =>
@@ -213,7 +213,7 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String createTaskButton(String taskType) {
-    return 'Vytvořit úkol $taskType';
+    return 'Vytvořit úlohu $taskType';
   }
 
   @override
@@ -280,7 +280,7 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get thresholdHelpText =>
-      'Žádný úkol skupiny nemůže uspět, pokud není shromážděn alespoň stanovený počet pozitivních hlasů od členů skupiny. Nastavením prahu a počtu podílů, které každý uživatel obdrží, můžete vynutit, aby pouze určité podmnožiny skupiny mohly pokračovat v daném úkolu.';
+      'Žádná úloha skupiny nemůže uspět, pokud není shromážděn alespoň stanovený počet pozitivních hlasů od členů skupiny. Nastavením prahu a počtu podílů, které každý uživatel obdrží, můžete vynutit, aby pouze určité podmnožiny skupiny mohly pokračovat v dané úloze.';
 
   @override
   String get purpose => 'Účel';
@@ -350,10 +350,10 @@ class AppLocalizationsCs extends AppLocalizations {
       'Nebyli nalezeni žádní členové s takovým názvem';
 
   @override
-  String get searchTasksByName => 'Hledat úkoly podle názvu...';
+  String get searchTasksByName => 'Hledat úlohy podle názvu...';
 
   @override
-  String get tasks => 'Úkoly';
+  String get tasks => 'úlohy';
 
   @override
   String get groups => 'Skupiny';
@@ -369,20 +369,20 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String noWaitingTasksFoundForQuery(String query) {
-    return 'Nebyly nalezeny žádné čekající úkoly pro \"$query\".';
+    return 'Nebyly nalezeny žádné čekající úlohy pro \"$query\".';
   }
 
   @override
   String get noWaitingTasksFound =>
-      'Momentálně nejsou nalezeny žádné čekající úkoly.';
+      'Momentálně nejsou nalezeny žádné čekající úlohy.';
 
   @override
   String noTasksFoundForQuery(String query) {
-    return 'Nebyly nalezeny žádné úkoly pro \"$query\".';
+    return 'Nebyly nalezeny žádné úlohy pro \"$query\".';
   }
 
   @override
-  String get reloadTasks => 'Obnovit úkoly';
+  String get reloadTasks => 'Obnovit úlohy';
 
   @override
   String get reloadGroups => 'Obnovit skupiny';
@@ -424,7 +424,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get waitingForConfirmationByOthers => 'Čeká se na potvrzení ostatními';
 
   @override
-  String get workingOnTask => 'Pracuje se na úkolu';
+  String get workingOnTask => 'Pracuje se na úloze';
 
   @override
   String get needsCardToContinue => 'Pro pokračování je potřeba karta';
@@ -433,7 +433,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get waiting => 'Čeká se';
 
   @override
-  String get newTask => 'Nový úkol';
+  String get newTask => 'Nová úloha';
 
   @override
   String get newGroup => 'Nová skupina';
@@ -512,19 +512,19 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
-  String get taskDetail => 'Detail úkolu';
+  String get taskDetail => 'Detail úlohy';
 
   @override
-  String get taskName => 'Název úkolu';
+  String get taskName => 'Název úlohy';
 
   @override
   String get fileName => 'Název souboru';
 
   @override
-  String get taskValue => 'Hodnota úkolu';
+  String get taskValue => 'Hodnota úlohy';
 
   @override
-  String get taskImage => 'Obrázek úkolu';
+  String get taskImage => 'Obrázek úlohy';
 
   @override
   String get openPdfFile => 'Otevřít PDF soubor';
@@ -533,7 +533,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get hexValue => 'Hexadecimální hodnota';
 
   @override
-  String get taskGroup => 'Skupina úkolu';
+  String get taskGroup => 'Skupina úlohy';
 
   @override
   String get description => 'Popis';
@@ -549,4 +549,32 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get archived => 'Archivováno';
+
+  @override
+  String get noGroupsYet => 'Zatím nejsou vytvořeny žádné skupiny.';
+
+  @override
+  String get createGroupToStart =>
+      'Vytvořte první skupinu pro používání aplikace.';
+
+  @override
+  String get createGroupButton => 'Vytvořit skupinu';
+
+  @override
+  String get back => 'Zpět';
+
+  @override
+  String get useTemplateForGroup => 'Použít jako šablonu pro novou skupinu';
+
+  @override
+  String get useTemplateForTask => 'Použít jako šablonu pro novou úlohu';
+
+  @override
+  String get copy => 'Kopírovat';
+
+  @override
+  String get copyNoun => 'Kopie';
+
+  @override
+  String get taskState => 'Stav úlohy';
 }

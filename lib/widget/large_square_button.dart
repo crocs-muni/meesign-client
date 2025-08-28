@@ -18,10 +18,10 @@ class LargeSquareButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(right: SMALL_GAP),
+      margin: EdgeInsets.only(bottom: SMALL_GAP),
       child: SizedBox(
         width: 100,
-        height: 100,
+        height: 50,
         child: ElevatedButton(
             onPressed: onPressed,
             style: ElevatedButton.styleFrom(
@@ -33,10 +33,6 @@ class LargeSquareButton extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, size: 30, color: Colors.white),
-                const SizedBox(
-                  height: 5,
-                ),
                 Text(
                   text,
                   style: TextStyle(fontSize: 14, color: Colors.white),

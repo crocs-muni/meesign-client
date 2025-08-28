@@ -50,12 +50,15 @@ class SigningTaskTile extends StatelessWidget {
                     group: task.info.group,
                     title: task.info.basename,
                     filePath: task.info.path,
+                    isArchived: task.archived,
+                    keyType: KeyType.signPdf,
+                    task: task,
                   ),
                 ),
               ),
               child: Text(AppLocalizations.of(context).view),
             )
-          ]
+          ],
         ],
       ),
       actions: const [],

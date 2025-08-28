@@ -103,7 +103,7 @@ class GroupTaskTile extends StatelessWidget {
               },
               child: Text(AppLocalizations.of(context).view),
             ),
-          ]
+          ],
         ],
       ),
       onArchiveChange: (archive) => model.archiveTask(task, archive: archive),

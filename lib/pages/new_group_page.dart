@@ -28,9 +28,10 @@ import '../widget/weighted_avatar.dart';
 import 'search_peer_page.dart';
 
 class NewGroupPage extends StatefulWidget {
-  const NewGroupPage({super.key, this.initialGroupType});
+  const NewGroupPage({super.key, this.initialGroupType, this.templateGroup});
 
   final TaskType? initialGroupType;
+  final Group? templateGroup;
 
   @override
   State<NewGroupPage> createState() => _NewGroupPageState();
@@ -54,6 +55,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
   TimeOfDay _policyAfterTime = const TimeOfDay(hour: 0, minute: 0);
   TimeOfDay _policyBeforeTime = const TimeOfDay(hour: 23, minute: 59);
   bool _policyDecline = false;
+  bool _isCreatingFromTemplate = false;
 
   int get _shareCount => _members.map((m) => m.shares).sum;
 
@@ -81,25 +83,94 @@ class _NewGroupPageState extends State<NewGroupPage> {
     });
 
     final session = context.read<AppContainer>().session!;
-    session.deviceRepository
-        .getDevice(session.user.did)
-        .then((device) => setState(() => _members.add(Member(device, 1))));
 
-    setInitialDevices(session);
+    // Set initial values from template group if provided
+    if (widget.templateGroup != null) {
+      _createGroupFromTemplate(session);
+    } else {
+      session.deviceRepository
+          .getDevice(session.user.did)
+          .then((device) => setState(() => _members.add(Member(device, 1))));
 
-    // Set initial purpose
-    setState(() {
-      if (widget.initialGroupType == TaskType.decrypt) {
-        _keyType = KeyType.decrypt;
-        _protocol = KeyType.decrypt.supportedProtocols.first;
-      } else if (widget.initialGroupType == TaskType.sign) {
-        _keyType = KeyType.signPdf;
-        _protocol = KeyType.signPdf.supportedProtocols.first;
-      } else if (widget.initialGroupType == TaskType.challenge) {
-        _keyType = KeyType.signChallenge;
-        _protocol = KeyType.signChallenge.supportedProtocols.first;
+      setInitialDevices(session);
+
+      // Set initial purpose
+      setState(() {
+        if (widget.initialGroupType == TaskType.decrypt) {
+          _keyType = KeyType.decrypt;
+          _protocol = KeyType.decrypt.supportedProtocols.first;
+        } else if (widget.initialGroupType == TaskType.sign) {
+          _keyType = KeyType.signPdf;
+          _protocol = KeyType.signPdf.supportedProtocols.first;
+        } else if (widget.initialGroupType == TaskType.challenge) {
+          _keyType = KeyType.signChallenge;
+          _protocol = KeyType.signChallenge.supportedProtocols.first;
+        }
+      });
+    }
+  }
+
+  void _createGroupFromTemplate(UserSession session) {
+    if (widget.templateGroup != null) {
+      final template = widget.templateGroup!;
+      _isCreatingFromTemplate = true;
+      _nameController.text =
+          '${template.name} ${AppLocalizations.of(context).copyNoun}';
+      _threshold = template.threshold;
+      _keyType = template.keyType;
+      _protocol = template.protocol;
+
+      final templateDevices = template.members.map((m) => m.device).toList();
+      _devices.addAll(templateDevices);
+      _addMembers(templateDevices);
+
+      // Update shares to match template values
+      for (final templateMember in template.members) {
+        final memberIndex =
+            _members.indexWhere((m) => m.device.id == templateMember.device.id);
+        if (memberIndex >= 0) {
+          _members[memberIndex] =
+              Member(_members[memberIndex].device, templateMember.shares);
+        }
       }
-    });
+
+      // Set policy from template if it exists
+      if (template.note != null) {
+        try {
+          final policy = jsonDecode(template.note!);
+          if (policy['after'] != null && policy['before'] != null) {
+            _policyTime = true;
+            final afterParts = policy['after'].split(':');
+            final beforeParts = policy['before'].split(':');
+            _policyAfterTime = TimeOfDay(
+                hour: int.parse(afterParts[0]),
+                minute: int.parse(afterParts[1]));
+            _policyBeforeTime = TimeOfDay(
+                hour: int.parse(beforeParts[0]),
+                minute: int.parse(beforeParts[1]));
+          }
+          if (policy['decline'] != null) {
+            _policyDecline = policy['decline'];
+          }
+
+          // Set custom policy text (excluding already handled fields)
+          final customPolicy = Map<String, dynamic>.from(policy);
+          customPolicy.remove('after');
+          customPolicy.remove('before');
+          customPolicy.remove('decline');
+          if (customPolicy.isNotEmpty) {
+            _policyController.text =
+                const JsonEncoder.withIndent('  ').convert(customPolicy);
+          }
+        } catch (e) {
+          // If parsing fails, just ignore the policy
+        }
+      }
+
+      // Restore template threshold and reset flag
+      _threshold = template.threshold;
+      _isCreatingFromTemplate = false;
+    }
   }
 
   @override
@@ -130,7 +201,8 @@ class _NewGroupPageState extends State<NewGroupPage> {
       }
       _sharesErr = null;
       _membersErr = null;
-      if (_protocol.thresholdType == ThresholdType.nOfN) {
+      if (_protocol.thresholdType == ThresholdType.nOfN &&
+          !_isCreatingFromTemplate) {
         _threshold = _shareCount;
       }
     });
@@ -294,7 +366,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                   title: AppLocalizations.of(context).moreGroupMembersRequired,
                   text: _membersErr!,
                 ),
-              _buildTresholdSection(),
+              _buildThresholdSection(),
               if (sharesIssue != null)
                 WarningBanner(
                   title: sharesIssue.title,
@@ -474,7 +546,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
     );
   }
 
-  Widget _buildTresholdSection() {
+  Widget _buildThresholdSection() {
     return OptionTile(
       title: AppLocalizations.of(context).threshold,
       help: Text(
@@ -506,11 +578,13 @@ class _NewGroupPageState extends State<NewGroupPage> {
                       max: _shareCount.toDouble(),
                       divisions: max(1, _shareCount),
                       label: '$_threshold',
-                      onChanged: (_protocol.thresholdType == ThresholdType.nOfN)
-                          ? null
-                          : (value) => setState(() {
-                                _setThreshold(value.round());
-                              }),
+                      onChanged:
+                          (_protocol.thresholdType == ThresholdType.nOfN ||
+                                  _shareCount <= 2)
+                              ? null
+                              : (value) => setState(() {
+                                    _setThreshold(value.round());
+                                  }),
                     ),
                   ),
                 ),

@@ -20,10 +20,11 @@ class GroupSuggestionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RadioListTile<bool>(
-      value: true,
-      groupValue: selected,
-      onChanged: onChanged,
+    return ListTile(
+      leading: Radio<bool>(
+        value: true,
+        onChanged: onChanged,
+      ),
       dense: true,
       visualDensity: VisualDensity.compact,
       title: Row(
@@ -37,6 +38,7 @@ class GroupSuggestionTile extends StatelessWidget {
           _buildInfoButton(context)
         ],
       ),
+      onTap: () => onChanged?.call(true),
     );
   }
 

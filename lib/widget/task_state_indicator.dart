@@ -41,7 +41,7 @@ class _TaskStateIndicatorState extends State<TaskStateIndicator> {
       width: 30,
       // TODO: add animation
       child: CircularProgressIndicator(
-        backgroundColor: Theme.of(context).colorScheme.primaryFixedDim,
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         value: widget.task.round / widget.task.nRounds,
         strokeWidth: 3.0,
       ),
