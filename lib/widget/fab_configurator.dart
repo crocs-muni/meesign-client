@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../l10n/arb/app_localizations.dart';
+
 import '../enums/fab_type.dart';
 import '../enums/task_type.dart';
 import '../util/actions/challenge_creator.dart';
 import '../util/actions/document_signer.dart';
 import '../util/actions/encrypt_data.dart';
+import '../pages/new_task_page.dart';
 import '../util/actions/group_creator.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
@@ -34,7 +37,7 @@ class FabConfigurator extends StatelessWidget {
         return _buildEncryptFab(context);
       case FabType.groupFab:
         return _buildGroupsFab(context);
-      case FabType.newTaskFab:
+      default:
         return _buildNewTaskFab(context);
     }
   }
@@ -101,7 +104,7 @@ class FabConfigurator extends StatelessWidget {
       key: ValueKey(key),
       heroTag: key,
       onPressed: () => createGroup(context, buildContext),
-      label: const Text('New group'),
+      label: Text(AppLocalizations.of(context).newGroup),
       icon: const Icon(Symbols.add),
     );
   }

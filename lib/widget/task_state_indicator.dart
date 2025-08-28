@@ -17,10 +17,11 @@ class _TaskStateIndicatorState extends State<TaskStateIndicator> {
   @override
   Widget build(BuildContext context) {
     return switch (widget.task.state) {
-      TaskState.created => const Icon(Symbols.arrow_drop_down),
+      TaskState.created => SizedBox(),
       TaskState.running => _buildProgressIndicator(),
-      TaskState.needsCard => const Icon(Symbols.payment),
+      TaskState.needsCard => const Icon(Symbols.payment, size: 30),
       TaskState.finished => Icon(
+          size: 30,
           Symbols.check,
           color: Theme.of(context).extension<CustomColors>()!.success,
         ),
@@ -30,19 +31,19 @@ class _TaskStateIndicatorState extends State<TaskStateIndicator> {
             _ => Symbols.error_outline,
           },
           color: Theme.of(context).colorScheme.error,
-        ),
+          size: 30),
     };
   }
 
   Widget _buildProgressIndicator() {
     return SizedBox(
-      height: 24,
-      width: 24,
+      height: 30,
+      width: 30,
       // TODO: add animation
       child: CircularProgressIndicator(
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         value: widget.task.round / widget.task.nRounds,
-        strokeWidth: 2.0,
+        strokeWidth: 3.0,
       ),
     );
   }

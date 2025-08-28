@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/arb/app_localizations.dart';
 import '../ui_constants.dart';
+import '../util/layout_getter.dart';
+import '../enums/screen_layout.dart';
 
 class DefaultPageTemplate extends StatelessWidget {
   final Widget body;
@@ -13,6 +16,7 @@ class DefaultPageTemplate extends StatelessWidget {
   final bool includePadding;
   final bool transparentBackground;
   final Widget? floatingActionButton;
+  final Function? onBackButtonPressed;
 
   const DefaultPageTemplate({
     super.key,
@@ -21,43 +25,52 @@ class DefaultPageTemplate extends StatelessWidget {
     this.customAppBar,
     this.showAppBar = false,
     this.appBarTitle = '',
-    this.backButtonText = 'Back',
+    this.backButtonText = '',
     this.wrapInScroll = false,
     this.includePadding = true,
     this.transparentBackground = false,
     this.appBarActions = const [],
+    this.onBackButtonPressed,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: transparentBackground
-          ? Colors.transparent
-          : Theme.of(context).scaffoldBackgroundColor,
-      appBar: showAppBar
-          ? customAppBar ??
-              AppBar(
-                actions: appBarActions,
-                forceMaterialTransparency: true,
-                surfaceTintColor: Colors.transparent,
-                leadingWidth: 120,
-                leading: _buildCustomBackButton(context),
-                title: Text(appBarTitle),
-              )
-          : null,
-      body: Container(
-        padding: EdgeInsets.all(includePadding ? MEDIUM_PADDING : 0),
-        child: SizedBox(
-          width: double.infinity,
-          child: SafeArea(
-              child: wrapInScroll
-                  ? SingleChildScrollView(
-                      child: body,
-                    )
-                  : body),
-        ),
-      ),
-      floatingActionButton: floatingActionButton,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = LayoutGetter.getCurLayout(constraints.maxWidth) ==
+            ScreenLayout.mobile;
+
+        return Scaffold(
+          backgroundColor: transparentBackground
+              ? Colors.transparent
+              : Theme.of(context).scaffoldBackgroundColor,
+          appBar: showAppBar
+              ? customAppBar ??
+                  AppBar(
+                    actions: appBarActions,
+                    forceMaterialTransparency: true,
+                    surfaceTintColor: Colors.transparent,
+                    leadingWidth: 120,
+                    leading: _buildCustomBackButton(context),
+                    centerTitle: isMobile,
+                    title: Text(appBarTitle),
+                  )
+              : null,
+          body: Container(
+            padding: EdgeInsets.all(includePadding ? MEDIUM_PADDING : 0),
+            child: SizedBox(
+              width: double.infinity,
+              child: SafeArea(
+                  child: wrapInScroll
+                      ? SingleChildScrollView(
+                          child: body,
+                        )
+                      : body),
+            ),
+          ),
+          floatingActionButton: floatingActionButton,
+        );
+      },
     );
   }
 
@@ -68,8 +81,13 @@ class DefaultPageTemplate extends StatelessWidget {
             child: TextButton.icon(
               onPressed: () {
                 Navigator.pop(context);
+                if (onBackButtonPressed != null) {
+                  onBackButtonPressed!();
+                }
               },
-              label: Text(backButtonText),
+              label: Text(backButtonText == ''
+                  ? AppLocalizations.of(context).back
+                  : backButtonText),
               icon: Icon(Icons.arrow_back),
             ),
           )

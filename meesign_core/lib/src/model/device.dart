@@ -25,24 +25,29 @@ class Device {
   final Uuid id;
   final DeviceKind kind;
   final DateTime lastActive;
+  final bool isLocal;
 
-  const Device(this.name, this.id, this.kind, this.lastActive);
+  const Device(this.name, this.id, this.kind, this.lastActive,
+      {this.isLocal = false});
 
   Device copyWith({
     String? name,
     Uuid? id,
     DeviceKind? kind,
     DateTime? lastActive,
+    bool? isLocal,
   }) {
     return Device(
       name ?? this.name,
       id ?? this.id,
       kind ?? this.kind,
       lastActive ?? this.lastActive,
+      isLocal: isLocal ?? this.isLocal,
     );
   }
 }
 
 extension DeviceConversion on db.Device {
-  Device toModel() => Device(name, Uuid.take(id), kind, DateTime.now());
+  Device toModel() =>
+      Device(name, Uuid.take(id), kind, DateTime.now(), isLocal: isLocal);
 }

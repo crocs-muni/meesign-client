@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:meesign_core/meesign_core.dart';
+
+import '../../l10n/arb/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../../card/card.dart';
 import '../../pages/group_page.dart';
+import '../../ui_constants.dart';
 import '../../util/card_reader_launcher.dart';
 import '../../util/chars.dart';
 import '../../view_model/app_view_model.dart';
 import '../entity_chip.dart';
+import '../large_square_button.dart';
 import '../task_tile.dart';
 
 class GroupTaskTile extends StatelessWidget {
@@ -27,56 +31,80 @@ class GroupTaskTile extends StatelessWidget {
     return TaskTile(
       task: task,
       name: group.name,
+      isGroupTask: true,
       leading: CircleAvatar(
         child: Text(group.name.initials),
       ),
       showDate: false,
       approveActions: [
-        FilledButton.tonal(
-          child: const Text('Join'),
-          onPressed: () => model.joinGroup(task, agree: true),
+        LargeSquareButton(
+          text: AppLocalizations.of(context).join,
+          icon: Icons.check,
+          onPressed: () {
+            model.joinGroup(task, agree: true);
+          },
+          color: Color(0xFF298E29),
         ),
+        LargeSquareButton(
+            text: AppLocalizations.of(context).decline,
+            icon: Icons.close,
+            onPressed: () {
+              model.joinGroup(task, agree: false);
+            },
+            color: Color(0xFFAA3026)),
         if (CardManager.platformSupported &&
             group.protocol.cardSupport &&
             thisMember.shares == 1)
           FilledButton.tonal(
             onPressed: () => model.joinGroup(task, agree: true, withCard: true),
-            child: const Text('Join with card'),
+            child: Text(AppLocalizations.of(context).joinWithCard),
           ),
-        OutlinedButton(
-          child: const Text('Decline'),
-          onPressed: () => model.joinGroup(task, agree: false),
-        ),
       ],
-      actions: [
-        FilledButton.tonal(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute<void>(
-                builder: (context) => GroupPage(
-                  group: group,
-                ),
-              ),
-            );
-          },
-          child: const Text('View'),
-        ),
-      ],
+      actions: const [],
       cardActions: [
         FilledButton.tonal(
           onPressed: () => launchCardReader(
               context, (card) => model.advanceGroupWithCard(task, card)),
-          child: const Text('Read card'),
+          child: Text(AppLocalizations.of(context).readCard),
         ),
       ],
-      actionChip: Container(
-        alignment: Alignment.topLeft,
-        child: Wrap(
-          spacing: 8,
-          runSpacing: 4,
-          children: [for (var m in members) DeviceChip(device: m.device)],
-        ),
+      actionChip: Row(
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            alignment: Alignment.topLeft,
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              children: [for (var m in members) DeviceChip(device: m.device)],
+            ),
+          ),
+          SizedBox(
+            width: SMALL_GAP,
+          ),
+          if (task.state == TaskState.finished) ...[
+            FilledButton.tonal(
+              style: FilledButton.styleFrom(
+                side: const BorderSide(
+                  color: Colors.grey,
+                  width: 1.0,
+                ),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (context) => GroupPage(
+                      group: group,
+                    ),
+                  ),
+                );
+              },
+              child: Text(AppLocalizations.of(context).view),
+            ),
+          ],
+        ],
       ),
       onArchiveChange: (archive) => model.archiveTask(task, archive: archive),
     );

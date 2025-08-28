@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../enums/task_status.dart';
 import '../enums/task_type.dart';
+import '../l10n/arb/app_localizations.dart';
 import '../ui_constants.dart';
 import '../view_model/app_view_model.dart';
 
@@ -13,6 +14,10 @@ class TaskListView<T> extends StatefulWidget {
   final Widget emptyView;
   final Widget Function(BuildContext, Task<T>) taskBuilder;
   final bool showArchived;
+  final bool showOnlyPending;
+  final bool showAllTypes;
+  final bool showHeading;
+  final String? customSearchBarHint;
 
   const TaskListView({
     super.key,
@@ -20,6 +25,10 @@ class TaskListView<T> extends StatefulWidget {
     required this.emptyView,
     required this.taskBuilder,
     this.showArchived = false,
+    this.showOnlyPending = false,
+    this.showAllTypes = false,
+    this.showHeading = true,
+    this.customSearchBarHint,
   });
 
   @override
@@ -30,6 +39,10 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
   final _searchController = TextEditingController();
   String _searchQuery = '';
   TaskType get taskType {
+    if (widget.showAllTypes) {
+      return TaskType.mix;
+    }
+
     if (T == Group) {
       return TaskType.group;
     } else if (T == Challenge) {
@@ -44,10 +57,13 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
   }
 
   bool isReloading = false;
+  bool showOnlyPending = false;
 
   @override
   void initState() {
     super.initState();
+    this.showOnlyPending = widget.showOnlyPending;
+
     _searchController.addListener(() {
       setState(() {
         _searchQuery = _searchController.text;
@@ -73,7 +89,13 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
       if (widget.showArchived) TaskListSection.archived,
     ];
 
+    final onlyPendingSections = [
+      TaskListSection.requests,
+      if (widget.showArchived) TaskListSection.archivedPending
+    ];
     final taskCount = sections.map((s) => (taskGroups[s] ?? []).length).sum;
+    final pendingCount =
+        onlyPendingSections.map((s) => (taskGroups[s] ?? []).length).sum;
 
     if (isReloading) {
       return Column(
@@ -87,15 +109,36 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
       );
     }
 
-    if (taskCount == 0 && _searchQuery.isEmpty) {
+    if (showOnlyPending && pendingCount == 0) {
+      return Column(
+        children: [
+          _buildTaskListHeader(),
+          const SizedBox(height: SMALL_GAP),
+          if (_searchQuery.isNotEmpty) ...[
+            Text(
+              AppLocalizations.of(context)
+                  .noWaitingTasksFoundForQuery(_searchQuery),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ] else ...[
+            Text(
+              AppLocalizations.of(context).noWaitingTasksFound,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ]
+        ],
+      );
+    } else if (taskCount == 0 && _searchQuery.isEmpty) {
+      // No tasks and no search query
       return widget.emptyView;
     } else if (taskCount == 0 && _searchQuery.isNotEmpty) {
+      // No tasks for given search query
       return Column(
         children: [
           _buildTaskListHeader(),
           const SizedBox(height: SMALL_GAP),
           Text(
-            'No tasks found for "$_searchQuery".',
+            AppLocalizations.of(context).noTasksFoundForQuery(_searchQuery),
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ],
@@ -115,7 +158,7 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
             _buildTaskListHeader(),
             const SizedBox(height: SMALL_GAP),
             Text(
-              'No tasks found for "$_searchQuery".',
+              AppLocalizations.of(context).noTasksFoundForQuery(_searchQuery),
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ],
@@ -127,12 +170,23 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
     final remainingTasks = <Task<T>>[];
 
     taskGroups.forEach((section, tasks) {
+      if (section == TaskListSection.requests ||
+          (widget.showArchived
+              ? section == TaskListSection.archivedPending
+              : false)) {
+        requestsTasks.addAll(tasks);
+      }
+    });
+
+    taskGroups.forEach((section, tasks) {
       if (section != TaskListSection.requests &&
+          section != TaskListSection.archivedPending &&
           (widget.showArchived || section != TaskListSection.archived)) {
         remainingTasks.addAll(tasks);
       }
     });
 
+    requestsTasks.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     remainingTasks.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
     return Column(
@@ -150,7 +204,14 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
 
   Map<TaskListSection, List<Task<T>>> groupTasks() {
     return filterTasks().groupListsBy((task) {
-      if (task.archived) return TaskListSection.archived;
+      if (task.archived) {
+        if (task.state != TaskState.finished &&
+            task.state != TaskState.failed) {
+          return TaskListSection.archivedPending;
+        }
+        return TaskListSection.archived;
+      }
+
       return switch (task.state) {
         TaskState.finished => TaskListSection.finished,
         TaskState.failed => switch (task.error) {
@@ -223,28 +284,46 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
 
   Future<void> _refreshTasks() async {
     var model = Provider.of<AppViewModel>(context, listen: false);
-    return model.refetchTasks(taskType);
+
+    if (widget.showAllTypes) {
+      // Refresh all task types when showing mixed tasks
+      await Future.wait([
+        model.refetchTasks(TaskType.group),
+        model.refetchTasks(TaskType.sign),
+        model.refetchTasks(TaskType.challenge),
+        model.refetchTasks(TaskType.decrypt),
+      ]);
+    } else {
+      return model.refetchTasks(taskType);
+    }
   }
 
   String _getGeneralHeading() {
+    if (widget.showAllTypes) {
+      return AppLocalizations.of(context).tasks;
+    }
+
     if (T == Group) {
-      return 'Groups';
+      return AppLocalizations.of(context).groups;
     } else if (T == Challenge) {
-      return 'Challenges';
+      return AppLocalizations.of(context).challenges;
     } else if (T == Decrypt) {
-      return 'Decryptions';
+      return AppLocalizations.of(context).decryptions;
     } else if (T == File) {
-      return 'Signings';
+      return AppLocalizations.of(context).signings;
     } else {
-      return 'Tasks';
+      return AppLocalizations.of(context).tasks;
     }
   }
 
   Widget _buildTaskSearchBar() {
     return TextField(
       controller: _searchController,
+      maxLength: 100,
       decoration: InputDecoration(
-        hintText: 'Search tasks by name...',
+        counterText: '',
+        hintText: widget.customSearchBarHint ??
+            AppLocalizations.of(context).searchTasksByName,
         prefixIcon: const Icon(Icons.search),
         fillColor: Theme.of(context).colorScheme.onInverseSurface,
         border: OutlineInputBorder(
@@ -259,20 +338,23 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(
         children: [
-          Text(
-            _getGeneralHeading(),
-            style: TextStyle(
-              fontSize: Theme.of(context).textTheme.titleLarge?.fontSize,
-              fontWeight: FontWeight.w900,
+          if (widget.showHeading) ...[
+            Text(
+              _getGeneralHeading(),
+              style: TextStyle(
+                fontSize: Theme.of(context).textTheme.titleLarge?.fontSize,
+                fontWeight: FontWeight.w900,
+              ),
             ),
-          ),
-          Spacer(),
-          _buildReloadButton()
+            Spacer(),
+            _buildReloadButton()
+          ],
         ],
       ),
       const SizedBox(height: SMALL_GAP),
       _buildTaskSearchBar(),
       const SizedBox(height: SMALL_GAP),
+      _buildFilterSection(),
       Divider(),
       const SizedBox(height: SMALL_GAP),
     ]);
@@ -294,17 +376,72 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
 
   Widget _buildReloadButton() {
     // Small screen uses pull to refresh, not reload button
-    if (MediaQuery.sizeOf(context).width < minTabletLayoutWidth) {
-      return const SizedBox.shrink();
-    }
+    // if (MediaQuery.sizeOf(context).width < minTabletLayoutWidth) {
+    //   return const SizedBox.shrink();
+    // }
 
-    return ElevatedButton.icon(
+    return FilledButton.icon(
         onPressed: () {
           _triggerReloadAnimation();
 
           _refreshTasks();
         },
         icon: Icon(Icons.refresh),
-        label: Text("Reload"));
+        label: Text(widget.showAllTypes
+            ? AppLocalizations.of(context).reloadTasks
+            : (T == Group
+                ? AppLocalizations.of(context).reloadGroups
+                : AppLocalizations.of(context).reloadTasks)));
+  }
+
+  Widget _buildFilterSection() {
+    return Padding(
+      padding: const EdgeInsets.only(top: SMALL_PADDING, bottom: SMALL_PADDING),
+      child: Row(
+        children: [
+          _buildCheckboxContainer(
+              title: AppLocalizations.of(context).showOnlyPending,
+              value: showOnlyPending,
+              onChanged: (value) {
+                setState(() {
+                  showOnlyPending = value ?? false;
+                });
+              }),
+          Spacer(),
+          _buildReloadButton()
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCheckboxContainer({
+    required String title,
+    required bool value,
+    required ValueChanged<bool?> onChanged,
+  }) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Checkbox(
+              value: value,
+              onChanged: (value) {
+                setState(() {
+                  onChanged(value);
+                });
+              },
+            ),
+            Text(title),
+          ],
+        ),
+        onTap: () {
+          setState(() {
+            onChanged(!value);
+          });
+        },
+      ),
+    );
   }
 }

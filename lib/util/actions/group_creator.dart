@@ -10,8 +10,8 @@ import '../../widget/error_dialog.dart';
 
 // TODO: reduce repetition across request methods
 // (_sign, _challenge, _group, _encrypt)
-Future<void> createGroup(BuildContext context, BuildContext buildContext,
-    {TaskType? groupType}) async {
+Future<bool> createGroup(BuildContext context, BuildContext buildContext,
+    {TaskType? groupType, Group? groupTemplate}) async {
   // Retrieve the HomeState instance before the async gap
   final homeState = buildContext.read<AppViewModel>();
   final tabsState = buildContext.read<TabsViewModel>();
@@ -22,17 +22,19 @@ Future<void> createGroup(BuildContext context, BuildContext buildContext,
     MaterialPageRoute(
         builder: (context) => NewGroupPage(
               initialGroupType: groupType,
+              templateGroup: groupTemplate,
             )),
   ) as Group?;
 
   tabsState.setNewGroupPageActive(false);
-  if (res == null) return;
+  if (res == null) return false;
 
   try {
     if (buildContext.mounted) {
       await homeState.addGroup(res.name, res.members, res.threshold,
           res.protocol, res.keyType, res.note);
     }
+    return true;
   } catch (e) {
     if (buildContext.mounted) {
       showErrorDialog(

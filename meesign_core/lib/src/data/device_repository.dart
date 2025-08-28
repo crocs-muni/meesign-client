@@ -1,5 +1,4 @@
-import 'dart:typed_data';
-
+import 'package:drift/drift.dart';
 import 'package:meesign_native/meesign_native.dart';
 import 'package:meesign_network/grpc.dart' as rpc;
 
@@ -16,6 +15,15 @@ class DeviceRepository {
   final DeviceDao _deviceDao;
 
   DeviceRepository(this._dispatcher, this._keyStore, this._deviceDao);
+
+  /// Creates a map of device IDs to their isLocal status from a list of devices
+  Map<Uuid, bool> _createLocalDeviceMap(List<Device> devices) {
+    final localDeviceMap = <Uuid, bool>{};
+    for (final device in devices) {
+      localDeviceMap[device.id] = device.isLocal;
+    }
+    return localDeviceMap;
+  }
 
   Future<Device> register(String name,
       {DeviceKind kind = DeviceKind.user}) async {
@@ -37,9 +45,10 @@ class DeviceRepository {
         id: did.bytes,
         name: name,
         kind: DeviceKind.user,
+        isLocal: const Value(true),
       ),
     );
-    return Device(name, did, DeviceKind.user, DateTime.now());
+    return Device(name, did, DeviceKind.user, DateTime.now(), isLocal: true);
   }
 
   Future<Iterable<Device>> _fetchAll() async {
@@ -53,6 +62,7 @@ class DeviceRepository {
         DateTime.fromMillisecondsSinceEpoch(
           device.lastActive.toInt() * 1000,
         ),
+        isLocal: false,
       ),
     );
   }
@@ -60,11 +70,22 @@ class DeviceRepository {
   /// Try to fetch devices with a name matching the query from the server.
   Future<Iterable<Device>> search(String query) async {
     // TODO: add a cache
-    return (await _fetchAll()).where((device) =>
-        device.name.startsWith(query) ||
-        device.name.split(' ').any(
-              (word) => word.startsWith(query),
-            ));
+    final remoteDevices = await _fetchAll();
+    final localDevices = await getAllLocalDevices();
+
+    // Create a map of local devices to check isLocal flag
+    final localDeviceMap = _createLocalDeviceMap(localDevices);
+
+    return remoteDevices.where((device) {
+      final matchesQuery = device.name.startsWith(query) ||
+          device.name.split(' ').any((word) => word.startsWith(query));
+
+      return matchesQuery;
+    }).map((device) {
+      // Preserve isLocal flag for devices that exist locally
+      final isLocal = localDeviceMap[device.id] ?? false;
+      return device.copyWith(isLocal: isLocal);
+    });
   }
 
   /// Returns the requested devices. Missing devices are fetched from the
@@ -76,13 +97,22 @@ class DeviceRepository {
     if (locals.length != ids.length) {
       // TODO: add GetDevice to server or request specific ids in DevicesRequest
       final remotes = await _fetchAll();
-      final updates = remotes
-          .where((device) => ids.contains(device.id))
-          .map((device) => db.DevicesCompanion.insert(
-                id: device.id.bytes,
-                name: device.name,
-                kind: device.kind,
-              ));
+
+      // Create a map of existing local devices to preserve their isLocal flag
+      final existingDevices =
+          _createLocalDeviceMap(locals.map((e) => e.toModel()).toList());
+
+      final updates =
+          remotes.where((device) => ids.contains(device.id)).map((device) {
+        // Preserve isLocal flag if device already exists locally
+        final isLocal = existingDevices[device.id] ?? false;
+        return db.DevicesCompanion.insert(
+          id: device.id.bytes,
+          name: device.name,
+          kind: device.kind,
+          isLocal: Value(isLocal),
+        );
+      });
       await _deviceDao.upsertDevices(updates);
 
       locals = await _deviceDao.getDevices(bIds);

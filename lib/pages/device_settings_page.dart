@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/arb/app_localizations.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
 import '../util/confirm_device_change.dart';
@@ -50,7 +51,7 @@ class _DeviceSettingsPageState extends State<DeviceSettingsPage> {
   @override
   Widget build(BuildContext context) {
     return DefaultPageTemplate(
-      appBarTitle: 'Device settings',
+      appBarTitle: AppLocalizations.of(context).deviceSettingsTitle,
       showAppBar: true,
       wrapInScroll: true,
       body: Column(
@@ -72,7 +73,7 @@ class _DeviceSettingsPageState extends State<DeviceSettingsPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Device name",
+          AppLocalizations.of(context).deviceName,
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         SizedBox(height: SMALL_GAP),
@@ -99,7 +100,8 @@ class _DeviceSettingsPageState extends State<DeviceSettingsPage> {
                             },
                           ),
                 filled: true,
-                hintText: 'Name to identify yourself',
+                hintText:
+                    AppLocalizations.of(context).nameToIdentifyYourselfHint,
                 hintStyle: TextStyle(
                   color: Theme.of(context).colorScheme.outline,
                 ),

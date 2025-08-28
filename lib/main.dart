@@ -3,10 +3,15 @@ import 'dart:io';
 import 'package:args/args.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:logging/logging.dart';
+import 'package:path/path.dart' as path_pkg;
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'app_container.dart';
+import 'l10n/arb/app_localizations.dart';
+import 'pages/register_page.dart';
 import 'pages/register_page.dart';
 import 'routes.dart';
 import 'services/settings_controller.dart';
@@ -52,9 +57,11 @@ Future<void> _prepareWindowManager() async {
   const double minWidth = 600;
   const double minHeight = 800;
 
-  await windowManager.ensureInitialized();
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    await windowManager.ensureInitialized();
     WindowManager.instance.setMinimumSize(const Size(minWidth, minHeight));
+    WindowManager.instance.setSize(const Size(minWidth, minHeight));
+    WindowManager.instance.center();
   }
 }
 
@@ -103,6 +110,9 @@ class MeeSignClient extends StatelessWidget {
                   prefillName: prefillName ?? '',
                 ),
           },
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: settingsController.getCurrentLanguageLocale(),
         );
       },
     );

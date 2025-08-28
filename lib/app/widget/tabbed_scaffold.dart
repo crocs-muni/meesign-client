@@ -5,6 +5,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
 import '../../pages/settings_page.dart';
+import '../../pages/tabbed_task_page.dart';
 import '../../ui_constants.dart';
 import '../../util/layout_getter.dart';
 import '../../view_model/app_view_model.dart';

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/arb/app_localizations.dart';
+
 class DismissibleBackground extends StatelessWidget {
   final AlignmentGeometry alignment;
   final Color? color;
@@ -41,11 +43,11 @@ Future<bool?> showConfirmationDialog({
         actions: <Widget>[
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('OK'),
+            child: Text(AppLocalizations.of(context).ok),
           ),
         ],
       );

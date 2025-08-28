@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:meesign_core/meesign_core.dart';
+import 'package:provider/provider.dart';
 
+import '../app_container.dart';
+import '../l10n/arb/app_localizations.dart';
 import '../ui_constants.dart';
 import '../util/date_formatter.dart';
 import '../util/extensions/list_intersperse.dart';
@@ -22,7 +25,9 @@ class TaskTile<T> extends StatelessWidget {
   final void Function(bool)? onArchiveChange;
   final bool showTaskTypeInfo;
   final bool showDetailRow;
+  final bool showTaskTypeInfo;
   final bool showDate;
+  final bool isGroupTask;
 
   const TaskTile({
     super.key,
@@ -40,35 +45,122 @@ class TaskTile<T> extends StatelessWidget {
     this.showTaskTypeInfo = true,
     this.showDetailRow = true,
     this.showDate = true,
+    this.isGroupTask = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final desc = this.desc ?? StatusMessage.getStatusMessage(task);
+    final desc = this.desc ?? StatusMessage.getStatusMessage(task, context);
     final trailing = TaskStateIndicator(task);
-    final allActions = actions +
-        (task.approvable ? approveActions : []) +
-        (task.state == TaskState.needsCard ? cardActions : []);
+    final allActions =
+        actions + (task.state == TaskState.needsCard ? cardActions : []);
+    final actionRow = _buildActionRow(allActions);
 
-    final actionRow = allActions.isNotEmpty || actionChip != null
-        ? Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (actionChip != null) actionChip!,
-              Expanded(
-                child: Wrap(
-                  alignment: WrapAlignment.end,
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: allActions,
-                ),
-              ),
-            ].intersperse(
-              const SizedBox(width: 8),
+    return _buildArchiveContainer(
+      context,
+      Padding(
+        padding: const EdgeInsets.all(4),
+        child: Column(
+          children: [
+            _buildHeader(context, desc,
+                actionRow: actionRow, trailing: trailing),
+            // ...children,
+          ].intersperse(
+            const SizedBox(width: 8),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context, String? desc,
+      {Widget? actionRow, Widget? trailing}) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            SizedBox(width: SMALL_GAP),
+            Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: SMALL_GAP),
+                    Text(name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        )),
+                    if (showTaskTypeInfo) ...[
+                      SizedBox(height: SMALL_GAP),
+                      _buildTaskTypeInfo(task, context),
+                    ],
+                    if (desc != null) ...[
+                      SizedBox(height: SMALL_GAP),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.access_time_outlined,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 16,
+                          ),
+                          SizedBox(
+                            width: SMALL_GAP,
+                          ),
+                          Expanded(
+                            child: Text(desc,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
+                                )),
+                          ),
+                        ],
+                      )
+                    ],
+                    if (actionRow != null) actionRow,
+                    SizedBox(height: SMALL_GAP)
+                  ]),
             ),
-          )
-        : null;
+            if (task.approvable) ...[
+              Padding(
+                  padding: const EdgeInsets.only(right: SMALL_GAP),
+                  child: Column(
+                    children: [..._buildConditionalApproveActions(context)],
+                  )),
+            ] else ...[
+              if (trailing != null) ...[
+                Padding(
+                  padding: const EdgeInsets.only(right: LARGE_GAP),
+                  child: trailing,
+                )
+              ],
+            ],
+          ],
+        ),
+      ],
+    );
+  }
 
+  List<Widget> _buildConditionalApproveActions(BuildContext context) {
+    if (isGroupTask) {
+      if (Provider.of<AppContainer>(context, listen: false)
+              .settingsController
+              .currentSettings
+              .autoJoinGroups ==
+          false) {
+        return approveActions;
+      } else {
+        // If auto-join is enabled, we don't show the approve actions
+        return [];
+      }
+    } else {
+      return approveActions;
+    }
+  }
+
+  Widget _buildArchiveContainer(BuildContext context, Widget child) {
     return Container(
       padding: EdgeInsets.only(bottom: SMALL_PADDING),
       child: Deletable.builder(
@@ -126,6 +218,25 @@ class TaskTile<T> extends StatelessWidget {
     );
   }
 
+
+  Widget? _buildActionRow(List<Widget> allActions) {
+    final actionRow = allActions.isNotEmpty || actionChip != null
+        ? Container(
+      padding: EdgeInsets.only(top: SMALL_GAP),
+      child: Wrap(
+        spacing: SMALL_GAP,
+        runSpacing: SMALL_GAP,
+        children: [
+          if (actionChip != null) actionChip!,
+          ...allActions,
+        ],
+      ),
+    )
+        : null;
+
+    return actionRow;
+  }
+
   Widget _buildGroupMetaDataRow(
       IconData icon, String text, BuildContext context) {
     return Row(
@@ -151,25 +262,25 @@ class TaskTile<T> extends StatelessWidget {
     Group? taskGroup;
 
     if (task is Task<Challenge>) {
-      text = "Challenge";
+      text = AppLocalizations.of(context).challenge;
       taskGroup = task.info.group;
     }
 
     if (task is Task<File>) {
-      text = "Sign";
+      text = AppLocalizations.of(context).signPdf;
       taskGroup = task.info.group;
     }
 
     if (task is Task<Decrypt>) {
-      text = "Decrypt";
+      text = AppLocalizations.of(context).decrypt;
       taskGroup = task.info.group;
     }
 
     if (task is Task<Group>) {
       text = switch (task.info.keyType) {
-        KeyType.signPdf => 'Sign PDF',
-        KeyType.signChallenge => 'Challenge',
-        KeyType.decrypt => 'Decrypt',
+        KeyType.signPdf => AppLocalizations.of(context).signPdf,
+        KeyType.signChallenge => AppLocalizations.of(context).challenge,
+        KeyType.decrypt => AppLocalizations.of(context).decrypt,
       };
       taskGroup = task.info;
     }
@@ -212,7 +323,8 @@ class TaskTile<T> extends StatelessWidget {
         ],
         if (task.archived) ...[
           SizedBox(width: LARGE_GAP),
-          _buildGroupMetaDataRow(Symbols.archive, 'Archived', context),
+          _buildGroupMetaDataRow(
+              Symbols.archive, AppLocalizations.of(context).archived, context),
         ]
       ],
     );

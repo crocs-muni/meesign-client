@@ -3,9 +3,11 @@ import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
 import '../enums/fab_type.dart';
+import '../l10n/arb/app_localizations.dart';
 import '../enums/task_type.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
+import '../util/actions/group_creator.dart';
 import '../util/actions/challenge_creator.dart';
 import '../util/actions/document_signer.dart';
 import '../util/actions/encrypt_data.dart';
@@ -18,12 +20,34 @@ import '../widget/task_list_view.dart';
 import '../widget/task_tiles/challenge_task_tile.dart';
 import '../widget/task_tiles/decrypt_task_tile.dart';
 import '../widget/task_tiles/signing_task_tile.dart';
+import 'groups_listing_page.dart';
+import 'new_task_page.dart';
 
-class TaskListing extends StatelessWidget {
-  const TaskListing({super.key});
+class TaskListing extends StatefulWidget {
+  const TaskListing(
+      {super.key,
+      this.showOnlyPending = false,
+      this.hidePending = false,
+      this.showHeading = true,
+      this.customSearchBarHint});
+  final bool showOnlyPending;
+  final bool hidePending;
+  final bool showHeading;
+  final String? customSearchBarHint;
+
+  @override
+  State<TaskListing> createState() => _TaskListingState();
+}
+
+class _TaskListingState extends State<TaskListing>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
+    super.build(
+        context); // Important: Must call super.build for AutomaticKeepAliveClientMixin
     final model = Provider.of<AppViewModel>(context, listen: false);
 
     return StreamBuilder(
@@ -32,8 +56,17 @@ class TaskListing extends StatelessWidget {
           return DefaultPageTemplate(
             floatingActionButton: _buildFab(context, model),
             body: TaskListView(
+              key: ValueKey('general_task_list'),
+              customSearchBarHint: widget.customSearchBarHint,
+              showAllTypes: true,
+              showHeading: widget.showHeading,
               tasks: model.allTasks,
-              emptyView: _buildEmptySignTasks(context, model),
+              emptyView: _buildEmptyTasks(
+                  context,
+                  model,
+                  AppLocalizations.of(context).noTasksAvailable,
+                  AppLocalizations.of(context).noTasksAvailableDescription,
+                  0),
               showArchived: model.showArchived,
               taskBuilder: (context, task) {
                 // Signing tasks
@@ -61,14 +94,33 @@ class TaskListing extends StatelessWidget {
 
   Widget _buildFab(BuildContext context, AppViewModel model) {
     // Don't show Fab if the list is empty - placeholder with CTA is shown instead
-    if (model.allTasks.where((task) => !task.archived).isEmpty) {
+    if (widget.showOnlyPending) {
+      if (model.allTasks
+          .where((task) =>
+              task.state != TaskState.finished &&
+              task.state != TaskState.failed &&
+              (model.showArchived ? true : task.archived == false))
+          .isEmpty) {
+        return SizedBox();
+      }
+    } else {
+      if (model.allTasks
+          .where((task) => (model.showArchived ? true : task.archived == false))
+          .isEmpty) {
+        return SizedBox();
+      }
+    }
+
+    if (model.allTasks.isEmpty) {
       return SizedBox();
     }
+
     return FabConfigurator(
         fabType: FabType.newTaskFab, buildContext: context, viewModel: model);
   }
 
-  Widget _buildEmptySignTasks(BuildContext context, AppViewModel viewModel) {
+  Widget _buildEmptyTasks(BuildContext context, AppViewModel viewModel,
+      String heading, String subheading, int animationStartIndex) {
     return Center(
       child: SingleChildScrollView(
         child: SizedBox(
@@ -82,17 +134,17 @@ class TaskListing extends StatelessWidget {
                   startAtTabIndex: 0,
                   assetName: 'assets/lottie/sign.json',
                   stopAtPercentage: 0.2,
-                  width: 400,
+                  height: 350,
                   fit: BoxFit.fitWidth,
                 ),
               ),
-              const Text(
-                'No tasks available',
+              Text(
+                heading,
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: SMALL_GAP),
-              const Text(
-                'Start by creating a challenge, decrypt or signing group.',
+              Text(
+                subheading,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: LARGE_GAP),
@@ -109,7 +161,7 @@ class TaskListing extends StatelessWidget {
                   .read<AppViewModel>()
                   .joinedGroupForTaskTypeExists(KeyType.signPdf)) ...[
                 const SizedBox(height: MEDIUM_GAP),
-                ElevatedButton(
+                FilledButton.icon(
                   onPressed: () async {
                     TaskType? result = await showTaskTypeDialog(context);
 
@@ -123,7 +175,8 @@ class TaskListing extends StatelessWidget {
                       }
                     }
                   },
-                  child: const Text('Create new task'),
+                  icon: const Icon(Icons.add),
+                  label: Text(AppLocalizations.of(context).createNewTask),
                 )
               ]
             ],
