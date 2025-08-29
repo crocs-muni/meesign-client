@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:collection/collection.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -11,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:mime/mime.dart';
 import 'package:provider/provider.dart';
+import 'package:collection/collection.dart';
 
 import '../enums/task_type.dart';
 import '../l10n/arb/app_localizations.dart';
@@ -63,10 +63,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
     // Start periodic refresh every second
     _refreshTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted) {
-        setState(() {
-          final state = context.read<AppViewModel>();
-          state.refetchTasks(TaskType.group);
-        });
+        context.read<AppViewModel>().refetchTasks(TaskType.group);
       }
     });
 
@@ -278,16 +275,12 @@ class _NewTaskPageState extends State<NewTaskPage> {
   Widget _buildContentTypeRadio({
     required ValueChanged<bool> onChanged,
     required String label,
-    required bool initValue,
+    required bool radioValue,
   }) {
     return Row(
       children: [
         Radio<bool>(
-          value: initValue,
-          groupValue: _showImageSelector,
-          onChanged: (value) {
-            onChanged(false);
-          },
+          value: radioValue,
         ),
         MouseRegion(
           cursor: SystemMouseCursors.click,
@@ -310,29 +303,37 @@ class _NewTaskPageState extends State<NewTaskPage> {
           AppLocalizations.of(context).selectDecryptionType,
           style: Theme.of(context).textTheme.bodyLarge,
         ),
-        Wrap(
-          spacing: LARGE_GAP,
-          runSpacing: SMALL_GAP,
-          children: [
-            _buildContentTypeRadio(
-              initValue: false,
-              onChanged: (value) {
-                setState(() {
-                  _showImageSelector = value;
-                });
-              },
-              label: AppLocalizations.of(context).decryptAMessage,
-            ),
-            _buildContentTypeRadio(
-              initValue: true,
-              onChanged: (value) {
-                setState(() {
-                  _showImageSelector = !value;
-                });
-              },
-              label: AppLocalizations.of(context).decryptAnImage,
-            ),
-          ],
+        RadioGroup<bool>(
+          groupValue: _showImageSelector,
+          onChanged: (value) {
+            setState(() {
+              _showImageSelector = value!;
+            });
+          },
+          child: Wrap(
+            spacing: LARGE_GAP,
+            runSpacing: SMALL_GAP,
+            children: [
+              _buildContentTypeRadio(
+                radioValue: false,
+                onChanged: (_) {
+                  setState(() {
+                    _showImageSelector = false;
+                  });
+                },
+                label: AppLocalizations.of(context).decryptAMessage,
+              ),
+              _buildContentTypeRadio(
+                radioValue: true,
+                onChanged: (_) {
+                  setState(() {
+                    _showImageSelector = true;
+                  });
+                },
+                label: AppLocalizations.of(context).decryptAnImage,
+              ),
+            ],
+          ),
         ),
         SizedBox(height: LARGE_GAP),
       ],
@@ -447,14 +448,31 @@ class _NewTaskPageState extends State<NewTaskPage> {
 
         // Select the first group of task type if none is selected
         if (_selectedGroup == null && groups.isNotEmpty && !_isFromTemplate) {
-          _selectedGroup = groups.first;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            setState(() {
+              _selectedGroup = groups.first;
+            });
+          });
         }
 
-        // If the currently selected group is no longer available, reset it
-        if (_selectedGroup != null &&
-            !groups.contains(_selectedGroup) &&
-            !_isFromTemplate) {
-          _selectedGroup = groups.isNotEmpty ? groups.first : null;
+        // Update selected group reference to match the refreshed data
+        if (_selectedGroup != null && groups.isNotEmpty) {
+          final matchingGroup = groups.firstWhereOrNull(
+              (g) => const ListEquality().equals(g.id, _selectedGroup!.id));
+          if (matchingGroup != null && matchingGroup != _selectedGroup) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              setState(() {
+                _selectedGroup = matchingGroup;
+              });
+            });
+          } else if (matchingGroup == null && !_isFromTemplate) {
+            // If the currently selected group is no longer available, reset it
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              setState(() {
+                _selectedGroup = groups.isNotEmpty ? groups.first : null;
+              });
+            });
+          }
         }
 
         return Column(
@@ -547,33 +565,22 @@ class _NewTaskPageState extends State<NewTaskPage> {
               child: Scrollbar(
                 thumbVisibility: true,
                 controller: _groupScrollController,
-                child: ListView.builder(
-                  controller: _groupScrollController,
-                  itemCount: groups.length,
-                  itemBuilder: (context, index) {
-                    final group = groups.elementAt(index);
-                    final isSelected = _selectedGroup != null &&
-                        const ListEquality()
-                            .equals(_selectedGroup!.id, group.id);
-                    return GroupSuggestionTile(
-                      group: group,
-                      active: true,
-                      selected: isSelected,
-                      onChanged: (value) {
-                        setState(() {
-                          if (value == true) {
-                            _selectedGroup = group;
-                            // Reset template flag after manual selection
-                            if (_isFromTemplate) {
-                              _isFromTemplate = false;
-                            }
-                          } else {
-                            _selectedGroup = null;
-                          }
-                        });
-                      },
-                    );
+                child: RadioGroup<Group>(
+                  groupValue: _selectedGroup,
+                  onChanged: (group) {
+                    _onGroupChanged(group);
                   },
+                  child: ListView.builder(
+                    controller: _groupScrollController,
+                    itemCount: groups.length,
+                    itemBuilder: (context, index) {
+                      final group = groups.elementAt(index);
+                      return GroupSuggestionTile(
+                        key: ValueKey(group.id),
+                        group: group,
+                      );
+                    },
+                  ),
                 ),
               ),
             ),
@@ -581,6 +588,15 @@ class _NewTaskPageState extends State<NewTaskPage> {
         );
       },
     );
+  }
+
+  void _onGroupChanged(Group? group) {
+    setState(() {
+      _selectedGroup = group;
+      if (_isFromTemplate) {
+        _isFromTemplate = false;
+      }
+    });
   }
 
   TaskType _getTaskType() {
