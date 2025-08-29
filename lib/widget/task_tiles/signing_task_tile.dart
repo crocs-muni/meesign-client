@@ -25,6 +25,7 @@ class SigningTaskTile extends StatelessWidget {
     final model = Provider.of<AppViewModel>(context, listen: false);
 
     return TaskTile(
+      key: ValueKey('signing-task-${task.id}'),
       task: task,
       name: task.info.basename,
       showDetailRow: false,

@@ -447,7 +447,10 @@ class _NewTaskPageState extends State<NewTaskPage> {
             .toList();
 
         // Select the first group of task type if none is selected
-        if (_selectedGroup == null && groups.isNotEmpty && !_isFromTemplate) {
+        if (_selectedGroup == null &&
+            groups.isNotEmpty &&
+            !_isFromTemplate &&
+            widget.templateTask == null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             setState(() {
               _selectedGroup = groups.first;

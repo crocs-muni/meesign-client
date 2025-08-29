@@ -29,6 +29,7 @@ class DecryptTaskTile extends StatelessWidget {
     final model = Provider.of<AppViewModel>(context, listen: false);
 
     return TaskTile(
+      key: ValueKey('decrypt-task-${task.id}'),
       task: task,
       name: task.info.name,
       showDetailRow: false,

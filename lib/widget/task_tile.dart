@@ -10,6 +10,7 @@ import '../util/date_formatter.dart';
 import '../util/extensions/list_intersperse.dart';
 import '../util/status_message.dart';
 import '../util/extensions/task_approvable.dart';
+import '../view_model/app_view_model.dart';
 import 'dismissible.dart';
 import 'task_state_indicator.dart';
 
@@ -54,6 +55,7 @@ class TaskTile<T> extends StatelessWidget {
     final allActions = actions +
         (task.approvable ? _buildConditionalApproveActions(context) : []) +
         (task.state == TaskState.needsCard ? cardActions : []);
+    final appViewModel = Provider.of<AppViewModel>(context);
 
     final actionRow = allActions.isNotEmpty || actionChip != null
         ? Row(
@@ -80,8 +82,12 @@ class TaskTile<T> extends StatelessWidget {
         dismissibleKey: ObjectKey(task),
         icon: task.archived ? Symbols.unarchive : Symbols.archive,
         color: Colors.transparent,
-        onDeleted: (_) {
-          if (onArchiveChange != null) onArchiveChange!(!task.archived);
+        confirmDismiss: (_) async {
+          if (onArchiveChange != null) {
+            onArchiveChange!(!task.archived);
+            return !appViewModel.showArchived;
+          }
+          return false;
         },
         childBuilder: (isDragging) => Material(
           color: Theme.of(context).colorScheme.surfaceContainerHighest,

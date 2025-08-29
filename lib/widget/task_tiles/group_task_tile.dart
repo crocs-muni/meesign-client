@@ -30,6 +30,7 @@ class GroupTaskTile extends StatelessWidget {
     );
 
     return TaskTile(
+      key: ValueKey('group-task-${task.id}'),
       task: task,
       name: group.name,
       isGroupTask: true,
