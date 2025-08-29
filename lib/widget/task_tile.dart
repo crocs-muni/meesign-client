@@ -10,6 +10,7 @@ import '../util/date_formatter.dart';
 import '../util/extensions/list_intersperse.dart';
 import '../util/status_message.dart';
 import '../util/extensions/task_approvable.dart';
+import '../view_model/app_view_model.dart';
 import 'dismissible.dart';
 import 'task_state_indicator.dart';
 
@@ -54,8 +55,10 @@ class TaskTile<T> extends StatelessWidget {
     final allActions =
         actions + (task.state == TaskState.needsCard ? cardActions : []);
     final actionRow = _buildActionRow(allActions);
+    final appViewModel = Provider.of<AppViewModel>(context);
 
     return _buildArchiveContainer(
+      appViewModel.showArchived,
       context,
       Padding(
         padding: const EdgeInsets.all(4),
@@ -159,15 +162,20 @@ class TaskTile<T> extends StatelessWidget {
     }
   }
 
-  Widget _buildArchiveContainer(BuildContext context, Widget child) {
+  Widget _buildArchiveContainer(
+      bool showArhchived, BuildContext context, Widget child) {
     return Container(
       padding: EdgeInsets.only(bottom: SMALL_PADDING),
       child: Deletable.builder(
         dismissibleKey: ObjectKey(task),
         icon: task.archived ? Symbols.unarchive : Symbols.archive,
         color: Colors.transparent,
-        onDeleted: (_) {
-          if (onArchiveChange != null) onArchiveChange!(!task.archived);
+        confirmDismiss: (_) async {
+          if (onArchiveChange != null) {
+            onArchiveChange!(!task.archived);
+            return !showArhchived; // Allow dismissal only when not showing archived
+          }
+          return false;
         },
         childBuilder: (isDragging) => Material(
           color: Theme.of(context).colorScheme.surfaceContainerHighest,
