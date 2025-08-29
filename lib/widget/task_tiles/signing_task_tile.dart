@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../pages/task_detail_page.dart';
 import '../../ui_constants.dart';
+import '../../util/actions/document_signer.dart';
 import '../../view_model/app_view_model.dart';
 import '../entity_chip.dart';
 import '../large_square_button.dart';
@@ -58,6 +59,25 @@ class SigningTaskTile extends StatelessWidget {
               ),
               child: Text(AppLocalizations.of(context).view),
             )
+          ],
+          SizedBox(
+            width: SMALL_GAP,
+          ),
+          if (task.state == TaskState.finished ||
+              task.state == TaskState.failed) ...[
+            FilledButton.tonal(
+              style: FilledButton.styleFrom(
+                side: const BorderSide(
+                  color: Colors.grey,
+                  width: 1.0,
+                ),
+              ),
+              onPressed: () => signDocument(
+                  context: context,
+                  buildContext: context,
+                  templateSignTask: task),
+              child: Text(AppLocalizations.of(context).copy),
+            ),
           ],
         ],
       ),

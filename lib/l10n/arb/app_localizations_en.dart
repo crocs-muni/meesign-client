@@ -576,4 +576,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get taskState => 'Task state';
+
+  @override
+  String get settings => 'Settings';
 }

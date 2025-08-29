@@ -8,7 +8,6 @@ import '../enums/task_type.dart';
 import '../util/actions/challenge_creator.dart';
 import '../util/actions/document_signer.dart';
 import '../util/actions/encrypt_data.dart';
-import '../pages/new_task_page.dart';
 import '../util/actions/group_creator.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
@@ -52,11 +51,11 @@ class FabConfigurator extends StatelessWidget {
 
         if (context.mounted) {
           if (result == TaskType.sign) {
-            signDocument(context, context);
+            signDocument(context: context, buildContext: context);
           } else if (result == TaskType.decrypt) {
-            encryptData(context, context);
+            encryptData(context: context, buildContext: context);
           } else if (result == TaskType.challenge) {
-            createChallenge(context, context);
+            createChallenge(context: context, buildContext: context);
           }
         }
       },
@@ -70,7 +69,7 @@ class FabConfigurator extends StatelessWidget {
     return FloatingActionButton.extended(
       key: ValueKey(key),
       heroTag: key,
-      onPressed: () => signDocument(context, buildContext),
+      onPressed: () => signDocument(context: context, buildContext: context),
       label: const Text('New signature'),
       icon: const Icon(Symbols.add),
     );
@@ -81,7 +80,7 @@ class FabConfigurator extends StatelessWidget {
     return FloatingActionButton.extended(
       key: ValueKey(key),
       heroTag: key,
-      onPressed: () => createChallenge(context, buildContext),
+      onPressed: () => createChallenge(context: context, buildContext: context),
       label: const Text('New challenge'),
       icon: const Icon(Symbols.add),
     );
@@ -92,7 +91,7 @@ class FabConfigurator extends StatelessWidget {
     return FloatingActionButton.extended(
       key: ValueKey(key),
       heroTag: key,
-      onPressed: () => encryptData(context, buildContext),
+      onPressed: () => encryptData(context: context, buildContext: context),
       label: const Text('New encryption'),
       icon: const Icon(Symbols.add),
     );

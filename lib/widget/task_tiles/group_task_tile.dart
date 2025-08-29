@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../card/card.dart';
 import '../../pages/group_page.dart';
 import '../../ui_constants.dart';
+import '../../util/actions/group_creator.dart';
 import '../../util/card_reader_launcher.dart';
 import '../../util/chars.dart';
 import '../../view_model/app_view_model.dart';
@@ -102,6 +103,23 @@ class GroupTaskTile extends StatelessWidget {
                 );
               },
               child: Text(AppLocalizations.of(context).view),
+            ),
+          ],
+          SizedBox(
+            width: SMALL_GAP,
+          ),
+          if (task.state == TaskState.finished ||
+              task.state == TaskState.failed) ...[
+            FilledButton.tonal(
+              style: FilledButton.styleFrom(
+                side: const BorderSide(
+                  color: Colors.grey,
+                  width: 1.0,
+                ),
+              ),
+              onPressed: () =>
+                  createGroup(context, context, groupTemplate: group),
+              child: Text(AppLocalizations.of(context).copy),
             ),
           ],
         ],

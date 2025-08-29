@@ -25,7 +25,6 @@ class TaskTile<T> extends StatelessWidget {
   final void Function(bool)? onArchiveChange;
   final bool showTaskTypeInfo;
   final bool showDetailRow;
-  final bool showTaskTypeInfo;
   final bool showDate;
   final bool isGroupTask;
 
@@ -52,115 +51,29 @@ class TaskTile<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final desc = this.desc ?? StatusMessage.getStatusMessage(task, context);
     final trailing = TaskStateIndicator(task);
-    final allActions =
-        actions + (task.state == TaskState.needsCard ? cardActions : []);
-    final actionRow = _buildActionRow(allActions);
+    final allActions = actions +
+        (task.approvable ? _buildConditionalApproveActions(context) : []) +
+        (task.state == TaskState.needsCard ? cardActions : []);
 
-    return _buildArchiveContainer(
-      context,
-      Padding(
-        padding: const EdgeInsets.all(4),
-        child: Column(
-          children: [
-            _buildHeader(context, desc,
-                actionRow: actionRow, trailing: trailing),
-            // ...children,
-          ].intersperse(
-            const SizedBox(width: 8),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context, String? desc,
-      {Widget? actionRow, Widget? trailing}) {
-    return Column(
-      children: [
-        Row(
-          children: [
-            SizedBox(width: SMALL_GAP),
-            Expanded(
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: SMALL_GAP),
-                    Text(name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                        )),
-                    if (showTaskTypeInfo) ...[
-                      SizedBox(height: SMALL_GAP),
-                      _buildTaskTypeInfo(task, context),
-                    ],
-                    if (desc != null) ...[
-                      SizedBox(height: SMALL_GAP),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.access_time_outlined,
-                            color: Theme.of(context).colorScheme.primary,
-                            size: 16,
-                          ),
-                          SizedBox(
-                            width: SMALL_GAP,
-                          ),
-                          Expanded(
-                            child: Text(desc,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.primary,
-                                )),
-                          ),
-                        ],
-                      )
-                    ],
-                    if (actionRow != null) actionRow,
-                    SizedBox(height: SMALL_GAP)
-                  ]),
+    final actionRow = allActions.isNotEmpty || actionChip != null
+        ? Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (actionChip != null) actionChip!,
+              Expanded(
+                child: Wrap(
+                  alignment: WrapAlignment.end,
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: allActions,
+                ),
+              ),
+            ].intersperse(
+              const SizedBox(width: 8),
             ),
-            if (task.approvable) ...[
-              Padding(
-                  padding: const EdgeInsets.only(right: SMALL_GAP),
-                  child: Column(
-                    children: [..._buildConditionalApproveActions(context)],
-                  )),
-            ] else ...[
-              if (trailing != null) ...[
-                Padding(
-                  padding: const EdgeInsets.only(right: LARGE_GAP),
-                  child: trailing,
-                )
-              ],
-            ],
-          ],
-        ),
-      ],
-    );
-  }
+          )
+        : null;
 
-  List<Widget> _buildConditionalApproveActions(BuildContext context) {
-    if (isGroupTask) {
-      if (Provider.of<AppContainer>(context, listen: false)
-              .settingsController
-              .currentSettings
-              .autoJoinGroups ==
-          false) {
-        return approveActions;
-      } else {
-        // If auto-join is enabled, we don't show the approve actions
-        return [];
-      }
-    } else {
-      return approveActions;
-    }
-  }
-
-  Widget _buildArchiveContainer(BuildContext context, Widget child) {
     return Container(
       padding: EdgeInsets.only(bottom: SMALL_PADDING),
       child: Deletable.builder(
@@ -175,6 +88,7 @@ class TaskTile<T> extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
           clipBehavior: Clip.antiAlias,
           child: ExpansionTile(
+            key: ValueKey('expansion_tile_${task.id}'),
             title: Row(
               children: [
                 Flexible(
@@ -218,23 +132,21 @@ class TaskTile<T> extends StatelessWidget {
     );
   }
 
-
-  Widget? _buildActionRow(List<Widget> allActions) {
-    final actionRow = allActions.isNotEmpty || actionChip != null
-        ? Container(
-      padding: EdgeInsets.only(top: SMALL_GAP),
-      child: Wrap(
-        spacing: SMALL_GAP,
-        runSpacing: SMALL_GAP,
-        children: [
-          if (actionChip != null) actionChip!,
-          ...allActions,
-        ],
-      ),
-    )
-        : null;
-
-    return actionRow;
+  List<Widget> _buildConditionalApproveActions(BuildContext context) {
+    if (isGroupTask) {
+      if (Provider.of<AppContainer>(context, listen: false)
+              .settingsController
+              .currentSettings
+              .autoJoinGroups ==
+          false) {
+        return approveActions;
+      } else {
+        // If auto-join is enabled, we don't show the approve actions
+        return [];
+      }
+    } else {
+      return approveActions;
+    }
   }
 
   Widget _buildGroupMetaDataRow(

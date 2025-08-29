@@ -71,48 +71,52 @@ class _NewTaskPageState extends State<NewTaskPage> {
     });
 
     if (widget.templateTask != null) {
-      _createTaskFromTemplate();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _createTaskFromTemplate();
+      });
     }
   }
 
   void _createTaskFromTemplate() {
-    if (widget.templateTask == null) {
-      return;
-    }
-
-    final template = widget.templateTask!;
     setState(() {
-      _isFromTemplate = true;
-      // Set task type based on template group's key type
-      _taskType = template.info.group.keyType;
-      _selectedGroup = template.info.group;
-
-      // Restore task-specific data based on type
-      if (template.info is Challenge) {
-        final challengeInfo = template.info as Challenge;
-        _descController.text =
-            '${challengeInfo.name} ${AppLocalizations.of(context).copyNoun}';
-        _messageController.text = utf8.decode(challengeInfo.data);
-      } else if (template.info is Decrypt) {
-        final decryptInfo = template.info as Decrypt;
-        _descController.text =
-            '${decryptInfo.name} ${AppLocalizations.of(context).copyNoun}';
-
-        if (decryptInfo.dataType.isImage) {
-          _showImageSelector = true;
-          _image = Uint8List.fromList(decryptInfo.data);
-          _imageMimeType = decryptInfo.dataType;
-        } else {
-          _showImageSelector = false;
-          _messageController.text = utf8.decode(decryptInfo.data);
-        }
-      } else if (template.info is File) {
-        final fileInfo = template.info as File;
-        _descController.text =
-            '${fileInfo.basename} ${AppLocalizations.of(context).copyNoun}';
-        // Note: We can't restore the actual PDF file since we only have the path
-        // The user will need to select the file again
+      if (widget.templateTask == null) {
+        return;
       }
+
+      final template = widget.templateTask!;
+      setState(() {
+        _isFromTemplate = true;
+        // Set task type based on template group's key type
+        _taskType = template.info.group.keyType;
+        _selectedGroup = template.info.group;
+
+        // Restore task-specific data based on type
+        if (template.info is Challenge) {
+          final challengeInfo = template.info as Challenge;
+          _descController.text =
+              '${challengeInfo.name} ${AppLocalizations.of(context).copyNoun}';
+          _messageController.text = utf8.decode(challengeInfo.data);
+        } else if (template.info is Decrypt) {
+          final decryptInfo = template.info as Decrypt;
+          _descController.text =
+              '${decryptInfo.name} ${AppLocalizations.of(context).copyNoun}';
+
+          if (decryptInfo.dataType.isImage) {
+            _showImageSelector = true;
+            _image = Uint8List.fromList(decryptInfo.data);
+            _imageMimeType = decryptInfo.dataType;
+          } else {
+            _showImageSelector = false;
+            _messageController.text = utf8.decode(decryptInfo.data);
+          }
+        } else if (template.info is File) {
+          final fileInfo = template.info as File;
+          _descController.text =
+              '${fileInfo.basename} ${AppLocalizations.of(context).copyNoun}';
+          // Note: We can't restore the actual PDF file since we only have the path
+          // The user will need to select the file again
+        }
+      });
     });
   }
 

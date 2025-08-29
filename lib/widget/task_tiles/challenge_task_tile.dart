@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 
 import '../../pages/task_detail_page.dart';
 import '../../ui_constants.dart';
+import '../../util/actions/challenge_creator.dart';
 import '../../util/card_reader_launcher.dart';
 import '../../view_model/app_view_model.dart';
 import '../entity_chip.dart';
@@ -64,28 +65,43 @@ class ChallengeTaskTile extends StatelessWidget {
               child: Text(AppLocalizations.of(context).view),
             ),
           ],
+          SizedBox(
+            width: SMALL_GAP,
+          ),
+          if (task.state == TaskState.finished ||
+              task.state == TaskState.failed) ...[
+            FilledButton.tonal(
+              style: FilledButton.styleFrom(
+                side: const BorderSide(
+                  color: Colors.grey,
+                  width: 1.0,
+                ),
+              ),
+              onPressed: () => createChallenge(
+                  context: context,
+                  buildContext: context,
+                  templateChallenge: task),
+              child: Text(AppLocalizations.of(context).copy),
+            ),
+          ],
         ],
       ),
       approveActions: [
-        Column(
-          children: [
-            LargeSquareButton(
-              text: AppLocalizations.of(context).sign,
-              icon: Icons.check,
-              onPressed: () {
-                model.joinChallenge(task, agree: true);
-              },
-              color: Color(0xFF438743),
-            ),
-            LargeSquareButton(
-                text: AppLocalizations.of(context).decline,
-                icon: Icons.close,
-                onPressed: () {
-                  model.joinChallenge(task, agree: false);
-                },
-                color: Color(0xFF753732))
-          ],
+        LargeSquareButton(
+          text: AppLocalizations.of(context).sign,
+          icon: Icons.check,
+          onPressed: () {
+            model.joinChallenge(task, agree: true);
+          },
+          color: Color(0xFF298E29),
         ),
+        LargeSquareButton(
+            text: AppLocalizations.of(context).decline,
+            icon: Icons.close,
+            onPressed: () {
+              model.joinChallenge(task, agree: false);
+            },
+            color: Color(0xFFAA3026))
       ],
       cardActions: [
         FilledButton.tonal(

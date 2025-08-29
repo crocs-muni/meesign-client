@@ -7,7 +7,6 @@ import '../l10n/arb/app_localizations.dart';
 import '../enums/task_type.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
-import '../util/actions/group_creator.dart';
 import '../util/actions/challenge_creator.dart';
 import '../util/actions/document_signer.dart';
 import '../util/actions/encrypt_data.dart';
@@ -20,8 +19,6 @@ import '../widget/task_list_view.dart';
 import '../widget/task_tiles/challenge_task_tile.dart';
 import '../widget/task_tiles/decrypt_task_tile.dart';
 import '../widget/task_tiles/signing_task_tile.dart';
-import 'groups_listing_page.dart';
-import 'new_task_page.dart';
 
 class TaskListing extends StatefulWidget {
   const TaskListing(
@@ -167,11 +164,12 @@ class _TaskListingState extends State<TaskListing>
 
                     if (context.mounted) {
                       if (result == TaskType.sign) {
-                        signDocument(context, context);
+                        signDocument(context: context, buildContext: context);
                       } else if (result == TaskType.decrypt) {
-                        encryptData(context, context);
+                        encryptData(context: context, buildContext: context);
                       } else if (result == TaskType.challenge) {
-                        createChallenge(context, context);
+                        createChallenge(
+                            context: context, buildContext: context);
                       }
                     }
                   },

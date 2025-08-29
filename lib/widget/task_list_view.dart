@@ -62,7 +62,7 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
   @override
   void initState() {
     super.initState();
-    this.showOnlyPending = widget.showOnlyPending;
+    showOnlyPending = widget.showOnlyPending;
 
     _searchController.addListener(() {
       setState(() {
@@ -166,7 +166,7 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
       }
     }
 
-    final requestsTasks = taskGroups[TaskListSection.requests] ?? <Task<T>>[];
+    final requestsTasks = <Task<T>>[];
     final remainingTasks = <Task<T>>[];
 
     taskGroups.forEach((section, tasks) {
@@ -346,8 +346,6 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
                 fontWeight: FontWeight.w900,
               ),
             ),
-            Spacer(),
-            _buildReloadButton()
           ],
         ],
       ),

@@ -242,5 +242,6 @@
     "copy": "Copy",
     "copyNoun": "Copy",
     "taskState": "Task state",
-    "archived": "Archived"
+    "archived": "Archived",
+    "settings": "Settings"
 }

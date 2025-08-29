@@ -79,9 +79,10 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
     final session = context.read<AppContainer>().session!;
 
-    // Set initial values from template group if provided
     if (widget.templateGroup != null) {
-      _createGroupFromTemplate(session);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _createGroupFromTemplate(session);
+      });
     } else {
       session.deviceRepository
           .getDevice(session.user.did)
@@ -106,66 +107,68 @@ class _NewGroupPageState extends State<NewGroupPage> {
   }
 
   void _createGroupFromTemplate(UserSession session) {
-    if (widget.templateGroup != null) {
-      final template = widget.templateGroup!;
-      _isCreatingFromTemplate = true;
-      _nameController.text =
-          '${template.name} ${AppLocalizations.of(context).copyNoun}';
-      _threshold = template.threshold;
-      _keyType = template.keyType;
-      _protocol = template.protocol;
+    setState(() {
+      if (widget.templateGroup != null) {
+        final template = widget.templateGroup!;
+        _isCreatingFromTemplate = true;
+        _nameController.text =
+            '${template.name} ${AppLocalizations.of(context).copyNoun}';
+        _threshold = template.threshold;
+        _keyType = template.keyType;
+        _protocol = template.protocol;
 
-      final templateDevices = template.members.map((m) => m.device).toList();
-      _devices.addAll(templateDevices);
-      _addMembers(templateDevices);
+        final templateDevices = template.members.map((m) => m.device).toList();
+        _devices.addAll(templateDevices);
+        _addMembers(templateDevices);
 
-      // Update shares to match template values
-      for (final templateMember in template.members) {
-        final memberIndex =
-            _members.indexWhere((m) => m.device.id == templateMember.device.id);
-        if (memberIndex >= 0) {
-          _members[memberIndex] =
-              Member(_members[memberIndex].device, templateMember.shares);
+        // Update shares to match template values
+        for (final templateMember in template.members) {
+          final memberIndex = _members
+              .indexWhere((m) => m.device.id == templateMember.device.id);
+          if (memberIndex >= 0) {
+            _members[memberIndex] =
+                Member(_members[memberIndex].device, templateMember.shares);
+          }
         }
-      }
 
-      // Set policy from template if it exists
-      if (template.note != null) {
-        try {
-          final policy = jsonDecode(template.note!);
-          if (policy['after'] != null && policy['before'] != null) {
-            _policyTime = true;
-            final afterParts = policy['after'].split(':');
-            final beforeParts = policy['before'].split(':');
-            _policyAfterTime = TimeOfDay(
-                hour: int.parse(afterParts[0]),
-                minute: int.parse(afterParts[1]));
-            _policyBeforeTime = TimeOfDay(
-                hour: int.parse(beforeParts[0]),
-                minute: int.parse(beforeParts[1]));
-          }
-          if (policy['decline'] != null) {
-            _policyDecline = policy['decline'];
-          }
+        // Set policy from template if it exists
+        if (template.note != null) {
+          try {
+            final policy = jsonDecode(template.note!);
+            if (policy['after'] != null && policy['before'] != null) {
+              _policyTime = true;
+              final afterParts = policy['after'].split(':');
+              final beforeParts = policy['before'].split(':');
+              _policyAfterTime = TimeOfDay(
+                  hour: int.parse(afterParts[0]),
+                  minute: int.parse(afterParts[1]));
+              _policyBeforeTime = TimeOfDay(
+                  hour: int.parse(beforeParts[0]),
+                  minute: int.parse(beforeParts[1]));
+            }
+            if (policy['decline'] != null) {
+              _policyDecline = policy['decline'];
+            }
 
-          // Set custom policy text (excluding already handled fields)
-          final customPolicy = Map<String, dynamic>.from(policy);
-          customPolicy.remove('after');
-          customPolicy.remove('before');
-          customPolicy.remove('decline');
-          if (customPolicy.isNotEmpty) {
-            _policyController.text =
-                const JsonEncoder.withIndent('  ').convert(customPolicy);
+            // Set custom policy text (excluding already handled fields)
+            final customPolicy = Map<String, dynamic>.from(policy);
+            customPolicy.remove('after');
+            customPolicy.remove('before');
+            customPolicy.remove('decline');
+            if (customPolicy.isNotEmpty) {
+              _policyController.text =
+                  const JsonEncoder.withIndent('  ').convert(customPolicy);
+            }
+          } catch (e) {
+            // If parsing fails, just ignore the policy
           }
-        } catch (e) {
-          // If parsing fails, just ignore the policy
         }
-      }
 
-      // Restore template threshold and reset flag
-      _threshold = template.threshold;
-      _isCreatingFromTemplate = false;
-    }
+        // Restore template threshold and reset flag
+        _threshold = template.threshold;
+        _isCreatingFromTemplate = false;
+      }
+    });
   }
 
   @override

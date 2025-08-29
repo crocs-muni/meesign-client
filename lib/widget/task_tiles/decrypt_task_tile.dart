@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 
 import '../../pages/task_detail_page.dart';
 import '../../ui_constants.dart';
+import '../../util/actions/encrypt_data.dart';
 import '../../util/status_message.dart';
 import '../../view_model/app_view_model.dart';
 import '../entity_chip.dart';
@@ -72,6 +73,26 @@ class DecryptTaskTile extends StatelessWidget {
               child: Text(AppLocalizations.of(context).view),
             ),
           ],
+          SizedBox(
+            width: SMALL_GAP,
+          ),
+          if (task.state == TaskState.finished ||
+              task.state == TaskState.failed) ...[
+            FilledButton.tonal(
+              style: FilledButton.styleFrom(
+                side: const BorderSide(
+                  color: Colors.grey,
+                  width: 1.0,
+                ),
+              ),
+              onPressed: () => encryptData(
+                context: context,
+                buildContext: context,
+                templateDecryptTask: task,
+              ),
+              child: Text(AppLocalizations.of(context).copy),
+            ),
+          ],
         ],
       ),
       approveActions: [
@@ -81,7 +102,7 @@ class DecryptTaskTile extends StatelessWidget {
           onPressed: () {
             model.joinDecrypt(task, agree: true);
           },
-          color: Color(0xFF438743),
+          color: Color(0xFF298E29),
         ),
         LargeSquareButton(
             text: AppLocalizations.of(context).decline,
@@ -89,7 +110,7 @@ class DecryptTaskTile extends StatelessWidget {
             onPressed: () {
               model.joinDecrypt(task, agree: false);
             },
-            color: Color(0xFF753732)),
+            color: Color(0xFFAA3026)),
       ],
       actions: const [],
       onArchiveChange: (archive) => model.archiveTask(task, archive: archive),

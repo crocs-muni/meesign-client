@@ -95,7 +95,7 @@ class SigningListingPage extends StatelessWidget {
               ] else ...[
                 ElevatedButton(
                   onPressed: () {
-                    signDocument(context, context);
+                    signDocument(context: context, buildContext: context);
                   },
                   child: const Text('Sign a document'),
                 )

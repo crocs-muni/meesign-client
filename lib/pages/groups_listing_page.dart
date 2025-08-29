@@ -78,17 +78,15 @@ class _GroupsListingPageState extends State<GroupsListingPage>
         stream: model.combinedTaskStream,
         builder: (context, snapshot) {
           return DefaultPageTemplate(
-              showAppBar: true,
               floatingActionButton: _buildFab(context, model),
-              appBarTitle: AppLocalizations.of(context).groups,
               body: TaskListView<Group>(
                 key: ValueKey('group_task_list'),
                 tasks: model.groupTasks,
-                showHeading: false,
+                showHeading: true,
                 customSearchBarHint: 'Search groups by name...',
                 emptyView: _buildEmptyGroups(context),
                 showArchived: model.showArchived,
-                showAllTypes: true,
+                showAllTypes: false,
                 taskBuilder: (context, task) {
                   final group = task.info;
                   return GroupTaskTile(task: task, group: group);

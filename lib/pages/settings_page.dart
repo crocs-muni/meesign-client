@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../l10n/arb/app_localizations.dart';
 import '../templates/default_page_template.dart';
-import '../view_model/tabs_view_model.dart';
 import 'about_page.dart';
 import 'device_settings_page.dart';
 import 'general_settings_page.dart';
@@ -20,10 +18,6 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
-    // Ensure the settings page is in the stack when this widget is created
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<TabsViewModel>().setSettingsPageInStack(true);
-    });
   }
 
   @override
@@ -32,21 +26,12 @@ class _SettingsPageState extends State<SettingsPage> {
       showAppBar: true,
       customAppBar: AppBar(
         title: Text(AppLocalizations.of(context).applicationSettingsTitle),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
       ),
       wrapInScroll: true,
       body: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("What do you want to do?",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          SizedBox(height: 10),
           _buildMenuItems(context),
         ],
       ),

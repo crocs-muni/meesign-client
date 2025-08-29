@@ -95,7 +95,7 @@ class DecryptListingPage extends StatelessWidget {
               ] else ...[
                 ElevatedButton(
                   onPressed: () {
-                    encryptData(context, context);
+                    encryptData(context: context, buildContext: context);
                   },
                   child: const Text('Encrypt message'),
                 )

@@ -99,7 +99,7 @@ class ChallengeListingPage extends StatelessWidget {
               ] else ...[
                 ElevatedButton(
                   onPressed: () {
-                    createChallenge(context, context);
+                    createChallenge(context: context, buildContext: context);
                   },
                   child: const Text('Create a challenge'),
                 )

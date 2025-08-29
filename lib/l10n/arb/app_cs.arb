@@ -242,5 +242,6 @@
     "copy": "Kopírovat",
     "copyNoun": "Kopie",
     "taskState": "Stav úlohy",
-    "archived": "Archivováno"
+    "archived": "Archivováno",
+    "settings": "Nastavení"
 }

@@ -4,10 +4,9 @@ import 'package:meesign_core/meesign_core.dart';
 import '../../pages/new_task_page.dart';
 
 Future<bool?> signDocument(
-  BuildContext context,
-  BuildContext buildContext,
-  Task? templateSignTask,
-) async {
+    {required BuildContext context,
+    required BuildContext buildContext,
+    Task? templateSignTask}) async {
   return await Navigator.push(
     context,
     MaterialPageRoute<bool>(

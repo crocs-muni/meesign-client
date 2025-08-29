@@ -577,4 +577,7 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get taskState => 'Stav úlohy';
+
+  @override
+  String get settings => 'Nastavení';
 }

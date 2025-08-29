@@ -222,12 +222,20 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
           onPressed: () async {
             bool? redirectBack = false;
             if (widget.keyType == KeyType.signChallenge) {
-              redirectBack =
-                  await createChallenge(context, context, widget.task);
+              redirectBack = await createChallenge(
+                  context: context,
+                  buildContext: context,
+                  templateChallenge: widget.task);
             } else if (widget.keyType == KeyType.decrypt) {
-              redirectBack = await encryptData(context, context, widget.task);
+              redirectBack = await encryptData(
+                  context: context,
+                  buildContext: context,
+                  templateDecryptTask: widget.task);
             } else if (widget.keyType == KeyType.signPdf) {
-              redirectBack = await signDocument(context, context, widget.task);
+              redirectBack = await signDocument(
+                  context: context,
+                  buildContext: context,
+                  templateSignTask: widget.task);
             }
 
             if (redirectBack == true && context.mounted) {
