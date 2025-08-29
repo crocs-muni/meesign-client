@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:meesign_core/meesign_core.dart';
 
+import '../l10n/arb/app_localizations.dart';
 import '../util/platform.dart';
 import '../util/share_decrypt.dart';
 
@@ -29,7 +30,9 @@ class ShareButton extends StatelessWidget {
         }
       },
       label: Text(
-        PlatformGroup.isMobile ? 'Share' : 'Download',
+        PlatformGroup.isMobile
+            ? AppLocalizations.of(context).share
+            : AppLocalizations.of(context).download,
       ),
       icon: Icon(PlatformGroup.isMobile ? Symbols.share : Symbols.save_alt),
     );

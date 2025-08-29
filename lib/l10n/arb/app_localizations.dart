@@ -1250,6 +1250,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create PDF signing'**
   String get createPdfSigning;
+
+  /// No description provided for @download.
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get download;
+
+  /// No description provided for @share.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get share;
 }
 
 class _AppLocalizationsDelegate

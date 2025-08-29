@@ -258,5 +258,7 @@
     "startWithNewPdfSigning": "Start by creating a new PDF signing task",
     "startWithPdfSigningGroup": "Start by creating a PDF signing group",
     "createPdfSigningGroup": "Create PDF signing group",
-    "createPdfSigning": "Create PDF signing"
+    "createPdfSigning": "Create PDF signing",
+    "download": "Download",
+    "share": "Share"
 }

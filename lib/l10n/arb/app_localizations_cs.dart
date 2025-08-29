@@ -629,4 +629,10 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get createPdfSigning => 'Vytvořit úlohu podepisování PDF';
+
+  @override
+  String get download => 'Stáhnout';
+
+  @override
+  String get share => 'Sdílet';
 }

@@ -258,5 +258,7 @@
     "startWithNewPdfSigning": "Začněte vytvořením nové úlohy podepisování PDF",
     "startWithPdfSigningGroup": "Začněte vytvořením skupiny pro podepisování PDF",
     "createPdfSigningGroup": "Vytvořit skupinu pro podepisování PDF",
-    "createPdfSigning": "Vytvořit úlohu podepisování PDF"
+    "createPdfSigning": "Vytvořit úlohu podepisování PDF",
+    "download": "Stáhnout",
+    "share": "Sdílet"
 }

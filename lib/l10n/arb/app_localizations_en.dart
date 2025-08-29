@@ -627,4 +627,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get createPdfSigning => 'Create PDF signing';
+
+  @override
+  String get download => 'Download';
+
+  @override
+  String get share => 'Share';
 }

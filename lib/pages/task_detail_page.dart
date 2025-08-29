@@ -30,7 +30,7 @@ class TaskDetailPage extends StatefulWidget {
       this.hexValue,
       this.imageDecrypt,
       this.timedAutoClose = false,
-      this.autoCloseDurationInSeconds = 5,
+      this.autoCloseDurationInSeconds = 15,
       this.filePath,
       this.isArchived = false});
 
@@ -76,8 +76,10 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
   }
 
   void _closePage() {
-    if (mounted) {
+    if (mounted && ModalRoute.of(context)?.isCurrent == true) {
       Navigator.of(context).pop();
+    } else if (mounted) {
+      Future.delayed(Duration(milliseconds: 250), () => _closePage());
     }
   }
 
@@ -220,6 +222,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
         const SizedBox(height: 24),
         FilledButton.icon(
           onPressed: () async {
+            sub.pause();
             bool? redirectBack = false;
             if (widget.keyType == KeyType.signChallenge) {
               redirectBack = await createChallenge(
@@ -237,6 +240,8 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                   buildContext: context,
                   templateSignTask: widget.task);
             }
+
+            sub.resume();
 
             if (redirectBack == true && context.mounted) {
               Navigator.of(context).pop();
