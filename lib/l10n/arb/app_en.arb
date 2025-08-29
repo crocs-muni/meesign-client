@@ -243,5 +243,20 @@
     "copyNoun": "Copy",
     "taskState": "Task state",
     "archived": "Archived",
-    "settings": "Settings"
+    "settings": "Settings",
+    "tryNewChallenge": "Try creating a new challenge",
+    "startWithNewChallenge": "Start by creating a new challenge",
+    "startWithChallengeGroup": "Start by creating a challenge group",
+    "createChallengeGroup": "Create challenge group",
+    "createChallenge": "Create challenge",
+    "tryEncryptingData": "Try encrypting data",
+    "startWithNewDecryption": "Start by creating a new decryption task",
+    "startWithDecryptionGroup": "Start by creating a decryption group",
+    "createDecryptionGroup": "Create decryption group",
+    "createDecryption": "Create decryption",
+    "trySigningPdf": "Try signing a PDF",
+    "startWithNewPdfSigning": "Start by creating a new PDF signing task",
+    "startWithPdfSigningGroup": "Start by creating a PDF signing group",
+    "createPdfSigningGroup": "Create PDF signing group",
+    "createPdfSigning": "Create PDF signing"
 }

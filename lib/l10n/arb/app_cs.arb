@@ -243,5 +243,20 @@
     "copyNoun": "Kopie",
     "taskState": "Stav úlohy",
     "archived": "Archivováno",
-    "settings": "Nastavení"
+    "settings": "Nastavení",
+    "tryNewChallenge": "Zkuste vytvořit novou výzvu",
+    "startWithNewChallenge": "Začněte vytvořením nové výzvy",
+    "startWithChallengeGroup": "Začněte vytvořením skupiny pro výzvy",
+    "createChallengeGroup": "Vytvořit skupinu pro výzvy",
+    "createChallenge": "Vytvořit výzvu",
+    "tryEncryptingData": "Zkuste zašifrovat data",
+    "startWithNewDecryption": "Začněte vytvořením nové úlohy dešifrování",
+    "startWithDecryptionGroup": "Začněte vytvořením skupiny pro dešifrování",
+    "createDecryptionGroup": "Vytvořit skupinu pro dešifrování",
+    "createDecryption": "Vytvořit dešifrovací úlohu",
+    "trySigningPdf": "Zkuste podepsat PDF",
+    "startWithNewPdfSigning": "Začněte vytvořením nové úlohy podepisování PDF",
+    "startWithPdfSigningGroup": "Začněte vytvořením skupiny pro podepisování PDF",
+    "createPdfSigningGroup": "Vytvořit skupinu pro podepisování PDF",
+    "createPdfSigning": "Vytvořit úlohu podepisování PDF"
 }
