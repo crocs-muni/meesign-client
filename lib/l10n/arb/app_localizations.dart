@@ -1154,6 +1154,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Task state'**
   String get taskState;
+
+  /// No description provided for @settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// No description provided for @tryNewChallenge.
+  ///
+  /// In en, this message translates to:
+  /// **'Try creating a new challenge'**
+  String get tryNewChallenge;
+
+  /// No description provided for @startWithNewChallenge.
+  ///
+  /// In en, this message translates to:
+  /// **'Start by creating a new challenge'**
+  String get startWithNewChallenge;
+
+  /// No description provided for @startWithChallengeGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Start by creating a challenge group'**
+  String get startWithChallengeGroup;
+
+  /// No description provided for @createChallengeGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Create challenge group'**
+  String get createChallengeGroup;
+
+  /// No description provided for @createChallenge.
+  ///
+  /// In en, this message translates to:
+  /// **'Create challenge'**
+  String get createChallenge;
+
+  /// No description provided for @tryEncryptingData.
+  ///
+  /// In en, this message translates to:
+  /// **'Try encrypting data'**
+  String get tryEncryptingData;
+
+  /// No description provided for @startWithNewDecryption.
+  ///
+  /// In en, this message translates to:
+  /// **'Start by creating a new decryption task'**
+  String get startWithNewDecryption;
+
+  /// No description provided for @startWithDecryptionGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Start by creating a decryption group'**
+  String get startWithDecryptionGroup;
+
+  /// No description provided for @createDecryptionGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Create decryption group'**
+  String get createDecryptionGroup;
+
+  /// No description provided for @createDecryption.
+  ///
+  /// In en, this message translates to:
+  /// **'Create decryption'**
+  String get createDecryption;
+
+  /// No description provided for @trySigningPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Try signing a PDF'**
+  String get trySigningPdf;
+
+  /// No description provided for @startWithNewPdfSigning.
+  ///
+  /// In en, this message translates to:
+  /// **'Start by creating a new PDF signing task'**
+  String get startWithNewPdfSigning;
+
+  /// No description provided for @startWithPdfSigningGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Start by creating a PDF signing group'**
+  String get startWithPdfSigningGroup;
+
+  /// No description provided for @createPdfSigningGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Create PDF signing group'**
+  String get createPdfSigningGroup;
+
+  /// No description provided for @createPdfSigning.
+  ///
+  /// In en, this message translates to:
+  /// **'Create PDF signing'**
+  String get createPdfSigning;
+
+  /// No description provided for @download.
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get download;
+
+  /// No description provided for @share.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get share;
 }
 
 class _AppLocalizationsDelegate

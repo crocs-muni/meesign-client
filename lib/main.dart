@@ -56,7 +56,12 @@ Future<void> _prepareWindowManager() async {
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     await windowManager.ensureInitialized();
     WindowManager.instance.setMinimumSize(const Size(minWidth, minHeight));
-    WindowManager.instance.setSize(const Size(minWidth, minHeight));
+
+    Size currentSize = await WindowManager.instance.getSize();
+    if (currentSize.width < minWidth || currentSize.height < minHeight) {
+      await WindowManager.instance.setSize(const Size(minWidth, minHeight));
+    }
+
     WindowManager.instance.center();
   }
 }

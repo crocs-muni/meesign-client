@@ -577,4 +577,62 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get taskState => 'Stav úlohy';
+
+  @override
+  String get settings => 'Nastavení';
+
+  @override
+  String get tryNewChallenge => 'Zkuste vytvořit novou výzvu';
+
+  @override
+  String get startWithNewChallenge => 'Začněte vytvořením nové výzvy';
+
+  @override
+  String get startWithChallengeGroup => 'Začněte vytvořením skupiny pro výzvy';
+
+  @override
+  String get createChallengeGroup => 'Vytvořit skupinu pro výzvy';
+
+  @override
+  String get createChallenge => 'Vytvořit výzvu';
+
+  @override
+  String get tryEncryptingData => 'Zkuste zašifrovat data';
+
+  @override
+  String get startWithNewDecryption =>
+      'Začněte vytvořením nové úlohy dešifrování';
+
+  @override
+  String get startWithDecryptionGroup =>
+      'Začněte vytvořením skupiny pro dešifrování';
+
+  @override
+  String get createDecryptionGroup => 'Vytvořit skupinu pro dešifrování';
+
+  @override
+  String get createDecryption => 'Vytvořit dešifrovací úlohu';
+
+  @override
+  String get trySigningPdf => 'Zkuste podepsat PDF';
+
+  @override
+  String get startWithNewPdfSigning =>
+      'Začněte vytvořením nové úlohy podepisování PDF';
+
+  @override
+  String get startWithPdfSigningGroup =>
+      'Začněte vytvořením skupiny pro podepisování PDF';
+
+  @override
+  String get createPdfSigningGroup => 'Vytvořit skupinu pro podepisování PDF';
+
+  @override
+  String get createPdfSigning => 'Vytvořit úlohu podepisování PDF';
+
+  @override
+  String get download => 'Stáhnout';
+
+  @override
+  String get share => 'Sdílet';
 }

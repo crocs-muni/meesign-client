@@ -62,7 +62,7 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
   @override
   void initState() {
     super.initState();
-    this.showOnlyPending = widget.showOnlyPending;
+    showOnlyPending = widget.showOnlyPending;
 
     _searchController.addListener(() {
       setState(() {

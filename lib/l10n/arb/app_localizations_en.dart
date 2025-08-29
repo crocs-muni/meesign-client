@@ -576,4 +576,61 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get taskState => 'Task state';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get tryNewChallenge => 'Try creating a new challenge';
+
+  @override
+  String get startWithNewChallenge => 'Start by creating a new challenge';
+
+  @override
+  String get startWithChallengeGroup => 'Start by creating a challenge group';
+
+  @override
+  String get createChallengeGroup => 'Create challenge group';
+
+  @override
+  String get createChallenge => 'Create challenge';
+
+  @override
+  String get tryEncryptingData => 'Try encrypting data';
+
+  @override
+  String get startWithNewDecryption =>
+      'Start by creating a new decryption task';
+
+  @override
+  String get startWithDecryptionGroup => 'Start by creating a decryption group';
+
+  @override
+  String get createDecryptionGroup => 'Create decryption group';
+
+  @override
+  String get createDecryption => 'Create decryption';
+
+  @override
+  String get trySigningPdf => 'Try signing a PDF';
+
+  @override
+  String get startWithNewPdfSigning =>
+      'Start by creating a new PDF signing task';
+
+  @override
+  String get startWithPdfSigningGroup =>
+      'Start by creating a PDF signing group';
+
+  @override
+  String get createPdfSigningGroup => 'Create PDF signing group';
+
+  @override
+  String get createPdfSigning => 'Create PDF signing';
+
+  @override
+  String get download => 'Download';
+
+  @override
+  String get share => 'Share';
 }

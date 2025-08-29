@@ -6,25 +6,18 @@ import '../ui_constants.dart';
 
 class GroupSuggestionTile extends StatelessWidget {
   final Group group;
-  final bool active;
-  final bool selected;
-  final void Function(bool?)? onChanged;
+  final void Function(Group?)? onChanged;
 
   const GroupSuggestionTile({
     super.key,
     required this.group,
-    this.active = false,
-    this.selected = false,
     this.onChanged,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Radio<bool>(
-        value: true,
-        onChanged: onChanged,
-      ),
+    return RadioListTile<Group>(
+      value: group,
       dense: true,
       visualDensity: VisualDensity.compact,
       title: Row(
@@ -38,7 +31,6 @@ class GroupSuggestionTile extends StatelessWidget {
           _buildInfoButton(context)
         ],
       ),
-      onTap: () => onChanged?.call(true),
     );
   }
 
