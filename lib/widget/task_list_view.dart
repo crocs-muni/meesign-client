@@ -95,10 +95,16 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
     ];
     final taskCount = widget.showArchived
         ? sections.map((s) => (taskGroups[s] ?? []).length).sum
-        : sections.map((s) => (taskGroups[s] ?? []).where((task) => !task.archived).length).sum;
+        : sections
+            .map((s) =>
+                (taskGroups[s] ?? []).where((task) => !task.archived).length)
+            .sum;
     final pendingCount = widget.showArchived
         ? onlyPendingSections.map((s) => (taskGroups[s] ?? []).length).sum
-        : onlyPendingSections.map((s) => (taskGroups[s] ?? []).where((task) => !task.archived).length).sum;
+        : onlyPendingSections
+            .map((s) =>
+                (taskGroups[s] ?? []).where((task) => !task.archived).length)
+            .sum;
 
     if (isReloading) {
       return Column(
