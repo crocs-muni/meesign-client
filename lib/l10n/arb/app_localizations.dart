@@ -161,7 +161,7 @@ abstract class AppLocalizations {
   /// No description provided for @applicationSettingsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Application settings'**
+  /// **'What would you like to do?'**
   String get applicationSettingsTitle;
 
   /// No description provided for @deviceAndServerSettingsTitle.

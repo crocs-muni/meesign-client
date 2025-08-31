@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../l10n/arb/app_localizations.dart';
 import '../templates/default_page_template.dart';
+import '../ui_constants.dart';
 import 'about_page.dart';
 import 'device_settings_page.dart';
 import 'general_settings_page.dart';
@@ -23,15 +24,22 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return DefaultPageTemplate(
-      showAppBar: true,
-      customAppBar: AppBar(
-        title: Text(AppLocalizations.of(context).applicationSettingsTitle),
-      ),
       wrapInScroll: true,
       body: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Container(
+            padding:
+                EdgeInsets.only(left: SMALL_PADDING, bottom: MEDIUM_PADDING),
+            child: Text(
+              AppLocalizations.of(context).applicationSettingsTitle,
+              style: TextStyle(
+                fontSize: Theme.of(context).textTheme.titleLarge?.fontSize,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
           _buildMenuItems(context),
         ],
       ),

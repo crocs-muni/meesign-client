@@ -42,7 +42,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get generalSettingsTitle => 'General settings';
 
   @override
-  String get applicationSettingsTitle => 'Application settings';
+  String get applicationSettingsTitle => 'What would you like to do?';
 
   @override
   String get deviceAndServerSettingsTitle => 'Device and server';
