@@ -174,7 +174,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
               ? AppLocalizations.of(context).taskName
               : AppLocalizations.of(context).fileName,
           content: widget.title,
-          showCopyButton: false,
+          showCopyButton: true,
         ),
         if (widget.textValue != null) ...[
           const SizedBox(height: SMALL_GAP),

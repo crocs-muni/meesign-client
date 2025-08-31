@@ -93,9 +93,18 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
       TaskListSection.requests,
       if (widget.showArchived) TaskListSection.archivedPending
     ];
-    final taskCount = sections.map((s) => (taskGroups[s] ?? []).length).sum;
-    final pendingCount =
-        onlyPendingSections.map((s) => (taskGroups[s] ?? []).length).sum;
+    final taskCount = widget.showArchived
+        ? sections.map((s) => (taskGroups[s] ?? []).length).sum
+        : sections
+            .map((s) =>
+                (taskGroups[s] ?? []).where((task) => !task.archived).length)
+            .sum;
+    final pendingCount = widget.showArchived
+        ? onlyPendingSections.map((s) => (taskGroups[s] ?? []).length).sum
+        : onlyPendingSections
+            .map((s) =>
+                (taskGroups[s] ?? []).where((task) => !task.archived).length)
+            .sum;
 
     if (isReloading) {
       return Column(
@@ -147,7 +156,7 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
       // Check if there is any non-archived task
       final nonArchivedTaskCount = taskGroups.entries
           .where((entry) => entry.key != TaskListSection.archived)
-          .map((entry) => entry.value.length)
+          .map((entry) => entry.value.where((task) => !task.archived).length)
           .sum;
 
       if (nonArchivedTaskCount == 0 && _searchQuery.isEmpty) {
@@ -174,7 +183,11 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
           (widget.showArchived
               ? section == TaskListSection.archivedPending
               : false)) {
-        requestsTasks.addAll(tasks);
+        if (section == TaskListSection.requests && !widget.showArchived) {
+          requestsTasks.addAll(tasks.where((task) => !task.archived));
+        } else {
+          requestsTasks.addAll(tasks);
+        }
       }
     });
 
@@ -182,7 +195,11 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
       if (section != TaskListSection.requests &&
           section != TaskListSection.archivedPending &&
           (widget.showArchived || section != TaskListSection.archived)) {
-        remainingTasks.addAll(tasks);
+        if (widget.showArchived) {
+          remainingTasks.addAll(tasks);
+        } else {
+          remainingTasks.addAll(tasks.where((task) => !task.archived));
+        }
       }
     });
 
@@ -196,7 +213,7 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
         Expanded(
             child: _buildTaskList(
           requestsTasks,
-          remainingTasks,
+          showOnlyPending ? <Task<T>>[] : remainingTasks,
         ))
       ],
     );
