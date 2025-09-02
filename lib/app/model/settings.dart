@@ -13,7 +13,7 @@ class Settings {
       {this.themeMode = ThemeMode.light,
       this.showArchivedItems = false,
       this.currentUserId = '',
-      this.autoJoinGroups = true,
+      this.autoJoinGroups = false,
       this.autoRejectGroups = false,
       this.minGroupMembers = 2,
       this.currentLanguage = 'en'});

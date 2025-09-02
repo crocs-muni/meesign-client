@@ -158,21 +158,12 @@ class SettingsController {
       // Use saved language if it exists
       currentLanguage = savedLanguage;
     } else {
-      // Detect device locale and use it if supported, otherwise use English
-      String deviceLanguage = _getDeviceLanguage();
-      currentLanguage = isLanguageSupported(deviceLanguage)
-          ? deviceLanguage
-          : defaultLanguage;
+      // For devel branch use English by default
+      currentLanguage = defaultLanguage;
     }
 
     updateCurrentLanguage(currentLanguage);
     sharedPreferences.setString(currentLanguageKey, currentLanguage);
-  }
-
-  // Get the device's preferred language code
-  String _getDeviceLanguage() {
-    final locale = SchedulerBinding.instance.platformDispatcher.locale;
-    return locale.languageCode;
   }
 
   void saveUserIdentifier(String deviceName, String host, String id) async {

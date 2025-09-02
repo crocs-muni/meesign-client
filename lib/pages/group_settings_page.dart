@@ -7,7 +7,7 @@ import '../l10n/arb/app_localizations.dart';
 import '../services/settings_controller.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
-import 'groups_listing_page.dart';
+import '../view_model/tabs_view_model.dart';
 import '../widget/number_input.dart';
 
 class GroupSettingsPage extends StatelessWidget {
@@ -107,9 +107,8 @@ class GroupSettingsPage extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         child: InkWell(
           onTap: () {
-            Navigator.of(context, rootNavigator: false).push(
-              MaterialPageRoute(builder: (context) => GroupsListingPage()),
-            );
+            final tabsState = context.read<TabsViewModel>();
+            tabsState.setIndex(3); // 3 = Groups tab
           },
           borderRadius: BorderRadius.circular(10),
           child: ListTile(
