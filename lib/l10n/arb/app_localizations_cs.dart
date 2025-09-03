@@ -635,4 +635,24 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get share => 'Sdílet';
+
+  @override
+  String minimumMembersRequired(int minGroupMembers) {
+    return 'Pro vytvoření skupiny je potřeba alespoň $minGroupMembers členů. Toto můžete změnit v nastavení aplikace.';
+  }
+
+  @override
+  String get unnecessarySharesTitle => 'Zbytečně volké množství podílů';
+
+  @override
+  String unnecessarySharesText(String newThreshold, String newShares) {
+    return 'Můžete dosáhnout stejného rozložení hlasovacích práv nastavením prahu na $newThreshold a podílů na ($newShares). To může zlepšit výkon.';
+  }
+
+  @override
+  String get manySharesWarning => 'Velké množství podílů';
+
+  @override
+  String get manySharesWarningText =>
+      'S některými protokoly můžete zaznamenat snížený výkon, pokud je počet podílů příliš vysoký. Zvažte odebrání některých členů nebo snížení počtu podílů, které obdrží, pokud zaznamenáte problém s výkonem.';
 }
