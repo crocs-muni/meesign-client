@@ -1262,6 +1262,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Share'**
   String get share;
+
+  /// No description provided for @minimumMembersRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'At least {minGroupMembers} members are required to create a group. You can change this in the application settings.'**
+  String minimumMembersRequired(int minGroupMembers);
+
+  /// No description provided for @unnecessarySharesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unnecessary number of shares'**
+  String get unnecessarySharesTitle;
+
+  /// No description provided for @unnecessarySharesText.
+  ///
+  /// In en, this message translates to:
+  /// **'You can achieve the same voting rights distribution by setting threshold to {newThreshold} and shares to ({newShares}). This may improve performance.'**
+  String unnecessarySharesText(String newThreshold, String newShares);
+
+  /// No description provided for @manySharesWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Very large number of shares'**
+  String get manySharesWarning;
+
+  /// No description provided for @manySharesWarningText.
+  ///
+  /// In en, this message translates to:
+  /// **'You may experience degraded performance with certain protocols if the share count is too high. Consider removing some members or lowering the number of shares they receive if this poses an issue.'**
+  String get manySharesWarningText;
 }
 
 class _AppLocalizationsDelegate

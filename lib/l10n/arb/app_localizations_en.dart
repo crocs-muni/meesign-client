@@ -633,4 +633,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get share => 'Share';
+
+  @override
+  String minimumMembersRequired(int minGroupMembers) {
+    return 'At least $minGroupMembers members are required to create a group. You can change this in the application settings.';
+  }
+
+  @override
+  String get unnecessarySharesTitle => 'Unnecessary number of shares';
+
+  @override
+  String unnecessarySharesText(String newThreshold, String newShares) {
+    return 'You can achieve the same voting rights distribution by setting threshold to $newThreshold and shares to ($newShares). This may improve performance.';
+  }
+
+  @override
+  String get manySharesWarning => 'Very large number of shares';
+
+  @override
+  String get manySharesWarningText =>
+      'You may experience degraded performance with certain protocols if the share count is too high. Consider removing some members or lowering the number of shares they receive if this poses an issue.';
 }

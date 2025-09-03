@@ -217,6 +217,25 @@ class _HomePageViewState extends State<HomePageView> {
     );
   }
 
+  Widget _buildReactiveNavigationDestination(NavigationTabModel destination) {
+    return StreamBuilder(
+      stream: settingsController.settingsStream,
+      builder: (context, settingsSnapshot) {
+        if (settingsSnapshot.hasError || !settingsSnapshot.hasData) {
+          return NavigationDestination(
+            icon: destination.icon,
+            label: destination.label,
+          );
+        }
+
+        final tabs = _generateTabs();
+        return NavigationDestination(
+            icon: destination.icon,
+            label: tabs[_tabs.indexOf(destination)].label);
+      },
+    );
+  }
+
   Widget _buildResponsiveLayout(Widget child, double width) {
     if (width > minLaptopLayoutWidth) {
       return Center(
@@ -293,12 +312,9 @@ class _HomePageViewState extends State<HomePageView> {
       return NavigationBar(
         selectedIndex: context.watch<TabsViewModel>().index,
         onDestinationSelected: _onItemTapped,
-        destinations: _tabs.map<NavigationDestination>(
+        destinations: _tabs.map(
           (NavigationTabModel destination) {
-            return NavigationDestination(
-              icon: destination.icon,
-              label: destination.label,
-            );
+            return _buildReactiveNavigationDestination(destination);
           },
         ).toList(),
       );

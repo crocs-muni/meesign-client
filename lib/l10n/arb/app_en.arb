@@ -260,5 +260,27 @@
     "createPdfSigningGroup": "Create PDF signing group",
     "createPdfSigning": "Create PDF signing",
     "download": "Download",
-    "share": "Share"
+    "share": "Share",
+    "minimumMembersRequired": "At least {minGroupMembers} members are required to create a group. You can change this in the application settings.",
+    "@minimumMembersRequired": {
+        "placeholders": {
+            "minGroupMembers": {
+                "type": "int"
+            }
+        }
+    },
+    "unnecessarySharesTitle": "Unnecessary number of shares",
+    "unnecessarySharesText": "You can achieve the same voting rights distribution by setting threshold to {newThreshold} and shares to ({newShares}). This may improve performance.",
+    "@unnecessarySharesText": {
+        "placeholders": {
+            "newThreshold": {
+                "type": "String"
+            },
+            "newShares": {
+                "type": "String"
+            }
+        }
+    },
+    "manySharesWarning": "Very large number of shares",
+    "manySharesWarningText": "You may experience degraded performance with certain protocols if the share count is too high. Consider removing some members or lowering the number of shares they receive if this poses an issue."
 }

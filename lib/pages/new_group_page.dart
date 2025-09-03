@@ -45,9 +45,10 @@ class _NewGroupPageState extends State<NewGroupPage> {
   final List<Device> _devices = [];
   final _nameController = TextEditingController();
   final _policyController = TextEditingController();
-  String? _membersErr;
-  String? _nameErr, _policyErr;
-  ({String title, String text})? _sharesErr;
+  bool _membersErr = false;
+  bool _nameErr = false;
+  bool _policyErr = false;
+  bool _sharesErr = false;
   KeyType _keyType = KeyType.signPdf;
   Protocol _protocol = KeyType.signPdf.supportedProtocols.first;
   bool _policyTime = false;
@@ -61,18 +62,19 @@ class _NewGroupPageState extends State<NewGroupPage> {
   @override
   void initState() {
     super.initState();
+    // Reset errors on input change
     _nameController.addListener(() {
-      if (_nameErr != null) {
+      if (_nameErr) {
         setState(() {
-          _nameErr = null;
+          _nameErr = false;
         });
       }
     });
 
     _policyController.addListener(() {
-      if (_policyErr != null) {
+      if (_policyErr) {
         setState(() {
-          _policyErr = null;
+          _policyErr = false;
         });
       }
     });
@@ -197,8 +199,8 @@ class _NewGroupPageState extends State<NewGroupPage> {
         if (_members.any((member) => member.device.id == device.id)) continue;
         _members.add(Member(device, 1));
       }
-      _sharesErr = null;
-      _membersErr = null;
+      _sharesErr = false;
+      _membersErr = false;
       if (_protocol.thresholdType == ThresholdType.nOfN &&
           !_isCreatingFromTemplate) {
         _threshold = _shareCount;
@@ -250,25 +252,35 @@ class _NewGroupPageState extends State<NewGroupPage> {
   void _tryCreate() {
     if (_nameController.text.isEmpty) {
       setState(() {
-        _nameErr = AppLocalizations.of(context).enterGroupName;
+        _nameErr = true;
       });
     }
-    if (_shareCount < 2) {
+
+    final sharesIssue = getSharesWarning(
+      members: _members,
+      shareCount: _shareCount,
+      threshold: _threshold,
+      minThreshold: _minThreshold,
+      protocol: _protocol,
+    );
+
+    if (sharesIssue != null) {
       setState(() {
-        _sharesErr = (
-          title: AppLocalizations.of(context).atLeastTwoSharesRequired,
-          text: AppLocalizations.of(context).atLeastTwoSharesRequiredText,
-        );
+        _sharesErr = true;
       });
     }
 
     final AppContainer container = context.read<AppContainer>();
     final minGroupMembers =
         container.settingsController.currentSettings.minGroupMembers;
+
     if (_members.length < minGroupMembers) {
       setState(() {
-        _membersErr =
-            'At least $minGroupMembers members are required to create a group. You can change this in the application settings.';
+        _membersErr = true;
+      });
+    } else {
+      setState(() {
+        _membersErr = false;
       });
     }
 
@@ -280,15 +292,12 @@ class _NewGroupPageState extends State<NewGroupPage> {
         policy = {...policy, ...customPolicy};
       } catch (e) {
         setState(() {
-          _policyErr = AppLocalizations.of(context).invalidJson;
+          _policyErr = true;
         });
       }
     }
 
-    if (_nameErr != null ||
-        _sharesErr != null ||
-        _policyErr != null ||
-        _membersErr != null) {
+    if (_nameErr || _sharesErr || _policyErr || _membersErr) {
       return;
     }
 
@@ -323,23 +332,18 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
   @override
   Widget build(BuildContext context) {
-    final sharesIssue = _sharesErr ??
-        getSharesWarning(
-          members: _members,
-          shareCount: _shareCount,
-          threshold: _threshold,
-          minThreshold: _minThreshold,
-          protocol: _protocol,
-        );
-
     return DefaultPageTemplate(
         showAppBar: true,
         appBarTitle: AppLocalizations.of(context).newGroupTitle,
         includePadding: false,
-        body: _buildPageBody(sharesIssue));
+        body: _buildPageBody());
   }
 
-  Widget _buildPageBody(({String title, String text})? sharesIssue) {
+  Widget _buildPageBody() {
+    final AppContainer container = context.read<AppContainer>();
+    final minGroupMembers =
+        container.settingsController.currentSettings.minGroupMembers;
+
     return Column(
       children: [
         Expanded(
@@ -347,17 +351,18 @@ class _NewGroupPageState extends State<NewGroupPage> {
             children: [
               _buildNameInput(),
               _buildMembersSection(),
-              if (_membersErr != null)
-                WarningBanner(
-                  title: AppLocalizations.of(context).moreGroupMembersRequired,
-                  text: _membersErr!,
+              if (_membersErr)
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: MEDIUM_PADDING),
+                  child: WarningBanner(
+                    title:
+                        AppLocalizations.of(context).moreGroupMembersRequired,
+                    text: AppLocalizations.of(context)
+                        .minimumMembersRequired(minGroupMembers),
+                  ),
                 ),
               _buildThresholdSection(),
-              if (sharesIssue != null)
-                WarningBanner(
-                  title: sharesIssue.title,
-                  text: sharesIssue.text,
-                ),
+              if (_sharesErr) ...[_buildReactiveWarningBanner()],
               _buildPurposeSection(),
               if (_hasBot) _buildBotSection(),
               _buildAdvancedSection(),
@@ -370,6 +375,46 @@ class _NewGroupPageState extends State<NewGroupPage> {
     );
   }
 
+  Widget _buildReactiveWarningBanner() {
+    final shareWarning = getSharesWarning(
+      members: _members,
+      shareCount: _shareCount,
+      threshold: _threshold,
+      minThreshold: _minThreshold,
+      protocol: _protocol,
+    );
+
+    var title = '';
+    var warningText = '';
+
+    switch (shareWarning?.warningType) {
+      case ShareWarningType.manyShares:
+        title = AppLocalizations.of(context).manySharesWarning;
+        warningText = AppLocalizations.of(context).manySharesWarningText;
+        break;
+      case ShareWarningType.unnecessaryShares:
+        title = AppLocalizations.of(context).unnecessarySharesTitle;
+        warningText = AppLocalizations.of(context).unnecessarySharesText(
+            shareWarning?.warningParams?[0] ?? '',
+            shareWarning?.warningParams?[1] ?? '');
+        break;
+      case ShareWarningType.atLeastTwoShares:
+        title = AppLocalizations.of(context).atLeastTwoSharesRequired;
+        warningText = AppLocalizations.of(context).atLeastTwoSharesRequiredText;
+        break;
+      case null:
+        return const SizedBox.shrink();
+    }
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: MEDIUM_PADDING),
+      child: WarningBanner(
+        title: title,
+        text: warningText,
+      ),
+    );
+  }
+
   Widget _buildNameInput() {
     int maxNameLength = 32;
 
@@ -379,9 +424,9 @@ class _NewGroupPageState extends State<NewGroupPage> {
         TextField(
           controller: _nameController,
           decoration: InputDecoration(
-            // labelText: 'Name',
             border: const OutlineInputBorder(),
-            errorText: _nameErr,
+            errorText:
+                _nameErr ? AppLocalizations.of(context).enterGroupName : null,
           ),
           maxLength: maxNameLength,
           inputFormatters: [
@@ -473,7 +518,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                     setState(() {
                       if (newWeight > 0) {
                         _members[i] = Member(member.device, newWeight);
-                        _sharesErr = null;
+                        _sharesErr = false;
                         if (_protocol.thresholdType == ThresholdType.nOfN) {
                           _threshold = _shareCount;
                         }
@@ -518,7 +563,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                 // 2. Remove the member from the group
                 _members.removeAt(i);
 
-                _sharesErr = null;
+                _sharesErr = false;
                 if (_protocol.thresholdType == ThresholdType.nOfN) {
                   _threshold = _shareCount;
                 }
@@ -748,7 +793,9 @@ class _NewGroupPageState extends State<NewGroupPage> {
                 controller: _policyController,
                 decoration: InputDecoration(
                   border: const OutlineInputBorder(),
-                  errorText: _policyErr,
+                  errorText: _policyErr
+                      ? AppLocalizations.of(context).invalidJson
+                      : null,
                   hintText: const JsonEncoder.withIndent('  ')
                       .convert(_buildPolicy(includeAll: true)),
                 ),

@@ -260,5 +260,27 @@
     "createPdfSigningGroup": "Vytvořit skupinu pro podepisování PDF",
     "createPdfSigning": "Vytvořit úlohu podepisování PDF",
     "download": "Stáhnout",
-    "share": "Sdílet"
+    "share": "Sdílet",
+    "minimumMembersRequired": "Pro vytvoření skupiny je potřeba alespoň {minGroupMembers} členů. Toto můžete změnit v nastavení aplikace.",
+    "@minimumMembersRequired": {
+        "placeholders": {
+            "minGroupMembers": {
+                "type": "int"
+            }
+        }
+    },
+    "unnecessarySharesTitle": "Zbytečně volké množství podílů",
+    "unnecessarySharesText": "Můžete dosáhnout stejného rozložení hlasovacích práv nastavením prahu na {newThreshold} a podílů na ({newShares}). To může zlepšit výkon.",
+    "@unnecessarySharesText": {
+        "placeholders": {
+            "newThreshold": {
+                "type": "String"
+            },
+            "newShares": {
+                "type": "String"
+            }
+        }
+    },
+    "manySharesWarning": "Velké množství podílů",
+    "manySharesWarningText": "S některými protokoly můžete zaznamenat snížený výkon, pokud je počet podílů příliš vysoký. Zvažte odebrání některých členů nebo snížení počtu podílů, které obdrží, pokud zaznamenáte problém s výkonem."
 }
