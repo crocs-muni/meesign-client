@@ -3,6 +3,7 @@ import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
 import '../enums/fab_type.dart';
+import '../l10n/arb/app_localizations.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
 import '../util/actions/challenge_creator.dart';
@@ -73,15 +74,15 @@ class ChallengeListingPage extends StatelessWidget {
                   fit: BoxFit.fitWidth,
                 ),
               ),
-              const Text(
-                'Try creating a new challenge.',
+              Text(
+                AppLocalizations.of(context).tryNewChallenge,
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: SMALL_GAP),
               Text(
                 groupForTaskExists
-                    ? 'Start by creating a new challenge.'
-                    : 'Start by creating a group for challenges.',
+                    ? AppLocalizations.of(context).startWithNewChallenge
+                    : AppLocalizations.of(context).startWithChallengeGroup,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: LARGE_GAP),
@@ -94,14 +95,15 @@ class ChallengeListingPage extends StatelessWidget {
                     tabViewModel.setIndex(3,
                         postNavigationAction: 'createChallengeGroup');
                   },
-                  child: const Text('Create a challenge group'),
+                  child:
+                      Text(AppLocalizations.of(context).createChallengeGroup),
                 ),
               ] else ...[
                 ElevatedButton(
                   onPressed: () {
-                    createChallenge(context, context);
+                    createChallenge(context: context, buildContext: context);
                   },
-                  child: const Text('Create a challenge'),
+                  child: Text(AppLocalizations.of(context).createChallenge),
                 )
               ]
             ],

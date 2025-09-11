@@ -3,12 +3,18 @@ import 'package:meesign_core/meesign_core.dart';
 
 import '../../pages/new_task_page.dart';
 
-Future<void> signDocument(
-    BuildContext context, BuildContext buildContext) async {
-  Navigator.push(
+Future<bool?> signDocument(
+    {required BuildContext context,
+    required BuildContext buildContext,
+    Task? templateSignTask}) async {
+  return await Navigator.push(
     context,
-    MaterialPageRoute<void>(
-      builder: (context) => NewTaskPage(initialTaskType: KeyType.signPdf),
+    MaterialPageRoute<bool>(
+      builder: (context) => NewTaskPage(
+        initialTaskType: KeyType.signPdf,
+        templateTask: templateSignTask,
+        showTaskTypeSelector: true,
+      ),
     ),
   );
 }

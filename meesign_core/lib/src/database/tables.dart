@@ -9,6 +9,7 @@ class Devices extends Table {
   BlobColumn get id => blob()();
   TextColumn get name => text()();
   TextColumn get kind => textEnum<DeviceKind>()();
+  BoolColumn get isLocal => boolean().withDefault(const Constant(false))();
 
   @override
   Set<Column> get primaryKey => {id};

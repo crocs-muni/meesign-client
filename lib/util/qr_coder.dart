@@ -25,6 +25,6 @@ class QrCoder {
     final name = args[1];
     final kind = DeviceKind.values.firstWhere((kind) => kind.name == args[2]);
 
-    return Device(name, Uuid(id), kind, DateTime.now());
+    return Device(name, Uuid(id), kind, DateTime.now(), isLocal: false);
   }
 }

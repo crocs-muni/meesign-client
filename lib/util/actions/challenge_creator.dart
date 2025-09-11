@@ -2,11 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:meesign_core/meesign_core.dart';
 import '../../pages/new_task_page.dart';
 
-void createChallenge(BuildContext context, BuildContext buildContext) async {
-  Navigator.push(
+Future<bool?> createChallenge(
+    {required BuildContext context,
+    required BuildContext buildContext,
+    Task? templateChallenge}) async {
+  return await Navigator.push(
     context,
-    MaterialPageRoute<void>(
-      builder: (context) => NewTaskPage(initialTaskType: KeyType.signChallenge),
+    MaterialPageRoute<bool>(
+      builder: (context) => NewTaskPage(
+        initialTaskType: KeyType.signChallenge,
+        templateTask: templateChallenge,
+        showTaskTypeSelector: true,
+      ),
     ),
   );
 }

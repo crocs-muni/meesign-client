@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
-void showConfirmationDialog(BuildContext context, String title,
+import '../l10n/arb/app_localizations.dart';
+
+Future<bool?> showConfirmationDialog(BuildContext context, String title,
     String description, String confirmButtonText, Function onConfirm) {
-  showDialog(
+  return showDialog<bool>(
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
@@ -11,14 +13,14 @@ void showConfirmationDialog(BuildContext context, String title,
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(dialogContext);
+                Navigator.pop(dialogContext, false);
               },
-              child: Text('Cancel'),
+              child: Text(AppLocalizations.of(context).cancel),
             ),
             TextButton(
               onPressed: () {
                 onConfirm();
-                Navigator.pop(dialogContext);
+                Navigator.pop(dialogContext, true);
               },
               child: Text(confirmButtonText),
             )

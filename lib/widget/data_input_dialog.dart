@@ -10,19 +10,20 @@ import 'package:meesign_core/meesign_core.dart';
 import 'package:mime/mime.dart';
 
 import '../enums/data_input_type.dart';
+import '../l10n/arb/app_localizations.dart';
 import '../util/chars.dart';
 
 class DataInputDialog extends StatefulWidget {
-  final String title;
+  final String? _title;
   final Set<DataInputType> dataInputTypes;
   final DataInputType? defaultDataInputType;
 
   DataInputDialog({
     super.key,
-    this.title = 'Enter input',
+    String? title,
     required this.dataInputTypes,
     this.defaultDataInputType,
-  }) {
+  }) : _title = title {
     assert(dataInputTypes.isNotEmpty);
     if (defaultDataInputType != null) {
       assert(dataInputTypes.contains(defaultDataInputType));
@@ -92,15 +93,15 @@ class _DataInputDialogState extends State<DataInputDialog> {
     final image = _image;
 
     return AlertDialog(
-      title: Text(widget.title),
+      title: Text(widget._title ?? AppLocalizations.of(context).enterInput),
       actions: [
         TextButton(
           onPressed: _handleCancel,
-          child: const Text('Cancel'),
+          child: Text(AppLocalizations.of(context).cancel),
         ),
         TextButton(
           onPressed: _handleOk,
-          child: const Text('OK'),
+          child: Text(AppLocalizations.of(context).ok),
         )
       ],
       scrollable: true,
@@ -110,9 +111,9 @@ class _DataInputDialogState extends State<DataInputDialog> {
         children: [
           TextField(
             controller: _description,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'Description',
+            decoration: InputDecoration(
+              border: const OutlineInputBorder(),
+              labelText: AppLocalizations.of(context).description,
             ),
           ),
           const SizedBox(height: 16),
@@ -143,15 +144,15 @@ class _DataInputDialogState extends State<DataInputDialog> {
           switch (_dataInputType) {
             DataInputType.text => TextField(
                 controller: _message,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Message',
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  labelText: AppLocalizations.of(context).message,
                 ),
               ),
             DataInputType.image => image == null
                 ? OutlinedButton(
                     onPressed: _selectImage,
-                    child: const Text('Select'),
+                    child: Text(AppLocalizations.of(context).select),
                   )
                 : Stack(
                     alignment: Alignment.center,

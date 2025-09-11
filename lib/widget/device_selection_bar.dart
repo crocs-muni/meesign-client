@@ -7,11 +7,13 @@ import 'entity_chip.dart';
 class DeviceSelectionBar extends StatefulWidget implements PreferredSizeWidget {
   final List<Device> devices;
   final void Function(Device) onDeleted;
+  final bool showNoPeerSelected;
 
   const DeviceSelectionBar({
     super.key,
     required this.devices,
     required this.onDeleted,
+    this.showNoPeerSelected = true,
   });
 
   @override
@@ -58,9 +60,11 @@ class _DeviceSelectionBarState extends State<DeviceSelectionBar> {
       child: Align(
         alignment: Alignment.topCenter,
         child: device == null
-            ? InputChip(
-                label: Text("No peer selected"),
-              )
+            ? widget.showNoPeerSelected
+                ? InputChip(
+                    label: Text("No peer selected"),
+                  )
+                : const SizedBox.shrink()
             : DeviceChip(
                 device: device,
                 onDeleted: () => onDeleted(device),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../l10n/arb/app_localizations.dart';
+
 import '../enums/fab_type.dart';
 import '../enums/task_type.dart';
 import '../util/actions/challenge_creator.dart';
@@ -34,7 +36,7 @@ class FabConfigurator extends StatelessWidget {
         return _buildEncryptFab(context);
       case FabType.groupFab:
         return _buildGroupsFab(context);
-      case FabType.newTaskFab:
+      default:
         return _buildNewTaskFab(context);
     }
   }
@@ -49,11 +51,11 @@ class FabConfigurator extends StatelessWidget {
 
         if (context.mounted) {
           if (result == TaskType.sign) {
-            signDocument(context, context);
+            signDocument(context: context, buildContext: context);
           } else if (result == TaskType.decrypt) {
-            encryptData(context, context);
+            encryptData(context: context, buildContext: context);
           } else if (result == TaskType.challenge) {
-            createChallenge(context, context);
+            createChallenge(context: context, buildContext: context);
           }
         }
       },
@@ -67,7 +69,7 @@ class FabConfigurator extends StatelessWidget {
     return FloatingActionButton.extended(
       key: ValueKey(key),
       heroTag: key,
-      onPressed: () => signDocument(context, buildContext),
+      onPressed: () => signDocument(context: context, buildContext: context),
       label: const Text('New signature'),
       icon: const Icon(Symbols.add),
     );
@@ -78,7 +80,7 @@ class FabConfigurator extends StatelessWidget {
     return FloatingActionButton.extended(
       key: ValueKey(key),
       heroTag: key,
-      onPressed: () => createChallenge(context, buildContext),
+      onPressed: () => createChallenge(context: context, buildContext: context),
       label: const Text('New challenge'),
       icon: const Icon(Symbols.add),
     );
@@ -89,7 +91,7 @@ class FabConfigurator extends StatelessWidget {
     return FloatingActionButton.extended(
       key: ValueKey(key),
       heroTag: key,
-      onPressed: () => encryptData(context, buildContext),
+      onPressed: () => encryptData(context: context, buildContext: context),
       label: const Text('New encryption'),
       icon: const Icon(Symbols.add),
     );
@@ -101,7 +103,7 @@ class FabConfigurator extends StatelessWidget {
       key: ValueKey(key),
       heroTag: key,
       onPressed: () => createGroup(context, buildContext),
-      label: const Text('New group'),
+      label: Text(AppLocalizations.of(context).newGroup),
       icon: const Icon(Symbols.add),
     );
   }

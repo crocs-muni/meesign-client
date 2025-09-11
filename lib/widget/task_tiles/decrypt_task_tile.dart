@@ -1,21 +1,19 @@
 import 'dart:convert';
-import 'dart:math';
 
-import 'package:file_selector/file_selector.dart';
+import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:meesign_core/meesign_core.dart';
-import 'package:mime/mime.dart';
-import 'package:provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
-import 'package:share_plus/share_plus.dart';
 
-import '../../util/platform.dart';
+import '../../l10n/arb/app_localizations.dart';
+import 'package:provider/provider.dart';
+
+import '../../pages/task_detail_page.dart';
+import '../../ui_constants.dart';
+import '../../util/actions/encrypt_data.dart';
 import '../../util/status_message.dart';
 import '../../view_model/app_view_model.dart';
 import '../entity_chip.dart';
+import '../large_square_button.dart';
 import '../task_tile.dart';
 
 class DecryptTaskTile extends StatelessWidget {
@@ -31,143 +29,92 @@ class DecryptTaskTile extends StatelessWidget {
     final model = Provider.of<AppViewModel>(context, listen: false);
 
     return TaskTile(
+      key: ValueKey('decrypt-task-${task.id}'),
       task: task,
       name: task.info.name,
       showDetailRow: false,
-      desc: StatusMessage.getStatusMessage(task),
-      actionChip: GroupChip(group: task.info.group),
-      approveActions: [
-        FilledButton.tonal(
-          child: const Text('Decrypt'),
-          onPressed: () => model.joinDecrypt(task, agree: true),
-        ),
-        OutlinedButton(
-          child: const Text('Decline'),
-          onPressed: () => model.joinDecrypt(task, agree: false),
-        )
-      ],
-      actions: [
-        if (task.state == TaskState.finished)
-          FilledButton.tonal(
-            onPressed: () => showDecryptDialog(context, task.info),
-            child: const Text('View'),
-          )
-      ],
-      onArchiveChange: (archive) => model.archiveTask(task, archive: archive),
-    );
-  }
-
-  Future<void> showDecryptDialog(BuildContext context, Decrypt decrypt) async {
-    const duration = Duration(seconds: 5);
-    const refreshInterval = Duration(milliseconds: 20);
-    int steps = duration.inMilliseconds ~/ refreshInterval.inMilliseconds;
-    final countdown =
-        Stream.periodic(refreshInterval, (i) => max(0, steps - i));
-    final countdownSubject = BehaviorSubject<int>();
-    bool isDialogOpen = true;
-    final sub = countdown.listen((value) {
-      countdownSubject.add(value);
-
-      // We need to check if isDialogOpen, to avoid closing the dialog multiple times
-      // and jumping out of the navigator stack
-      if (value == 0 && isDialogOpen) {
-        isDialogOpen = false;
-        if (context.mounted) {
-          Navigator.of(context, rootNavigator: true).pop();
-        }
-      }
-    });
-
-    final text = decrypt.dataType == MimeType.textUtf8
-        ? utf8.decode(decrypt.data, allowMalformed: true)
-        : null;
-
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          icon: StreamBuilder(
-            stream: countdownSubject.stream,
-            builder: (context, snapshot) {
-              return Center(
-                child: SizedBox.square(
-                  dimension: 24,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    value: (snapshot.data ?? steps) / steps,
+      desc: StatusMessage.getStatusMessage(task, context),
+      actionChip: Row(
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GroupChip(group: task.info.group),
+          SizedBox(
+            width: SMALL_GAP,
+          ),
+          if (task.state == TaskState.finished) ...[
+            FilledButton.tonal(
+              style: FilledButton.styleFrom(
+                side: const BorderSide(
+                  color: Colors.grey,
+                  width: 1.0,
+                ),
+              ),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (context) => TaskDetailPage(
+                    title: task.info.name,
+                    group: task.info.group,
+                    timedAutoClose: true,
+                    autoCloseDurationInSeconds: 5,
+                    isArchived: task.archived,
+                    keyType: KeyType.decrypt,
+                    task: task,
+                    imageDecrypt: task.info.dataType.isImage ? task.info : null,
+                    textValue: task.info.dataType.isText
+                        ? utf8.decode(task.info.data, allowMalformed: true)
+                        : null,
+                    hexValue: task.info.dataType.isText
+                        ? hex.encode(task.info.data)
+                        : null,
                   ),
                 ),
-              );
-            },
-          ),
-          title: Text(decrypt.name),
-          content: switch (decrypt.dataType) {
-            MimeType.textUtf8 => Text(text!, textAlign: TextAlign.center),
-            MimeType.imageSvg => SvgPicture.memory(decrypt.data as Uint8List),
-            var t when t.isImage => Image.memory(decrypt.data as Uint8List),
-            _ => const Text(
-                'Error: Unknown data type',
-                textAlign: TextAlign.center,
               ),
-          },
-          actionsAlignment: MainAxisAlignment.spaceBetween,
-          actions: [
-            switch (decrypt.dataType) {
-              MimeType.textUtf8 => IconButton(
-                  onPressed: () {
-                    Clipboard.setData(ClipboardData(text: text!));
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Copied!')),
-                    );
-                  },
-                  icon: const Icon(Symbols.content_copy),
-                ),
-              var t when t.isImage => IconButton(
-                  onPressed: () async {
-                    sub.pause();
-                    await _shareDecrypt(decrypt);
-                    sub.resume();
-                  },
-                  icon: Icon(PlatformGroup.isMobile
-                      ? Symbols.share
-                      : Symbols.save_alt),
-                ),
-              _ => const SizedBox(),
-            },
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Hide'),
+              child: Text(AppLocalizations.of(context).view),
             ),
           ],
-        );
-      },
+          SizedBox(
+            width: SMALL_GAP,
+          ),
+          if (task.state == TaskState.finished ||
+              task.state == TaskState.failed) ...[
+            FilledButton.tonal(
+              style: FilledButton.styleFrom(
+                side: const BorderSide(
+                  color: Colors.grey,
+                  width: 1.0,
+                ),
+              ),
+              onPressed: () => encryptData(
+                context: context,
+                buildContext: context,
+                templateDecryptTask: task,
+              ),
+              child: Text(AppLocalizations.of(context).copy),
+            ),
+          ],
+        ],
+      ),
+      approveActions: [
+        LargeSquareButton(
+          text: AppLocalizations.of(context).decrypt,
+          icon: Icons.check,
+          onPressed: () {
+            model.joinDecrypt(task, agree: true);
+          },
+          color: Color(0xFF298E29),
+        ),
+        LargeSquareButton(
+            text: AppLocalizations.of(context).decline,
+            icon: Icons.close,
+            onPressed: () {
+              model.joinDecrypt(task, agree: false);
+            },
+            color: Color(0xFFAA3026)),
+      ],
+      actions: const [],
+      onArchiveChange: (archive) => model.archiveTask(task, archive: archive),
     );
-
-    sub.cancel();
-  }
-
-  static Future<void> _shareDecrypt(Decrypt decrypt) async {
-    final file = XFile.fromData(
-      decrypt.data as Uint8List,
-      name: decrypt.name,
-      mimeType: decrypt.dataType.value,
-    );
-
-    if (PlatformGroup.isDesktop) {
-      final ext = extensionFromMime(decrypt.dataType.value);
-      final loc = await getSaveLocation(
-        suggestedName: '${decrypt.name}.$ext',
-      );
-      if (loc != null) {
-        file.saveTo(loc.path);
-      }
-    }
-    if (PlatformGroup.isMobile) {
-      await SharePlus.instance.share(ShareParams(
-        files: [file],
-        text: decrypt.name,
-      ));
-    }
   }
 }

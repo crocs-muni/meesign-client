@@ -1,0 +1,286 @@
+{
+    "languageSettingsTitle": "Nastavení jazyka",
+    "languageSettingsDescription": "Vyberte si preferovaný jazyk pro uživatelské rozhraní aplikace.",
+    "archivationSettingsTitle": "Nastavení archivace",
+    "archivationSettingsDescription": "Můžete si vybrat, zda chcete zobrazovat položky, které byly archivovány. Archivované položky budou zobrazeny na svých odpovídajících stránkách.",
+    "showArchivedItems": "Zobrazit archivované položky",
+    "themeSettingsTitle": "Nastavení motivu aplikace",
+    "themeSettingsDescription": "Můžete ručně nastavit svůj preferovaný motiv, nebo použít systémový motiv pro automatické nastavení barevného schématu na základě nastavení vašeho operačního systému.",
+    "useSystemTheme": "Použít systémový motiv",
+    "darkMode": "Tmavý režim",
+    "generalSettingsTitle": "Obecná nastavení",
+    "applicationSettingsTitle": "Co by jste chtěli dělat?",
+    "deviceAndServerSettingsTitle": "Zařízení a server",
+    "groupSettingsTitle": "Nastavení skupin",
+    "aboutThisProject": "O tomto projektu",
+    "deviceSettingsTitle": "Nastavení zařízení",
+    "deviceName": "Název zařízení",
+    "nameToIdentifyYourselfHint": "Jméno pod kterým vás uvidí ostatní",
+    "changeServerOrDeviceTitle": "Změnit server nebo zařízení",
+    "changeServerOrDeviceDescription": "Tímto se vrátíte na registrační obrazovku, kde můžete změnit server nebo zaregistrovat nové zařízení.",
+    "changeDeviceButton": "Změnit zařízení",
+    "dangerZoneTitle": "Nebezpečná zóna",
+    "dangerZoneDescription": "Tato akce efektivně smaže vaše zařízení a všechna související data. Po smazání budete muset znovu zaregistrovat své zařízení, abyste mohli pokračovat v používání aplikace.",
+    "deleteDeviceButton": "Smazat zařízení",
+    "groupAutomationSettingsTitle": "Nastavení automatizace skupin",
+    "groupAutomationSettingsDescription": "Ve výchozím nastavení budou všechny pozvánky do skupin, které obdržíte, automaticky přijaty. Toto chování můžete změnit v sekci níže, kde je možné zapnout ruční posouzení každé pozvánky.",
+    "automaticallyAcceptGroupInvitations": "Automaticky přijímat pozvánky do skupin",
+    "minimumNumberOfMembersToCreateGroup": "Minimální počet členů pro vytvoření skupiny",
+    "manageGroups": "Spravovat skupiny",
+    "manageGroupsDescription": "Spravujte své skupiny a pozvánky do skupin",
+    "version": "verze",
+    "developedBy": "Vyvinuto skupinou",
+    "projectWebsite": "Web projektu",
+    "crocsWebsite": "Web CRoCS",
+    "authors": "Autoři:",
+    "noTasksAvailable": "Žádné úlohy k dispozici",
+    "noTasksAvailableDescription": "Připojte se ke skupině a vytvořte váši první úlohu.",
+    "createGroup": "Vytvořit skupinu",
+    "createNewTask": "Vytvořit novou úlohu",
+    "createNewTaskTitle": "Vytvořit novou úlohu",
+    "typeOfTask": "Typ úlohy",
+    "signPdf": "Podepsat PDF",
+    "challenge": "Výzva",
+    "decrypt": "Dešifrovat",
+    "pdfSigning": "podepisování PDF",
+    "decryption": "dešifrování",
+    "nameOfPdfSigningTask": "Název úlohy pro podepisování PDF",
+    "nameOfChallengeTask": "Název úlohy pro výzvu",
+    "nameOfDecryptionTask": "Název úlohy pro dešifrování",
+    "enterDescriptionOfTask": "Zadejte popis úlohy {taskType}",
+    "@enterDescriptionOfTask": {
+        "placeholders": {
+            "taskType": {
+                "type": "String"
+            }
+        }
+    },
+    "selectDecryptionType": "Vyberte typ dešifrování",
+    "decryptAMessage": "Dešifrovat zprávu",
+    "decryptAnImage": "Dešifrovat obrázek",
+    "selectImage": "Vybrat obrázek",
+    "enterMessageToBeSigned": "Zadejte zprávu k podpisu",
+    "enterMessageToBeDecrypted": "Zadejte zprávu k dešifrování",
+    "enterMessage": "Zadejte zprávu",
+    "enterTheMessage": "Zadejte zprávu",
+    "selectGroupForNewTask": "Vyberte skupinu pro novou úlohu",
+    "refreshGroups": "Obnovit skupiny",
+    "noGroupsAvailableForTaskType": "Pro tento typ úlohy zatím nejsou k dispozici žádné skupiny.",
+    "createGroupForPdfSigning": "Vytvořit skupinu pro podepisování PDF",
+    "createGroupForChallenges": "Vytvořit skupinu pro výzvy",
+    "createGroupForDecryption": "Vytvořit skupinu pro dešifrování",
+    "createTaskButton": "Vytvořit úlohu {taskType}",
+    "@createTaskButton": {
+        "placeholders": {
+            "taskType": {
+                "type": "String"
+            }
+        }
+    },
+    "selectPdf": "Vybrat PDF",
+    "chooseFile": "Vybrat soubor",
+    "changeFile": "Změnit soubor",
+    "fileTooLarge": "Soubor je příliš velký",
+    "pleaseSelectSmallerOne": "Prosím vyberte menší.",
+    "dataTooLarge": "Data jsou příliš velká",
+    "pleaseSelectSmallerImageOrShorterText": "Prosím vyberte menší obrázek nebo zadejte kratší text.",
+    "challengeRequestFailed": "Požadavek na výzvu selhal",
+    "pleaseTryAgain": "Prosím zkuste to znovu.",
+    "decryptionRequestFailed": "Požadavek na dešifrování selhal",
+    "signRequestFailed": "Požadavek na podpis selhal",
+    "newGroupTitle": "Nová skupina",
+    "groupName": "Název skupiny",
+    "enterGroupName": "Zadejte název skupiny",
+    "members": "Členové",
+    "membersHelpText": "Ve výchozím nastavení každý člen obdrží jeden podíl soukromého klíče skupiny. Výsledkem je, že všichni členové mají stejná hlasovací práva.\n\nPočet podílů klíče, které daný člen obdrží, můžete změnit pomocí šipek vedle jeho jména. Kruh kolem avataru uživatele vizualizuje jeho hlasovací sílu.\n\nNapříklad uživatel níže obdrží jeden podíl, což představuje jednu třetinu celkového počtu hlasů.",
+    "example": "příklad",
+    "addMembers": "Přidat členy",
+    "scan": "Skenovat",
+    "threshold": "Práh",
+    "thresholdHelpText": "Žádná úloha skupiny nemůže uspět, pokud není shromážděn alespoň stanovený počet pozitivních hlasů od členů skupiny. Nastavením prahu a počtu podílů, které každý uživatel obdrží, můžete vynutit, aby pouze určité podmnožiny skupiny mohly pokračovat v dané úloze.",
+    "purpose": "Účel",
+    "policy": "Zásady",
+    "policyHelpText": "Pokud je ve skupině přítomen bot, můžete nastavit pravidla, které upravují jeho chování (kdy schválit nebo zamítnout požadavky).\n\nV závislosti na konfiguraci bota může ignorovat uživatelsky poskytované pravidla.",
+    "time": "Čas",
+    "declineIfNotSatisfiedImmediately": "Zamítnout, pokud není okamžitě splněno",
+    "advancedOptions": "Pokročilé možnosti",
+    "protocol": "Protokol",
+    "customPolicy": "Vlastní pravidla",
+    "invalidJson": "Neplatný JSON",
+    "moreGroupMembersRequired": "Vyžadováno více členů skupiny",
+    "atLeastTwoSharesRequired": "Vyžadovány alespoň dva podíly",
+    "atLeastTwoSharesRequiredText": "Buď přidejte nové členy do skupiny, nebo dejte více podílů stávajícím členům.",
+    "shareSliderDisabledTitle": "Posuvník podílů je pro tento protokol zakázán",
+    "shareSliderDisabledText": "Při použití protokolu MUSIG2 je práh vždy nastaven na maximální počet podílů. Proto není možné použít posuvník.",
+    "ok": "Ok",
+    "create": "Vytvořit",
+    "add": "Přidat",
+    "searchForPeer": "Hledat členy",
+    "noPeersExistOnServer": "Na tomto serveru neexistují žádní jiní členové.",
+    "noPeersWithSuchNameFound": "Nebyli nalezeni žádní členové s takovým názvem",
+    "searchTasksByName": "Hledat úlohy podle názvu...",
+    "tasks": "úlohy",
+    "groups": "Skupiny",
+    "challenges": "Výzvy",
+    "decryptions": "Dešifrování",
+    "signings": "Podpisy",
+    "noWaitingTasksFoundForQuery": "Nebyly nalezeny žádné čekající úlohy pro \"{query}\".",
+    "@noWaitingTasksFoundForQuery": {
+        "placeholders": {
+            "query": {
+                "type": "String"
+            }
+        }
+    },
+    "noWaitingTasksFound": "Momentálně nejsou nalezeny žádné čekající úlohy.",
+    "noTasksFoundForQuery": "Nebyly nalezeny žádné úlohy pro \"{query}\".",
+    "@noTasksFoundForQuery": {
+        "placeholders": {
+            "query": {
+                "type": "String"
+            }
+        }
+    },
+    "reloadTasks": "Obnovit úlohy",
+    "reloadGroups": "Obnovit skupiny",
+    "showOnlyPending": "Zobrazit pouze čekající",
+    "membersSubtitle": "{userCount} uživatel{userPlural}, {botCount} bot{botPlural}",
+    "@membersSubtitle": {
+        "placeholders": {
+            "userCount": {
+                "type": "int"
+            },
+            "userPlural": {
+                "type": "String"
+            },
+            "botCount": {
+                "type": "int"
+            },
+            "botPlural": {
+                "type": "String"
+            }
+        }
+    },
+    "selectGroupForNewTask": "Vyberte skupinu pro novou úlohu",
+    "refreshGroups": "Obnovit skupiny",
+    "noGroupsAvailableForTaskType": "Pro tento typ úlohy zatím nejsou k dispozici žádné skupiny.",
+    "createGroupForPdfSigning": "Vytvořit skupinu pro podepisování PDF",
+    "createGroupForChallenges": "Vytvořit skupinu pro výzvy",
+    "createGroupForDecryption": "Vytvořit skupinu pro dešifrování",
+    "images": "Obrázky",
+    "view": "Zobrazit",
+    "sign": "Podepsat",
+    "decline": "Zamítnout",
+    "readCard": "Načíst kartu",
+    "decrypt": "Dešifrovat",
+    "join": "Připojit se",
+    "joinWithCard": "Připojit se s kartou",
+    "waitingForConfirmation": "Čeká se na potvrzení",
+    "waitingForConfirmationByOthers": "Čeká se na potvrzení ostatními",
+    "workingOnTask": "Pracuje se na úloze",
+    "needsCardToContinue": "Pro pokračování je potřeba karta",
+    "waiting": "Čeká se",
+    "newTask": "Nová úloha",
+    "newGroup": "Nová skupina",
+    "confirmDeletion": "Potvrdit smazání",
+    "confirmDeviceDeletion": "Opravdu chcete smazat toto zařízení?",
+    "delete": "Smazat",
+    "confirmProfileChange": "Potvrdit změnu profilu",
+    "confirmServerOrDeviceChange": "Opravdu chcete změnit server nebo zařízení?",
+    "confirm": "Potvrdit",
+    "name": "Jméno",
+    "server": "Server",
+    "nameMustNotBeEmpty": "Jméno nesmí být prázdné",
+    "failedToRegister": "Registrace selhala",
+    "register": "Registrovat",
+    "useExistingAccount": "nebo použít existující účet",
+    "selectAccount": "Vybrat účet",
+    "cancel": "Zrušit",
+    "edit": "Upravit",
+    "noAccountsFound": "Nebyly nalezeny žádné účty",
+    "areYouSureDeleteDevices": "Opravdu chcete smazat tato zařízení?",
+    "areYouSureDeleteDevice": "Opravdu chcete smazat toto zařízení?",
+    "deleteDevicesConfirmation": "Tímto smažete vybraná zařízení a veškerou jejich komunikaci. Tuto akci nelze vrátit zpět.",
+    "deleteDeviceConfirmation": "Tímto smažete vybrané zařízení a veškerou jeho komunikaci. Tuto akci nelze vrátit zpět.",
+    "devicesDeleted": "Smazáno {count} zařízení.",
+    "@devicesDeleted": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "deviceDeleted": "Smazáno {count} zařízení.",
+    "@deviceDeleted": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "taskDetail": "Detail úlohy",
+    "taskName": "Název úlohy",
+    "fileName": "Název souboru",
+    "taskValue": "Hodnota úlohy",
+    "taskImage": "Obrázek úlohy",
+    "openPdfFile": "Otevřít PDF soubor",
+    "hexValue": "Hexadecimální hodnota",
+    "taskGroup": "Skupina úlohy",
+    "cancel": "Zrušit",
+    "ok": "OK",
+    "description": "Popis",
+    "message": "Zpráva",
+    "select": "Vybrat",
+    "enterInput": "Zadejte vstup",
+    "archived": "Archivováno",
+    "noGroupsYet": "Zatím nejsou vytvořeny žádné skupiny.",
+    "createGroupToStart": "Vytvořte první skupinu pro používání aplikace.",
+    "createGroupButton": "Vytvořit skupinu",
+    "back": "Zpět",
+    "useTemplateForGroup": "Použít jako šablonu pro novou skupinu",
+    "useTemplateForTask": "Použít jako šablonu pro novou úlohu",
+    "copy": "Kopírovat",
+    "copyNoun": "Kopie",
+    "taskState": "Stav úlohy",
+    "archived": "Archivováno",
+    "settings": "Nastavení",
+    "tryNewChallenge": "Zkuste vytvořit novou výzvu",
+    "startWithNewChallenge": "Začněte vytvořením nové výzvy",
+    "startWithChallengeGroup": "Začněte vytvořením skupiny pro výzvy",
+    "createChallengeGroup": "Vytvořit skupinu pro výzvy",
+    "createChallenge": "Vytvořit výzvu",
+    "tryEncryptingData": "Zkuste zašifrovat data",
+    "startWithNewDecryption": "Začněte vytvořením nové úlohy dešifrování",
+    "startWithDecryptionGroup": "Začněte vytvořením skupiny pro dešifrování",
+    "createDecryptionGroup": "Vytvořit skupinu pro dešifrování",
+    "createDecryption": "Vytvořit dešifrovací úlohu",
+    "trySigningPdf": "Zkuste podepsat PDF",
+    "startWithNewPdfSigning": "Začněte vytvořením nové úlohy podepisování PDF",
+    "startWithPdfSigningGroup": "Začněte vytvořením skupiny pro podepisování PDF",
+    "createPdfSigningGroup": "Vytvořit skupinu pro podepisování PDF",
+    "createPdfSigning": "Vytvořit úlohu podepisování PDF",
+    "download": "Stáhnout",
+    "share": "Sdílet",
+    "minimumMembersRequired": "Pro vytvoření skupiny je potřeba alespoň {minGroupMembers} členů. Toto můžete změnit v nastavení aplikace.",
+    "@minimumMembersRequired": {
+        "placeholders": {
+            "minGroupMembers": {
+                "type": "int"
+            }
+        }
+    },
+    "unnecessarySharesTitle": "Zbytečně volké množství podílů",
+    "unnecessarySharesText": "Můžete dosáhnout stejného rozložení hlasovacích práv nastavením prahu na {newThreshold} a podílů na ({newShares}). To může zlepšit výkon.",
+    "@unnecessarySharesText": {
+        "placeholders": {
+            "newThreshold": {
+                "type": "String"
+            },
+            "newShares": {
+                "type": "String"
+            }
+        }
+    },
+    "manySharesWarning": "Velké množství podílů",
+    "manySharesWarningText": "S některými protokoly můžete zaznamenat snížený výkon, pokud je počet podílů příliš vysoký. Zvažte odebrání některých členů nebo snížení počtu podílů, které obdrží, pokud zaznamenáte problém s výkonem."
+}

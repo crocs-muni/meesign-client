@@ -1,13 +1,15 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:meesign_core/meesign_core.dart';
-import 'package:open_filex/open_filex.dart';
-import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
+import '../../l10n/arb/app_localizations.dart';
+import 'package:provider/provider.dart';
+
+import '../../pages/task_detail_page.dart';
+import '../../ui_constants.dart';
+import '../../util/actions/document_signer.dart';
 import '../../view_model/app_view_model.dart';
 import '../entity_chip.dart';
+import '../large_square_button.dart';
 import '../task_tile.dart';
 
 class SigningTaskTile extends StatelessWidget {
@@ -23,37 +25,82 @@ class SigningTaskTile extends StatelessWidget {
     final model = Provider.of<AppViewModel>(context, listen: false);
 
     return TaskTile(
+      key: ValueKey('signing-task-${task.id}'),
       task: task,
       name: task.info.basename,
       showDetailRow: false,
-      actionChip: GroupChip(group: task.info.group),
-      actions: <Widget>[
-        FilledButton.tonal(
-          child: const Text('View'),
-          onPressed: () => _openFile(task.info.path),
-        ),
-      ],
+      actionChip: Row(
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GroupChip(group: task.info.group),
+          SizedBox(
+            width: SMALL_GAP,
+          ),
+          if (task.state == TaskState.finished) ...[
+            FilledButton.tonal(
+              style: FilledButton.styleFrom(
+                side: const BorderSide(
+                  color: Colors.grey,
+                  width: 1.0,
+                ),
+              ),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (context) => TaskDetailPage(
+                    group: task.info.group,
+                    title: task.info.basename,
+                    filePath: task.info.path,
+                    isArchived: task.archived,
+                    keyType: KeyType.signPdf,
+                    task: task,
+                  ),
+                ),
+              ),
+              child: Text(AppLocalizations.of(context).view),
+            )
+          ],
+          SizedBox(
+            width: SMALL_GAP,
+          ),
+          if (task.state == TaskState.finished ||
+              task.state == TaskState.failed) ...[
+            FilledButton.tonal(
+              style: FilledButton.styleFrom(
+                side: const BorderSide(
+                  color: Colors.grey,
+                  width: 1.0,
+                ),
+              ),
+              onPressed: () => signDocument(
+                  context: context,
+                  buildContext: context,
+                  templateSignTask: task),
+              child: Text(AppLocalizations.of(context).copy),
+            ),
+          ],
+        ],
+      ),
+      actions: const [],
       approveActions: [
-        FilledButton.tonal(
-          child: const Text('Sign'),
-          onPressed: () => model.joinSign(task, agree: true),
+        LargeSquareButton(
+          text: AppLocalizations.of(context).sign,
+          icon: Icons.check,
+          onPressed: () {
+            model.joinSign(task, agree: true);
+          },
+          color: Color(0xFF298E29),
         ),
-        OutlinedButton(
-          child: const Text('Decline'),
-          onPressed: () => model.joinSign(task, agree: false),
-        ),
+        LargeSquareButton(
+            text: AppLocalizations.of(context).decline,
+            icon: Icons.close,
+            onPressed: () {
+              model.joinSign(task, agree: false);
+            },
+            color: Color(0xFFAA3026)),
       ],
       onArchiveChange: (archive) => model.archiveTask(task, archive: archive),
     );
-  }
-
-  void _openFile(String path) {
-    if (Platform.isLinux) {
-      launchUrl(Uri.file(path));
-    } else {
-      // FIXME: try to avoid open_file package,
-      // it seems to be of low quality
-      OpenFilex.open(path);
-    }
   }
 }

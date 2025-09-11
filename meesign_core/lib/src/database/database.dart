@@ -40,5 +40,15 @@ class Database extends _$Database {
       });
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onUpgrade: (Migrator m, int from, int to) async {
+          if (from < 2) {
+            // Add isLocal column to Devices table with default value false
+            await m.addColumn(devices, devices.isLocal);
+          }
+        },
+      );
 }

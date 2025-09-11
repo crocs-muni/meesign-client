@@ -3,6 +3,7 @@ import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
 import '../enums/fab_type.dart';
+import '../l10n/arb/app_localizations.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
 import '../util/actions/encrypt_data.dart';
@@ -69,15 +70,15 @@ class DecryptListingPage extends StatelessWidget {
                   fit: BoxFit.fitWidth,
                 ),
               ),
-              const Text(
-                'Try encrypting some data.',
+              Text(
+                AppLocalizations.of(context).tryEncryptingData,
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: SMALL_GAP),
               Text(
                 groupForTaskExists
-                    ? 'Start by creating a new encryption task.'
-                    : 'Start by creating a group for decryption.',
+                    ? AppLocalizations.of(context).startWithNewDecryption
+                    : AppLocalizations.of(context).startWithDecryptionGroup,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: LARGE_GAP),
@@ -90,14 +91,15 @@ class DecryptListingPage extends StatelessWidget {
                     tabViewModel.setIndex(3,
                         postNavigationAction: 'createDecryptGroup');
                   },
-                  child: const Text('Create a decryption group'),
+                  child:
+                      Text(AppLocalizations.of(context).createDecryptionGroup),
                 )
               ] else ...[
                 ElevatedButton(
                   onPressed: () {
-                    encryptData(context, context);
+                    encryptData(context: context, buildContext: context);
                   },
-                  child: const Text('Encrypt message'),
+                  child: Text(AppLocalizations.of(context).createDecryption),
                 )
               ]
             ],

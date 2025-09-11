@@ -16,8 +16,8 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 
-# Do not forget to update lib/ui/about_page.dart as well!
-version: 0.4.2
+# Do not forget to update lib/pages/about_page.dart as well!
+version: 0.5.1
 
 environment:
   sdk: ^3.0.0
@@ -31,6 +31,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   provider: ^6.0.1
 
 
@@ -39,9 +41,6 @@ dependencies:
   cupertino_icons: ^1.0.2
   qr_flutter: ^4.0.0
   animations: ^2.0.2
-  # TODO: fully migrate to file_selector,
-  # file_picker has suboptimal linux impl
-  file_picker: ^8.0.0+1
   flutter_nfc_kit: ^3.1.0
   path_provider: ^2.0.8
   # FIXME: find an alternative, open_file seems to be
@@ -63,7 +62,7 @@ dependencies:
   rxdart: ^0.27.7
   sqlite3_flutter_libs: ^0.5.13
   logging: ^1.2.0
-  file_selector: ^1.0.0
+  file_selector: ^1.0.3
   collection: ^1.17.1
   mime: ^1.0.4
   share_plus: ^11.0.0
@@ -77,7 +76,10 @@ dependencies:
   window_manager: ^0.4.3
   flutter_slidable: ^4.0.0
   lottie: ^3.3.0
-  skeletonizer: ^1.4.3
+  skeletonizer: ^2.0.1
+  flutter_launcher_icons: ^0.14.3
+  intl: ^0.20.2
+  dropdown_button2: ^2.3.9
 
 dev_dependencies:
   flutter_test:
@@ -100,6 +102,7 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  generate: true
 
   assets:
     - assets/icon_logo_light_mode.svg
@@ -112,6 +115,7 @@ flutter:
     - assets/lottie/groups_light_mode.json
     - assets/lottie/sign_light_mode.json
     - assets/lottie/sign_dark_mode.json
+    - assets/lottie/sign.json
     - assets/lottie/challenge_light_mode.json
     - assets/lottie/challenge_dark_mode.json
     - assets/lottie/decrypt_light_mode.json

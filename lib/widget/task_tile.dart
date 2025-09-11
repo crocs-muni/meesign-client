@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:meesign_core/meesign_core.dart';
+import 'package:provider/provider.dart';
 
+import '../app_container.dart';
+import '../l10n/arb/app_localizations.dart';
 import '../ui_constants.dart';
 import '../util/date_formatter.dart';
 import '../util/extensions/list_intersperse.dart';
 import '../util/status_message.dart';
 import '../util/extensions/task_approvable.dart';
+import '../view_model/app_view_model.dart';
 import 'dismissible.dart';
 import 'task_state_indicator.dart';
 
@@ -23,6 +27,7 @@ class TaskTile<T> extends StatelessWidget {
   final bool showTaskTypeInfo;
   final bool showDetailRow;
   final bool showDate;
+  final bool isGroupTask;
 
   const TaskTile({
     super.key,
@@ -40,15 +45,17 @@ class TaskTile<T> extends StatelessWidget {
     this.showTaskTypeInfo = true,
     this.showDetailRow = true,
     this.showDate = true,
+    this.isGroupTask = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final desc = this.desc ?? StatusMessage.getStatusMessage(task);
+    final desc = this.desc ?? StatusMessage.getStatusMessage(task, context);
     final trailing = TaskStateIndicator(task);
     final allActions = actions +
-        (task.approvable ? approveActions : []) +
+        (task.approvable ? _buildConditionalApproveActions(context) : []) +
         (task.state == TaskState.needsCard ? cardActions : []);
+    final appViewModel = Provider.of<AppViewModel>(context);
 
     final actionRow = allActions.isNotEmpty || actionChip != null
         ? Row(
@@ -75,14 +82,19 @@ class TaskTile<T> extends StatelessWidget {
         dismissibleKey: ObjectKey(task),
         icon: task.archived ? Symbols.unarchive : Symbols.archive,
         color: Colors.transparent,
-        onDeleted: (_) {
-          if (onArchiveChange != null) onArchiveChange!(!task.archived);
+        confirmDismiss: (_) async {
+          if (onArchiveChange != null) {
+            onArchiveChange!(!task.archived);
+            return !appViewModel.showArchived;
+          }
+          return false;
         },
         childBuilder: (isDragging) => Material(
           color: Theme.of(context).colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(8),
           clipBehavior: Clip.antiAlias,
           child: ExpansionTile(
+            key: ValueKey('expansion_tile_${task.id}'),
             title: Row(
               children: [
                 Flexible(
@@ -126,6 +138,23 @@ class TaskTile<T> extends StatelessWidget {
     );
   }
 
+  List<Widget> _buildConditionalApproveActions(BuildContext context) {
+    if (isGroupTask) {
+      if (Provider.of<AppContainer>(context, listen: false)
+              .settingsController
+              .currentSettings
+              .autoJoinGroups ==
+          false) {
+        return approveActions;
+      } else {
+        // If auto-join is enabled, we don't show the approve actions
+        return [];
+      }
+    } else {
+      return approveActions;
+    }
+  }
+
   Widget _buildGroupMetaDataRow(
       IconData icon, String text, BuildContext context) {
     return Row(
@@ -151,25 +180,25 @@ class TaskTile<T> extends StatelessWidget {
     Group? taskGroup;
 
     if (task is Task<Challenge>) {
-      text = "Challenge";
+      text = AppLocalizations.of(context).challenge;
       taskGroup = task.info.group;
     }
 
     if (task is Task<File>) {
-      text = "Sign";
+      text = AppLocalizations.of(context).signPdf;
       taskGroup = task.info.group;
     }
 
     if (task is Task<Decrypt>) {
-      text = "Decrypt";
+      text = AppLocalizations.of(context).decrypt;
       taskGroup = task.info.group;
     }
 
     if (task is Task<Group>) {
       text = switch (task.info.keyType) {
-        KeyType.signPdf => 'Sign PDF',
-        KeyType.signChallenge => 'Challenge',
-        KeyType.decrypt => 'Decrypt',
+        KeyType.signPdf => AppLocalizations.of(context).signPdf,
+        KeyType.signChallenge => AppLocalizations.of(context).challenge,
+        KeyType.decrypt => AppLocalizations.of(context).decrypt,
       };
       taskGroup = task.info;
     }
@@ -212,7 +241,8 @@ class TaskTile<T> extends StatelessWidget {
         ],
         if (task.archived) ...[
           SizedBox(width: LARGE_GAP),
-          _buildGroupMetaDataRow(Symbols.archive, 'Archived', context),
+          _buildGroupMetaDataRow(
+              Symbols.archive, AppLocalizations.of(context).archived, context),
         ]
       ],
     );

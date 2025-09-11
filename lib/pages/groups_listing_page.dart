@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../enums/fab_type.dart';
 import '../enums/task_type.dart';
+import '../l10n/arb/app_localizations.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
 import '../util/actions/group_creator.dart';
@@ -22,8 +23,12 @@ class GroupsListingPage extends StatefulWidget {
   State<GroupsListingPage> createState() => _GroupsListingPageState();
 }
 
-class _GroupsListingPageState extends State<GroupsListingPage> {
+class _GroupsListingPageState extends State<GroupsListingPage>
+    with AutomaticKeepAliveClientMixin {
   late TabsViewModel _tabsViewModel;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -56,12 +61,17 @@ class _GroupsListingPageState extends State<GroupsListingPage> {
         if (_tabsViewModel.postNavigationAction == 'createDecryptGroup') {
           createGroup(context, context, groupType: TaskType.decrypt);
         }
+
+        if (_tabsViewModel.postNavigationAction == 'createGroup') {
+          createGroup(context, context);
+        }
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final model = Provider.of<AppViewModel>(context, listen: false);
 
     return StreamBuilder<TaskStream>(
@@ -72,8 +82,11 @@ class _GroupsListingPageState extends State<GroupsListingPage> {
               body: TaskListView<Group>(
                 key: ValueKey('group_task_list'),
                 tasks: model.groupTasks,
+                showHeading: true,
+                customSearchBarHint: 'Search groups by name...',
                 emptyView: _buildEmptyGroups(context),
                 showArchived: model.showArchived,
+                showAllTypes: false,
                 taskBuilder: (context, task) {
                   final group = task.info;
                   return GroupTaskTile(task: task, group: group);
@@ -116,13 +129,13 @@ class _GroupsListingPageState extends State<GroupsListingPage> {
                 fit: BoxFit.fitWidth,
               ),
             ),
-            const Text(
-              'No groups yet!',
+            Text(
+              AppLocalizations.of(context).noGroupsYet,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: SMALL_GAP),
-            const Text(
-              'Create a group to get started.',
+            Text(
+              AppLocalizations.of(context).createGroupToStart,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: LARGE_GAP),
@@ -130,7 +143,7 @@ class _GroupsListingPageState extends State<GroupsListingPage> {
               onPressed: () {
                 createGroup(context, context);
               },
-              child: const Text('Create group'),
+              child: Text(AppLocalizations.of(context).createGroup),
             )
           ],
         ),

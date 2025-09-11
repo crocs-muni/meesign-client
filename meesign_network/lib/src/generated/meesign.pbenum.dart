@@ -20,11 +20,14 @@ class ProtocolType extends $pb.ProtobufEnum {
       ProtocolType._(1, _omitEnumNames ? '' : 'ELGAMAL');
   static const ProtocolType FROST =
       ProtocolType._(2, _omitEnumNames ? '' : 'FROST');
+  static const ProtocolType MUSIG2 =
+      ProtocolType._(3, _omitEnumNames ? '' : 'MUSIG2');
 
   static const $core.List<ProtocolType> values = <ProtocolType>[
     GG18,
     ELGAMAL,
     FROST,
+    MUSIG2,
   ];
 
   static final $core.Map<$core.int, ProtocolType> _byValue =

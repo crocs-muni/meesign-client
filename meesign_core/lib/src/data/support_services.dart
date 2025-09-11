@@ -13,7 +13,7 @@ class SupportServices {
   SupportServices(this._dispatcher);
 
   static final serverVersionConstraint =
-      VersionConstraint.compatibleWith(Version(0, 5, 0));
+      VersionConstraint.compatibleWith(Version(0, 5, 1));
 
   Future<Version> getVersion([Uuid? did]) async {
     final info = await (did != null ? _dispatcher[did] : _dispatcher.unauth)

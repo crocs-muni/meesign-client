@@ -3,12 +3,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../l10n/arb/app_localizations.dart';
 import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
 import '../widget/smart_logo.dart';
 
 class AboutPage extends StatelessWidget {
-  static const version = '0.5.0';
+  static const version = '0.5.1';
 
   static const crocsAuth = 'crocs.fi.muni.cz';
   static const meesignAuth = 'meesign.$crocsAuth';
@@ -42,9 +43,11 @@ class AboutPage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildWebsiteButton('Project website', meesignAuth),
+                _buildWebsiteButton(
+                    AppLocalizations.of(context).projectWebsite, meesignAuth),
                 SizedBox(width: MEDIUM_GAP),
-                _buildWebsiteButton('CROCS website', crocsAuth),
+                _buildWebsiteButton(
+                    AppLocalizations.of(context).crocsWebsite, crocsAuth)
               ],
             ),
             SizedBox(height: MEDIUM_GAP),
@@ -61,7 +64,7 @@ class AboutPage extends StatelessWidget {
         SmartLogo(logoWidth: 72),
         Text('MeeSign',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 50)),
-        Text('version $version',
+        Text('${AppLocalizations.of(context).version} $version',
             style: theme.textTheme.bodyLarge
                 ?.copyWith(color: theme.colorScheme.outline)),
         SizedBox(height: MEDIUM_GAP),
@@ -74,7 +77,8 @@ class AboutPage extends StatelessWidget {
 
     return Column(
       children: [
-        Text('Developed by', style: theme.textTheme.bodyMedium),
+        Text(AppLocalizations.of(context).developedBy,
+            style: theme.textTheme.bodyMedium),
         SizedBox(height: MEDIUM_GAP),
         SvgPicture.asset(
           'assets/crocs_logo.svg',
@@ -96,7 +100,7 @@ class AboutPage extends StatelessWidget {
     return Column(
       children: [
         Divider(thickness: 0),
-        Text('Authors:',
+        Text(AppLocalizations.of(context).authors,
             style: theme.textTheme.headlineLarge?.copyWith(
                 fontWeight: FontWeight.bold, color: theme.colorScheme.primary)),
         SizedBox(height: SMALL_GAP),

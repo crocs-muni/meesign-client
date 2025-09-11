@@ -1,12 +1,25 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/arb/app_localizations.dart';
 import '../templates/default_page_template.dart';
+import '../ui_constants.dart';
 import 'about_page.dart';
 import 'device_settings_page.dart';
 import 'general_settings_page.dart';
+import 'group_settings_page.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
+
+  @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,9 +29,17 @@ class SettingsPage extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("What do you want to do?",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          SizedBox(height: 10),
+          Container(
+            padding:
+                EdgeInsets.only(left: SMALL_PADDING, bottom: MEDIUM_PADDING),
+            child: Text(
+              AppLocalizations.of(context).applicationSettingsTitle,
+              style: TextStyle(
+                fontSize: Theme.of(context).textTheme.titleLarge?.fontSize,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
           _buildMenuItems(context),
         ],
       ),
@@ -29,17 +50,22 @@ class SettingsPage extends StatelessWidget {
     final List<Map<String, dynamic>> menuItems = [
       {
         "icon": Icons.settings,
-        "text": "General settings",
+        "text": AppLocalizations.of(context).generalSettingsTitle,
         "page": GeneralSettingsPage()
       },
       {
         "icon": Icons.devices,
-        "text": "Device and server",
+        "text": AppLocalizations.of(context).deviceAndServerSettingsTitle,
         "page": DeviceSettingsPage()
       },
       {
+        "icon": Icons.group,
+        "text": AppLocalizations.of(context).groupSettingsTitle,
+        "page": GroupSettingsPage()
+      },
+      {
         "icon": Icons.question_mark,
-        "text": "About this project",
+        "text": AppLocalizations.of(context).aboutThisProject,
         "page": AboutPage()
       },
     ];

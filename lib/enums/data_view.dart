@@ -1,0 +1,1 @@
+enum DataView { hex, text }

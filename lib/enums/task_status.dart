@@ -4,4 +4,5 @@ enum TaskListSection {
   rejected,
   failed,
   archived,
+  archivedPending
 }

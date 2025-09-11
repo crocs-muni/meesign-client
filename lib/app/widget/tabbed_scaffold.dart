@@ -4,7 +4,9 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
+import '../../l10n/arb/app_localizations.dart';
 import '../../pages/settings_page.dart';
+import '../../services/settings_controller.dart';
 import '../../ui_constants.dart';
 import '../../util/layout_getter.dart';
 import '../../view_model/app_view_model.dart';
@@ -54,6 +56,10 @@ class HomePageView extends StatefulWidget {
 class _HomePageViewState extends State<HomePageView> {
   List<NavigationTabModel> _tabs = [];
 
+  late final AppContainer container = context.read<AppContainer>();
+  late final SettingsController settingsController =
+      container.settingsController;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -88,7 +94,10 @@ class _HomePageViewState extends State<HomePageView> {
                           : 0),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(LARGE_BORDER_RADIUS),
+                    borderRadius: BorderRadius.circular(
+                        constraints.maxWidth > minTabletLayoutWidth
+                            ? LARGE_BORDER_RADIUS
+                            : 0),
                     border: Border.all(
                         color: borderColor.withValues(alpha: borderOpacity),
                         width: borderWidth),
@@ -128,9 +137,13 @@ class _HomePageViewState extends State<HomePageView> {
       return;
     }
 
-    _tabs = <NavigationTabModel>[
+    _tabs = _generateTabs();
+  }
+
+  List<NavigationTabModel> _generateTabs() {
+    return <NavigationTabModel>[
       NavigationTabModel(
-        label: 'Signing',
+        label: AppLocalizations.of(context).signings,
         child: SigningListingPage(),
         icon: _buildCounterIcon(
           stream: context.watch<AppViewModel>().nSignReqs,
@@ -139,7 +152,7 @@ class _HomePageViewState extends State<HomePageView> {
         ),
       ),
       NavigationTabModel(
-        label: 'Challenge',
+        label: AppLocalizations.of(context).challenges,
         child: ChallengeListingPage(),
         icon: _buildCounterIcon(
           stream: context.watch<AppViewModel>().nChallengeReqs,
@@ -148,7 +161,7 @@ class _HomePageViewState extends State<HomePageView> {
         ),
       ),
       NavigationTabModel(
-        label: 'Decrypt',
+        label: AppLocalizations.of(context).decryptions,
         child: DecryptListingPage(),
         icon: _buildCounterIcon(
           stream: context.watch<AppViewModel>().nDecryptReqs,
@@ -157,7 +170,7 @@ class _HomePageViewState extends State<HomePageView> {
         ),
       ),
       NavigationTabModel(
-        label: 'Groups',
+        label: AppLocalizations.of(context).groups,
         child: GroupsListingPage(),
         icon: _buildCounterIcon(
           stream: context.watch<AppViewModel>().nGroupReqs,
@@ -166,7 +179,7 @@ class _HomePageViewState extends State<HomePageView> {
         ),
       ),
       NavigationTabModel(
-          label: 'Settings',
+          label: AppLocalizations.of(context).settings,
           child: SettingsPage(),
           icon: Icon(Symbols.settings)),
     ];
@@ -188,6 +201,41 @@ class _HomePageViewState extends State<HomePageView> {
     ));
   }
 
+  Widget _buildReactiveTabLabel(NavigationTabModel destination) {
+    // Since we initialize _tabs only once to prevent losing state of the OffstageNavigators,
+    // we need to rebuild the labels reactively to reflect the current language.
+    return StreamBuilder(
+      stream: settingsController.settingsStream,
+      builder: (context, settingsSnapshot) {
+        if (settingsSnapshot.hasError || !settingsSnapshot.hasData) {
+          return Text(destination.label);
+        }
+
+        final tabs = _generateTabs();
+        return Text(tabs[_tabs.indexOf(destination)].label);
+      },
+    );
+  }
+
+  Widget _buildReactiveNavigationDestination(NavigationTabModel destination) {
+    return StreamBuilder(
+      stream: settingsController.settingsStream,
+      builder: (context, settingsSnapshot) {
+        if (settingsSnapshot.hasError || !settingsSnapshot.hasData) {
+          return NavigationDestination(
+            icon: destination.icon,
+            label: destination.label,
+          );
+        }
+
+        final tabs = _generateTabs();
+        return NavigationDestination(
+            icon: destination.icon,
+            label: tabs[_tabs.indexOf(destination)].label);
+      },
+    );
+  }
+
   Widget _buildResponsiveLayout(Widget child, double width) {
     if (width > minLaptopLayoutWidth) {
       return Center(
@@ -203,7 +251,7 @@ class _HomePageViewState extends State<HomePageView> {
                   (NavigationTabModel destination) {
                     return NavigationRailDestination(
                       icon: destination.icon,
-                      label: Text(destination.label),
+                      label: _buildReactiveTabLabel(destination),
                     );
                   },
                 ).toList(),
@@ -228,7 +276,7 @@ class _HomePageViewState extends State<HomePageView> {
               (NavigationTabModel destination) {
                 return NavigationRailDestination(
                   icon: destination.icon,
-                  label: Text(destination.label),
+                  label: _buildReactiveTabLabel(destination),
                 );
               },
             ).toList(),
@@ -264,12 +312,9 @@ class _HomePageViewState extends State<HomePageView> {
       return NavigationBar(
         selectedIndex: context.watch<TabsViewModel>().index,
         onDestinationSelected: _onItemTapped,
-        destinations: _tabs.map<NavigationDestination>(
+        destinations: _tabs.map(
           (NavigationTabModel destination) {
-            return NavigationDestination(
-              icon: destination.icon,
-              label: destination.label,
-            );
+            return _buildReactiveNavigationDestination(destination);
           },
         ).toList(),
       );

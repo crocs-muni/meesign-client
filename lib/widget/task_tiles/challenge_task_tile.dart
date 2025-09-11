@@ -2,15 +2,18 @@ import 'dart:convert';
 
 import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:meesign_core/meesign_core.dart';
+
+import '../../l10n/arb/app_localizations.dart';
 import 'package:provider/provider.dart';
 
-import '../../pages/challenge_listing_page.dart';
+import '../../pages/task_detail_page.dart';
+import '../../ui_constants.dart';
+import '../../util/actions/challenge_creator.dart';
 import '../../util/card_reader_launcher.dart';
-import '../../util/chars.dart';
 import '../../view_model/app_view_model.dart';
 import '../entity_chip.dart';
+import '../large_square_button.dart';
 import '../task_tile.dart';
 
 class ChallengeTaskTile extends StatelessWidget {
@@ -26,113 +29,98 @@ class ChallengeTaskTile extends StatelessWidget {
     final model = Provider.of<AppViewModel>(context, listen: false);
 
     return TaskTile(
+      key: ValueKey('challenge-task-${task.id}'),
       task: task,
       name: task.info.name,
       showDetailRow: false,
-      actionChip: GroupChip(group: task.info.group),
+      actionChip: Row(
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GroupChip(group: task.info.group),
+          SizedBox(
+            width: SMALL_GAP,
+          ),
+          if (task.state == TaskState.finished) ...[
+            FilledButton.tonal(
+              style: FilledButton.styleFrom(
+                side: const BorderSide(
+                  color: Colors.grey,
+                  width: 1.0,
+                ),
+              ),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (context) => TaskDetailPage(
+                    title: task.info.name,
+                    group: task.info.group,
+                    textValue: _decodeHexToString(task.info.data),
+                    hexValue: hex.encode(task.info.data),
+                    isArchived: task.archived,
+                    keyType: KeyType.signChallenge,
+                    task: task,
+                  ),
+                ),
+              ),
+              child: Text(AppLocalizations.of(context).view),
+            ),
+          ],
+          SizedBox(
+            width: SMALL_GAP,
+          ),
+          if (task.state == TaskState.finished ||
+              task.state == TaskState.failed) ...[
+            FilledButton.tonal(
+              style: FilledButton.styleFrom(
+                side: const BorderSide(
+                  color: Colors.grey,
+                  width: 1.0,
+                ),
+              ),
+              onPressed: () => createChallenge(
+                  context: context,
+                  buildContext: context,
+                  templateChallenge: task),
+              child: Text(AppLocalizations.of(context).copy),
+            ),
+          ],
+        ],
+      ),
       approveActions: [
-        FilledButton.tonal(
-          child: const Text('Sign'),
-          onPressed: () => model.joinChallenge(task, agree: true),
+        LargeSquareButton(
+          text: AppLocalizations.of(context).sign,
+          icon: Icons.check,
+          onPressed: () {
+            model.joinChallenge(task, agree: true);
+          },
+          color: Color(0xFF298E29),
         ),
-        OutlinedButton(
-          child: const Text('Decline'),
-          onPressed: () => model.joinChallenge(task, agree: false),
-        )
+        LargeSquareButton(
+            text: AppLocalizations.of(context).decline,
+            icon: Icons.close,
+            onPressed: () {
+              model.joinChallenge(task, agree: false);
+            },
+            color: Color(0xFFAA3026))
       ],
       cardActions: [
         FilledButton.tonal(
           onPressed: () => launchCardReader(
               context, (card) => model.advanceChallengeWithCard(task, card)),
-          child: const Text('Read card'),
+          child: Text(AppLocalizations.of(context).readCard),
         ),
       ],
-      actions: [
-        FilledButton.tonal(
-          onPressed: () => showChallengeDialog(context, task.info),
-          child: const Text('View'),
-        )
-      ],
+      actions: const [],
       onArchiveChange: (archive) => model.archiveTask(task, archive: archive),
     );
   }
 
-  Future<void> showChallengeDialog(
-    BuildContext context,
-    Challenge challenge,
-  ) async {
-    final dataHex = hex.encode(challenge.data);
-    String? dataStr;
+  String _decodeHexToString(List<int> data) {
     try {
-      dataStr = utf8.decode(
-        challenge.data,
-        allowMalformed: false,
-      );
+      return utf8.decode(data, allowMalformed: false);
     } on FormatException {
-      dataStr = null;
+      return hex.encode(data);
     }
-
-    await showDialog(
-      context: context,
-      builder: (context) {
-        final supportedViews = {
-          if (dataStr != null) DataView.text,
-          DataView.hex,
-        };
-        DataView view = supportedViews.first;
-
-        return AlertDialog(
-          icon: const Icon(Symbols.quiz),
-          title: Text(challenge.name),
-          content: SingleChildScrollView(
-            child: StatefulBuilder(
-              builder: (context, setState) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (supportedViews.length > 1) ...[
-                      SegmentedButton<DataView>(
-                        segments: [
-                          for (final view in supportedViews)
-                            ButtonSegment(
-                              value: view,
-                              label: Text(view.name.capitalize()),
-                            ),
-                        ],
-                        selected: {view},
-                        onSelectionChanged: (newView) {
-                          setState(() => view = newView.first);
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-                    Center(
-                      child: switch (view) {
-                        DataView.hex => Text(
-                            dataHex,
-                            style: const TextStyle(
-                              fontFamily: 'RobotoMono',
-                            ),
-                          ),
-                        DataView.text => Text(
-                            dataStr!,
-                          ),
-                      },
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Hide'),
-            ),
-          ],
-        );
-      },
-    );
   }
 }
