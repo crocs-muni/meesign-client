@@ -56,18 +56,19 @@ void main() {
 
   List<int>? serverCerts;
   final String? serverCertsPath = io.Platform.environment['SERVER_CERTS'];
-  if (serverCertsPath != null) {
-    serverCerts = io.File(serverCertsPath).readAsBytesSync();
-  }
+  final String? meesignServerDomain = io.Platform.environment['MEESIGN_SERVER_DOMAIN'];
+  final String? meesignServerPort = io.Platform.environment['MEESIGN_SERVER_PORT'];
 
   setUp(() {
     database = Database(appDir);
     keyStore = KeyStore(appDir);
     dispatcher = NetworkDispatcher(
-      'localhost',
+      meesignServerDomain ?? "localhost",
       keyStore,
       serverCerts: serverCerts,
       allowBadCerts: serverCerts == null,
+      // TODO is there a better way to set the default?
+      port: int.tryParse(meesignServerPort ?? "") ?? 1337,
     );
     deviceRepository = DeviceRepository(
       dispatcher,
