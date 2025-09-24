@@ -59,6 +59,10 @@ void main() {
   final String? meesignServerDomain = io.Platform.environment['MEESIGN_SERVER_DOMAIN'];
   final String? meesignServerPort = io.Platform.environment['MEESIGN_SERVER_PORT'];
 
+  if (serverCertsPath != null) {
+    serverCerts = io.File(serverCertsPath).readAsBytesSync();
+  }
+
   setUp(() {
     database = Database(appDir);
     keyStore = KeyStore(appDir);
