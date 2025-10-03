@@ -282,5 +282,6 @@
         }
     },
     "manySharesWarning": "Velké množství podílů",
-    "manySharesWarningText": "S některými protokoly můžete zaznamenat snížený výkon, pokud je počet podílů příliš vysoký. Zvažte odebrání některých členů nebo snížení počtu podílů, které obdrží, pokud zaznamenáte problém s výkonem."
+    "manySharesWarningText": "S některými protokoly můžete zaznamenat snížený výkon, pokud je počet podílů příliš vysoký. Zvažte odebrání některých členů nebo snížení počtu podílů, které obdrží, pokud zaznamenáte problém s výkonem.",
+    "groupCreationFailed": "Vytvoření skupiny selhalo"
 }

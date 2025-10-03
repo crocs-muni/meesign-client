@@ -1292,6 +1292,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You may experience degraded performance with certain protocols if the share count is too high. Consider removing some members or lowering the number of shares they receive if this poses an issue.'**
   String get manySharesWarningText;
+
+  /// No description provided for @groupCreationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Group creation failed'**
+  String get groupCreationFailed;
 }
 
 class _AppLocalizationsDelegate

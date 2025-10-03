@@ -653,4 +653,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get manySharesWarningText =>
       'You may experience degraded performance with certain protocols if the share count is too high. Consider removing some members or lowering the number of shares they receive if this poses an issue.';
+
+  @override
+  String get groupCreationFailed => 'Group creation failed';
 }

@@ -655,4 +655,7 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get manySharesWarningText =>
       'S některými protokoly můžete zaznamenat snížený výkon, pokud je počet podílů příliš vysoký. Zvažte odebrání některých členů nebo snížení počtu podílů, které obdrží, pokud zaznamenáte problém s výkonem.';
+
+  @override
+  String get groupCreationFailed => 'Vytvoření skupiny selhalo';
 }
