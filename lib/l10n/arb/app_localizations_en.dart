@@ -656,4 +656,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get groupCreationFailed => 'Group creation failed';
+
+  @override
+  String get confirmCloseSettingsTitle => 'Confirm close settings';
+
+  @override
+  String get confirmCloseSettingsDesc =>
+      'You can choose whether to confirm closing the application to prevent accidental exits.';
+
+  @override
+  String get confirmCloseSettings => 'Show confirmation on exit';
+
+  @override
+  String get confirmQuitTitle => 'Do you really want to quit?';
+
+  @override
+  String get confirmQuitYesDontAsk => 'Yes, don\'t ask again';
+
+  @override
+  String get no => 'No';
+
+  @override
+  String get yes => 'Yes';
+
+  @override
+  String get pleaseCreateNewGroupForTaskType =>
+      'Please create a new group for this task type in order to proceed';
 }

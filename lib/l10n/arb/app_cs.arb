@@ -283,5 +283,13 @@
     },
     "manySharesWarning": "Velké množství podílů",
     "manySharesWarningText": "S některými protokoly můžete zaznamenat snížený výkon, pokud je počet podílů příliš vysoký. Zvažte odebrání některých členů nebo snížení počtu podílů, které obdrží, pokud zaznamenáte problém s výkonem.",
-    "groupCreationFailed": "Vytvoření skupiny selhalo"
+    "groupCreationFailed": "Vytvoření skupiny selhalo",
+    "confirmCloseSettingsTitle": "Nastavení potvrzení zavření aplikace",
+    "confirmCloseSettingsDesc": "Můžete si vybrat, zda chcete zobrazit potvrzovací dialog při pokusu o zavření aplikace.",
+    "confirmCloseSettings": "Potvrdit zavření aplikace",
+    "confirmQuitTitle": "Opravdu chcete aplikaci ukončit?",
+    "confirmQuitYesDontAsk": "Ano, příště se již neptat",
+    "no": "Ne",
+    "yes": "Ano",
+    "pleaseCreateNewGroupForTaskType": "Pro pokračování prosím vytvořte novou skupinu pro tento typ úlohy"
 }

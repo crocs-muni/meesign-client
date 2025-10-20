@@ -1298,6 +1298,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Group creation failed'**
   String get groupCreationFailed;
+
+  /// No description provided for @confirmCloseSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm close settings'**
+  String get confirmCloseSettingsTitle;
+
+  /// No description provided for @confirmCloseSettingsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'You can choose whether to confirm closing the application to prevent accidental exits.'**
+  String get confirmCloseSettingsDesc;
+
+  /// No description provided for @confirmCloseSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Show confirmation on exit'**
+  String get confirmCloseSettings;
+
+  /// No description provided for @confirmQuitTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you really want to quit?'**
+  String get confirmQuitTitle;
+
+  /// No description provided for @confirmQuitYesDontAsk.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, don\'t ask again'**
+  String get confirmQuitYesDontAsk;
+
+  /// No description provided for @no.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no;
+
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
+
+  /// No description provided for @pleaseCreateNewGroupForTaskType.
+  ///
+  /// In en, this message translates to:
+  /// **'Please create a new group for this task type in order to proceed'**
+  String get pleaseCreateNewGroupForTaskType;
 }
 
 class _AppLocalizationsDelegate

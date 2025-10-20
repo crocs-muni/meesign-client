@@ -658,4 +658,31 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get groupCreationFailed => 'Vytvoření skupiny selhalo';
+
+  @override
+  String get confirmCloseSettingsTitle =>
+      'Nastavení potvrzení zavření aplikace';
+
+  @override
+  String get confirmCloseSettingsDesc =>
+      'Můžete si vybrat, zda chcete zobrazit potvrzovací dialog při pokusu o zavření aplikace.';
+
+  @override
+  String get confirmCloseSettings => 'Potvrdit zavření aplikace';
+
+  @override
+  String get confirmQuitTitle => 'Opravdu chcete aplikaci ukončit?';
+
+  @override
+  String get confirmQuitYesDontAsk => 'Ano, příště se již neptat';
+
+  @override
+  String get no => 'Ne';
+
+  @override
+  String get yes => 'Ano';
+
+  @override
+  String get pleaseCreateNewGroupForTaskType =>
+      'Pro pokračování prosím vytvořte novou skupinu pro tento typ úlohy';
 }

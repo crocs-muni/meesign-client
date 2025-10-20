@@ -44,6 +44,9 @@ class GeneralSettingsPage extends StatelessWidget {
                   SizedBox(height: XLARGE_GAP * 2),
                   _buildArchivedSettingsSection(
                       settingsController, settings, context),
+                  SizedBox(height: XLARGE_GAP * 2),
+                  _buildCloseAppConfirmationSettingsSection(
+                      settingsController, settings, context)
                 ],
               );
             },
@@ -121,6 +124,37 @@ class GeneralSettingsPage extends StatelessWidget {
           value: settings.showArchivedItems,
           onChanged: (value) {
             controller.updateShowArchivedItems(value);
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCloseAppConfirmationSettingsSection(
+      SettingsController controller, Settings settings, BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          AppLocalizations.of(context).confirmCloseSettingsTitle,
+          style: Theme.of(context)
+              .textTheme
+              .bodyLarge
+              ?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: SMALL_GAP),
+        Text(AppLocalizations.of(context).confirmCloseSettingsDesc,
+            style: theme.textTheme.bodyMedium
+                ?.copyWith(color: theme.colorScheme.outline)),
+        SizedBox(height: SMALL_GAP),
+        SwitchListTile(
+          title: Text(AppLocalizations.of(context).confirmCloseSettings,
+              style: theme.textTheme.bodyMedium),
+          value: !settings.closeWithoutConfirmation,
+          onChanged: (value) {
+            controller.updateCloseWithoutConfirmation(!value);
           },
         ),
       ],
