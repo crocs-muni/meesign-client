@@ -1,13 +1,14 @@
+// This is a generated file - do not edit.
 //
-//  Generated code. Do not modify.
-//  source: meesign.proto
-//
-// @dart = 2.12
+// Generated from meesign.proto.
+
+// @dart = 3.3
 
 // ignore_for_file: annotate_overrides, camel_case_types, comment_references
-// ignore_for_file: constant_identifier_names, library_prefixes
-// ignore_for_file: non_constant_identifier_names, prefer_final_fields
-// ignore_for_file: unnecessary_import, unnecessary_this, unused_import
+// ignore_for_file: constant_identifier_names
+// ignore_for_file: curly_braces_in_flow_control_structures
+// ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
+// ignore_for_file: non_constant_identifier_names, unused_import
 
 import 'dart:convert' as $convert;
 import 'dart:core' as $core;
@@ -275,6 +276,46 @@ final $typed_data.Uint8List signRequestDescriptor = $convert.base64Decode(
     'CgtTaWduUmVxdWVzdBISCgRuYW1lGAEgASgJUgRuYW1lEhkKCGdyb3VwX2lkGAIgASgMUgdncm'
     '91cElkEhIKBGRhdGEYAyABKAxSBGRhdGE=');
 
+@$core.Deprecated('Use signRequestChunkDescriptor instead')
+const SignRequestChunk$json = {
+  '1': 'SignRequestChunk',
+  '2': [
+    {
+      '1': 'metadata',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meesign.SignMetadata',
+      '9': 0,
+      '10': 'metadata'
+    },
+    {'1': 'chunk', '3': 2, '4': 1, '5': 12, '9': 0, '10': 'chunk'},
+  ],
+  '8': [
+    {'1': 'payload'},
+  ],
+};
+
+/// Descriptor for `SignRequestChunk`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List signRequestChunkDescriptor = $convert.base64Decode(
+    'ChBTaWduUmVxdWVzdENodW5rEjMKCG1ldGFkYXRhGAEgASgLMhUubWVlc2lnbi5TaWduTWV0YW'
+    'RhdGFIAFIIbWV0YWRhdGESFgoFY2h1bmsYAiABKAxIAFIFY2h1bmtCCQoHcGF5bG9hZA==');
+
+@$core.Deprecated('Use signMetadataDescriptor instead')
+const SignMetadata$json = {
+  '1': 'SignMetadata',
+  '2': [
+    {'1': 'name', '3': 1, '4': 1, '5': 9, '10': 'name'},
+    {'1': 'group_id', '3': 2, '4': 1, '5': 12, '10': 'groupId'},
+    {'1': 'total_size', '3': 3, '4': 1, '5': 4, '10': 'totalSize'},
+  ],
+};
+
+/// Descriptor for `SignMetadata`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List signMetadataDescriptor = $convert.base64Decode(
+    'CgxTaWduTWV0YWRhdGESEgoEbmFtZRgBIAEoCVIEbmFtZRIZCghncm91cF9pZBgCIAEoDFIHZ3'
+    'JvdXBJZBIdCgp0b3RhbF9zaXplGAMgASgEUgl0b3RhbFNpemU=');
+
 @$core.Deprecated('Use decryptRequestDescriptor instead')
 const DecryptRequest$json = {
   '1': 'DecryptRequest',
@@ -291,6 +332,49 @@ final $typed_data.Uint8List decryptRequestDescriptor = $convert.base64Decode(
     'Cg5EZWNyeXB0UmVxdWVzdBISCgRuYW1lGAEgASgJUgRuYW1lEhkKCGdyb3VwX2lkGAIgASgMUg'
     'dncm91cElkEhIKBGRhdGEYAyABKAxSBGRhdGESGwoJZGF0YV90eXBlGAQgASgJUghkYXRhVHlw'
     'ZQ==');
+
+@$core.Deprecated('Use decryptRequestChunkDescriptor instead')
+const DecryptRequestChunk$json = {
+  '1': 'DecryptRequestChunk',
+  '2': [
+    {
+      '1': 'metadata',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.meesign.DecryptMetadata',
+      '9': 0,
+      '10': 'metadata'
+    },
+    {'1': 'chunk', '3': 2, '4': 1, '5': 12, '9': 0, '10': 'chunk'},
+  ],
+  '8': [
+    {'1': 'payload'},
+  ],
+};
+
+/// Descriptor for `DecryptRequestChunk`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List decryptRequestChunkDescriptor = $convert.base64Decode(
+    'ChNEZWNyeXB0UmVxdWVzdENodW5rEjYKCG1ldGFkYXRhGAEgASgLMhgubWVlc2lnbi5EZWNyeX'
+    'B0TWV0YWRhdGFIAFIIbWV0YWRhdGESFgoFY2h1bmsYAiABKAxIAFIFY2h1bmtCCQoHcGF5bG9h'
+    'ZA==');
+
+@$core.Deprecated('Use decryptMetadataDescriptor instead')
+const DecryptMetadata$json = {
+  '1': 'DecryptMetadata',
+  '2': [
+    {'1': 'name', '3': 1, '4': 1, '5': 9, '10': 'name'},
+    {'1': 'group_id', '3': 2, '4': 1, '5': 12, '10': 'groupId'},
+    {'1': 'data_type', '3': 3, '4': 1, '5': 9, '10': 'dataType'},
+    {'1': 'total_size', '3': 4, '4': 1, '5': 4, '10': 'totalSize'},
+  ],
+};
+
+/// Descriptor for `DecryptMetadata`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List decryptMetadataDescriptor = $convert.base64Decode(
+    'Cg9EZWNyeXB0TWV0YWRhdGESEgoEbmFtZRgBIAEoCVIEbmFtZRIZCghncm91cF9pZBgCIAEoDF'
+    'IHZ3JvdXBJZBIbCglkYXRhX3R5cGUYAyABKAlSCGRhdGFUeXBlEh0KCnRvdGFsX3NpemUYBCAB'
+    'KARSCXRvdGFsU2l6ZQ==');
 
 @$core.Deprecated('Use taskRequestDescriptor instead')
 const TaskRequest$json = {

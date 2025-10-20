@@ -1,13 +1,14 @@
+// This is a generated file - do not edit.
 //
-//  Generated code. Do not modify.
-//  source: meesign.proto
-//
-// @dart = 2.12
+// Generated from meesign.proto.
+
+// @dart = 3.3
 
 // ignore_for_file: annotate_overrides, camel_case_types, comment_references
-// ignore_for_file: constant_identifier_names, library_prefixes
-// ignore_for_file: non_constant_identifier_names, prefer_final_fields
-// ignore_for_file: unnecessary_import, unnecessary_this, unused_import
+// ignore_for_file: constant_identifier_names
+// ignore_for_file: curly_braces_in_flow_control_structures
+// ignore_for_file: deprecated_member_use_from_same_package, library_prefixes
+// ignore_for_file: non_constant_identifier_names
 
 import 'dart:core' as $core;
 
@@ -30,11 +31,12 @@ class ProtocolType extends $pb.ProtobufEnum {
     MUSIG2,
   ];
 
-  static final $core.Map<$core.int, ProtocolType> _byValue =
-      $pb.ProtobufEnum.initByValue(values);
-  static ProtocolType? valueOf($core.int value) => _byValue[value];
+  static final $core.List<ProtocolType?> _byValue =
+      $pb.ProtobufEnum.$_initByValueList(values, 3);
+  static ProtocolType? valueOf($core.int value) =>
+      value < 0 || value >= _byValue.length ? null : _byValue[value];
 
-  const ProtocolType._($core.int v, $core.String n) : super(v, n);
+  const ProtocolType._(super.value, super.name);
 }
 
 class KeyType extends $pb.ProtobufEnum {
@@ -49,11 +51,12 @@ class KeyType extends $pb.ProtobufEnum {
     Decrypt,
   ];
 
-  static final $core.Map<$core.int, KeyType> _byValue =
-      $pb.ProtobufEnum.initByValue(values);
-  static KeyType? valueOf($core.int value) => _byValue[value];
+  static final $core.List<KeyType?> _byValue =
+      $pb.ProtobufEnum.$_initByValueList(values, 2);
+  static KeyType? valueOf($core.int value) =>
+      value < 0 || value >= _byValue.length ? null : _byValue[value];
 
-  const KeyType._($core.int v, $core.String n) : super(v, n);
+  const KeyType._(super.value, super.name);
 }
 
 class TaskType extends $pb.ProtobufEnum {
@@ -72,11 +75,12 @@ class TaskType extends $pb.ProtobufEnum {
     DECRYPT,
   ];
 
-  static final $core.Map<$core.int, TaskType> _byValue =
-      $pb.ProtobufEnum.initByValue(values);
-  static TaskType? valueOf($core.int value) => _byValue[value];
+  static final $core.List<TaskType?> _byValue =
+      $pb.ProtobufEnum.$_initByValueList(values, 3);
+  static TaskType? valueOf($core.int value) =>
+      value < 0 || value >= _byValue.length ? null : _byValue[value];
 
-  const TaskType._($core.int v, $core.String n) : super(v, n);
+  const TaskType._(super.value, super.name);
 }
 
 class DeviceKind extends $pb.ProtobufEnum {
@@ -88,11 +92,12 @@ class DeviceKind extends $pb.ProtobufEnum {
     BOT,
   ];
 
-  static final $core.Map<$core.int, DeviceKind> _byValue =
-      $pb.ProtobufEnum.initByValue(values);
-  static DeviceKind? valueOf($core.int value) => _byValue[value];
+  static final $core.List<DeviceKind?> _byValue =
+      $pb.ProtobufEnum.$_initByValueList(values, 1);
+  static DeviceKind? valueOf($core.int value) =>
+      value < 0 || value >= _byValue.length ? null : _byValue[value];
 
-  const DeviceKind._($core.int v, $core.String n) : super(v, n);
+  const DeviceKind._(super.value, super.name);
 }
 
 class Task_TaskState extends $pb.ProtobufEnum {
@@ -112,11 +117,13 @@ class Task_TaskState extends $pb.ProtobufEnum {
     FAILED,
   ];
 
-  static final $core.Map<$core.int, Task_TaskState> _byValue =
-      $pb.ProtobufEnum.initByValue(values);
-  static Task_TaskState? valueOf($core.int value) => _byValue[value];
+  static final $core.List<Task_TaskState?> _byValue =
+      $pb.ProtobufEnum.$_initByValueList(values, 3);
+  static Task_TaskState? valueOf($core.int value) =>
+      value < 0 || value >= _byValue.length ? null : _byValue[value];
 
-  const Task_TaskState._($core.int v, $core.String n) : super(v, n);
+  const Task_TaskState._(super.value, super.name);
 }
 
-const _omitEnumNames = $core.bool.fromEnvironment('protobuf.omit_enum_names');
+const $core.bool _omitEnumNames =
+    $core.bool.fromEnvironment('protobuf.omit_enum_names');
