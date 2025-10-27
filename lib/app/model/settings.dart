@@ -8,6 +8,7 @@ class Settings {
   final bool autoRejectGroups;
   final int minGroupMembers;
   final String currentLanguage;
+  final bool closeWithoutConfirmation;
 
   Settings(
       {this.themeMode = ThemeMode.light,
@@ -16,7 +17,8 @@ class Settings {
       this.autoJoinGroups = false,
       this.autoRejectGroups = false,
       this.minGroupMembers = 2,
-      this.currentLanguage = 'en'});
+      this.currentLanguage = 'en',
+      this.closeWithoutConfirmation = false});
 
   Settings copyWith(
       {ThemeMode? themeMode,
@@ -25,7 +27,8 @@ class Settings {
       bool? autoJoinGroups,
       bool? autoRejectGroups,
       int? minGroupMembers,
-      String? currentLanguage}) {
+      String? currentLanguage,
+      bool? closeWithoutConfirmation}) {
     return Settings(
         themeMode: themeMode ?? this.themeMode,
         showArchivedItems: showArchivedItems ?? this.showArchivedItems,
@@ -33,6 +36,8 @@ class Settings {
         autoJoinGroups: autoJoinGroups ?? this.autoJoinGroups,
         autoRejectGroups: autoRejectGroups ?? this.autoRejectGroups,
         minGroupMembers: minGroupMembers ?? this.minGroupMembers,
-        currentLanguage: currentLanguage ?? this.currentLanguage);
+        currentLanguage: currentLanguage ?? this.currentLanguage,
+        closeWithoutConfirmation:
+            closeWithoutConfirmation ?? this.closeWithoutConfirmation);
   }
 }

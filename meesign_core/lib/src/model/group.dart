@@ -1,5 +1,5 @@
 import 'package:collection/collection.dart';
-import 'package:meta/meta.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../database/daos.dart';
 import '../database/database.dart' as db;
@@ -8,47 +8,40 @@ import 'device.dart';
 import 'key_type.dart';
 import 'protocol.dart';
 
-@immutable
-class Member {
-  final Device device;
-  final int shares;
+part 'group.freezed.dart';
 
-  const Member(this.device, this.shares);
+@freezed
+abstract class Member with _$Member {
+  const factory Member(Device device, int shares) = _Member;
 }
 
-@immutable
-class Group {
-  final List<int> id;
-  final String name;
-  final List<Member> members;
-  final int threshold;
-  final Protocol protocol;
-  final KeyType keyType;
-  final String? note;
+@freezed
+abstract class Group with _$Group {
+  const factory Group({
+    required List<int> id,
+    required String name,
+    required List<Member> members,
+    required int threshold,
+    required Protocol protocol,
+    required KeyType keyType,
+    String? note,
+  }) = _Group;
 
-  const Group(
-    this.id,
-    this.name,
-    this.members,
-    this.threshold,
-    this.protocol,
-    this.keyType, {
-    this.note,
-  });
+  const Group._();
 
   int get shares => members.map((m) => m.shares).sum;
 
-  hasMember(Uuid id) => members.any((member) => member.device.id == id);
+  bool hasMember(Uuid id) => members.any((member) => member.device.id == id);
 }
 
 extension GroupConversion on db.Group {
   Group toModel({List<Member> members = const []}) => Group(
-        id ?? [],
-        name,
-        members,
-        threshold,
-        protocol,
-        keyType,
+        id: id ?? [],
+        name: name,
+        members: members,
+        threshold: threshold,
+        protocol: protocol,
+        keyType: keyType,
         note: note,
       );
 }

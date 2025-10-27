@@ -19,6 +19,7 @@ import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
 import '../util/chars.dart';
 import '../util/get_shares_warning.dart';
+import '../view_model/tabs_view_model.dart';
 import '../widget/device_name.dart';
 import '../widget/number_input.dart';
 import '../widget/option_tile.dart';
@@ -39,9 +40,15 @@ class NewGroupPage extends StatefulWidget {
 const int _minThreshold = 2;
 
 class _NewGroupPageState extends State<NewGroupPage> {
-  // TODO: store this in a Group object?
-  int _threshold = _minThreshold;
-  final List<Member> _members = [];
+  Group newGroup = Group(
+    name: '',
+    id: const [],
+    members: const [],
+    threshold: _minThreshold,
+    protocol: KeyType.signPdf.supportedProtocols.first,
+    keyType: KeyType.signPdf,
+  );
+
   final List<Device> _devices = [];
   final _nameController = TextEditingController();
   final _policyController = TextEditingController();
@@ -49,19 +56,21 @@ class _NewGroupPageState extends State<NewGroupPage> {
   bool _nameErr = false;
   bool _policyErr = false;
   bool _sharesErr = false;
-  KeyType _keyType = KeyType.signPdf;
-  Protocol _protocol = KeyType.signPdf.supportedProtocols.first;
   bool _policyTime = false;
   TimeOfDay _policyAfterTime = const TimeOfDay(hour: 0, minute: 0);
   TimeOfDay _policyBeforeTime = const TimeOfDay(hour: 23, minute: 59);
   bool _policyDecline = false;
   bool _isCreatingFromTemplate = false;
 
-  int get _shareCount => _members.map((m) => m.shares).sum;
+  int get _shareCount => newGroup.members.map((m) => m.shares).sum;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<TabsViewModel>().setNewGroupPageInStack(true);
+    });
+
     // Reset errors on input change
     _nameController.addListener(() {
       if (_nameErr) {
@@ -69,6 +78,8 @@ class _NewGroupPageState extends State<NewGroupPage> {
           _nameErr = false;
         });
       }
+
+      newGroup = newGroup.copyWith(name: _nameController.text);
     });
 
     _policyController.addListener(() {
@@ -88,21 +99,31 @@ class _NewGroupPageState extends State<NewGroupPage> {
     } else {
       session.deviceRepository
           .getDevice(session.user.did)
-          .then((device) => setState(() => _members.add(Member(device, 1))));
+          .then((device) => setState(() {
+                newGroup = newGroup.copyWith(
+                  members: [...newGroup.members, Member(device, 1)],
+                );
+              }));
 
       setInitialDevices(session);
 
       // Set initial purpose
       setState(() {
         if (widget.initialGroupType == TaskType.decrypt) {
-          _keyType = KeyType.decrypt;
-          _protocol = KeyType.decrypt.supportedProtocols.first;
+          newGroup = newGroup.copyWith(
+            keyType: KeyType.decrypt,
+            protocol: KeyType.decrypt.supportedProtocols.first,
+          );
         } else if (widget.initialGroupType == TaskType.sign) {
-          _keyType = KeyType.signPdf;
-          _protocol = KeyType.signPdf.supportedProtocols.first;
+          newGroup = newGroup.copyWith(
+            keyType: KeyType.signPdf,
+            protocol: KeyType.signPdf.supportedProtocols.first,
+          );
         } else if (widget.initialGroupType == TaskType.challenge) {
-          _keyType = KeyType.signChallenge;
-          _protocol = KeyType.signChallenge.supportedProtocols.first;
+          newGroup = newGroup.copyWith(
+            keyType: KeyType.signChallenge,
+            protocol: KeyType.signChallenge.supportedProtocols.first,
+          );
         }
       });
     }
@@ -115,9 +136,12 @@ class _NewGroupPageState extends State<NewGroupPage> {
         _isCreatingFromTemplate = true;
         _nameController.text =
             '${template.name} ${AppLocalizations.of(context).copyNoun}';
-        _threshold = template.threshold;
-        _keyType = template.keyType;
-        _protocol = template.protocol;
+
+        newGroup = newGroup.copyWith(
+          threshold: template.threshold,
+          keyType: template.keyType,
+          protocol: template.protocol,
+        );
 
         final templateDevices = template.members.map((m) => m.device).toList();
         _devices.addAll(templateDevices);
@@ -125,11 +149,13 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
         // Update shares to match template values
         for (final templateMember in template.members) {
-          final memberIndex = _members
+          final memberIndex = newGroup.members
               .indexWhere((m) => m.device.id == templateMember.device.id);
           if (memberIndex >= 0) {
-            _members[memberIndex] =
-                Member(_members[memberIndex].device, templateMember.shares);
+            final updatedMembers = List<Member>.from(newGroup.members);
+            updatedMembers[memberIndex] = Member(
+                newGroup.members[memberIndex].device, templateMember.shares);
+            newGroup = newGroup.copyWith(members: updatedMembers);
           }
         }
 
@@ -167,7 +193,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
         }
 
         // Restore template threshold and reset flag
-        _threshold = template.threshold;
+        newGroup = newGroup.copyWith(threshold: template.threshold);
         _isCreatingFromTemplate = false;
       }
     });
@@ -185,10 +211,11 @@ class _NewGroupPageState extends State<NewGroupPage> {
   }
 
   void _setThreshold(int value) {
-    if (_protocol.thresholdType == ThresholdType.nOfN) {
-      _threshold = _shareCount;
+    if (newGroup.protocol.thresholdType == ThresholdType.nOfN) {
+      newGroup = newGroup.copyWith(threshold: _shareCount);
     } else {
-      _threshold = max(_minThreshold, min(value, _shareCount));
+      newGroup = newGroup.copyWith(
+          threshold: max(_minThreshold, min(value, _shareCount)));
     }
   }
 
@@ -196,20 +223,24 @@ class _NewGroupPageState extends State<NewGroupPage> {
     if (devices is! List<Device>) return;
     setState(() {
       for (final device in devices) {
-        if (_members.any((member) => member.device.id == device.id)) continue;
-        _members.add(Member(device, 1));
+        if (newGroup.members.any((member) => member.device.id == device.id)) {
+          continue;
+        }
+
+        newGroup = newGroup
+            .copyWith(members: [...newGroup.members, Member(device, 1)]);
       }
       _sharesErr = false;
       _membersErr = false;
-      if (_protocol.thresholdType == ThresholdType.nOfN &&
+      if (newGroup.protocol.thresholdType == ThresholdType.nOfN &&
           !_isCreatingFromTemplate) {
-        _threshold = _shareCount;
+        newGroup = newGroup.copyWith(threshold: _shareCount);
       }
     });
   }
 
   bool get _hasBot =>
-      _members.any((member) => member.device.kind == DeviceKind.bot);
+      newGroup.members.any((member) => member.device.kind == DeviceKind.bot);
 
   void _selectPeer(String route) async {
     final session = context.read<AppContainer>().session!;
@@ -257,11 +288,11 @@ class _NewGroupPageState extends State<NewGroupPage> {
     }
 
     final sharesIssue = getSharesWarning(
-      members: _members,
+      members: newGroup.members,
       shareCount: _shareCount,
-      threshold: _threshold,
+      threshold: newGroup.threshold,
       minThreshold: _minThreshold,
-      protocol: _protocol,
+      protocol: newGroup.protocol,
     );
 
     if (sharesIssue != null) {
@@ -274,7 +305,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
     final minGroupMembers =
         container.settingsController.currentSettings.minGroupMembers;
 
-    if (_members.length < minGroupMembers) {
+    if (newGroup.members.length < minGroupMembers) {
       setState(() {
         _membersErr = true;
       });
@@ -301,19 +332,17 @@ class _NewGroupPageState extends State<NewGroupPage> {
       return;
     }
 
+    TabsViewModel model = context.read<TabsViewModel>();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      model.setNewGroupPageInStack(false);
+    });
+
     // Pass the new created group back to the previous screen where its handled
     Navigator.pop(
-      context,
-      Group(
-        const [],
-        _nameController.text,
-        _members,
-        _threshold,
-        _protocol,
-        _keyType,
-        note: _hasBot ? jsonEncode(policy) : null,
-      ),
-    );
+        context,
+        newGroup.copyWith(
+          note: _hasBot ? jsonEncode(policy) : null,
+        ));
   }
 
   Widget _buildCreateGroupButton() {
@@ -332,10 +361,17 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
   @override
   Widget build(BuildContext context) {
+    TabsViewModel model = context.read<TabsViewModel>();
+
     return DefaultPageTemplate(
         showAppBar: true,
         appBarTitle: AppLocalizations.of(context).newGroupTitle,
         includePadding: false,
+        onBackButtonPressed: () {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            model.setNewGroupPageInStack(false);
+          });
+        },
         body: _buildPageBody());
   }
 
@@ -377,11 +413,11 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
   Widget _buildReactiveWarningBanner() {
     final shareWarning = getSharesWarning(
-      members: _members,
+      members: newGroup.members,
       shareCount: _shareCount,
-      threshold: _threshold,
+      threshold: newGroup.threshold,
       minThreshold: _minThreshold,
-      protocol: _protocol,
+      protocol: newGroup.protocol,
     );
 
     var title = '';
@@ -496,12 +532,12 @@ class _NewGroupPageState extends State<NewGroupPage> {
           ],
         ),
         const SizedBox(height: 8),
-        for (final (i, member) in _members.indexed)
+        for (final (i, member) in newGroup.members.indexed)
           ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 0),
             leading: WeightedAvatar(
               index: i,
-              weights: _members.map((m) => m.shares).toList(),
+              weights: newGroup.members.map((m) => m.shares).toList(),
               child: Text(member.device.name.initials),
             ),
             title: DeviceName(
@@ -517,13 +553,17 @@ class _NewGroupPageState extends State<NewGroupPage> {
                   onUpdate: (newWeight) {
                     setState(() {
                       if (newWeight > 0) {
-                        _members[i] = Member(member.device, newWeight);
+                        final updatedMembers =
+                            List<Member>.from(newGroup.members);
+                        updatedMembers[i] = Member(member.device, newWeight);
+                        newGroup = newGroup.copyWith(members: updatedMembers);
                         _sharesErr = false;
-                        if (_protocol.thresholdType == ThresholdType.nOfN) {
-                          _threshold = _shareCount;
+                        if (newGroup.protocol.thresholdType ==
+                            ThresholdType.nOfN) {
+                          newGroup = newGroup.copyWith(threshold: _shareCount);
                         }
 
-                        if (_threshold > _shareCount) {
+                        if (newGroup.threshold > _shareCount) {
                           _setThreshold(_shareCount);
                         }
                       }
@@ -561,14 +601,19 @@ class _NewGroupPageState extends State<NewGroupPage> {
                 _devices.removeWhere((d) => d.id == member.device.id);
 
                 // 2. Remove the member from the group
-                _members.removeAt(i);
+                final memberToDelete = newGroup.members[i];
+                newGroup = newGroup.copyWith(
+                  members: newGroup.members
+                      .where((m) => m.device.id != memberToDelete.device.id)
+                      .toList(),
+                );
 
                 _sharesErr = false;
-                if (_protocol.thresholdType == ThresholdType.nOfN) {
-                  _threshold = _shareCount;
+                if (newGroup.protocol.thresholdType == ThresholdType.nOfN) {
+                  newGroup = newGroup.copyWith(threshold: _shareCount);
                 }
                 // Adjust threshold if it's now too high
-                if (_threshold > _shareCount) {
+                if (newGroup.threshold > _shareCount) {
                   _setThreshold(_shareCount);
                 }
               });
@@ -592,30 +637,32 @@ class _NewGroupPageState extends State<NewGroupPage> {
                 const Icon(Symbols.person),
                 Expanded(
                   child: GestureDetector(
-                    onTap: (_protocol.thresholdType == ThresholdType.nOfN)
-                        ? () => displayWarningDialog()
-                        : null,
+                    onTap:
+                        (newGroup.protocol.thresholdType == ThresholdType.nOfN)
+                            ? () => displayWarningDialog()
+                            : null,
                     behavior: HitTestBehavior.translucent,
                     onHorizontalDragStart:
-                        (_protocol.thresholdType == ThresholdType.nOfN)
+                        (newGroup.protocol.thresholdType == ThresholdType.nOfN)
                             ? (_) => displayWarningDialog()
                             : null,
                     child: Slider(
-                      value: (_protocol.thresholdType == ThresholdType.nOfN
-                              ? _shareCount
-                              : min(_threshold, _shareCount))
-                          .toDouble(),
+                      value:
+                          (newGroup.protocol.thresholdType == ThresholdType.nOfN
+                                  ? _shareCount
+                                  : min(newGroup.threshold, _shareCount))
+                              .toDouble(),
                       min: 0,
                       max: _shareCount.toDouble(),
                       divisions: max(1, _shareCount),
-                      label: '$_threshold',
-                      onChanged:
-                          (_protocol.thresholdType == ThresholdType.nOfN ||
-                                  _shareCount <= 2)
-                              ? null
-                              : (value) => setState(() {
-                                    _setThreshold(value.round());
-                                  }),
+                      label: '${newGroup.threshold}',
+                      onChanged: (newGroup.protocol.thresholdType ==
+                                  ThresholdType.nOfN ||
+                              _shareCount <= 2)
+                          ? null
+                          : (value) => setState(() {
+                                _setThreshold(value.round());
+                              }),
                     ),
                   ),
                 ),
@@ -649,13 +696,16 @@ class _NewGroupPageState extends State<NewGroupPage> {
       title: AppLocalizations.of(context).purpose,
       children: [
         SegmentedButton<KeyType>(
-          selected: {_keyType},
+          selected: {newGroup.keyType},
           onSelectionChanged: (value) {
             setState(() {
-              _protocol = value.first.supportedProtocols.first;
-              _keyType = value.first;
-              if (_protocol.thresholdType == ThresholdType.nOfN) {
-                _threshold = _shareCount;
+              newGroup = newGroup.copyWith(
+                keyType: value.first,
+                protocol: value.first.supportedProtocols.first,
+              );
+
+              if (newGroup.protocol.thresholdType == ThresholdType.nOfN) {
+                newGroup = newGroup.copyWith(threshold: _shareCount);
               }
             });
           },
@@ -766,17 +816,20 @@ class _NewGroupPageState extends State<NewGroupPage> {
           title: AppLocalizations.of(context).protocol,
           children: [
             SegmentedButton<Protocol>(
-              selected: {_protocol},
+              selected: {newGroup.protocol},
               onSelectionChanged: (value) {
                 setState(() {
-                  _protocol = value.first;
-                  if (_protocol.thresholdType == ThresholdType.nOfN) {
-                    _threshold = _shareCount;
+                  newGroup = newGroup.copyWith(
+                    protocol: value.first,
+                  );
+
+                  if (newGroup.protocol.thresholdType == ThresholdType.nOfN) {
+                    newGroup = newGroup.copyWith(threshold: _shareCount);
                   }
                 });
               },
               segments: [
-                for (var protocol in _keyType.supportedProtocols)
+                for (var protocol in newGroup.keyType.supportedProtocols)
                   ButtonSegment<Protocol>(
                     value: protocol,
                     label: Text(protocol.name.toUpperCase()),

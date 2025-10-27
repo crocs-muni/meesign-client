@@ -161,7 +161,7 @@ abstract class AppLocalizations {
   /// No description provided for @applicationSettingsTitle.
   ///
   /// In en, this message translates to:
-  /// **'What would you like to do?'**
+  /// **'Application settings'**
   String get applicationSettingsTitle;
 
   /// No description provided for @deviceAndServerSettingsTitle.
@@ -1292,6 +1292,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You may experience degraded performance with certain protocols if the share count is too high. Consider removing some members or lowering the number of shares they receive if this poses an issue.'**
   String get manySharesWarningText;
+
+  /// No description provided for @groupCreationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Group creation failed'**
+  String get groupCreationFailed;
+
+  /// No description provided for @confirmCloseSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm close settings'**
+  String get confirmCloseSettingsTitle;
+
+  /// No description provided for @confirmCloseSettingsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'You can choose whether to confirm closing the application to prevent accidental exits.'**
+  String get confirmCloseSettingsDesc;
+
+  /// No description provided for @confirmCloseSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Show confirmation on exit'**
+  String get confirmCloseSettings;
+
+  /// No description provided for @confirmQuitTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you really want to quit?'**
+  String get confirmQuitTitle;
+
+  /// No description provided for @confirmQuitYesDontAsk.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, don\'t ask again'**
+  String get confirmQuitYesDontAsk;
+
+  /// No description provided for @no.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no;
+
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
+
+  /// No description provided for @pleaseCreateNewGroupForTaskType.
+  ///
+  /// In en, this message translates to:
+  /// **'Please create a new group for this task type in order to proceed'**
+  String get pleaseCreateNewGroupForTaskType;
 }
 
 class _AppLocalizationsDelegate

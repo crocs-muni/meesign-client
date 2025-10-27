@@ -63,10 +63,11 @@ Future<void> _prepareWindowManager() async {
     }
 
     WindowManager.instance.center();
+    await windowManager.setPreventClose(true);
   }
 }
 
-class MeeSignClient extends StatelessWidget {
+class MeeSignClient extends StatefulWidget {
   final String? prefillHost;
   final String? prefillName;
 
@@ -75,6 +76,13 @@ class MeeSignClient extends StatelessWidget {
     this.prefillHost,
     this.prefillName,
   });
+
+  @override
+  State<MeeSignClient> createState() => _MeeSignClientState();
+}
+
+class _MeeSignClientState extends State<MeeSignClient> with WindowListener {
+  final _navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   Widget build(BuildContext context) {
@@ -95,6 +103,7 @@ class MeeSignClient extends StatelessWidget {
         final settings = settingsSnapshot.data!;
 
         return MaterialApp(
+          navigatorKey: _navigatorKey,
           title: 'MeeSign',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.light,
@@ -107,8 +116,8 @@ class MeeSignClient extends StatelessWidget {
             Routes.newGroupQr: (_) => const QrReaderPage(),
             Routes.about: (_) => const AboutPage(),
             Routes.init: (_) => RegisterPage(
-                  prefillHost: prefillHost ?? defaultHost,
-                  prefillName: prefillName ?? '',
+                  prefillHost: widget.prefillHost ?? defaultHost,
+                  prefillName: widget.prefillName ?? '',
                 ),
           },
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -128,5 +137,77 @@ class MeeSignClient extends StatelessWidget {
         systemNavigationBarColor: Colors.transparent,
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      windowManager.addListener(this);
+    }
+  }
+
+  @override
+  void dispose() {
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      windowManager.removeListener(this);
+    }
+    super.dispose();
+  }
+
+  @override
+  void onWindowClose() async {
+    final context = _navigatorKey.currentContext;
+    if (context == null) return;
+
+    final AppContainer container = context.read<AppContainer>();
+    final settingsController = container.settingsController;
+
+    // Check if user previously chose "don't ask again"
+    final dontAskAgain =
+        settingsController.currentSettings.closeWithoutConfirmation;
+
+    if (dontAskAgain) {
+      await windowManager.destroy();
+      return;
+    }
+
+    const yesKey = 'yes';
+    const noKey = 'no';
+    const yesDontAskKey = 'yesDontAsk';
+
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        final localizations = AppLocalizations.of(context);
+        return AlertDialog(
+          title: Text(localizations.confirmQuitTitle),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(yesDontAskKey),
+              child: Text(localizations.confirmQuitYesDontAsk),
+            ),
+            SizedBox(
+              width: 50,
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(noKey),
+              child: Text(localizations.no),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(yesKey),
+              child: Text(localizations.yes),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == yesKey || result == yesDontAskKey) {
+      if (result == yesDontAskKey) {
+        settingsController.updateCloseWithoutConfirmation(true);
+      }
+      await windowManager.destroy();
+    }
   }
 }

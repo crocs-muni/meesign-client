@@ -147,7 +147,6 @@ class _NewTaskPageState extends State<NewTaskPage> {
           ),
           SizedBox(height: MEDIUM_GAP),
           _buildTaskBuilder(),
-          _buildSubmitButton(context),
           SizedBox(height: XLARGE_GAP * 2)
         ],
       ),
@@ -198,27 +197,97 @@ class _NewTaskPageState extends State<NewTaskPage> {
   }
 
   Widget _buildTaskBuilder() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: MEDIUM_PADDING),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (_taskType == KeyType.signPdf) ...[
-            _buildPdfSelector(context),
-          ] else ...[
-            _buildTaskDesc(),
-            SizedBox(height: LARGE_GAP),
-            if (_taskType == KeyType.decrypt) ...[
-              _buildContentTypeSelector(),
-            ],
-            if (_showImageSelector && _taskType == KeyType.decrypt)
-              ..._buildImageSelector(context),
-            if (!_showImageSelector || _taskType == KeyType.signChallenge)
-              _buildTaskMessage(),
-          ],
-        ],
-      ),
-    );
+    return Consumer<AppViewModel>(builder: (context, state, child) {
+      final taskGroups = state.groupTasks
+          .where((task) =>
+              task.state == TaskState.finished &&
+              task.info.keyType == _taskType &&
+              (state.showArchived ? true : !task.archived))
+          .map((task) => task.info)
+          .toList();
+
+      return GestureDetector(
+        onTap: taskGroups.isEmpty
+            ? () {
+                showDialog(
+                  context: context,
+                  builder: (dialogContext) => AlertDialog(
+                    title: Text(AppLocalizations.of(context)
+                        .noGroupsAvailableForTaskType),
+                    content: Text(AppLocalizations.of(context)
+                        .pleaseCreateNewGroupForTaskType),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(dialogContext);
+                        },
+                        child: Text(AppLocalizations.of(context).cancel),
+                      ),
+                      FilledButton.icon(
+                        onPressed: () async {
+                          Navigator.pop(dialogContext);
+
+                          // Navigate to groups listing page (don't await)
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => GroupsListingPage(),
+                          ));
+
+                          // Create a new group
+                          await createGroup(context, context,
+                              groupType: _getTaskType());
+
+                          // Force aggressive refresh to pick up the new group
+                          if (mounted) {
+                            await state.refetchTasks(TaskType.group);
+                            await Future.delayed(
+                                const Duration(milliseconds: 1500));
+                            setState(() {});
+                          }
+                        },
+                        icon: const Icon(Icons.add_rounded),
+                        label: Text(AppLocalizations.of(context).createGroup),
+                      ),
+                    ],
+                  ),
+                );
+              }
+            : null,
+        child: Opacity(
+          opacity: taskGroups.isEmpty ? 0.3 : 1.0,
+          child: AbsorbPointer(
+            absorbing: taskGroups.isEmpty,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: MEDIUM_PADDING),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (_taskType == KeyType.signPdf) ...[
+                        _buildPdfSelector(context),
+                      ] else ...[
+                        _buildTaskDesc(),
+                        SizedBox(height: LARGE_GAP),
+                        if (_taskType == KeyType.decrypt) ...[
+                          _buildContentTypeSelector(),
+                        ],
+                        if (_showImageSelector && _taskType == KeyType.decrypt)
+                          ..._buildImageSelector(context),
+                        if (!_showImageSelector ||
+                            _taskType == KeyType.signChallenge)
+                          _buildTaskMessage(),
+                      ],
+                    ],
+                  ),
+                ),
+                _buildSubmitButton(context),
+              ],
+            ),
+          ),
+        ),
+      );
+    });
   }
 
   String _getTaskNameHeader() {
@@ -556,6 +625,14 @@ class _NewTaskPageState extends State<NewTaskPage> {
                           // 2. Create a new group
                           await createGroup(context, context,
                               groupType: _getTaskType());
+
+                          // Force aggressive refresh to pick up the new group
+                          if (mounted) {
+                            await state.refetchTasks(TaskType.group);
+                            await Future.delayed(
+                                const Duration(milliseconds: 1500));
+                            setState(() {});
+                          }
                         },
                         icon: const Icon(Icons.add_rounded),
                         label: Text(_getCreateGroupButtonText()),

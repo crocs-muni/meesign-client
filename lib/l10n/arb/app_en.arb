@@ -282,5 +282,14 @@
         }
     },
     "manySharesWarning": "Very large number of shares",
-    "manySharesWarningText": "You may experience degraded performance with certain protocols if the share count is too high. Consider removing some members or lowering the number of shares they receive if this poses an issue."
+    "manySharesWarningText": "You may experience degraded performance with certain protocols if the share count is too high. Consider removing some members or lowering the number of shares they receive if this poses an issue.",
+    "groupCreationFailed": "Group creation failed",
+    "confirmCloseSettingsTitle": "Confirm close settings",
+    "confirmCloseSettingsDesc": "You can choose whether to confirm closing the application to prevent accidental exits.",
+    "confirmCloseSettings": "Show confirmation on exit",
+    "confirmQuitTitle": "Do you really want to quit?",
+    "confirmQuitYesDontAsk": "Yes, don't ask again",
+    "no": "No",
+    "yes": "Yes",
+    "pleaseCreateNewGroupForTaskType": "Please create a new group for this task type in order to proceed"
 }

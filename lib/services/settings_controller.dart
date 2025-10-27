@@ -14,7 +14,8 @@ class SettingsController {
   static const defaultThemeMode = ThemeMode.system;
   static const minGroupMembersKey = 'minGroupMembers';
   static const currentLanguageKey = 'currentLanguage';
-  static const defaultLanguage = 'en';
+  static const defaultLanguage = 'cs';
+  static const closeWithoutConfirmationKey = 'close_without_confirmation';
 
   // Seed settings controller stream with default settings
   final _settingsController = BehaviorSubject<Settings>.seeded(
@@ -37,6 +38,7 @@ class SettingsController {
     _initCurrentUserIdSettings();
     _initMinGroupMembers();
     _initLanguageSettings();
+    _initCloseWithoutConfirmation();
   }
 
   void updateAutoJoinGroups(bool autoJoin) {
@@ -66,6 +68,9 @@ class SettingsController {
   void updateCurrentLanguage(String currentLanguage) =>
       _updateSettingsStream(currentLanguage: currentLanguage);
 
+  void updateCloseWithoutConfirmation(bool closeWithoutConfirmation) =>
+      _updateSettingsStream(closeWithoutConfirmation: closeWithoutConfirmation);
+
   void _updateSettingsStream(
       {ThemeMode? themeMode,
       bool? showArchivedItems,
@@ -73,7 +78,8 @@ class SettingsController {
       bool? autoJoinGroups,
       bool? autoRejectGroups,
       int? minGroupMembers,
-      String? currentLanguage}) {
+      String? currentLanguage,
+      bool? closeWithoutConfirmation}) {
     final currentSettings = _settingsController.value;
     final updatedSettings = currentSettings.copyWith(
         themeMode: themeMode ?? currentSettings.themeMode,
@@ -83,7 +89,9 @@ class SettingsController {
         autoJoinGroups: autoJoinGroups ?? currentSettings.autoJoinGroups,
         autoRejectGroups: autoRejectGroups ?? currentSettings.autoRejectGroups,
         minGroupMembers: minGroupMembers ?? currentSettings.minGroupMembers,
-        currentLanguage: currentLanguage ?? currentSettings.currentLanguage);
+        currentLanguage: currentLanguage ?? currentSettings.currentLanguage,
+        closeWithoutConfirmation: closeWithoutConfirmation ??
+            currentSettings.closeWithoutConfirmation);
     _settingsController.add(updatedSettings);
 
     SharedPreferences.getInstance().then((sharedPreferences) {
@@ -101,6 +109,8 @@ class SettingsController {
           minGroupMembersKey, updatedSettings.minGroupMembers);
       sharedPreferences.setString(
           currentLanguageKey, updatedSettings.currentLanguage);
+      sharedPreferences.setBool(closeWithoutConfirmationKey,
+          updatedSettings.closeWithoutConfirmation);
     });
   }
 
@@ -164,6 +174,16 @@ class SettingsController {
 
     updateCurrentLanguage(currentLanguage);
     sharedPreferences.setString(currentLanguageKey, currentLanguage);
+  }
+
+  void _initCloseWithoutConfirmation() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    bool closeWithoutConfirmation =
+        sharedPreferences.getBool(closeWithoutConfirmationKey) ?? false;
+
+    updateCloseWithoutConfirmation(closeWithoutConfirmation);
+    sharedPreferences.setBool(
+        closeWithoutConfirmationKey, closeWithoutConfirmation);
   }
 
   void saveUserIdentifier(String deviceName, String host, String id) async {
