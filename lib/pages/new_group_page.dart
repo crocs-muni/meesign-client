@@ -19,7 +19,6 @@ import '../templates/default_page_template.dart';
 import '../ui_constants.dart';
 import '../util/chars.dart';
 import '../util/get_shares_warning.dart';
-import '../view_model/tabs_view_model.dart';
 import '../widget/device_name.dart';
 import '../widget/number_input.dart';
 import '../widget/option_tile.dart';
