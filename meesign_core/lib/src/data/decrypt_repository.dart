@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:fixnum/fixnum.dart';
 import 'package:meesign_native/meesign_native.dart';
 import 'package:meesign_network/grpc.dart' as rpc;
 
@@ -34,13 +35,51 @@ class DecryptRepository extends TaskRepository<Decrypt> {
     List<int> gid,
   ) async {
     final enc = ElGamalWrapper.encrypt(data, gid);
-    await _dispatcher.unauth.decrypt(
-      rpc.DecryptRequest()
-        ..groupId = gid
-        ..name = description
-        ..dataType = dataType.value
-        ..data = enc,
-    );
+
+    // Use streaming for large encrypted data (> 1MB)
+    if (enc.length > 1024 * 1024) {
+      await _encryptStreaming(description, dataType, enc, gid);
+    } else {
+      // Use regular RPC for small data
+      await _dispatcher.unauth.decrypt(
+        rpc.DecryptRequest()
+          ..groupId = gid
+          ..name = description
+          ..dataType = dataType.value
+          ..data = enc,
+      );
+    }
+  }
+
+  /// Stream large encrypted data in chunks to avoid gRPC message size limits.
+  Future<void> _encryptStreaming(
+    String description,
+    MimeType dataType,
+    List<int> encryptedData,
+    List<int> gid,
+  ) async {
+    const chunkSize = 256 * 1024; // 256KB chunks
+
+    Stream<rpc.DecryptRequestChunk> chunks() async* {
+      // First chunk: metadata
+      yield rpc.DecryptRequestChunk()
+        ..metadata = (rpc.DecryptMetadata()
+          ..name = description
+          ..groupId = gid
+          ..dataType = dataType.value
+          ..totalSize = Int64(encryptedData.length));
+
+      // Subsequent chunks: data
+      for (var i = 0; i < encryptedData.length; i += chunkSize) {
+        final end = (i + chunkSize < encryptedData.length)
+            ? i + chunkSize
+            : encryptedData.length;
+
+        yield rpc.DecryptRequestChunk()..chunk = encryptedData.sublist(i, end);
+      }
+    }
+
+    await _dispatcher.unauth.decryptStream(chunks());
   }
 
   @override
