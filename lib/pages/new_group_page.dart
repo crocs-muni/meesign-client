@@ -67,9 +67,6 @@ class _NewGroupPageState extends State<NewGroupPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<TabsViewModel>().setNewGroupPageInStack(true);
-    });
 
     // Reset errors on input change
     _nameController.addListener(() {
@@ -332,11 +329,6 @@ class _NewGroupPageState extends State<NewGroupPage> {
       return;
     }
 
-    TabsViewModel model = context.read<TabsViewModel>();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      model.setNewGroupPageInStack(false);
-    });
-
     // Pass the new created group back to the previous screen where its handled
     Navigator.pop(
         context,
@@ -361,17 +353,10 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
   @override
   Widget build(BuildContext context) {
-    TabsViewModel model = context.read<TabsViewModel>();
-
     return DefaultPageTemplate(
         showAppBar: true,
         appBarTitle: AppLocalizations.of(context).newGroupTitle,
         includePadding: false,
-        onBackButtonPressed: () {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            model.setNewGroupPageInStack(false);
-          });
-        },
         body: _buildPageBody());
   }
 

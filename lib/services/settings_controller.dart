@@ -14,7 +14,7 @@ class SettingsController {
   static const defaultThemeMode = ThemeMode.system;
   static const minGroupMembersKey = 'minGroupMembers';
   static const currentLanguageKey = 'currentLanguage';
-  static const defaultLanguage = 'cs';
+  static const defaultLanguage = 'en';
   static const closeWithoutConfirmationKey = 'close_without_confirmation';
 
   // Seed settings controller stream with default settings
