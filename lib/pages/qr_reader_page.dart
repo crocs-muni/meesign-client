@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../l10n/arb/app_localizations.dart';
+import '../templates/default_page_template.dart';
 import '../util/qr_coder.dart';
 
 class QrReaderPage extends StatefulWidget {
@@ -50,7 +52,8 @@ class _QrReaderPageState extends State<QrReaderPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return DefaultPageTemplate(
+      showAppBar: true,
       body: Column(
         children: <Widget>[
           Expanded(
@@ -65,12 +68,18 @@ class _QrReaderPageState extends State<QrReaderPage> {
             child: Center(
               child: _recentError
                   ? Text(
-                      'This code does not belong to any peer',
+                      AppLocalizations.of(context).qrCodeNotBelongToPeer,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.error,
                       ),
                     )
-                  : const Text('Scan the code of the peer'),
+                  : Text(
+                      AppLocalizations.of(context).scanPeerCode,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color:
+                              Theme.of(context).colorScheme.onSurfaceVariant),
+                    ),
             ),
           )
         ],

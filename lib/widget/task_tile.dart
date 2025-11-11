@@ -58,21 +58,22 @@ class TaskTile<T> extends StatelessWidget {
     final appViewModel = Provider.of<AppViewModel>(context);
 
     final actionRow = allActions.isNotEmpty || actionChip != null
-        ? Row(
+        ? Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              if (actionChip != null) actionChip!,
-              Expanded(
-                child: Wrap(
-                  alignment: WrapAlignment.end,
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: allActions,
-                ),
+              if (actionChip != null) ...[
+                actionChip!,
+                const SizedBox(width: 8),
+              ],
+              SizedBox(height: MEDIUM_GAP),
+              Wrap(
+                alignment: WrapAlignment.start,
+                spacing: 8,
+                runSpacing: 8,
+                children: allActions,
               ),
-            ].intersperse(
-              const SizedBox(width: 8),
-            ),
+            ],
           )
         : null;
 
@@ -95,20 +96,17 @@ class TaskTile<T> extends StatelessWidget {
           clipBehavior: Clip.antiAlias,
           child: ExpansionTile(
             key: ValueKey('expansion_tile_${task.id}'),
-            title: Row(
+            title: Wrap(
+              crossAxisAlignment: WrapCrossAlignment.start,
+              spacing: LARGE_GAP * 1.5,
+              runSpacing: SMALL_GAP,
               children: [
-                Flexible(
-                  child: Text(name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      )),
-                ),
-                if (showTaskTypeInfo) ...[
-                  SizedBox(width: LARGE_GAP * 1.5),
-                  _buildTaskTypeInfo(task, context),
-                ],
+                Text(name,
+                    overflow: TextOverflow.visible,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    )),
+                if (showTaskTypeInfo) _buildTaskTypeInfo(task, context),
               ],
             ),
             subtitle: desc != null
@@ -120,7 +118,7 @@ class TaskTile<T> extends StatelessWidget {
             initiallyExpanded: !task.archived &&
                 task.state != TaskState.finished &&
                 task.state != TaskState.failed,
-            leading: leading,
+            leading: MediaQuery.sizeOf(context).width > 400 ? leading : null,
             trailing: trailing,
             childrenPadding: const EdgeInsets.symmetric(
               horizontal: 16,

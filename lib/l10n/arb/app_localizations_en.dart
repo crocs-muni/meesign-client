@@ -42,7 +42,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get generalSettingsTitle => 'General settings';
 
   @override
-  String get applicationSettingsTitle => 'Application settings';
+  String get applicationSettingsTitle => 'What would you like to do?';
 
   @override
   String get deviceAndServerSettingsTitle => 'Device and server';
@@ -378,6 +378,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get reload => 'Reload';
+
+  @override
   String get reloadTasks => 'Reload tasks';
 
   @override
@@ -528,6 +531,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get openPdfFile => 'Open PDF file';
+
+  @override
+  String get previewDocument => 'Preview Document';
 
   @override
   String get hexValue => 'Hex value';
@@ -682,4 +688,14 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get pleaseCreateNewGroupForTaskType =>
       'Please create a new group for this task type in order to proceed';
+
+  @override
+  String get qrCodeNotBelongToPeer => 'This code does not belong to any peer';
+
+  @override
+  String get scanPeerCode => 'Scan the code of the peer';
+
+  @override
+  String get javaCardsFrostGroupsHelpText =>
+      'You can use JavaCards as members in FROST groups.';
 }

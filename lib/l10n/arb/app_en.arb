@@ -141,6 +141,7 @@
             }
         }
     },
+    "reload": "Reload",
     "reloadTasks": "Reload tasks",
     "reloadGroups": "Reload groups",
     "showOnlyPending": "Show only pending",
@@ -224,6 +225,7 @@
     "taskValue": "Task value",
     "taskImage": "Task image",
     "openPdfFile": "Open PDF file",
+    "previewDocument": "Preview Document",
     "hexValue": "Hex value",
     "taskGroup": "Task group",
     "cancel": "Cancel",
@@ -291,5 +293,8 @@
     "confirmQuitYesDontAsk": "Yes, don't ask again",
     "no": "No",
     "yes": "Yes",
-    "pleaseCreateNewGroupForTaskType": "Please create a new group for this task type in order to proceed"
+    "pleaseCreateNewGroupForTaskType": "Please create a new group for this task type in order to proceed",
+    "qrCodeNotBelongToPeer": "This code does not belong to any peer",
+    "scanPeerCode": "Scan the code of the peer",
+    "javaCardsFrostGroupsHelpText": "You can use JavaCards as members in FROST groups."
 }

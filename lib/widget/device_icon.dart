@@ -18,30 +18,51 @@ class DeviceIcon extends StatelessWidget {
     return Consumer<AppViewModel>(
       builder: (context, model, child) {
         final name = model.device?.name ?? '';
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            if (showFullName) ...[
-              Text(name, overflow: TextOverflow.ellipsis),
-            ],
-            const SizedBox(width: SMALL_GAP / 2),
-            Container(
-                padding: const EdgeInsets.only(right: SMALL_PADDING),
-                child: IconButton(
-                  onPressed: () {
-                    final device = model.device;
-                    if (device == null) return;
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute<void>(
-                        builder: (BuildContext context) =>
-                            DevicePage(device: device),
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            const minSpaceForAvatar = 48.0 + SMALL_PADDING;
+            const minSpaceForText = 60.0;
+            const minSpaceForTextWithGap = minSpaceForText + SMALL_GAP / 2;
+            final hasSpaceForText = constraints.maxWidth >=
+                (minSpaceForAvatar + minSpaceForTextWithGap);
+
+            final shouldShowText = showFullName && hasSpaceForText;
+
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (shouldShowText) ...[
+                  Flexible(
+                    child: Text(
+                      name,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 16,
                       ),
-                    );
-                  },
-                  icon: _buildIndicatorIcon(context, name),
-                )),
-          ],
+                    ),
+                  ),
+                  const SizedBox(width: SMALL_GAP / 2),
+                ],
+                Container(
+                    padding: const EdgeInsets.only(right: SMALL_PADDING),
+                    child: IconButton(
+                      onPressed: () {
+                        final device = model.device;
+                        if (device == null) return;
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (BuildContext context) =>
+                                DevicePage(device: device),
+                          ),
+                        );
+                      },
+                      icon: _buildIndicatorIcon(context, name),
+                    )),
+              ],
+            );
+          },
         );
       },
     );

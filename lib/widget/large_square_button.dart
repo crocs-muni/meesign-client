@@ -22,7 +22,7 @@ class LargeSquareButton extends StatelessWidget {
       child: SizedBox(
         width: 100,
         height: 50,
-        child: ElevatedButton(
+        child: ElevatedButton.icon(
             onPressed: onPressed,
             style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.all(0),
@@ -30,7 +30,8 @@ class LargeSquareButton extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                     borderRadius:
                         BorderRadiusGeometry.circular(SMALL_BORDER_RADIUS))),
-            child: Column(
+            icon: Icon(icon, color: Colors.white),
+            label: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(

@@ -22,6 +22,7 @@ class SearchPeerPage extends StatefulWidget {
 
 class _SearchPeerPageState extends State<SearchPeerPage> {
   static const activeThreshold = Duration(seconds: 10);
+  bool isReloading = false;
 
   final _queryController = TextEditingController();
   List<Device> _queryResults = [];
@@ -71,6 +72,23 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
     });
   }
 
+  Future<void> _refresh() async {
+    /// TODO: Implement auto-refresh so user doesn't have to manually reload
+    _query(_queryController.text);
+
+    if (isReloading) return;
+
+    setState(() {
+      isReloading = true;
+    });
+
+    Future.delayed(const Duration(seconds: 1), () {
+      setState(() {
+        isReloading = false;
+      });
+    });
+  }
+
   void _changeSelection(Device device, bool value) {
     if (value) {
       if (_selection.any((elem) => elem.id == device.id)) return;
@@ -115,53 +133,81 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
                   onDeleted: (device) => _changeSelection(device, false),
                 )
               : null),
-      body: _queryResults.isEmpty
-          ? !_loaded
-              ? LinearProgressIndicator()
-              : NoResultsPlaceholder(
-                  label: _queryController.text.isEmpty
-                      ? AppLocalizations.of(context).noPeersExistOnServer
-                      : AppLocalizations.of(context).noPeersWithSuchNameFound,
-                  icon: _queryController.text.isEmpty
-                      ? Icons.device_unknown
-                      : Icons.search_off,
-                )
-          : ListView.builder(
-              itemCount: _queryResults.length,
-              itemBuilder: (context, index) {
-                final device = _queryResults[index];
-                return DeviceSuggestionTile(
-                  device: device,
-                  active: _isActive(device),
-                  // TODO: don't recompute this?
-                  selected: _selection.any((elem) => elem.id == device.id),
-                  onChanged: device.id == widget.currentDevice.id
-                      ? _selection
-                              .any((elem) => elem.id == widget.currentDevice.id)
-                          ? null
-                          : (value) {
-                              if (value != null) {
-                                _changeSelection(device, value);
-                              }
-                            }
-                      : (value) {
-                          if (value != null) _changeSelection(device, value);
-                        },
-                );
-              },
-            ),
+      body: isReloading
+          ? LinearProgressIndicator()
+          : _queryResults.isEmpty
+              ? !_loaded
+                  ? LinearProgressIndicator()
+                  : RefreshIndicator(
+                      onRefresh: _refresh,
+                      child: ListView(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: XLARGE_GAP * 3),
+                            child: NoResultsPlaceholder(
+                              label: _queryController.text.isEmpty
+                                  ? AppLocalizations.of(context)
+                                      .noPeersExistOnServer
+                                  : AppLocalizations.of(context)
+                                      .noPeersWithSuchNameFound,
+                              icon: _queryController.text.isEmpty
+                                  ? Icons.device_unknown
+                                  : Icons.search_off,
+                            ),
+                          )
+                        ],
+                      ))
+              : RefreshIndicator(
+                  onRefresh: _refresh,
+                  child: ListView.builder(
+                    itemCount: _queryResults.length,
+                    itemBuilder: (context, index) {
+                      final device = _queryResults[index];
+                      return DeviceSuggestionTile(
+                        device: device,
+                        active: _isActive(device),
+                        // TODO: don't recompute this?
+                        selected:
+                            _selection.any((elem) => elem.id == device.id),
+                        onChanged: device.id == widget.currentDevice.id
+                            ? _selection.any((elem) =>
+                                    elem.id == widget.currentDevice.id)
+                                ? null
+                                : (value) {
+                                    if (value != null) {
+                                      _changeSelection(device, value);
+                                    }
+                                  }
+                            : (value) {
+                                if (value != null) {
+                                  _changeSelection(device, value);
+                                }
+                              },
+                      );
+                    },
+                  ),
+                ),
     );
   }
 
   Widget _buildAddButton() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: MEDIUM_PADDING),
-      child: FilledButton(
-        onPressed: filterCurrentDevice(devices: _selection).isEmpty
-            ? null
-            : () => Navigator.pop(context, _selection),
-        child: Text(AppLocalizations.of(context).add),
-      ),
+    return Row(
+      children: [
+        FilledButton(
+          onPressed: filterCurrentDevice(devices: _selection).isEmpty
+              ? null
+              : () => Navigator.pop(context, _selection),
+          child: Text(AppLocalizations.of(context).add),
+        ),
+        SizedBox(width: SMALL_GAP),
+        Padding(
+          padding: const EdgeInsets.only(right: SMALL_PADDING),
+          child: FilledButton(
+            onPressed: isReloading ? null : _refresh,
+            child: Text(AppLocalizations.of(context).reload),
+          ),
+        )
+      ],
     );
   }
 

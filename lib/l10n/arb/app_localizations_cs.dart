@@ -42,7 +42,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get generalSettingsTitle => 'Obecná nastavení';
 
   @override
-  String get applicationSettingsTitle => 'Nastavení aplikace';
+  String get applicationSettingsTitle => 'Co by jste chtěli dělat?';
 
   @override
   String get deviceAndServerSettingsTitle => 'Zařízení a server';
@@ -382,6 +382,9 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
+  String get reload => 'Obnovit';
+
+  @override
   String get reloadTasks => 'Obnovit úlohy';
 
   @override
@@ -528,6 +531,9 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get openPdfFile => 'Otevřít PDF soubor';
+
+  @override
+  String get previewDocument => 'Zobrazit dokument';
 
   @override
   String get hexValue => 'Hexadecimální hodnota';
@@ -685,4 +691,14 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get pleaseCreateNewGroupForTaskType =>
       'Pro pokračování prosím vytvořte novou skupinu pro tento typ úlohy';
+
+  @override
+  String get qrCodeNotBelongToPeer => 'Tento kód nepatří žádnému členu';
+
+  @override
+  String get scanPeerCode => 'Naskenujte kód člena';
+
+  @override
+  String get javaCardsFrostGroupsHelpText =>
+      'Ve FROST skupině můžete použít JavaCards.';
 }

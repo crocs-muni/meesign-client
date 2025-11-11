@@ -24,6 +24,7 @@ import '../widget/number_input.dart';
 import '../widget/option_tile.dart';
 import '../widget/warning_banner.dart';
 import '../widget/weighted_avatar.dart';
+import 'qr_reader_page.dart';
 import 'search_peer_page.dart';
 
 class NewGroupPage extends StatefulWidget {
@@ -242,6 +243,24 @@ class _NewGroupPageState extends State<NewGroupPage> {
     final session = context.read<AppContainer>().session!;
     final navigator = Navigator.of(context, rootNavigator: false);
     Device device = await session.deviceRepository.getDevice(session.user.did);
+
+    if (route == Routes.newGroupQr) {
+      final scannedDevice = await navigator.push<Device?>(
+        MaterialPageRoute(builder: (context) => QrReaderPage()),
+      );
+
+      if (scannedDevice == null) {
+        return;
+      }
+
+      if (_devices.any((d) => d.id == scannedDevice.id)) {
+        return;
+      }
+
+      _devices.add(scannedDevice);
+      _addMembers([scannedDevice]);
+      return;
+    }
 
     final devicesSelection = await navigator.push(
       MaterialPageRoute(
@@ -822,6 +841,9 @@ class _NewGroupPageState extends State<NewGroupPage> {
             ),
           ],
         ),
+        if (newGroup.protocol == Protocol.frost) ...[
+          _buildJavaCardAvailableInfo()
+        ],
         if (_hasBot)
           OptionTile(
             title: AppLocalizations.of(context).customPolicy,
@@ -841,6 +863,38 @@ class _NewGroupPageState extends State<NewGroupPage> {
             ],
           ),
       ],
+    );
+  }
+
+  Widget _buildJavaCardAvailableInfo() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: MEDIUM_PADDING),
+      child: Row(
+        children: [
+          Icon(
+            size: 20,
+            Icons.info_outline,
+            color: Theme.of(context)
+                .textTheme
+                .bodyLarge
+                ?.color
+                ?.withValues(alpha: 0.65),
+          ),
+          SizedBox(width: SMALL_GAP),
+          Expanded(
+            child: Text(
+              style: TextStyle(
+                color: Theme.of(context)
+                    .textTheme
+                    .bodyLarge
+                    ?.color
+                    ?.withValues(alpha: 0.65),
+              ),
+              AppLocalizations.of(context).javaCardsFrostGroupsHelpText,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

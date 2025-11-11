@@ -413,16 +413,21 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
     return Padding(
       padding: const EdgeInsets.only(top: SMALL_PADDING, bottom: SMALL_PADDING),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildCheckboxContainer(
-              title: AppLocalizations.of(context).showOnlyPending,
-              value: showOnlyPending,
-              onChanged: (value) {
-                setState(() {
-                  showOnlyPending = value ?? false;
-                });
-              }),
-          Spacer(),
+          Flexible(
+            child: Container(
+              padding: EdgeInsets.only(right: SMALL_PADDING),
+              child: _buildCheckboxContainer(
+                  title: AppLocalizations.of(context).showOnlyPending,
+                  value: showOnlyPending,
+                  onChanged: (value) {
+                    setState(() {
+                      showOnlyPending = value ?? false;
+                    });
+                  }),
+            ),
+          ),
           _buildReloadButton()
         ],
       ),
@@ -448,7 +453,11 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
                 });
               },
             ),
-            Text(title),
+            Flexible(
+              child: Text(
+                title,
+              ),
+            )
           ],
         ),
         onTap: () {

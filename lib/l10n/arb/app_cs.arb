@@ -141,6 +141,7 @@
             }
         }
     },
+    "reload": "Obnovit",
     "reloadTasks": "Obnovit úlohy",
     "reloadGroups": "Obnovit skupiny",
     "showOnlyPending": "Zobrazit pouze čekající",
@@ -224,6 +225,7 @@
     "taskValue": "Hodnota úlohy",
     "taskImage": "Obrázek úlohy",
     "openPdfFile": "Otevřít PDF soubor",
+    "previewDocument": "Zobrazit dokument",
     "hexValue": "Hexadecimální hodnota",
     "taskGroup": "Skupina úlohy",
     "cancel": "Zrušit",
@@ -291,5 +293,8 @@
     "confirmQuitYesDontAsk": "Ano, příště se již neptat",
     "no": "Ne",
     "yes": "Ano",
-    "pleaseCreateNewGroupForTaskType": "Pro pokračování prosím vytvořte novou skupinu pro tento typ úlohy"
+    "pleaseCreateNewGroupForTaskType": "Pro pokračování prosím vytvořte novou skupinu pro tento typ úlohy",
+    "qrCodeNotBelongToPeer": "Tento kód nepatří žádnému členu",
+    "scanPeerCode": "Naskenujte kód člena",
+    "javaCardsFrostGroupsHelpText": "Ve FROST skupině můžete použít JavaCards."
 }

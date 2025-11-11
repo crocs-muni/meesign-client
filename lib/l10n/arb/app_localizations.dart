@@ -161,7 +161,7 @@ abstract class AppLocalizations {
   /// No description provided for @applicationSettingsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Application settings'**
+  /// **'What would you like to do?'**
   String get applicationSettingsTitle;
 
   /// No description provided for @deviceAndServerSettingsTitle.
@@ -782,6 +782,12 @@ abstract class AppLocalizations {
   /// **'No tasks found for \"{query}\".'**
   String noTasksFoundForQuery(String query);
 
+  /// No description provided for @reload.
+  ///
+  /// In en, this message translates to:
+  /// **'Reload'**
+  String get reload;
+
   /// No description provided for @reloadTasks.
   ///
   /// In en, this message translates to:
@@ -1058,6 +1064,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open PDF file'**
   String get openPdfFile;
+
+  /// No description provided for @previewDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview Document'**
+  String get previewDocument;
 
   /// No description provided for @hexValue.
   ///
@@ -1346,6 +1358,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please create a new group for this task type in order to proceed'**
   String get pleaseCreateNewGroupForTaskType;
+
+  /// No description provided for @qrCodeNotBelongToPeer.
+  ///
+  /// In en, this message translates to:
+  /// **'This code does not belong to any peer'**
+  String get qrCodeNotBelongToPeer;
+
+  /// No description provided for @scanPeerCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan the code of the peer'**
+  String get scanPeerCode;
+
+  /// No description provided for @javaCardsFrostGroupsHelpText.
+  ///
+  /// In en, this message translates to:
+  /// **'You can use JavaCards as members in FROST groups.'**
+  String get javaCardsFrostGroupsHelpText;
 }
 
 class _AppLocalizationsDelegate

@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:meesign_core/meesign_core.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../l10n/arb/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -80,6 +84,21 @@ class SigningTaskTile extends StatelessWidget {
               child: Text(AppLocalizations.of(context).copy),
             ),
           ],
+          if (task.state == TaskState.failed) ...[
+            SizedBox(
+              width: SMALL_GAP,
+            ),
+            FilledButton.tonal(
+              style: FilledButton.styleFrom(
+                side: const BorderSide(
+                  color: Colors.grey,
+                  width: 1.0,
+                ),
+              ),
+              onPressed: () => _openFile(),
+              child: Text(AppLocalizations.of(context).view),
+            ),
+          ],
         ],
       ),
       actions: const [],
@@ -99,8 +118,48 @@ class SigningTaskTile extends StatelessWidget {
               model.joinSign(task, agree: false);
             },
             color: Color(0xFFAA3026)),
+        Container(
+          margin: EdgeInsets.only(bottom: SMALL_GAP),
+          child: SizedBox(
+              height: 50,
+              child: _buildPreviewButton(context: context, model: model)),
+        ),
       ],
       onArchiveChange: (archive) => model.archiveTask(task, archive: archive),
     );
+  }
+
+  Widget _buildPreviewButton({
+    required BuildContext context,
+    required AppViewModel model,
+  }) {
+    return ElevatedButton.icon(
+        onPressed: () {
+          _openFile();
+        },
+        style: ElevatedButton.styleFrom(
+            backgroundColor: Color(0xFF555555),
+            padding: EdgeInsets.all(MEDIUM_PADDING),
+            shape: RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadiusGeometry.circular(SMALL_BORDER_RADIUS))),
+        icon: Icon(Icons.list_alt, color: Colors.white),
+        label: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              AppLocalizations.of(context).previewDocument,
+              style: TextStyle(fontSize: 14, color: Colors.white),
+            )
+          ],
+        ));
+  }
+
+  void _openFile() {
+    if (Platform.isLinux) {
+      launchUrl(Uri.file(task.info.path));
+    } else {
+      OpenFilex.open(task.info.path);
+    }
   }
 }
