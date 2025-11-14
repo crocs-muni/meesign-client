@@ -8,6 +8,7 @@ import 'package:rxdart/rxdart.dart';
 
 import '../app/model/settings.dart';
 import '../enums/task_type.dart';
+import '../services/local_auth_service.dart';
 import '../services/settings_controller.dart';
 import '../util/extensions/task_approvable.dart';
 
@@ -226,20 +227,44 @@ class AppViewModel with ChangeNotifier {
       _decryptRepository.encrypt(description, mimeType, data, group.id);
 
   Future<void> joinGroup(Task<Group> task,
-          {required bool agree, bool withCard = false}) =>
+      {required bool agree, bool withCard = false}) async {
+    if (await LocalAuthService.authUser(_settingsController) && agree) {
       _groupRepository.approveTask(device!.id, task.id,
           agree: agree, withCard: withCard);
-  Future<void> joinSign(Task<File> task, {required bool agree}) =>
+    }
+  }
+
+  Future<void> joinSign(Task<File> task, {required bool agree}) async {
+    if (await LocalAuthService.authUser(_settingsController) && agree) {
       _fileRepository.approveTask(device!.id, task.id, agree: agree);
-  Future<void> joinChallenge(Task<Challenge> task, {required bool agree}) =>
+    }
+  }
+
+  Future<void> joinChallenge(Task<Challenge> task,
+      {required bool agree}) async {
+    if (await LocalAuthService.authUser(_settingsController) && agree) {
       _challengeRepository.approveTask(device!.id, task.id, agree: agree);
-  Future<void> joinDecrypt(Task<Decrypt> task, {required bool agree}) =>
+    }
+  }
+
+  Future<void> joinDecrypt(Task<Decrypt> task, {required bool agree}) async {
+    if (await LocalAuthService.authUser(_settingsController) && agree) {
       _decryptRepository.approveTask(device!.id, task.id, agree: agree);
+    }
+  }
+
   // FIXME: avoid this repetition
-  Future<void> advanceGroupWithCard(Task<Group> task, Card card) =>
+  Future<void> advanceGroupWithCard(Task<Group> task, Card card) async {
+    if (await LocalAuthService.authUser(_settingsController)) {
       _groupRepository.advanceTaskWithCard(device!.id, task.id, card);
-  Future<void> advanceChallengeWithCard(Task<Challenge> task, Card card) =>
+    }
+  }
+
+  Future<void> advanceChallengeWithCard(Task<Challenge> task, Card card) async {
+    if (await LocalAuthService.authUser(_settingsController)) {
       _challengeRepository.advanceTaskWithCard(device!.id, task.id, card);
+    }
+  }
 
   TaskRepository<T> _selectRepository<T>() {
     return switch (T) {

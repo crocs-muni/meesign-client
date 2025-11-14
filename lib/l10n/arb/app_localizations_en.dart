@@ -674,6 +674,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmCloseSettings => 'Show confirmation on exit';
 
   @override
+  String get authenticateProtectedActionsSettingsTitle =>
+      'Authentication settings';
+
+  @override
+  String get authenticateProtectedActionsSettingsDesc =>
+      'Require biometric or device authentication for sensitive actions to enhance security.';
+
+  @override
+  String get authenticateProtectedActionsSettings =>
+      'Authenticate protected actions';
+
+  @override
   String get confirmQuitTitle => 'Do you really want to quit?';
 
   @override

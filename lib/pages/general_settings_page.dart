@@ -46,6 +46,9 @@ class GeneralSettingsPage extends StatelessWidget {
                       settingsController, settings, context),
                   SizedBox(height: XLARGE_GAP * 2),
                   _buildCloseAppConfirmationSettingsSection(
+                      settingsController, settings, context),
+                  SizedBox(height: XLARGE_GAP * 2),
+                  _buildAuthenticateProtectedActionsSettingsSection(
                       settingsController, settings, context)
                 ],
               );
@@ -155,6 +158,41 @@ class GeneralSettingsPage extends StatelessWidget {
           value: !settings.closeWithoutConfirmation,
           onChanged: (value) {
             controller.updateCloseWithoutConfirmation(!value);
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAuthenticateProtectedActionsSettingsSection(
+      SettingsController controller, Settings settings, BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          AppLocalizations.of(context)
+              .authenticateProtectedActionsSettingsTitle,
+          style: Theme.of(context)
+              .textTheme
+              .bodyLarge
+              ?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: SMALL_GAP),
+        Text(
+            AppLocalizations.of(context)
+                .authenticateProtectedActionsSettingsDesc,
+            style: theme.textTheme.bodyMedium
+                ?.copyWith(color: theme.colorScheme.outline)),
+        SizedBox(height: SMALL_GAP),
+        SwitchListTile(
+          title: Text(
+              AppLocalizations.of(context).authenticateProtectedActionsSettings,
+              style: theme.textTheme.bodyMedium),
+          value: settings.authenticateProtectedActions,
+          onChanged: (value) {
+            controller.updateAuthenticateProtectedActions(value);
           },
         ),
       ],

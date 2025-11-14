@@ -16,6 +16,8 @@ class SettingsController {
   static const currentLanguageKey = 'currentLanguage';
   static const defaultLanguage = 'en';
   static const closeWithoutConfirmationKey = 'close_without_confirmation';
+  static const authenticateProtectedActionsKey =
+      'authenticate_protected_actions';
 
   // Seed settings controller stream with default settings
   final _settingsController = BehaviorSubject<Settings>.seeded(
@@ -39,6 +41,7 @@ class SettingsController {
     _initMinGroupMembers();
     _initLanguageSettings();
     _initCloseWithoutConfirmation();
+    _initAuthenticateProtectedActions();
   }
 
   void updateAutoJoinGroups(bool autoJoin) {
@@ -71,6 +74,10 @@ class SettingsController {
   void updateCloseWithoutConfirmation(bool closeWithoutConfirmation) =>
       _updateSettingsStream(closeWithoutConfirmation: closeWithoutConfirmation);
 
+  void updateAuthenticateProtectedActions(bool authenticateProtectedActions) =>
+      _updateSettingsStream(
+          authenticateProtectedActions: authenticateProtectedActions);
+
   void _updateSettingsStream(
       {ThemeMode? themeMode,
       bool? showArchivedItems,
@@ -79,7 +86,8 @@ class SettingsController {
       bool? autoRejectGroups,
       int? minGroupMembers,
       String? currentLanguage,
-      bool? closeWithoutConfirmation}) {
+      bool? closeWithoutConfirmation,
+      bool? authenticateProtectedActions}) {
     final currentSettings = _settingsController.value;
     final updatedSettings = currentSettings.copyWith(
         themeMode: themeMode ?? currentSettings.themeMode,
@@ -91,7 +99,9 @@ class SettingsController {
         minGroupMembers: minGroupMembers ?? currentSettings.minGroupMembers,
         currentLanguage: currentLanguage ?? currentSettings.currentLanguage,
         closeWithoutConfirmation: closeWithoutConfirmation ??
-            currentSettings.closeWithoutConfirmation);
+            currentSettings.closeWithoutConfirmation,
+        authenticateProtectedActions: authenticateProtectedActions ??
+            currentSettings.authenticateProtectedActions);
     _settingsController.add(updatedSettings);
 
     SharedPreferences.getInstance().then((sharedPreferences) {
@@ -111,6 +121,8 @@ class SettingsController {
           currentLanguageKey, updatedSettings.currentLanguage);
       sharedPreferences.setBool(closeWithoutConfirmationKey,
           updatedSettings.closeWithoutConfirmation);
+      sharedPreferences.setBool(authenticateProtectedActionsKey,
+          updatedSettings.authenticateProtectedActions);
     });
   }
 
@@ -184,6 +196,16 @@ class SettingsController {
     updateCloseWithoutConfirmation(closeWithoutConfirmation);
     sharedPreferences.setBool(
         closeWithoutConfirmationKey, closeWithoutConfirmation);
+  }
+
+  void _initAuthenticateProtectedActions() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    bool authenticateProtectedActions =
+        sharedPreferences.getBool(authenticateProtectedActionsKey) ?? true;
+
+    updateAuthenticateProtectedActions(authenticateProtectedActions);
+    sharedPreferences.setBool(
+        authenticateProtectedActionsKey, authenticateProtectedActions);
   }
 
   void saveUserIdentifier(String deviceName, String host, String id) async {
