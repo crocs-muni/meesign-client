@@ -42,7 +42,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get generalSettingsTitle => 'Obecná nastavení';
 
   @override
-  String get applicationSettingsTitle => 'Co by jste chtěli dělat?';
+  String get applicationSettingsTitle => 'Nastavení aplikace';
 
   @override
   String get deviceAndServerSettingsTitle => 'Zařízení a server';
