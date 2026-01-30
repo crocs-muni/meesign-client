@@ -5,34 +5,37 @@ import 'package:collection/collection.dart';
 import 'package:convert/convert.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:meesign_core/src/card/apdu.dart';
+import 'package:meesign_core/src/card/card.dart';
+import 'package:meesign_core/src/card/iso7816.dart';
+import 'package:meesign_core/src/data/network_dispatcher.dart';
 import 'package:meesign_core/src/database/daos.dart';
+import 'package:meesign_core/src/database/database.dart' as db;
+import 'package:meesign_core/src/model/task.dart';
+import 'package:meesign_core/src/util/default_map.dart';
+import 'package:meesign_core/src/util/logger_service.dart';
+import 'package:meesign_core/src/util/uuid.dart';
 import 'package:meesign_native/meesign_native.dart';
+import 'package:meesign_network/grpc.dart' as rpc;
 import 'package:meesign_network/meesign_network.dart'
     show BcastRespStream, BcastRespStreamExt, GrpcError;
-import 'package:meesign_network/grpc.dart' as rpc;
 import 'package:meta/meta.dart';
 import 'package:synchronized/synchronized.dart';
-
-import '../card/apdu.dart';
-import '../card/card.dart';
-import '../card/iso7816.dart';
-import '../database/database.dart' as db;
-import '../model/task.dart';
-import '../util/default_map.dart';
-import '../util/uuid.dart';
-import 'network_dispatcher.dart';
 
 class StateException implements Exception {}
 
 class TaskSource {
+  TaskSource(this._dispatcher);
   final NetworkDispatcher _dispatcher;
 
   final Map<Uuid, BcastRespStream<rpc.Task>> _streams = HashMap();
 
-  TaskSource(this._dispatcher);
-
   Future<rpc.Resp> update(
-          Uuid did, Uint8List tid, List<List<int>> data, int attempt) =>
+    Uuid did,
+    Uint8List tid,
+    List<List<int>> data,
+    int attempt,
+  ) =>
       _dispatcher[did].updateTask(
         rpc.TaskUpdate(data: data)
           ..task = tid
@@ -81,19 +84,18 @@ class TaskSource {
   }
 }
 
-// TODO: create DeviceTaskRepository to simplify did handling?
+// TODO(dev): create DeviceTaskRepository to simplify did handling?
 abstract class TaskRepository<T> {
+  TaskRepository(this._taskType, this._taskSource, this._taskDao);
   final rpc.TaskType _taskType;
   final TaskSource _taskSource;
   final TaskDao _taskDao;
 
   @protected
   final DefaultMap<Uuid, DefaultMap<Uuid, Lock>> taskLocks =
-      DefaultMap(HashMap(), () => DefaultMap(HashMap(), () => Lock()));
+      DefaultMap(HashMap(), () => DefaultMap(HashMap(), Lock.new));
 
   final Map<Uuid, StreamSubscription<rpc.Task>> _subscriptions = HashMap();
-
-  TaskRepository(this._taskType, this._taskSource, this._taskDao);
 
   Future<db.Group> _getAssociatedGroup(Uuid did, db.Task task) {
     // FIXME: unify group references
@@ -110,7 +112,7 @@ abstract class TaskRepository<T> {
   @visibleForOverriding
   Future<void> finishTask(Uuid did, db.Task task, rpc.Task rpcTask);
 
-  // TODO: better way to compare states?
+  // TODO(dev): better way to compare states?
 
   Future<db.Task> _syncCreated(Uuid did, db.Task task, rpc.Task rpcTask) async {
     return task;
@@ -129,14 +131,17 @@ abstract class TaskRepository<T> {
     }
 
     return task.copyWith(
-      context: Value(null),
+      context: const Value(null),
       state: TaskState.failed,
       error: Value(error),
     );
   }
 
   Future<db.Task> _syncFinished(
-      Uuid did, db.Task task, rpc.Task rpcTask) async {
+    Uuid did,
+    db.Task task,
+    rpc.Task rpcTask,
+  ) async {
     if (task.state == TaskState.finished || task.state == TaskState.failed) {
       return task;
     }
@@ -145,7 +150,7 @@ abstract class TaskRepository<T> {
     await finishTask(did, task, rpcTask);
     await _taskSource.acknowledge(did, task.id);
 
-    return task.copyWith(context: Value(null), state: TaskState.finished);
+    return task.copyWith(context: const Value(null), state: TaskState.finished);
   }
 
   Future<db.Task> _syncRunning(Uuid did, db.Task task, rpc.Task rpcTask) async {
@@ -153,7 +158,7 @@ abstract class TaskRepository<T> {
       return task;
     }
 
-    bool activeParticipant = task.context != null || rpcTask.data.isNotEmpty;
+    final activeParticipant = task.context != null || rpcTask.data.isNotEmpty;
     if (!activeParticipant) {
       return task.copyWith(
         state: TaskState.running,
@@ -166,28 +171,36 @@ abstract class TaskRepository<T> {
     if (rpcTask.round <= task.round) return task;
     if (rpcTask.round != task.round + 1) throw StateException();
 
-    if (task.round == 0) task = await initTask(did, task, rpcTask);
+    var currentTask = task;
+    if (currentTask.round == 0) {
+      currentTask = await initTask(did, currentTask, rpcTask);
+    }
     final res = await ProtocolWrapper.advance(
-      task.context!,
+      currentTask.context!,
       rpcTask.data,
     );
-    // TODO: rollback if we fail to deliver the update
-    bool forCard = res.recipient == Recipient.Card;
+    // TODO(dev): rollback if we fail to deliver the update
+    final forCard = res.recipient == Recipient.Card;
     if (forCard) {
       if (res.data.length != 1) throw StateException();
     } else {
       try {
-        await _taskSource.update(did, task.id, res.data, task.attempt);
+        await _taskSource.update(
+          did,
+          currentTask.id,
+          res.data,
+          currentTask.attempt,
+        );
       } on GrpcError catch (e) {
         // FIXME: avoid matching error strings
-        if (e.message == 'Stale update') return task;
+        if (e.message == 'Stale update') return currentTask;
         rethrow;
       }
     }
 
-    return task.copyWith(
+    return currentTask.copyWith(
       state: forCard ? TaskState.needsCard : TaskState.running,
-      round: task.round + 1,
+      round: currentTask.round + 1,
       context: Value(res.context),
       data: Value(forCard ? res.data.first : null),
     );
@@ -198,7 +211,7 @@ abstract class TaskRepository<T> {
       state: TaskState.created,
       round: 0,
       attempt: rpcTask.attempt,
-      context: Value(null),
+      context: const Value(null),
     );
   }
 
@@ -208,15 +221,15 @@ abstract class TaskRepository<T> {
     int maxRetries = 10,
     Duration initialDelay = const Duration(milliseconds: 200),
   }) async {
-    int retryCount = 0;
-    Duration delay = initialDelay;
+    var retryCount = 0;
+    var delay = initialDelay;
 
     while (true) {
       try {
         return await operation();
       } catch (e) {
         // Check if it's a database lock error (SQLite error code 5)
-        bool isLockError = e.toString().contains('database is locked') ||
+        final isLockError = e.toString().contains('database is locked') ||
             (e is SqliteException && e.extendedResultCode == 5);
 
         // If it's not a lock error or we've reached max retries, rethrow
@@ -225,11 +238,12 @@ abstract class TaskRepository<T> {
         }
 
         // Log the retry attempt
-        print(
-            'Database locked, retrying in ${delay.inMilliseconds}ms (attempt ${retryCount + 1}/$maxRetries)');
+        LoggerService.logWarning(
+          'Database locked, retrying in ${delay.inMilliseconds}ms (attempt ${retryCount + 1}/$maxRetries)',
+        );
 
         // Wait before retrying with exponential backoff
-        await Future.delayed(delay);
+        await Future<void>.delayed(delay);
         retryCount++;
         delay *= 2; // Exponential backoff
       }
@@ -243,39 +257,44 @@ abstract class TaskRepository<T> {
 
       db.Task? newTask;
 
+      var currentRpcTask = rpcTask;
       try {
         if (task == null) {
-          rpcTask = await _taskSource.fetch(did, tid);
-          await createTask(did, rpcTask);
-          task = (await _taskDao.getTask(did.bytes, tid.bytes))!;
+          currentRpcTask = await _taskSource.fetch(did, tid);
+          await createTask(did, currentRpcTask);
+          task = await _taskDao.getTask(did.bytes, tid.bytes);
         }
 
-        if (task.attempt < rpcTask.attempt) {
-          task = _restart(task, rpcTask);
-        } else if (task.attempt > rpcTask.attempt) {
+        // If task not found nor locally nor remotely, something is wrong
+        // and we cannot proceed
+        if (task == null) {
+          throw StateException();
+        }
+
+        if (task.attempt < currentRpcTask.attempt) {
+          task = _restart(task, currentRpcTask);
+        } else if (task.attempt > currentRpcTask.attempt) {
           return;
         }
 
-        switch (rpcTask.state) {
+        switch (currentRpcTask.state) {
           case rpc.Task_TaskState.CREATED:
-            newTask = await _syncCreated(did, task, rpcTask);
-            break;
+            newTask = await _syncCreated(did, task, currentRpcTask);
           case rpc.Task_TaskState.FAILED:
-            newTask = await _syncFailed(did, task, rpcTask);
-            break;
+            newTask = await _syncFailed(did, task, currentRpcTask);
           case rpc.Task_TaskState.FINISHED:
-            newTask = await _syncFinished(did, task, rpcTask);
-            break;
+            newTask = await _syncFinished(did, task, currentRpcTask);
           case rpc.Task_TaskState.RUNNING:
-            newTask = await _syncRunning(did, task, rpcTask);
-            break;
+            newTask = await _syncRunning(did, task, currentRpcTask);
         }
       } on Exception {
-        // TODO: some errors need to be reported to the server,
+        // TODO(dev): some errors need to be reported to the server,
         // sometimes we can rollback (e.g. in case of network errors)
         if (task != null) {
-          newTask =
-              task.copyWith(context: Value(null), state: TaskState.failed);
+          newTask = task.copyWith(
+            context: const Value(null),
+            state: TaskState.failed,
+          );
         }
         rethrow;
       } finally {
@@ -308,9 +327,9 @@ abstract class TaskRepository<T> {
         () => _syncTaskUnsafe(did, tid, rpcTask),
         timeout: const Duration(seconds: 5),
       );
-    } catch (e) {
+    } on Exception catch (e) {
       // Log the error but don't rethrow to allow the app to continue
-      print('Error syncing task $tid: $e');
+      LoggerService.logError('Error syncing task $tid: $e');
     } finally {
       // Clear the lock for this specific task if it's no longer needed
       _cleanupLock(did, tid);
@@ -325,8 +344,8 @@ abstract class TaskRepository<T> {
             .where((t) => t.type == _taskType)
             .map((t) => _syncTask(did, t)),
       );
-    } catch (e) {
-      print('Error syncing tasks for device $did: $e');
+    } on Exception catch (e) {
+      LoggerService.logError('Error syncing tasks for device $did: $e');
     }
   }
 
@@ -358,7 +377,11 @@ abstract class TaskRepository<T> {
       _subscriptions.remove(did)?.cancel();
 
   @protected
-  Future<void> approveTaskUnsafe(Uuid did, Uuid tid, bool agree) async {
+  Future<void> approveTaskUnsafe(
+    Uuid did,
+    Uuid tid, {
+    required bool agree,
+  }) async {
     return _withDbRetry(() async {
       final task = await _taskDao.getTask(did.bytes, tid.bytes);
       if (task == null) throw StateException();
@@ -373,11 +396,11 @@ abstract class TaskRepository<T> {
   Future<void> approveTask(Uuid did, Uuid tid, {required bool agree}) async {
     try {
       await taskLocks[did][tid].synchronized(
-        () => approveTaskUnsafe(did, tid, agree),
+        () => approveTaskUnsafe(did, tid, agree: agree),
         timeout: const Duration(seconds: 5),
       );
-    } catch (e) {
-      print('Error approving task $tid: $e');
+    } on Exception catch (e) {
+      LoggerService.logError('Error approving task $tid: $e');
     } finally {
       _cleanupLock(did, tid);
     }
@@ -386,15 +409,19 @@ abstract class TaskRepository<T> {
   Future<void> archiveTask(Uuid did, Uuid tid, {required bool archive}) async {
     try {
       await taskLocks[did][tid].synchronized(
-        () => _withDbRetry(() => _taskDao.updateTask(db.TasksCompanion(
+        () => _withDbRetry(
+          () => _taskDao.updateTask(
+            db.TasksCompanion(
               id: Value(tid.bytes),
               did: Value(did.bytes),
               archived: Value(archive),
-            ))),
+            ),
+          ),
+        ),
         timeout: const Duration(seconds: 5),
       );
-    } catch (e) {
-      print('Error archiving task $tid: $e');
+    } on Exception catch (e) {
+      LoggerService.logError('Error archiving task $tid: $e');
     } finally {
       _cleanupLock(did, tid);
     }
@@ -402,13 +429,14 @@ abstract class TaskRepository<T> {
 
   Stream<List<Task<T>>> observeTasks(Uuid did);
 
-  Stream<List<T>> observeResults(Uuid did) =>
-      observeTasks(did).map((tasks) => tasks
-          .where((task) => task.state == TaskState.finished)
-          .map((task) => task.info)
-          .toList());
+  Stream<List<T>> observeResults(Uuid did) => observeTasks(did).map(
+        (tasks) => tasks
+            .where((task) => task.state == TaskState.finished)
+            .map((task) => task.info)
+            .toList(),
+      );
 
-  // TODO: provide finer control? expose just list of task ids?
+  // TODO(dev): provide finer control? expose just list of task ids?
 
   Future<void> _advanceTaskWithCardUnsafe(Uuid did, Uuid tid, Card card) async {
     return _withDbRetry(() async {
@@ -419,16 +447,19 @@ abstract class TaskRepository<T> {
       final group = await _getAssociatedGroup(did, task);
 
       final aid = hex.decode(group.protocol.aid!);
-      final resp = await card.send(CommandApdu(
-        Iso7816.claIso7816,
-        Iso7816.insSelect,
-        p1: 0x04,
-        data: aid,
-      ));
+      final resp = await card.send(
+        CommandApdu(
+          Iso7816.claIso7816,
+          Iso7816.insSelect,
+          p1: 0x04,
+          data: aid,
+        ),
+      );
       if (resp.status != Iso7816.swNoError) throw SelectException();
 
       try {
-        Uint8List context = task.context!, data = task.data!;
+        var context = task.context!;
+        var data = task.data!;
         int recipient;
         do {
           final resp = await card.transceive(data);
@@ -443,14 +474,14 @@ abstract class TaskRepository<T> {
         final newTask = task.copyWith(
           state: TaskState.running,
           context: Value(context),
-          data: Value(null),
+          data: const Value(null),
         );
         await _taskDao.upsertTask(newTask.toCompanion(true));
       } on Exception {
         final newTask = task.copyWith(
           state: TaskState.failed,
-          context: Value(null),
-          data: Value(null),
+          context: const Value(null),
+          data: const Value(null),
         );
         await _taskDao.upsertTask(newTask.toCompanion(true));
         rethrow;

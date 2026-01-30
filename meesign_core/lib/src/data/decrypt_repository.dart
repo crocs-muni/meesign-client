@@ -1,30 +1,28 @@
 import 'package:drift/drift.dart';
+import 'package:meesign_core/src/data/key_store.dart';
+import 'package:meesign_core/src/data/network_dispatcher.dart';
+import 'package:meesign_core/src/data/task_repository.dart';
+import 'package:meesign_core/src/database/daos.dart';
+import 'package:meesign_core/src/database/database.dart' as db;
+import 'package:meesign_core/src/model/decrypt.dart';
+import 'package:meesign_core/src/model/group.dart';
+import 'package:meesign_core/src/model/protocol.dart';
+import 'package:meesign_core/src/model/task.dart';
+import 'package:meesign_core/src/util/mime_type.dart';
+import 'package:meesign_core/src/util/uuid.dart';
 import 'package:meesign_native/meesign_native.dart';
 import 'package:meesign_network/grpc.dart' as rpc;
 
-import '../database/daos.dart';
-import '../database/database.dart' as db;
-import '../model/decrypt.dart';
-import '../model/group.dart';
-import '../model/protocol.dart';
-import '../model/task.dart';
-import '../util/mime_type.dart';
-import '../util/uuid.dart';
-import 'task_repository.dart';
-import 'network_dispatcher.dart';
-import 'key_store.dart';
-
 class DecryptRepository extends TaskRepository<Decrypt> {
-  final TaskDao _taskDao;
-  final NetworkDispatcher _dispatcher;
-  final KeyStore _keyStore;
-
   DecryptRepository(
     this._dispatcher,
     this._keyStore,
     TaskSource taskSource,
     this._taskDao,
   ) : super(rpc.TaskType.DECRYPT, taskSource, _taskDao);
+  final TaskDao _taskDao;
+  final NetworkDispatcher _dispatcher;
+  final KeyStore _keyStore;
 
   /// Encrypt data for the given group.
   Future<void> encrypt(
@@ -77,13 +75,15 @@ class DecryptRepository extends TaskRepository<Decrypt> {
   Future<db.Task> initTask(Uuid did, db.Task task, rpc.Task rpcTask) async {
     final group = await _taskDao.getGroup(did.bytes, gid: task.gid);
     return task.copyWith(
-      context: Value(ProtocolWrapper.init(
-        group.protocol.toNative(),
-        group.context,
-        group.certificates!,
-        _keyStore.load(did) as Uint8List,
-        shares: rpcTask.data.length,
-      )),
+      context: Value(
+        ProtocolWrapper.init(
+          group.protocol.toNative(),
+          group.context,
+          group.certificates!,
+          _keyStore.load(did) as Uint8List,
+          shares: rpcTask.data.length,
+        ),
+      ),
     );
   }
 
@@ -91,11 +91,13 @@ class DecryptRepository extends TaskRepository<Decrypt> {
   Future<void> finishTask(Uuid did, db.Task task, rpc.Task rpcTask) async {
     final context = task.context;
     if (context != null) ProtocolWrapper.finish(context);
-    await _taskDao.updateDecrypt(db.DecryptsCompanion(
-      tid: Value(task.id),
-      did: Value(task.did),
-      data: Value(rpcTask.data.first as Uint8List),
-    ));
+    await _taskDao.updateDecrypt(
+      db.DecryptsCompanion(
+        tid: Value(task.id),
+        did: Value(task.did),
+        data: Value(rpcTask.data.first as Uint8List),
+      ),
+    );
   }
 
   @override
@@ -109,12 +111,15 @@ class DecryptRepository extends TaskRepository<Decrypt> {
         dt.decrypt.data,
       );
       return TaskConversion.fromEntity(
-          dt.task, group.protocol.signRounds, decrypt);
+        dt.task,
+        group.protocol.signRounds,
+        decrypt,
+      );
     }
 
     return _taskDao
         .watchDecryptTasks(did.bytes)
-        .map((list) => list.map((toModel)).toList());
+        .map((list) => list.map(toModel).toList());
   }
 
   Stream<List<Decrypt>> observeDecrypts(Uuid did) => observeResults(did);

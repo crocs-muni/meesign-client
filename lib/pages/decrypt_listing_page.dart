@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:meesign_client/enums/fab_type.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/templates/default_page_template.dart';
+import 'package:meesign_client/ui_constants.dart';
+import 'package:meesign_client/util/actions/encrypt_data.dart';
+import 'package:meesign_client/view_model/app_view_model.dart';
+import 'package:meesign_client/view_model/tabs_view_model.dart';
+import 'package:meesign_client/widget/controlled_lottie_animation.dart';
+import 'package:meesign_client/widget/fab_configurator.dart';
+import 'package:meesign_client/widget/task_list_view.dart';
+import 'package:meesign_client/widget/task_tiles/decrypt_task_tile.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
-
-import '../enums/fab_type.dart';
-import '../l10n/arb/app_localizations.dart';
-import '../templates/default_page_template.dart';
-import '../ui_constants.dart';
-import '../util/actions/encrypt_data.dart';
-import '../view_model/app_view_model.dart';
-import '../view_model/tabs_view_model.dart';
-import '../widget/controlled_lottie_animation.dart';
-import '../widget/fab_configurator.dart';
-import '../widget/task_list_view.dart';
-import '../widget/task_tiles/decrypt_task_tile.dart';
 
 class DecryptListingPage extends StatelessWidget {
   const DecryptListingPage({super.key});
@@ -22,33 +21,34 @@ class DecryptListingPage extends StatelessWidget {
     final model = Provider.of<AppViewModel>(context, listen: false);
 
     return StreamBuilder(
-        stream: model.combinedTaskStream,
-        builder: (context, snapshot) {
-          return DefaultPageTemplate(
-            floatingActionButton: _buildFab(context, model),
-            body: TaskListView<Decrypt>(
-              tasks: model.decryptTasks,
-              emptyView: _buildEmptyDecryptTasks(context),
-              showArchived: model.showArchived,
-              taskBuilder: (context, task) {
-                return DecryptTaskTile(task: task);
-              },
-            ),
-          );
-        });
+      stream: model.combinedTaskStream,
+      builder: (context, snapshot) {
+        return DefaultPageTemplate(
+          floatingActionButton: _buildFab(context, model),
+          body: TaskListView<Decrypt>(
+            tasks: model.decryptTasks,
+            emptyView: _buildEmptyDecryptTasks(context),
+            showArchived: model.showArchived,
+            taskBuilder: (context, task) {
+              return DecryptTaskTile(task: task);
+            },
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildFab(BuildContext context, AppViewModel model) {
     // Don't show Fab if the list is empty - placeholder with CTA is shown instead
     if (!model.joinedGroupForTaskTypeExists(KeyType.decrypt)) {
-      return SizedBox();
+      return const SizedBox();
     }
 
     return FabConfigurator(fabType: FabType.decryptFab, buildContext: context);
   }
 
   Widget _buildEmptyDecryptTasks(BuildContext context) {
-    bool groupForTaskExists = context
+    final groupForTaskExists = context
         .read<AppViewModel>()
         .joinedGroupForTaskTypeExists(KeyType.decrypt);
 
@@ -59,7 +59,7 @@ class DecryptListingPage extends StatelessWidget {
           child: Column(
             children: [
               Padding(
-                padding: EdgeInsets.only(bottom: MEDIUM_PADDING),
+                padding: const EdgeInsets.only(bottom: MEDIUM_PADDING),
                 child: ControlledLottieAnimation(
                   startAtTabIndex: 2,
                   assetName: Theme.of(context).brightness == Brightness.light
@@ -72,7 +72,8 @@ class DecryptListingPage extends StatelessWidget {
               ),
               Text(
                 AppLocalizations.of(context).tryEncryptingData,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: SMALL_GAP),
               Text(
@@ -85,23 +86,22 @@ class DecryptListingPage extends StatelessWidget {
               if (!groupForTaskExists) ...[
                 ElevatedButton(
                   onPressed: () {
-                    final tabViewModel =
-                        Provider.of<TabsViewModel>(context, listen: false);
-
-                    tabViewModel.setIndex(3,
-                        postNavigationAction: 'createDecryptGroup');
+                    Provider.of<TabsViewModel>(context, listen: false).setIndex(
+                      3,
+                      postNavigationAction: 'createDecryptGroup',
+                    );
                   },
                   child:
                       Text(AppLocalizations.of(context).createDecryptionGroup),
-                )
+                ),
               ] else ...[
                 ElevatedButton(
                   onPressed: () {
                     encryptData(context: context, buildContext: context);
                   },
                   child: Text(AppLocalizations.of(context).createDecryption),
-                )
-              ]
+                ),
+              ],
             ],
           ),
         ),

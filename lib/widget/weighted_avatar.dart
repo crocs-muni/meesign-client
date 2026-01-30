@@ -2,16 +2,15 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class WeightedAvatar extends StatelessWidget {
+  const WeightedAvatar({
+    required this.index,
+    required this.weights,
+    super.key,
+    this.child,
+  });
   final int index;
   final List<int> weights;
   final Widget? child;
-
-  const WeightedAvatar({
-    super.key,
-    required this.index,
-    required this.weights,
-    this.child,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +39,7 @@ class WeightedAvatar extends StatelessWidget {
                         .colorScheme
                         .primary
                         .withValues(alpha: j == index ? 1 : .2),
-                  )
+                  ),
               ],
             ),
           ),

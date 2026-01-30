@@ -2,23 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class OptionTile extends StatelessWidget {
+  const OptionTile({
+    required this.title,
+    super.key,
+    this.padding = const EdgeInsets.symmetric(
+      horizontal: 16,
+      vertical: 12,
+    ),
+    this.titlePadding = EdgeInsets.zero,
+    this.children = const [],
+    this.help,
+  });
   final String title;
   final EdgeInsets padding;
   final EdgeInsets titlePadding;
   final List<Widget> children;
   final Widget? help;
-
-  const OptionTile({
-    super.key,
-    required this.title,
-    this.padding = const EdgeInsets.symmetric(
-      horizontal: 16,
-      vertical: 12,
-    ),
-    this.titlePadding = const EdgeInsets.all(0),
-    this.children = const [],
-    this.help,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +26,7 @@ class OptionTile extends StatelessWidget {
       helpButton = SizedBox.square(
         dimension: 24,
         child: IconButton(
-          padding: const EdgeInsets.all(0),
+          padding: EdgeInsets.zero,
           iconSize: 20,
           onPressed: () {
             showDialog(

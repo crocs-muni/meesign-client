@@ -1,23 +1,25 @@
+import 'package:meesign_core/src/data/network_dispatcher.dart';
+import 'package:meesign_core/src/util/uuid.dart';
 import 'package:meesign_network/grpc.dart' as rpc;
-import 'package:meesign_network/meesign_network.dart';
+import 'package:meesign_network/meesign_network.dart'
+    show CallOptions, GrpcError, ServerInfoRequest;
 import 'package:pub_semver/pub_semver.dart';
-
-import '../util/uuid.dart';
-import 'network_dispatcher.dart';
 
 class UnknownDeviceException implements Exception {}
 
 class SupportServices {
-  final NetworkDispatcher _dispatcher;
-
   SupportServices(this._dispatcher);
+  final NetworkDispatcher _dispatcher;
 
   static final serverVersionConstraint =
       VersionConstraint.compatibleWith(Version(0, 5, 1));
 
   Future<Version> getVersion([Uuid? did]) async {
-    final info = await (did != null ? _dispatcher[did] : _dispatcher.unauth)
-        .getServerInfo(ServerInfoRequest());
+    final client = did != null ? _dispatcher[did] : _dispatcher.unauth;
+    final info = await client.getServerInfo(
+      ServerInfoRequest(),
+      options: CallOptions(timeout: const Duration(seconds: 10)),
+    );
     return Version.parse(info.version);
   }
 

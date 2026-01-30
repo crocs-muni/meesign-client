@@ -1,9 +1,9 @@
 import 'package:drift/drift.dart';
 
-import '../model/device.dart';
-import '../model/key_type.dart';
-import '../model/protocol.dart';
-import '../model/task.dart';
+import 'package:meesign_core/src/model/device.dart';
+import 'package:meesign_core/src/model/key_type.dart';
+import 'package:meesign_core/src/model/protocol.dart';
+import 'package:meesign_core/src/model/task.dart';
 
 class Devices extends Table {
   BlobColumn get id => blob()();
@@ -69,7 +69,7 @@ class GroupMembers extends Table {
   Set<Column> get primaryKey => {tid, did};
 }
 
-// TODO: enforce gid refers to a group with appropriate keyType?
+// TODO(dev): enforce gid refers to a group with appropriate keyType?
 
 class Files extends Table {
   BlobColumn get tid => blob()();

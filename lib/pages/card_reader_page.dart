@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart' hide Card;
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:meesign_client/card/card.dart';
+import 'package:meesign_client/util/platform.dart';
 import 'package:meesign_core/meesign_card.dart';
 
-import '../card/card.dart';
-import '../util/platform.dart';
-
 class CardReaderPage extends StatefulWidget {
-  final Future<void> Function(Card) onCard;
-
   const CardReaderPage({required this.onCard, super.key});
+  final Future<void> Function(Card) onCard;
 
   @override
   State<CardReaderPage> createState() => _CardReaderPageState();
 }
 
 sealed class ReaderStatus {
-  final String message;
   const ReaderStatus._(this.message);
+  final String message;
 }
 
 class ReaderOkStatus extends ReaderStatus {
@@ -68,8 +66,8 @@ class _CardReaderPageState extends State<CardReaderPage> {
     _poll();
   }
 
-  void _poll() async {
-    // TODO: wait for reader instead
+  Future<void> _poll() async {
+    // TODO(dev): wait for reader instead
     try {
       if ((await _manager.readers).isEmpty) throw Exception();
     } on Exception {
@@ -79,7 +77,7 @@ class _CardReaderPageState extends State<CardReaderPage> {
 
     try {
       final cards = await _manager.poll();
-      // TODO: let the user pick one?
+      // TODO(dev): let the user pick one?
       final card = cards[0];
       setStatus(ReaderOkStatus.working);
 
@@ -92,11 +90,11 @@ class _CardReaderPageState extends State<CardReaderPage> {
         await card.disconnect();
         setStatus(ReaderOkStatus.waiting);
       }
-    } catch (e) {
+    } on Exception {
       if (!mounted) return;
       _showError();
       /* TODO: request a retry from the user instead? */
-      await Future.delayed(const Duration(seconds: 1));
+      await Future<void>.delayed(const Duration(seconds: 1));
       if (!mounted) return;
       _poll();
     }

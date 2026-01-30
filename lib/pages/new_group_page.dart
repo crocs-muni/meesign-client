@@ -1,31 +1,29 @@
-import 'dart:math';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:meesign_client/app_container.dart';
+import 'package:meesign_client/enums/task_type.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/pages/qr_reader_page.dart';
+import 'package:meesign_client/pages/search_peer_page.dart';
+import 'package:meesign_client/routes.dart';
+import 'package:meesign_client/sessions/user_session.dart';
+import 'package:meesign_client/templates/default_page_template.dart';
+import 'package:meesign_client/ui_constants.dart';
+import 'package:meesign_client/util/chars.dart';
+import 'package:meesign_client/util/get_shares_warning.dart';
+import 'package:meesign_client/widget/device_name.dart';
+import 'package:meesign_client/widget/number_input.dart';
+import 'package:meesign_client/widget/option_tile.dart';
+import 'package:meesign_client/widget/warning_banner.dart';
+import 'package:meesign_client/widget/weighted_avatar.dart';
 import 'package:meesign_core/meesign_model.dart';
 import 'package:provider/provider.dart';
-
-import 'dart:io';
-
-import '../app_container.dart';
-import '../enums/task_type.dart';
-import '../l10n/arb/app_localizations.dart';
-import '../routes.dart';
-import '../sessions/user_session.dart';
-import '../templates/default_page_template.dart';
-import '../ui_constants.dart';
-import '../util/chars.dart';
-import '../util/get_shares_warning.dart';
-import '../widget/device_name.dart';
-import '../widget/number_input.dart';
-import '../widget/option_tile.dart';
-import '../widget/warning_banner.dart';
-import '../widget/weighted_avatar.dart';
-import 'qr_reader_page.dart';
-import 'search_peer_page.dart';
 
 class NewGroupPage extends StatefulWidget {
   const NewGroupPage({super.key, this.initialGroupType, this.templateGroup});
@@ -94,13 +92,13 @@ class _NewGroupPageState extends State<NewGroupPage> {
         _createGroupFromTemplate(session);
       });
     } else {
-      session.deviceRepository
-          .getDevice(session.user.did)
-          .then((device) => setState(() {
-                newGroup = newGroup.copyWith(
-                  members: [...newGroup.members, Member(device, 1)],
-                );
-              }));
+      session.deviceRepository.getDevice(session.user.did).then(
+            (device) => setState(() {
+              newGroup = newGroup.copyWith(
+                members: [...newGroup.members, Member(device, 1)],
+              );
+            }),
+          );
 
       setInitialDevices(session);
 
@@ -151,7 +149,9 @@ class _NewGroupPageState extends State<NewGroupPage> {
           if (memberIndex >= 0) {
             final updatedMembers = List<Member>.from(newGroup.members);
             updatedMembers[memberIndex] = Member(
-                newGroup.members[memberIndex].device, templateMember.shares);
+              newGroup.members[memberIndex].device,
+              templateMember.shares,
+            );
             newGroup = newGroup.copyWith(members: updatedMembers);
           }
         }
@@ -162,29 +162,32 @@ class _NewGroupPageState extends State<NewGroupPage> {
             final policy = jsonDecode(template.note!);
             if (policy['after'] != null && policy['before'] != null) {
               _policyTime = true;
-              final afterParts = policy['after'].split(':');
-              final beforeParts = policy['before'].split(':');
+              final afterParts = (policy['after'] as String).split(':');
+              final beforeParts = (policy['before'] as String).split(':');
               _policyAfterTime = TimeOfDay(
-                  hour: int.parse(afterParts[0]),
-                  minute: int.parse(afterParts[1]));
+                hour: int.parse(afterParts[0]),
+                minute: int.parse(afterParts[1]),
+              );
               _policyBeforeTime = TimeOfDay(
-                  hour: int.parse(beforeParts[0]),
-                  minute: int.parse(beforeParts[1]));
+                hour: int.parse(beforeParts[0]),
+                minute: int.parse(beforeParts[1]),
+              );
             }
             if (policy['decline'] != null) {
-              _policyDecline = policy['decline'];
+              _policyDecline = policy['decline'] as bool;
             }
 
             // Set custom policy text (excluding already handled fields)
-            final customPolicy = Map<String, dynamic>.from(policy);
-            customPolicy.remove('after');
-            customPolicy.remove('before');
-            customPolicy.remove('decline');
+            final customPolicy =
+                Map<String, dynamic>.from(policy as Map<String, dynamic>)
+                  ..remove('after')
+                  ..remove('before')
+                  ..remove('decline');
             if (customPolicy.isNotEmpty) {
               _policyController.text =
                   const JsonEncoder.withIndent('  ').convert(customPolicy);
             }
-          } catch (e) {
+          } on FormatException {
             // If parsing fails, just ignore the policy
           }
         }
@@ -212,7 +215,8 @@ class _NewGroupPageState extends State<NewGroupPage> {
       newGroup = newGroup.copyWith(threshold: _shareCount);
     } else {
       newGroup = newGroup.copyWith(
-          threshold: max(_minThreshold, min(value, _shareCount)));
+        threshold: max(_minThreshold, min(value, _shareCount)),
+      );
     }
   }
 
@@ -239,14 +243,14 @@ class _NewGroupPageState extends State<NewGroupPage> {
   bool get _hasBot =>
       newGroup.members.any((member) => member.device.kind == DeviceKind.bot);
 
-  void _selectPeer(String route) async {
+  Future<void> _selectPeer(String route) async {
     final session = context.read<AppContainer>().session!;
-    final navigator = Navigator.of(context, rootNavigator: false);
-    Device device = await session.deviceRepository.getDevice(session.user.did);
+    final navigator = Navigator.of(context);
+    final device = await session.deviceRepository.getDevice(session.user.did);
 
     if (route == Routes.newGroupQr) {
       final scannedDevice = await navigator.push<Device?>(
-        MaterialPageRoute(builder: (context) => QrReaderPage()),
+        MaterialPageRoute(builder: (context) => const QrReaderPage()),
       );
 
       if (scannedDevice == null) {
@@ -263,11 +267,12 @@ class _NewGroupPageState extends State<NewGroupPage> {
     }
 
     final devicesSelection = await navigator.push(
-      MaterialPageRoute(
-          builder: (context) => SearchPeerPage(
-                initialSelection: _devices,
-                currentDevice: device,
-              )),
+      MaterialPageRoute<List<Device>>(
+        builder: (context) => SearchPeerPage(
+          initialSelection: _devices,
+          currentDevice: device,
+        ),
+      ),
     );
 
     if (devicesSelection == null) {
@@ -316,7 +321,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
       });
     }
 
-    final AppContainer container = context.read<AppContainer>();
+    final container = context.read<AppContainer>();
     final minGroupMembers =
         container.settingsController.currentSettings.minGroupMembers;
 
@@ -330,13 +335,14 @@ class _NewGroupPageState extends State<NewGroupPage> {
       });
     }
 
-    Map<String, dynamic> policy = _buildPolicy();
+    var policy = _buildPolicy();
 
     if (_policyController.text.trim().isNotEmpty) {
       try {
-        final customPolicy = jsonDecode(_policyController.text);
+        final customPolicy =
+            jsonDecode(_policyController.text) as Map<String, dynamic>;
         policy = {...policy, ...customPolicy};
-      } catch (e) {
+      } on FormatException {
         setState(() {
           _policyErr = true;
         });
@@ -349,37 +355,42 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
     // Pass the new created group back to the previous screen where its handled
     Navigator.pop(
-        context,
-        newGroup.copyWith(
-          note: _hasBot ? jsonEncode(policy) : null,
-        ));
+      context,
+      newGroup.copyWith(
+        note: _hasBot ? jsonEncode(policy) : null,
+      ),
+    );
   }
 
   Widget _buildCreateGroupButton() {
     return Container(
       margin: const EdgeInsets.symmetric(
-          vertical: LARGE_GAP, horizontal: SMALL_GAP),
+        vertical: LARGE_GAP,
+        horizontal: SMALL_GAP,
+      ),
       child: FilledButton.icon(
-          style: FilledButton.styleFrom(
-            minimumSize: const Size.fromHeight(48),
-          ),
-          onPressed: _tryCreate,
-          label: Text(AppLocalizations.of(context).create),
-          icon: Icon(Icons.send_rounded)),
+        style: FilledButton.styleFrom(
+          minimumSize: const Size.fromHeight(48),
+        ),
+        onPressed: _tryCreate,
+        label: Text(AppLocalizations.of(context).create),
+        icon: const Icon(Icons.send_rounded),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return DefaultPageTemplate(
-        showAppBar: true,
-        appBarTitle: AppLocalizations.of(context).newGroupTitle,
-        includePadding: false,
-        body: _buildPageBody());
+      showAppBar: true,
+      appBarTitle: AppLocalizations.of(context).newGroupTitle,
+      includePadding: false,
+      body: _buildPageBody(),
+    );
   }
 
   Widget _buildPageBody() {
-    final AppContainer container = context.read<AppContainer>();
+    final container = context.read<AppContainer>();
     final minGroupMembers =
         container.settingsController.currentSettings.minGroupMembers;
 
@@ -392,7 +403,8 @@ class _NewGroupPageState extends State<NewGroupPage> {
               _buildMembersSection(),
               if (_membersErr)
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: MEDIUM_PADDING),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: MEDIUM_PADDING),
                   child: WarningBanner(
                     title:
                         AppLocalizations.of(context).moreGroupMembersRequired,
@@ -405,8 +417,8 @@ class _NewGroupPageState extends State<NewGroupPage> {
               _buildPurposeSection(),
               if (_hasBot) _buildBotSection(),
               _buildAdvancedSection(),
-              SizedBox(height: XLARGE_GAP),
-              _buildCreateGroupButton()
+              const SizedBox(height: XLARGE_GAP),
+              _buildCreateGroupButton(),
             ],
           ),
         ),
@@ -430,23 +442,21 @@ class _NewGroupPageState extends State<NewGroupPage> {
       case ShareWarningType.manyShares:
         title = AppLocalizations.of(context).manySharesWarning;
         warningText = AppLocalizations.of(context).manySharesWarningText;
-        break;
       case ShareWarningType.unnecessaryShares:
         title = AppLocalizations.of(context).unnecessarySharesTitle;
         warningText = AppLocalizations.of(context).unnecessarySharesText(
-            shareWarning?.warningParams?[0] ?? '',
-            shareWarning?.warningParams?[1] ?? '');
-        break;
+          shareWarning?.warningParams?[0] ?? '',
+          shareWarning?.warningParams?[1] ?? '',
+        );
       case ShareWarningType.atLeastTwoShares:
         title = AppLocalizations.of(context).atLeastTwoSharesRequired;
         warningText = AppLocalizations.of(context).atLeastTwoSharesRequiredText;
-        break;
       case null:
         return const SizedBox.shrink();
     }
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: MEDIUM_PADDING),
+      padding: const EdgeInsets.symmetric(horizontal: MEDIUM_PADDING),
       child: WarningBanner(
         title: title,
         text: warningText,
@@ -455,7 +465,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
   }
 
   Widget _buildNameInput() {
-    int maxNameLength = 32;
+    const maxNameLength = 32;
 
     return OptionTile(
       title: AppLocalizations.of(context).groupName,
@@ -471,7 +481,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
           inputFormatters: [
             FilteringTextInputFormatter.deny(
               RegExp('[${RegExp.escape(asciiPunctuationChars)}]'),
-            )
+            ),
           ],
         ),
       ],
@@ -485,12 +495,12 @@ class _NewGroupPageState extends State<NewGroupPage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'By default, each member receives one share of the group\'s '
+            "By default, each member receives one share of the group's "
             'private key. As a result, all members have equal voting '
             'rights.\n\n'
             'You can change the number of key shares a given member '
             'receives using the arrows next to its name. The circle '
-            'around user\'s avatar visualizes its voting power.\n\n'
+            "around user's avatar visualizes its voting power.\n\n"
             'For example, the user below receives one share which '
             'amounts to one third of the total number of votes.',
           ),
@@ -537,7 +547,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
         const SizedBox(height: 8),
         for (final (i, member) in newGroup.members.indexed)
           ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 0),
+            contentPadding: EdgeInsets.zero,
             leading: WeightedAvatar(
               index: i,
               weights: newGroup.members.map((m) => m.shares).toList(),
@@ -591,9 +601,12 @@ class _NewGroupPageState extends State<NewGroupPage> {
   }
 
   Future<Widget> _buildDeleteIcon(
-      Member member, int i, BuildContext context) async {
+    Member member,
+    int i,
+    BuildContext context,
+  ) async {
     final session = context.read<AppContainer>().session!;
-    Device device = await session.deviceRepository.getDevice(session.user.did);
+    final device = await session.deviceRepository.getDevice(session.user.did);
 
     return IconButton(
       onPressed: member.device.id == device.id
@@ -642,7 +655,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                   child: GestureDetector(
                     onTap:
                         (newGroup.protocol.thresholdType == ThresholdType.nOfN)
-                            ? () => displayWarningDialog()
+                            ? displayWarningDialog
                             : null,
                     behavior: HitTestBehavior.translucent,
                     onHorizontalDragStart:
@@ -655,7 +668,6 @@ class _NewGroupPageState extends State<NewGroupPage> {
                                   ? _shareCount
                                   : min(newGroup.threshold, _shareCount))
                               .toDouble(),
-                      min: 0,
                       max: _shareCount.toDouble(),
                       divisions: max(1, _shareCount),
                       label: '${newGroup.threshold}',
@@ -673,7 +685,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
               ],
             ),
           ],
-        )
+        ),
       ],
     );
   }
@@ -724,7 +736,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
             ButtonSegment<KeyType>(
               value: KeyType.decrypt,
               label: Text('Decrypt'),
-            )
+            ),
           ],
         ),
       ],
@@ -769,7 +781,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                 icon: const Icon(Symbols.access_time),
                 label: Text(_policyAfterTime.format(context)),
               ),
-              Text(' — '),
+              const Text(' — '),
               FilledButton.tonalIcon(
                 onPressed: _policyTime
                     ? () async {
@@ -799,7 +811,8 @@ class _NewGroupPageState extends State<NewGroupPage> {
           },
           controlAffinity: ListTileControlAffinity.leading,
           title: Text(
-              AppLocalizations.of(context).declineIfNotSatisfiedImmediately),
+            AppLocalizations.of(context).declineIfNotSatisfiedImmediately,
+          ),
         ),
       ],
     );
@@ -813,7 +826,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
       expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
       shape: const Border(),
       collapsedShape: const Border(),
-      childrenPadding: const EdgeInsets.symmetric(horizontal: 0),
+      childrenPadding: EdgeInsets.zero,
       children: [
         OptionTile(
           title: AppLocalizations.of(context).protocol,
@@ -832,7 +845,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                 });
               },
               segments: [
-                for (var protocol in newGroup.keyType.supportedProtocols)
+                for (final protocol in newGroup.keyType.supportedProtocols)
                   ButtonSegment<Protocol>(
                     value: protocol,
                     label: Text(protocol.name.toUpperCase()),
@@ -842,7 +855,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
           ],
         ),
         if (newGroup.protocol == Protocol.frost) ...[
-          _buildJavaCardAvailableInfo()
+          _buildJavaCardAvailableInfo(),
         ],
         if (_hasBot)
           OptionTile(
@@ -868,7 +881,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
   Widget _buildJavaCardAvailableInfo() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: MEDIUM_PADDING),
+      padding: const EdgeInsets.symmetric(horizontal: MEDIUM_PADDING),
       child: Row(
         children: [
           Icon(
@@ -880,7 +893,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                 ?.color
                 ?.withValues(alpha: 0.65),
           ),
-          SizedBox(width: SMALL_GAP),
+          const SizedBox(width: SMALL_GAP),
           Expanded(
             child: Text(
               style: TextStyle(

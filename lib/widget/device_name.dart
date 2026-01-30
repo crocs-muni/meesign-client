@@ -3,12 +3,6 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:meesign_core/meesign_model.dart';
 
 class DeviceName extends StatelessWidget {
-  final String name;
-  final DeviceKind kind;
-
-  final double? iconSize;
-  final TextStyle? textStyle;
-
   const DeviceName(
     this.name, {
     super.key,
@@ -16,6 +10,11 @@ class DeviceName extends StatelessWidget {
     this.iconSize,
     this.textStyle,
   });
+  final String name;
+  final DeviceKind kind;
+
+  final double? iconSize;
+  final TextStyle? textStyle;
 
   @override
   Widget build(BuildContext context) {

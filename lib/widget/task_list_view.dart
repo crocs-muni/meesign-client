@@ -1,15 +1,25 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:meesign_client/enums/task_status.dart';
+import 'package:meesign_client/enums/task_type.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/ui_constants.dart';
+import 'package:meesign_client/view_model/app_view_model.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
-import '../enums/task_status.dart';
-import '../enums/task_type.dart';
-import '../l10n/arb/app_localizations.dart';
-import '../ui_constants.dart';
-import '../view_model/app_view_model.dart';
-
 class TaskListView<T> extends StatefulWidget {
+  const TaskListView({
+    required this.tasks,
+    required this.emptyView,
+    required this.taskBuilder,
+    super.key,
+    this.showArchived = false,
+    this.showOnlyPending = false,
+    this.showAllTypes = false,
+    this.showHeading = true,
+    this.customSearchBarHint,
+  });
   final List<Task<T>> tasks;
   final Widget emptyView;
   final Widget Function(BuildContext, Task<T>) taskBuilder;
@@ -18,18 +28,6 @@ class TaskListView<T> extends StatefulWidget {
   final bool showAllTypes;
   final bool showHeading;
   final String? customSearchBarHint;
-
-  const TaskListView({
-    super.key,
-    required this.tasks,
-    required this.emptyView,
-    required this.taskBuilder,
-    this.showArchived = false,
-    this.showOnlyPending = false,
-    this.showAllTypes = false,
-    this.showHeading = true,
-    this.customSearchBarHint,
-  });
 
   @override
   State<TaskListView<T>> createState() => _TaskListViewState<T>();
@@ -91,19 +89,23 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
 
     final onlyPendingSections = [
       TaskListSection.requests,
-      if (widget.showArchived) TaskListSection.archivedPending
+      if (widget.showArchived) TaskListSection.archivedPending,
     ];
     final taskCount = widget.showArchived
         ? sections.map((s) => (taskGroups[s] ?? []).length).sum
         : sections
-            .map((s) =>
-                (taskGroups[s] ?? []).where((task) => !task.archived).length)
+            .map(
+              (s) =>
+                  (taskGroups[s] ?? []).where((task) => !task.archived).length,
+            )
             .sum;
     final pendingCount = widget.showArchived
         ? onlyPendingSections.map((s) => (taskGroups[s] ?? []).length).sum
         : onlyPendingSections
-            .map((s) =>
-                (taskGroups[s] ?? []).where((task) => !task.archived).length)
+            .map(
+              (s) =>
+                  (taskGroups[s] ?? []).where((task) => !task.archived).length,
+            )
             .sum;
 
     if (isReloading) {
@@ -111,9 +113,9 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
         children: [
           _buildTaskListHeader(),
           const SizedBox(height: SMALL_GAP),
-          Center(
+          const Center(
             child: CircularProgressIndicator(),
-          )
+          ),
         ],
       );
     }
@@ -127,14 +129,14 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
             Text(
               AppLocalizations.of(context)
                   .noWaitingTasksFoundForQuery(_searchQuery),
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ] else ...[
             Text(
               AppLocalizations.of(context).noWaitingTasksFound,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-          ]
+          ],
         ],
       );
     } else if (taskCount == 0 && _searchQuery.isEmpty) {
@@ -148,7 +150,7 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
           const SizedBox(height: SMALL_GAP),
           Text(
             AppLocalizations.of(context).noTasksFoundForQuery(_searchQuery),
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ],
       );
@@ -168,7 +170,7 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
             const SizedBox(height: SMALL_GAP),
             Text(
               AppLocalizations.of(context).noTasksFoundForQuery(_searchQuery),
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ],
         );
@@ -178,30 +180,29 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
     final requestsTasks = <Task<T>>[];
     final remainingTasks = <Task<T>>[];
 
-    taskGroups.forEach((section, tasks) {
-      if (section == TaskListSection.requests ||
-          (widget.showArchived
-              ? section == TaskListSection.archivedPending
-              : false)) {
-        if (section == TaskListSection.requests && !widget.showArchived) {
-          requestsTasks.addAll(tasks.where((task) => !task.archived));
-        } else {
-          requestsTasks.addAll(tasks);
+    taskGroups
+      ..forEach((section, tasks) {
+        if (section == TaskListSection.requests ||
+            (widget.showArchived &&
+                section == TaskListSection.archivedPending)) {
+          if (section == TaskListSection.requests && !widget.showArchived) {
+            requestsTasks.addAll(tasks.where((task) => !task.archived));
+          } else {
+            requestsTasks.addAll(tasks);
+          }
         }
-      }
-    });
-
-    taskGroups.forEach((section, tasks) {
-      if (section != TaskListSection.requests &&
-          section != TaskListSection.archivedPending &&
-          (widget.showArchived || section != TaskListSection.archived)) {
-        if (widget.showArchived) {
-          remainingTasks.addAll(tasks);
-        } else {
-          remainingTasks.addAll(tasks.where((task) => !task.archived));
+      })
+      ..forEach((section, tasks) {
+        if (section != TaskListSection.requests &&
+            section != TaskListSection.archivedPending &&
+            (widget.showArchived || section != TaskListSection.archived)) {
+          if (widget.showArchived) {
+            remainingTasks.addAll(tasks);
+          } else {
+            remainingTasks.addAll(tasks.where((task) => !task.archived));
+          }
         }
-      }
-    });
+      });
 
     requestsTasks.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     remainingTasks.sort((a, b) => b.createdAt.compareTo(a.createdAt));
@@ -211,10 +212,11 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
       children: [
         _buildTaskListHeader(),
         Expanded(
-            child: _buildTaskList(
-          requestsTasks,
-          showOnlyPending ? <Task<T>>[] : remainingTasks,
-        ))
+          child: _buildTaskList(
+            requestsTasks,
+            showOnlyPending ? <Task<T>>[] : remainingTasks,
+          ),
+        ),
       ],
     );
   }
@@ -268,39 +270,41 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
     List<Task<T>> requestsTasks,
     List<Task<T>> remainingTasks,
   ) {
-    var categories = ["requests", "remaining"];
-    Map<String, List<Task<T>>> orderedCategorizedTasks = {
+    final categories = ['requests', 'remaining'];
+    final orderedCategorizedTasks = <String, List<Task<T>>>{
       categories[0]: requestsTasks,
       categories[1]: remainingTasks,
     };
 
     return RefreshIndicator(
-        child: ListView(
-          children: categories.map((taskCategory) {
-            final sectionTasks =
-                orderedCategorizedTasks[taskCategory] ?? <Task<T>>[];
-            if (sectionTasks.isEmpty) return const SizedBox.shrink();
+      child: ListView(
+        children: categories.map((taskCategory) {
+          final sectionTasks =
+              orderedCategorizedTasks[taskCategory] ?? <Task<T>>[];
+          if (sectionTasks.isEmpty) return const SizedBox.shrink();
 
-            return Theme(
-                // This is to remove the default divider color of ExpansionTile
-                data: Theme.of(context)
-                    .copyWith(dividerColor: Colors.transparent),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      for (final task in sectionTasks)
-                        widget.taskBuilder(context, task),
-                    ]));
-          }).toList(),
-        ),
-        onRefresh: () {
-          _triggerReloadAnimation();
-          return _refreshTasks();
-        });
+          return Theme(
+            // This is to remove the default divider color of ExpansionTile
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (final task in sectionTasks)
+                  widget.taskBuilder(context, task),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+      onRefresh: () {
+        _triggerReloadAnimation();
+        return _refreshTasks();
+      },
+    );
   }
 
   Future<void> _refreshTasks() async {
-    var model = Provider.of<AppViewModel>(context, listen: false);
+    final model = Provider.of<AppViewModel>(context, listen: false);
 
     if (widget.showAllTypes) {
       // Refresh all task types when showing mixed tasks
@@ -344,7 +348,7 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
         prefixIcon: const Icon(Icons.search),
         fillColor: Theme.of(context).colorScheme.onInverseSurface,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
+          borderRadius: BorderRadius.circular(8),
         ),
         filled: true,
       ),
@@ -352,27 +356,30 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
   }
 
   Widget _buildTaskListHeader() {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Row(
-        children: [
-          if (widget.showHeading) ...[
-            Text(
-              _getGeneralHeading(),
-              style: TextStyle(
-                fontSize: Theme.of(context).textTheme.titleLarge?.fontSize,
-                fontWeight: FontWeight.w900,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            if (widget.showHeading) ...[
+              Text(
+                _getGeneralHeading(),
+                style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.titleLarge?.fontSize,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
-            ),
+            ],
           ],
-        ],
-      ),
-      const SizedBox(height: SMALL_GAP),
-      _buildTaskSearchBar(),
-      const SizedBox(height: SMALL_GAP),
-      _buildFilterSection(),
-      Divider(),
-      const SizedBox(height: SMALL_GAP),
-    ]);
+        ),
+        const SizedBox(height: SMALL_GAP),
+        _buildTaskSearchBar(),
+        const SizedBox(height: SMALL_GAP),
+        _buildFilterSection(),
+        const Divider(),
+        const SizedBox(height: SMALL_GAP),
+      ],
+    );
   }
 
   void _triggerReloadAnimation() {
@@ -396,17 +403,20 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
     // }
 
     return FilledButton.icon(
-        onPressed: () {
-          _triggerReloadAnimation();
+      onPressed: () {
+        _triggerReloadAnimation();
 
-          _refreshTasks();
-        },
-        icon: Icon(Icons.refresh),
-        label: Text(widget.showAllTypes
+        _refreshTasks();
+      },
+      icon: const Icon(Icons.refresh),
+      label: Text(
+        widget.showAllTypes
             ? AppLocalizations.of(context).reloadTasks
             : (T == Group
                 ? AppLocalizations.of(context).reloadGroups
-                : AppLocalizations.of(context).reloadTasks)));
+                : AppLocalizations.of(context).reloadTasks),
+      ),
+    );
   }
 
   Widget _buildFilterSection() {
@@ -417,18 +427,19 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
         children: [
           Flexible(
             child: Container(
-              padding: EdgeInsets.only(right: SMALL_PADDING),
+              padding: const EdgeInsets.only(right: SMALL_PADDING),
               child: _buildCheckboxContainer(
-                  title: AppLocalizations.of(context).showOnlyPending,
-                  value: showOnlyPending,
-                  onChanged: (value) {
-                    setState(() {
-                      showOnlyPending = value ?? false;
-                    });
-                  }),
+                title: AppLocalizations.of(context).showOnlyPending,
+                value: showOnlyPending,
+                onChanged: (value) {
+                  setState(() {
+                    showOnlyPending = value ?? false;
+                  });
+                },
+              ),
             ),
           ),
-          _buildReloadButton()
+          _buildReloadButton(),
         ],
       ),
     );
@@ -457,7 +468,7 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
               child: Text(
                 title,
               ),
-            )
+            ),
           ],
         ),
         onTap: () {

@@ -1,3 +1,4 @@
+// Using SCREAMING_SNAKE_CASE for global constants to match common conventions.
 // ignore_for_file: constant_identifier_names
 
 // Standardized gap sizes
@@ -12,10 +13,10 @@ const MEDIUM_BORDER_RADIUS = 16.0;
 const LARGE_BORDER_RADIUS = 32.0;
 
 // Standardized padding
-const double SMALL_PADDING = 8.0;
-const double MEDIUM_PADDING = 16.0;
-const double LARGE_PADDING = 24.0;
-const double XLARGE_PADDING = 32.0;
+const double SMALL_PADDING = 8;
+const double MEDIUM_PADDING = 16;
+const double LARGE_PADDING = 24;
+const double XLARGE_PADDING = 32;
 
 // Responsive layout breakpoints
 const double minTabletLayoutWidth = 700;

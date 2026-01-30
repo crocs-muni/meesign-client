@@ -1,20 +1,18 @@
 import 'package:drift/drift.dart';
+import 'package:meesign_core/src/data/key_store.dart';
+import 'package:meesign_core/src/data/network_dispatcher.dart';
+import 'package:meesign_core/src/database/daos.dart';
+import 'package:meesign_core/src/database/database.dart' as db;
+import 'package:meesign_core/src/model/device.dart';
+import 'package:meesign_core/src/util/uuid.dart';
 import 'package:meesign_native/meesign_native.dart';
 import 'package:meesign_network/grpc.dart' as rpc;
 
-import '../database/daos.dart';
-import '../database/database.dart' as db;
-import '../model/device.dart';
-import '../util/uuid.dart';
-import 'key_store.dart';
-import 'network_dispatcher.dart';
-
 class DeviceRepository {
+  DeviceRepository(this._dispatcher, this._keyStore, this._deviceDao);
   final NetworkDispatcher _dispatcher;
   final KeyStore _keyStore;
   final DeviceDao _deviceDao;
-
-  DeviceRepository(this._dispatcher, this._keyStore, this._deviceDao);
 
   /// Creates a map of device IDs to their isLocal status from a list of devices
   Map<Uuid, bool> _createLocalDeviceMap(List<Device> devices) {
@@ -25,8 +23,10 @@ class DeviceRepository {
     return localDeviceMap;
   }
 
-  Future<Device> register(String name,
-      {DeviceKind kind = DeviceKind.user}) async {
+  Future<Device> register(
+    String name, {
+    DeviceKind kind = DeviceKind.user,
+  }) async {
     final key = AuthWrapper.keygen(name);
 
     final resp = await _dispatcher.unauth.register(
@@ -38,7 +38,7 @@ class DeviceRepository {
 
     final did = Uuid(resp.deviceId);
     final pkcs12 = AuthWrapper.certKeyToPkcs12(key.key, resp.certificate);
-    // TODO: store key in db for consistency?
+    // TODO(dev): store key in db for consistency?
     await _keyStore.store(did, pkcs12);
     await _deviceDao.insertDevice(
       db.DevicesCompanion.insert(
@@ -62,14 +62,13 @@ class DeviceRepository {
         DateTime.fromMillisecondsSinceEpoch(
           device.lastActive.toInt() * 1000,
         ),
-        isLocal: false,
       ),
     );
   }
 
   /// Try to fetch devices with a name matching the query from the server.
   Future<Iterable<Device>> search(String query) async {
-    // TODO: add a cache
+    // TODO(dev): add a cache
     final remoteDevices = await _fetchAll();
     final localDevices = await getAllLocalDevices();
 
@@ -95,7 +94,7 @@ class DeviceRepository {
     var locals = await _deviceDao.getDevices(bIds);
 
     if (locals.length != ids.length) {
-      // TODO: add GetDevice to server or request specific ids in DevicesRequest
+      // TODO(dev): add GetDevice to server or request specific ids in DevicesRequest
       final remotes = await _fetchAll();
 
       // Create a map of existing local devices to preserve their isLocal flag

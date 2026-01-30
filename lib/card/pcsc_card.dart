@@ -1,14 +1,12 @@
 import 'dart:typed_data';
 
 import 'package:dart_pcsc/dart_pcsc.dart' as pcsc;
+import 'package:meesign_client/card/card.dart';
 import 'package:meesign_core/meesign_card.dart';
 
-import 'card.dart';
-
 class PcscCardDelegate extends Card {
-  final pcsc.Card _card;
-
   PcscCardDelegate(this._card);
+  final pcsc.Card _card;
 
   @override
   Future<void> disconnect() => _card.disconnect(pcsc.Disposition.leaveCard);
@@ -34,9 +32,9 @@ class PcscCardManager implements CardManager {
     final rs = await readers;
     if (rs.isEmpty) throw Exception('No reader');
 
-    List<String> withCard = await _context.waitForCard(rs).value;
+    final withCard = await _context.waitForCard(rs).value;
 
-    pcsc.Card card = await _context.connect(
+    final card = await _context.connect(
       withCard.first,
       pcsc.ShareMode.shared,
       pcsc.Protocol.any,

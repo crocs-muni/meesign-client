@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:meesign_client/app_container.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/templates/default_page_template.dart';
+import 'package:meesign_client/ui_constants.dart';
+import 'package:meesign_client/widget/device_selection_bar.dart';
+import 'package:meesign_client/widget/device_suggestion_tile.dart';
+import 'package:meesign_client/widget/no_results_placeholder.dart';
 import 'package:meesign_core/meesign_model.dart';
 import 'package:provider/provider.dart';
 
-import '../app_container.dart';
-import '../l10n/arb/app_localizations.dart';
-import '../templates/default_page_template.dart';
-import '../ui_constants.dart';
-import '../widget/device_selection_bar.dart';
-import '../widget/device_suggestion_tile.dart';
-import '../widget/no_results_placeholder.dart';
-
 class SearchPeerPage extends StatefulWidget {
-  const SearchPeerPage(
-      {super.key, required this.initialSelection, required this.currentDevice});
+  const SearchPeerPage({
+    required this.initialSelection,
+    required this.currentDevice,
+    super.key,
+  });
   final List<Device> initialSelection;
   final Device currentDevice;
 
@@ -39,12 +41,12 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
         .toList();
   }
 
-  void _query(String query) async {
+  Future<void> _query(String query) async {
     Iterable<Device> results = [];
     try {
       final deviceRepository =
           context.read<AppContainer>().session!.deviceRepository;
-      // TODO: allow searching by id?
+      // TODO(dev): allow searching by id?
 
       // Fetch devices from server
       results = await deviceRepository.search(_queryController.text);
@@ -54,16 +56,17 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
           .where((dev) => !dev.isLocal || dev.id == widget.currentDevice.id);
 
       setState(() => _loaded = true);
-    } catch (_) {}
+    } on Exception catch (_) {}
 
     _pivot = DateTime.now().subtract(activeThreshold);
     final active =
         filterCurrentDevice(devices: results.where(_isActive).toList());
     final inactive = filterCurrentDevice(
-        devices: results.where((dev) => !_isActive(dev)).toList());
+      devices: results.where((dev) => !_isActive(dev)).toList(),
+    );
 
-    // TODO: consider moving this computation to a separate isolate
-    cmp(Device a, Device b) => a.name.compareTo(b.name);
+    // TODO(dev): consider moving this computation to a separate isolate
+    int cmp(Device a, Device b) => a.name.compareTo(b.name);
     active.sort(cmp);
     inactive.sort(cmp);
 
@@ -73,7 +76,7 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
   }
 
   Future<void> _refresh() async {
-    /// TODO: Implement auto-refresh so user doesn't have to manually reload
+    // TODO(dev): Implement auto-refresh so user doesn't have to manually reload
     _query(_queryController.text);
 
     if (isReloading) return;
@@ -119,25 +122,26 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: migrate to showSearch/SearchDelegate?
+    // TODO(dev): migrate to showSearch/SearchDelegate?
     return DefaultPageTemplate(
       showAppBar: true,
       includePadding: false,
       customAppBar: AppBar(
-          title: _buildDeviceSearchBar(),
-          actions: [_buildAddButton()],
-          bottom: _queryResults.isNotEmpty
-              ? DeviceSelectionBar(
-                  showNoPeerSelected: _queryResults.isNotEmpty,
-                  devices: filterCurrentDevice(devices: _selection),
-                  onDeleted: (device) => _changeSelection(device, false),
-                )
-              : null),
+        title: _buildDeviceSearchBar(),
+        actions: [_buildAddButton()],
+        bottom: _queryResults.isNotEmpty
+            ? DeviceSelectionBar(
+                showNoPeerSelected: _queryResults.isNotEmpty,
+                devices: filterCurrentDevice(devices: _selection),
+                onDeleted: (device) => _changeSelection(device, false),
+              )
+            : null,
+      ),
       body: isReloading
-          ? LinearProgressIndicator()
+          ? const LinearProgressIndicator()
           : _queryResults.isEmpty
               ? !_loaded
-                  ? LinearProgressIndicator()
+                  ? const LinearProgressIndicator()
                   : RefreshIndicator(
                       onRefresh: _refresh,
                       child: ListView(
@@ -154,9 +158,10 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
                                   ? Icons.device_unknown
                                   : Icons.search_off,
                             ),
-                          )
+                          ),
                         ],
-                      ))
+                      ),
+                    )
               : RefreshIndicator(
                   onRefresh: _refresh,
                   child: ListView.builder(
@@ -166,12 +171,13 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
                       return DeviceSuggestionTile(
                         device: device,
                         active: _isActive(device),
-                        // TODO: don't recompute this?
+                        // TODO(dev): don't recompute this?
                         selected:
                             _selection.any((elem) => elem.id == device.id),
                         onChanged: device.id == widget.currentDevice.id
-                            ? _selection.any((elem) =>
-                                    elem.id == widget.currentDevice.id)
+                            ? _selection.any(
+                                (elem) => elem.id == widget.currentDevice.id,
+                              )
                                 ? null
                                 : (value) {
                                     if (value != null) {
@@ -199,14 +205,14 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
               : () => Navigator.pop(context, _selection),
           child: Text(AppLocalizations.of(context).add),
         ),
-        SizedBox(width: SMALL_GAP),
+        const SizedBox(width: SMALL_GAP),
         Padding(
           padding: const EdgeInsets.only(right: SMALL_PADDING),
           child: FilledButton(
             onPressed: isReloading ? null : _refresh,
             child: Text(AppLocalizations.of(context).reload),
           ),
-        )
+        ),
       ],
     );
   }
@@ -215,8 +221,12 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
     return TextField(
       controller: _queryController,
       maxLength: 50,
-      buildCounter: (_,
-          {required int currentLength, required bool isFocused, maxLength}) {
+      buildCounter: (
+        _, {
+        required int currentLength,
+        required bool isFocused,
+        maxLength,
+      }) {
         return null; // Disable the counter
       },
       decoration: InputDecoration.collapsed(

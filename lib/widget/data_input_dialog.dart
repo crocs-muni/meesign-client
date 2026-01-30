@@ -6,29 +6,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:meesign_client/enums/data_input_type.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/util/chars.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:mime/mime.dart';
 
-import '../enums/data_input_type.dart';
-import '../l10n/arb/app_localizations.dart';
-import '../util/chars.dart';
-
 class DataInputDialog extends StatefulWidget {
+  DataInputDialog({
+    required this.dataInputTypes,
+    super.key,
+    String? title,
+    this.defaultDataInputType,
+  })  : assert(
+          dataInputTypes.isNotEmpty,
+          'dataInputTypes must not be empty',
+        ),
+        assert(
+          defaultDataInputType == null ||
+              dataInputTypes.contains(defaultDataInputType),
+          'defaultDataInputType must be in dataInputTypes',
+        ),
+        _title = title;
   final String? _title;
   final Set<DataInputType> dataInputTypes;
   final DataInputType? defaultDataInputType;
-
-  DataInputDialog({
-    super.key,
-    String? title,
-    required this.dataInputTypes,
-    this.defaultDataInputType,
-  }) : _title = title {
-    assert(dataInputTypes.isNotEmpty);
-    if (defaultDataInputType != null) {
-      assert(dataInputTypes.contains(defaultDataInputType));
-    }
-  }
 
   @override
   State<DataInputDialog> createState() => _DataInputDialogState();
@@ -70,7 +72,7 @@ class _DataInputDialogState extends State<DataInputDialog> {
     };
     final description = _description.text;
 
-    // TODO: disable ok button instead
+    // TODO(dev): disable ok button instead
     if (description.isEmpty || mimeType == null || data == null) return;
 
     Navigator.pop(context, (description, mimeType, data));
@@ -102,7 +104,7 @@ class _DataInputDialogState extends State<DataInputDialog> {
         TextButton(
           onPressed: _handleOk,
           child: Text(AppLocalizations.of(context).ok),
-        )
+        ),
       ],
       scrollable: true,
       content: Column(
@@ -157,9 +159,10 @@ class _DataInputDialogState extends State<DataInputDialog> {
                 : Stack(
                     alignment: Alignment.center,
                     children: [
-                      _imageMimeType == MimeType.imageSvg
-                          ? SvgPicture.memory(image)
-                          : Image.memory(image),
+                      if (_imageMimeType == MimeType.imageSvg)
+                        SvgPicture.memory(image)
+                      else
+                        Image.memory(image),
                       Positioned.fill(
                         child: Material(
                           type: MaterialType.transparency,

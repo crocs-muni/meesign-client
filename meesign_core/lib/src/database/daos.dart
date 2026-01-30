@@ -1,13 +1,13 @@
 import 'package:drift/drift.dart';
 
-import 'database.dart';
-import 'tables.dart';
+import 'package:meesign_core/src/database/database.dart';
+import 'package:meesign_core/src/database/tables.dart';
 
 part 'daos.g.dart';
 
 @DriftAccessor(tables: [Devices])
 class DeviceDao extends DatabaseAccessor<Database> with _$DeviceDaoMixin {
-  DeviceDao(super.db);
+  DeviceDao(super.attachedDatabase);
 
   Future<List<Device>> getDevices(Iterable<Uint8List> ids) {
     final query = select(devices)..where((devices) => devices.id.isIn(ids));
@@ -34,7 +34,7 @@ class DeviceDao extends DatabaseAccessor<Database> with _$DeviceDaoMixin {
 
 @DriftAccessor(tables: [Users])
 class UserDao extends DatabaseAccessor<Database> with _$UserDaoMixin {
-  UserDao(super.db);
+  UserDao(super.attachedDatabase);
 
   Future<User?> getUser() {
     final query = select(users);
@@ -59,7 +59,7 @@ class UserDao extends DatabaseAccessor<Database> with _$UserDaoMixin {
   tables: [Tasks, Groups, GroupMembers, Devices, Files, Challenges, Decrypts],
 )
 class TaskDao extends DatabaseAccessor<Database> with _$TaskDaoMixin {
-  TaskDao(super.db);
+  TaskDao(super.attachedDatabase);
 
   Future<Task?> getTask(Uint8List did, Uint8List id) {
     final query = select(tasks)
@@ -81,7 +81,9 @@ class TaskDao extends DatabaseAccessor<Database> with _$TaskDaoMixin {
       (update(groups)..whereSamePrimaryKey(entity)).write(entity);
 
   Future<void> insertGroupMembers(
-      Uint8List tid, Iterable<({Uint8List did, int shares})> didShares) {
+    Uint8List tid,
+    Iterable<({Uint8List did, int shares})> didShares,
+  ) {
     final entities = didShares.map(
       (item) => GroupMembersCompanion.insert(
         tid: tid,
@@ -89,20 +91,28 @@ class TaskDao extends DatabaseAccessor<Database> with _$TaskDaoMixin {
         shares: item.shares,
       ),
     );
-    return batch((batch) => batch.insertAll(groupMembers, entities,
-        mode: InsertMode.insertOrIgnore));
+    return batch(
+      (batch) => batch.insertAll(
+        groupMembers,
+        entities,
+        mode: InsertMode.insertOrIgnore,
+      ),
+    );
   }
 
   Future<Group> getGroup(Uint8List did, {Uint8List? tid, Uint8List? gid}) {
     final query = select(groups)
-      ..where((groups) =>
-          groups.did.equals(did) &
-          (tid != null ? groups.tid.equals(tid) : groups.id.equals(gid!)));
+      ..where(
+        (groups) =>
+            groups.did.equals(did) &
+            (tid != null ? groups.tid.equals(tid) : groups.id.equals(gid!)),
+      );
     return query.getSingle();
   }
 
   Future<List<({Device device, int shares})>> getGroupMembers(
-      Uint8List tid) async {
+    Uint8List tid,
+  ) async {
     final membersQuery = select(groupMembers)
       ..where((groupMembers) => groupMembers.tid.equals(tid));
 
@@ -174,7 +184,7 @@ class TaskDao extends DatabaseAccessor<Database> with _$TaskDaoMixin {
             ..where((chal) => chal.did.equals(did) & chal.tid.equals(tid)))
           .getSingle();
 
-  // TODO: is there a way to reduce the repetition?
+  // TODO(dev): is there a way to reduce the repetition?
   Stream<List<ChallengeTask>> watchChallengeTasks(Uint8List did) {
     final query = select(challenges)..where((file) => file.did.equals(did));
     final onTask = tasks.id.equalsExp(challenges.tid) &
@@ -203,7 +213,7 @@ class TaskDao extends DatabaseAccessor<Database> with _$TaskDaoMixin {
   Future<void> updateDecrypt(DecryptsCompanion entity) =>
       (update(decrypts)..whereSamePrimaryKey(entity)).write(entity);
 
-  // TODO: is there a way to reduce the repetition?
+  // TODO(dev): is there a way to reduce the repetition?
   Stream<List<DecryptTask>> watchDecryptTasks(Uint8List did) {
     final query = select(decrypts)..where((file) => file.did.equals(did));
     final onTask =
@@ -224,36 +234,36 @@ class TaskDao extends DatabaseAccessor<Database> with _$TaskDaoMixin {
 }
 
 class PopulatedGroup {
+  const PopulatedGroup(this.group, this.members);
   final Group group;
   final List<({Device device, int shares})> members;
-  const PopulatedGroup(this.group, this.members);
 }
 
 class GroupTask {
+  const GroupTask(this.task, this.group);
   final Task task;
   final PopulatedGroup group;
-  const GroupTask(this.task, this.group);
 }
 
 // FIXME mixin to add task, group?
 
 class FileTask {
+  FileTask(this.task, this.file, this.group);
   final Task task;
   final PopulatedGroup group;
   final File file;
-  FileTask(this.task, this.file, this.group);
 }
 
 class ChallengeTask {
+  ChallengeTask(this.task, this.challenge, this.group);
   final Task task;
   final PopulatedGroup group;
   final Challenge challenge;
-  ChallengeTask(this.task, this.challenge, this.group);
 }
 
 class DecryptTask {
+  DecryptTask(this.task, this.decrypt, this.group);
   final Task task;
   final PopulatedGroup group;
   final Decrypt decrypt;
-  DecryptTask(this.task, this.decrypt, this.group);
 }

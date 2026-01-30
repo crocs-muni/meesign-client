@@ -5,22 +5,22 @@ import 'package:collection/collection.dart';
 import 'package:convert/convert.dart';
 import 'package:meta/meta.dart';
 
-// TODO: use uuid package?
+// TODO(dev): use uuid package?
 @immutable
 class Uuid {
-  final Uint8List bytes;
   Uuid(List<int> bytes) : bytes = Uint8List.fromList(bytes);
-  Uuid.take(this.bytes);
+  const Uuid.take(this.bytes);
+  final Uint8List bytes;
 
   @override
-  bool operator ==(other) {
+  bool operator ==(Object other) {
     if (other is! Uuid) return false;
-    return (const ListEquality()).equals(bytes, other.bytes);
+    return (const ListEquality<int>()).equals(bytes, other.bytes);
   }
 
   // FIXME: is this useable in a hashmap?
   @override
-  int get hashCode => (const ListEquality()).hash(bytes);
+  int get hashCode => (const ListEquality<int>()).hash(bytes);
 
   String encode({Codec<List<int>, String> codec = hex}) => codec.encode(bytes);
 }

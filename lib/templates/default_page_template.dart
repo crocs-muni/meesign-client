@@ -1,26 +1,13 @@
 import 'package:flutter/material.dart';
-
-import '../l10n/arb/app_localizations.dart';
-import '../ui_constants.dart';
-import '../util/layout_getter.dart';
-import '../enums/screen_layout.dart';
+import 'package:meesign_client/enums/screen_layout.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/ui_constants.dart';
+import 'package:meesign_client/util/layout_getter.dart';
 
 class DefaultPageTemplate extends StatelessWidget {
-  final Widget body;
-  final List<Widget> appBarActions;
-  final bool showAppBar;
-  final PreferredSizeWidget? customAppBar;
-  final String appBarTitle;
-  final bool wrapInScroll;
-  final String backButtonText;
-  final bool includePadding;
-  final bool transparentBackground;
-  final Widget? floatingActionButton;
-  final Function? onBackButtonPressed;
-
   const DefaultPageTemplate({
-    super.key,
     required this.body,
+    super.key,
     this.floatingActionButton,
     this.customAppBar,
     this.showAppBar = false,
@@ -32,6 +19,17 @@ class DefaultPageTemplate extends StatelessWidget {
     this.appBarActions = const [],
     this.onBackButtonPressed,
   });
+  final Widget body;
+  final List<Widget> appBarActions;
+  final bool showAppBar;
+  final PreferredSizeWidget? customAppBar;
+  final String appBarTitle;
+  final bool wrapInScroll;
+  final String backButtonText;
+  final bool includePadding;
+  final bool transparentBackground;
+  final Widget? floatingActionButton;
+  final Function? onBackButtonPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -61,11 +59,12 @@ class DefaultPageTemplate extends StatelessWidget {
             child: SizedBox(
               width: double.infinity,
               child: SafeArea(
-                  child: wrapInScroll
-                      ? SingleChildScrollView(
-                          child: body,
-                        )
-                      : body),
+                child: wrapInScroll
+                    ? SingleChildScrollView(
+                        child: body,
+                      )
+                    : body,
+              ),
             ),
           ),
           floatingActionButton: floatingActionButton,
@@ -77,18 +76,18 @@ class DefaultPageTemplate extends StatelessWidget {
   Widget? _buildCustomBackButton(BuildContext context) {
     return Navigator.canPop(context)
         ? Padding(
-            padding: EdgeInsets.only(left: 0),
+            padding: EdgeInsets.zero,
             child: TextButton.icon(
               onPressed: () {
                 Navigator.pop(context);
-                if (onBackButtonPressed != null) {
-                  onBackButtonPressed!();
-                }
+                onBackButtonPressed?.call();
               },
-              label: Text(backButtonText == ''
-                  ? AppLocalizations.of(context).back
-                  : backButtonText),
-              icon: Icon(Icons.arrow_back),
+              label: Text(
+                backButtonText == ''
+                    ? AppLocalizations.of(context).back
+                    : backButtonText,
+              ),
+              icon: const Icon(Icons.arrow_back),
             ),
           )
         : null;

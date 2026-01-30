@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 
-import '../ui_constants.dart';
+import 'package:meesign_client/ui_constants.dart';
 
 class NoResultsPlaceholder extends StatelessWidget {
+  const NoResultsPlaceholder({
+    required this.icon,
+    super.key,
+    this.label = '',
+    this.customLabel,
+  });
   final String label;
   final Widget? customLabel;
   final IconData icon;
-
-  const NoResultsPlaceholder({
-    super.key,
-    required this.icon,
-    this.label = "",
-    this.customLabel,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +24,7 @@ class NoResultsPlaceholder extends StatelessWidget {
             size: 120,
             color: Theme.of(context).colorScheme.onSecondaryFixedVariant,
           ),
-          SizedBox(height: SMALL_GAP),
+          const SizedBox(height: SMALL_GAP),
           customLabel ??
               Text(
                 label,
@@ -34,7 +33,7 @@ class NoResultsPlaceholder extends StatelessWidget {
                     .bodyLarge
                     ?.copyWith(color: Theme.of(context).colorScheme.onSurface),
               ),
-          SizedBox(height: XLARGE_GAP),
+          const SizedBox(height: XLARGE_GAP),
         ],
       ),
     );

@@ -2,14 +2,9 @@ import 'dart:io';
 
 import 'package:grpc/grpc.dart';
 
-import 'generated/meesign.pbgrpc.dart';
+import 'package:meesign_network/src/generated/meesign.pbgrpc.dart';
 
 class ClientChannelCredentials extends ChannelCredentials {
-  final List<int>? _key;
-  final String? _password;
-  final List<int>? _clientCerts;
-  final List<int>? _serverCerts;
-
   const ClientChannelCredentials(
     this._key,
     this._password,
@@ -17,13 +12,17 @@ class ClientChannelCredentials extends ChannelCredentials {
     this._serverCerts,
     BadCertificateHandler? onBadCertificate,
   ) : super.secure(onBadCertificate: onBadCertificate);
+  final List<int>? _key;
+  final String? _password;
+  final List<int>? _clientCerts;
+  final List<int>? _serverCerts;
 
   @override
   SecurityContext get securityContext {
     final context = SecurityContext()
       ..setAlpnProtocols(supportedAlpnProtocols, false);
 
-    // TODO: use files insead of bytes?
+    // TODO(dev): use files instead of bytes?
     if (_key != null) {
       context.usePrivateKeyBytes(_key!, password: _password);
     }

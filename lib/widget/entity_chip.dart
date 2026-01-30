@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:meesign_client/pages/device_page.dart';
+import 'package:meesign_client/pages/group_page.dart';
+import 'package:meesign_client/util/chars.dart';
+import 'package:meesign_client/widget/device_name.dart';
 import 'package:meesign_core/meesign_model.dart';
 
-import '../pages/device_page.dart';
-import '../pages/group_page.dart';
-import '../util/chars.dart';
-import 'device_name.dart';
-
 class DeviceChip extends StatelessWidget {
+  const DeviceChip({required this.device, super.key, this.onDeleted});
   final Device device;
 
   final void Function()? onDeleted;
-
-  const DeviceChip({super.key, required this.device, this.onDeleted});
 
   @override
   Widget build(BuildContext context) {
@@ -44,9 +42,8 @@ class DeviceChip extends StatelessWidget {
 }
 
 class GroupChip extends StatelessWidget {
+  const GroupChip({required this.group, super.key});
   final Group group;
-
-  const GroupChip({super.key, required this.group});
 
   @override
   Widget build(BuildContext context) {

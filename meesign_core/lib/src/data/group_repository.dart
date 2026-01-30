@@ -1,27 +1,21 @@
 import 'dart:collection';
 
 import 'package:drift/drift.dart';
+import 'package:meesign_core/src/data/device_repository.dart';
+import 'package:meesign_core/src/data/key_store.dart';
+import 'package:meesign_core/src/data/network_dispatcher.dart';
+import 'package:meesign_core/src/data/task_repository.dart';
+import 'package:meesign_core/src/database/daos.dart';
+import 'package:meesign_core/src/database/database.dart' as db;
+import 'package:meesign_core/src/model/group.dart';
+import 'package:meesign_core/src/model/key_type.dart';
+import 'package:meesign_core/src/model/protocol.dart';
+import 'package:meesign_core/src/model/task.dart';
+import 'package:meesign_core/src/util/uuid.dart';
 import 'package:meesign_native/meesign_native.dart';
 import 'package:meesign_network/grpc.dart' as rpc;
 
-import '../database/daos.dart';
-import '../database/database.dart' as db;
-import '../model/group.dart';
-import '../model/key_type.dart';
-import '../model/protocol.dart';
-import '../model/task.dart';
-import '../util/uuid.dart';
-import 'device_repository.dart';
-import 'network_dispatcher.dart';
-import 'task_repository.dart';
-import 'key_store.dart';
-
 class GroupRepository extends TaskRepository<Group> {
-  final NetworkDispatcher _dispatcher;
-  final KeyStore _keyStore;
-  final TaskDao _taskDao;
-  final DeviceRepository _deviceRepository;
-
   GroupRepository(
     this._dispatcher,
     this._keyStore,
@@ -29,6 +23,10 @@ class GroupRepository extends TaskRepository<Group> {
     this._taskDao,
     this._deviceRepository,
   ) : super(rpc.TaskType.GROUP, taskSource, _taskDao);
+  final NetworkDispatcher _dispatcher;
+  final KeyStore _keyStore;
+  final TaskDao _taskDao;
+  final DeviceRepository _deviceRepository;
 
   Future<void> group(
     String name,
@@ -39,8 +37,12 @@ class GroupRepository extends TaskRepository<Group> {
     String? note,
   }) async {
     final request = rpc.GroupRequest()
-      ..deviceIds.addAll(members.expand((member) =>
-          Iterable.generate(member.shares, (_) => member.device.id.bytes)))
+      ..deviceIds.addAll(
+        members.expand(
+          (member) =>
+              Iterable.generate(member.shares, (_) => member.device.id.bytes),
+        ),
+      )
       ..name = name
       ..threshold = threshold
       ..protocol = protocol.toNetwork()
@@ -56,7 +58,7 @@ class GroupRepository extends TaskRepository<Group> {
 
     final tid = rpcTask.id as Uint8List;
 
-    final ids = req.deviceIds.map((id) => Uuid(id)).toList();
+    final ids = req.deviceIds.map(Uuid.new).toList();
     final idShares = HashMap<Uuid, int>();
     for (final id in ids) {
       idShares.update(id, (value) => value + 1, ifAbsent: () => 1);
@@ -110,13 +112,15 @@ class GroupRepository extends TaskRepository<Group> {
     );
     final group = await _taskDao.getGroup(did.bytes, tid: task.id);
     return task.copyWith(
-      context: Value(ProtocolWrapper.keygen(
-        group.protocol.toNative(),
-        group.certificates!,
-        _keyStore.load(did) as Uint8List,
-        shares: rpcTask.data.length,
-        withCard: group.withCard,
-      )),
+      context: Value(
+        ProtocolWrapper.keygen(
+          group.protocol.toNative(),
+          group.certificates!,
+          _keyStore.load(did) as Uint8List,
+          shares: rpcTask.data.length,
+          withCard: group.withCard,
+        ),
+      ),
     );
   }
 
@@ -125,7 +129,7 @@ class GroupRepository extends TaskRepository<Group> {
     final id = Uint8List.fromList(rpcTask.data.first);
     final context = ProtocolWrapper.finish(task.context!);
 
-    // TODO: group with task update into a transaction?
+    // TODO(dev): group with task update into a transaction?
     await _taskDao.updateGroup(
       db.GroupsCompanion(
         did: Value(did.bytes),
@@ -137,11 +141,15 @@ class GroupRepository extends TaskRepository<Group> {
   }
 
   @override
-  Future<void> approveTask(Uuid did, Uuid tid,
-          {required bool agree, bool withCard = false}) =>
+  Future<void> approveTask(
+    Uuid did,
+    Uuid tid, {
+    required bool agree,
+    bool withCard = false,
+  }) =>
       taskLocks[did][tid].synchronized(() async {
-        await approveTaskUnsafe(did, tid, agree);
-        // TODO: throw early if withCard == true && shares > 1
+        await approveTaskUnsafe(did, tid, agree: agree);
+        // TODO(dev): throw early if withCard == true && shares > 1
         await _taskDao.updateGroup(
           db.GroupsCompanion(
             did: Value(did.bytes),
@@ -156,7 +164,10 @@ class GroupRepository extends TaskRepository<Group> {
     Task<Group> toModel(GroupTask gt) {
       final group = gt.group.toModel();
       return TaskConversion.fromEntity(
-          gt.task, group.protocol.keygenRounds, group);
+        gt.task,
+        group.protocol.keygenRounds,
+        group,
+      );
     }
 
     return _taskDao

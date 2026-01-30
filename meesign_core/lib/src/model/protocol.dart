@@ -12,17 +12,17 @@ enum Protocol {
   frost(4, 3, ThresholdType.tOfN, aid: '6a6366726f7374617070'),
   musig2(2, 3, ThresholdType.nOfN, aid: '01ffff04050607081101');
 
-  final int keygenRounds;
-  final int signRounds;
-  final ThresholdType thresholdType;
-  final String? aid;
-
   const Protocol(
     this.keygenRounds,
     this.signRounds,
     this.thresholdType, {
     this.aid,
   });
+
+  final int keygenRounds;
+  final int signRounds;
+  final ThresholdType thresholdType;
+  final String? aid;
 
   bool get cardSupport => aid != null;
 }

@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 
-import '../l10n/arb/app_localizations.dart';
-import '../pages/register_page.dart';
-import '../ui_constants.dart';
-import '../util/confirm_device_change.dart';
-import '../util/fade_black_page_transition.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/pages/register_page.dart';
+import 'package:meesign_client/ui_constants.dart';
+import 'package:meesign_client/util/confirm_device_change.dart';
+import 'package:meesign_client/util/fade_black_page_transition.dart';
 
 class DangerZoneSection extends StatefulWidget {
-  const DangerZoneSection(
-      {super.key, this.showText = true, this.centerContent = false});
+  const DangerZoneSection({
+    super.key,
+    this.showText = true,
+    this.centerContent = false,
+  });
   final bool showText;
   final bool centerContent;
 
@@ -29,18 +32,18 @@ class _DangerZoneSectionState extends State<DangerZoneSection> {
             AppLocalizations.of(context).dangerZoneTitle,
             style: Theme.of(context).textTheme.bodyLarge,
           ),
-          SizedBox(height: SMALL_GAP),
+          const SizedBox(height: SMALL_GAP),
           Text(
             AppLocalizations.of(context).dangerZoneDescription,
             style: TextStyle(color: Theme.of(context).colorScheme.outline),
           ),
-          SizedBox(height: MEDIUM_GAP),
+          const SizedBox(height: MEDIUM_GAP),
         ],
         FilledButton.icon(
           onPressed: () async {
-            var res = await showDeleteDialog(context, mounted);
+            final res = await showDeleteDialog(context, mounted: mounted);
 
-            if (res == null || res == false) {
+            if (res == null || !res) {
               return;
             }
 
@@ -48,23 +51,30 @@ class _DangerZoneSectionState extends State<DangerZoneSection> {
               if (mounted) {
                 Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
                   FadeBlackPageTransition.fadeBlack(
-                      destination: RegisterPage()),
+                    destination: const RegisterPage(),
+                  ),
                   (route) => false,
                 );
               }
             });
           },
           label: Padding(
-            padding: EdgeInsets.symmetric(vertical: 15),
-            child: Text(AppLocalizations.of(context).deleteDeviceButton,
-                style: TextStyle(
-                    color: Theme.of(context).colorScheme.onErrorContainer)),
+            padding: const EdgeInsets.symmetric(vertical: 15),
+            child: Text(
+              AppLocalizations.of(context).deleteDeviceButton,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onErrorContainer,
+              ),
+            ),
           ),
-          icon: Icon(Icons.delete,
-              color: Theme.of(context).colorScheme.onErrorContainer),
+          icon: Icon(
+            Icons.delete,
+            color: Theme.of(context).colorScheme.onErrorContainer,
+          ),
           style: ButtonStyle(
             backgroundColor: WidgetStateProperty.all<Color>(
-                Theme.of(context).colorScheme.errorContainer),
+              Theme.of(context).colorScheme.errorContainer,
+            ),
             shape: WidgetStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),

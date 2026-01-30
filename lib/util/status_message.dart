@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
 import 'package:meesign_core/meesign_core.dart';
-
-import '../l10n/arb/app_localizations.dart';
 
 class StatusMessage {
   static String? getStatusMessage(Task task, BuildContext context) {

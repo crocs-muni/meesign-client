@@ -1,38 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:meesign_client/app_container.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/ui_constants.dart';
+import 'package:meesign_client/util/date_formatter.dart';
+import 'package:meesign_client/util/extensions/list_intersperse.dart';
+import 'package:meesign_client/util/extensions/task_approvable.dart';
+import 'package:meesign_client/util/status_message.dart';
+import 'package:meesign_client/view_model/app_view_model.dart';
+import 'package:meesign_client/widget/dismissible.dart';
+import 'package:meesign_client/widget/task_state_indicator.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
-import '../app_container.dart';
-import '../l10n/arb/app_localizations.dart';
-import '../ui_constants.dart';
-import '../util/date_formatter.dart';
-import '../util/extensions/list_intersperse.dart';
-import '../util/status_message.dart';
-import '../util/extensions/task_approvable.dart';
-import '../view_model/app_view_model.dart';
-import 'dismissible.dart';
-import 'task_state_indicator.dart';
-
 class TaskTile<T> extends StatelessWidget {
-  final Task<T> task;
-
-  final String name;
-  final String? desc;
-  final Widget? leading, trailing;
-  final Widget? actionChip;
-  final List<Widget> approveActions, cardActions, actions;
-  final List<Widget> children;
-  final void Function(bool)? onArchiveChange;
-  final bool showTaskTypeInfo;
-  final bool showDetailRow;
-  final bool showDate;
-  final bool isGroupTask;
-
   const TaskTile({
-    super.key,
     required this.task,
     required this.name,
+    super.key,
     this.desc,
     this.leading,
     this.trailing,
@@ -47,6 +32,24 @@ class TaskTile<T> extends StatelessWidget {
     this.showDate = true,
     this.isGroupTask = false,
   });
+  final Task<T> task;
+
+  final String name;
+  final String? desc;
+  final Widget? leading;
+  final Widget? trailing;
+  final Widget? actionChip;
+  final List<Widget> approveActions;
+  final List<Widget> cardActions;
+  final List<Widget> actions;
+  final List<Widget> children;
+  // Archive callback requires bool to indicate new archive state.
+  // ignore: avoid_positional_boolean_parameters
+  final void Function(bool)? onArchiveChange;
+  final bool showTaskTypeInfo;
+  final bool showDetailRow;
+  final bool showDate;
+  final bool isGroupTask;
 
   @override
   Widget build(BuildContext context) {
@@ -60,15 +63,13 @@ class TaskTile<T> extends StatelessWidget {
     final actionRow = allActions.isNotEmpty || actionChip != null
         ? Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               if (actionChip != null) ...[
                 actionChip!,
                 const SizedBox(width: 8),
               ],
-              SizedBox(height: MEDIUM_GAP),
+              const SizedBox(height: MEDIUM_GAP),
               Wrap(
-                alignment: WrapAlignment.start,
                 spacing: 8,
                 runSpacing: 8,
                 children: allActions,
@@ -78,7 +79,7 @@ class TaskTile<T> extends StatelessWidget {
         : null;
 
     return Container(
-      padding: EdgeInsets.only(bottom: SMALL_PADDING),
+      padding: const EdgeInsets.only(bottom: SMALL_PADDING),
       child: Deletable.builder(
         dismissibleKey: ObjectKey(task),
         icon: task.archived ? Symbols.unarchive : Symbols.archive,
@@ -97,21 +98,22 @@ class TaskTile<T> extends StatelessWidget {
           child: ExpansionTile(
             key: ValueKey('expansion_tile_${task.id}'),
             title: Wrap(
-              crossAxisAlignment: WrapCrossAlignment.start,
               spacing: LARGE_GAP * 1.5,
               runSpacing: SMALL_GAP,
               children: [
-                Text(name,
-                    overflow: TextOverflow.visible,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    )),
+                Text(
+                  name,
+                  overflow: TextOverflow.visible,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 if (showTaskTypeInfo) _buildTaskTypeInfo(task, context),
               ],
             ),
             subtitle: desc != null
                 ? Padding(
-                    padding: EdgeInsets.only(top: SMALL_PADDING),
+                    padding: const EdgeInsets.only(top: SMALL_PADDING),
                     child: Text(desc),
                   )
                 : null,
@@ -138,11 +140,10 @@ class TaskTile<T> extends StatelessWidget {
 
   List<Widget> _buildConditionalApproveActions(BuildContext context) {
     if (isGroupTask) {
-      if (Provider.of<AppContainer>(context, listen: false)
-              .settingsController
-              .currentSettings
-              .autoJoinGroups ==
-          false) {
+      if (!Provider.of<AppContainer>(context, listen: false)
+          .settingsController
+          .currentSettings
+          .autoJoinGroups) {
         return approveActions;
       } else {
         // If auto-join is enabled, we don't show the approve actions
@@ -154,7 +155,10 @@ class TaskTile<T> extends StatelessWidget {
   }
 
   Widget _buildGroupMetaDataRow(
-      IconData icon, String text, BuildContext context) {
+    IconData icon,
+    String text,
+    BuildContext context,
+  ) {
     return Row(
       children: [
         Icon(
@@ -163,18 +167,20 @@ class TaskTile<T> extends StatelessWidget {
           color: Theme.of(context).colorScheme.onSurfaceVariant,
         ),
         const SizedBox(width: SMALL_GAP),
-        Text(text,
-            overflow: TextOverflow.clip,
-            style: TextStyle(
-              fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            )),
+        Text(
+          text,
+          overflow: TextOverflow.clip,
+          style: TextStyle(
+            fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
       ],
     );
   }
 
   Widget _buildTaskTypeInfo(Task task, BuildContext context) {
-    String text = "";
+    var text = '';
     Group? taskGroup;
 
     if (task is Task<Challenge>) {
@@ -205,43 +211,57 @@ class TaskTile<T> extends StatelessWidget {
       children: [
         _buildGroupMetaDataRow(Symbols.flag, text, context),
         if (showDetailRow) ...[
-          LayoutBuilder(builder: (context, constraints) {
-            return Row(
-              children: [
-                if (MediaQuery.sizeOf(context).width >
-                    minLaptopLayoutWidth) ...[
-                  SizedBox(width: LARGE_GAP),
-                  _buildGroupMetaDataRow(Symbols.code,
-                      taskGroup?.protocol.name.toUpperCase() ?? "", context),
-                  SizedBox(width: LARGE_GAP),
-                  _buildGroupMetaDataRow(
+          LayoutBuilder(
+            builder: (context, constraints) {
+              return Row(
+                children: [
+                  if (MediaQuery.sizeOf(context).width >
+                      minLaptopLayoutWidth) ...[
+                    const SizedBox(width: LARGE_GAP),
+                    _buildGroupMetaDataRow(
+                      Symbols.code,
+                      taskGroup?.protocol.name.toUpperCase() ?? '',
+                      context,
+                    ),
+                    const SizedBox(width: LARGE_GAP),
+                    _buildGroupMetaDataRow(
                       Symbols.donut_large,
                       '${taskGroup?.threshold} / ${taskGroup?.shares}',
-                      context),
+                      context,
+                    ),
+                  ],
                 ],
-              ],
-            );
-          })
+              );
+            },
+          ),
         ],
         if (showDate) ...[
-          LayoutBuilder(builder: (context, constraints) {
-            return Row(
-              children: [
-                if (MediaQuery.sizeOf(context).width >
-                    minLaptopLayoutWidth) ...[
-                  SizedBox(width: LARGE_GAP),
-                  _buildGroupMetaDataRow(Icons.calendar_month,
-                      formatDate(task.createdAt), context),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              return Row(
+                children: [
+                  if (MediaQuery.sizeOf(context).width >
+                      minLaptopLayoutWidth) ...[
+                    const SizedBox(width: LARGE_GAP),
+                    _buildGroupMetaDataRow(
+                      Icons.calendar_month,
+                      formatDate(task.createdAt),
+                      context,
+                    ),
+                  ],
                 ],
-              ],
-            );
-          })
+              );
+            },
+          ),
         ],
         if (task.archived) ...[
-          SizedBox(width: LARGE_GAP),
+          const SizedBox(width: LARGE_GAP),
           _buildGroupMetaDataRow(
-              Symbols.archive, AppLocalizations.of(context).archived, context),
-        ]
+            Symbols.archive,
+            AppLocalizations.of(context).archived,
+            context,
+          ),
+        ],
       ],
     );
   }

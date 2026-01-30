@@ -1,6 +1,6 @@
-import 'package:meesign_core/meesign_data.dart';
-
 import 'dart:convert';
+
+import 'package:meesign_core/meesign_data.dart';
 
 class QrCoder {
   static const String mime = 'application/meesign';
@@ -25,6 +25,6 @@ class QrCoder {
     final name = args[1];
     final kind = DeviceKind.values.firstWhere((kind) => kind.name == args[2]);
 
-    return Device(name, Uuid(id), kind, DateTime.now(), isLocal: false);
+    return Device(name, Uuid(id), kind, DateTime.now());
   }
 }

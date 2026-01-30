@@ -1,7 +1,6 @@
 class MimeType {
-  final String value;
-
   const MimeType(this.value);
+  final String value;
 
   static const textUtf8 = MimeType('text/plain;charset=UTF-8');
   static const octetStream = MimeType('application/octet-stream');
@@ -11,7 +10,7 @@ class MimeType {
   bool get isImage => value.startsWith('image/');
 
   @override
-  bool operator ==(other) {
+  bool operator ==(Object other) {
     if (other is! MimeType) return false;
     return value.toLowerCase() == other.value.toLowerCase();
   }

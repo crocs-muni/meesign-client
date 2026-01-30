@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart' hide Card;
+import 'package:meesign_client/pages/card_reader_page.dart';
 import 'package:meesign_core/meesign_card.dart';
-import '../pages/card_reader_page.dart';
 
 void launchCardReader(
   BuildContext context,
@@ -8,7 +8,7 @@ void launchCardReader(
 ) {
   Navigator.push(
     context,
-    MaterialPageRoute(
+    MaterialPageRoute<void>(
       builder: (context) => CardReaderPage(
         onCard: onCard,
       ),

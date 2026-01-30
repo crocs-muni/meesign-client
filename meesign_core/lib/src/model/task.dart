@@ -1,15 +1,26 @@
+import 'package:meesign_core/src/database/database.dart' as db;
+import 'package:meesign_core/src/util/uuid.dart';
 import 'package:meta/meta.dart';
-
-import '../database/database.dart' as db;
-import '../util/uuid.dart';
 
 enum TaskState { created, running, needsCard, finished, failed }
 
 enum TaskError { rejected }
 
-// TODO: use freezed package?
+// TODO(dev): use freezed package?
 @immutable
 class Task<T> {
+  const Task({
+    required this.id,
+    required this.nRounds,
+    required this.info,
+    required this.createdAt,
+    this.state = TaskState.created,
+    this.error,
+    this.approved = false,
+    this.archived = false,
+    this.round = 0,
+    this.attempt = 0,
+  });
   final Uuid id;
   final TaskState state;
   final TaskError? error;
@@ -21,20 +32,7 @@ class Task<T> {
   final T info;
   final int createdAt;
 
-  const Task({
-    required this.id,
-    this.state = TaskState.created,
-    this.error,
-    this.approved = false,
-    this.archived = false,
-    this.round = 0,
-    required this.nRounds,
-    this.attempt = 0,
-    required this.info,
-    required this.createdAt,
-  });
-
-  // TODO: implement comparison, hash
+  // TODO(dev): implement comparison, hash
 }
 
 class TaskConversion {

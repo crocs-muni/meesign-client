@@ -2,21 +2,19 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/pages/device_page.dart';
+import 'package:meesign_client/ui_constants.dart';
+import 'package:meesign_client/util/actions/group_creator.dart';
+import 'package:meesign_client/util/chars.dart';
+import 'package:meesign_client/widget/avatar_app_bar.dart';
+import 'package:meesign_client/widget/device_name.dart';
+import 'package:meesign_client/widget/weighted_avatar.dart';
 import 'package:meesign_core/meesign_model.dart';
 
-import '../l10n/arb/app_localizations.dart';
-import '../ui_constants.dart';
-import '../util/actions/group_creator.dart';
-import '../util/chars.dart';
-import '../widget/avatar_app_bar.dart';
-import '../widget/device_name.dart';
-import '../widget/weighted_avatar.dart';
-import 'device_page.dart';
-
 class GroupPage extends StatelessWidget {
+  const GroupPage({required this.group, super.key});
   final Group group;
-
-  const GroupPage({super.key, required this.group});
 
   static const kIconSize = 40.0;
 
@@ -94,11 +92,13 @@ class GroupPage extends StatelessWidget {
           child: Icon(Symbols.flag),
         ),
         title: Text(AppLocalizations.of(context).purpose),
-        subtitle: Text(switch (group.keyType) {
-          KeyType.signPdf => AppLocalizations.of(context).signPdf,
-          KeyType.signChallenge => AppLocalizations.of(context).challenge,
-          KeyType.decrypt => AppLocalizations.of(context).decrypt,
-        }),
+        subtitle: Text(
+          switch (group.keyType) {
+            KeyType.signPdf => AppLocalizations.of(context).signPdf,
+            KeyType.signChallenge => AppLocalizations.of(context).challenge,
+            KeyType.decrypt => AppLocalizations.of(context).decrypt,
+          },
+        ),
       ),
       ListTile(
         leading: const SizedBox.square(
@@ -124,7 +124,7 @@ class GroupPage extends StatelessWidget {
           padding: const EdgeInsets.only(left: LARGE_PADDING),
           child: FilledButton.icon(
             onPressed: () async {
-              bool shouldRedirect =
+              final shouldRedirect =
                   await createGroup(context, context, groupTemplate: group);
 
               if (context.mounted && shouldRedirect) {
@@ -132,7 +132,7 @@ class GroupPage extends StatelessWidget {
               }
             },
             label: Padding(
-              padding: EdgeInsets.symmetric(vertical: 15),
+              padding: const EdgeInsets.symmetric(vertical: 15),
               child: Text(AppLocalizations.of(context).useTemplateForGroup),
             ),
             icon: const Icon(
@@ -170,7 +170,7 @@ class GroupPage extends StatelessWidget {
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );

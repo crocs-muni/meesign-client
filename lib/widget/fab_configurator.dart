@@ -1,29 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
-
-import '../l10n/arb/app_localizations.dart';
-
-import '../enums/fab_type.dart';
-import '../enums/task_type.dart';
-import '../util/actions/challenge_creator.dart';
-import '../util/actions/document_signer.dart';
-import '../util/actions/encrypt_data.dart';
-import '../util/actions/group_creator.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
-
-import '../util/actions/task_type_selector.dart';
-import '../view_model/app_view_model.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:meesign_client/enums/fab_type.dart';
+import 'package:meesign_client/enums/task_type.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/util/actions/challenge_creator.dart';
+import 'package:meesign_client/util/actions/document_signer.dart';
+import 'package:meesign_client/util/actions/encrypt_data.dart';
+import 'package:meesign_client/util/actions/group_creator.dart';
+import 'package:meesign_client/util/actions/task_type_selector.dart';
+import 'package:meesign_client/view_model/app_view_model.dart';
 
 class FabConfigurator extends StatelessWidget {
+  const FabConfigurator({
+    required this.fabType,
+    required this.buildContext,
+    super.key,
+    this.viewModel,
+  });
   final FabType fabType;
   final BuildContext buildContext;
 
   final AppViewModel? viewModel;
-  const FabConfigurator(
-      {super.key,
-      required this.fabType,
-      required this.buildContext,
-      this.viewModel});
 
   @override
   Widget build(BuildContext context) {
@@ -36,18 +34,18 @@ class FabConfigurator extends StatelessWidget {
         return _buildEncryptFab(context);
       case FabType.groupFab:
         return _buildGroupsFab(context);
-      default:
+      case FabType.newTaskFab:
         return _buildNewTaskFab(context);
     }
   }
 
   Widget _buildNewTaskFab(BuildContext context) {
-    String key = "NewTaskFab";
+    const key = 'NewTaskFab';
     return FloatingActionButton.extended(
-      key: ValueKey(key),
+      key: const ValueKey(key),
       heroTag: key,
       onPressed: () async {
-        TaskType? result = await showTaskTypeDialog(context);
+        final result = await showTaskTypeDialog(context);
 
         if (context.mounted) {
           if (result == TaskType.sign) {
@@ -65,9 +63,9 @@ class FabConfigurator extends StatelessWidget {
   }
 
   Widget _buildSignFab(BuildContext context) {
-    String key = "SignFab";
+    const key = 'SignFab';
     return FloatingActionButton.extended(
-      key: ValueKey(key),
+      key: const ValueKey(key),
       heroTag: key,
       onPressed: () => signDocument(context: context, buildContext: context),
       label: const Text('New signature'),
@@ -76,9 +74,9 @@ class FabConfigurator extends StatelessWidget {
   }
 
   Widget _buildChallengeFab(BuildContext context) {
-    String key = "ChallengeFab";
+    const key = 'ChallengeFab';
     return FloatingActionButton.extended(
-      key: ValueKey(key),
+      key: const ValueKey(key),
       heroTag: key,
       onPressed: () => createChallenge(context: context, buildContext: context),
       label: const Text('New challenge'),
@@ -87,9 +85,9 @@ class FabConfigurator extends StatelessWidget {
   }
 
   Widget _buildEncryptFab(BuildContext context) {
-    String key = "EncryptFab";
+    const key = 'EncryptFab';
     return FloatingActionButton.extended(
-      key: ValueKey(key),
+      key: const ValueKey(key),
       heroTag: key,
       onPressed: () => encryptData(context: context, buildContext: context),
       label: const Text('New encryption'),
@@ -98,9 +96,9 @@ class FabConfigurator extends StatelessWidget {
   }
 
   Widget _buildGroupsFab(BuildContext context) {
-    String key = "GroupFab";
+    const key = 'GroupFab';
     return FloatingActionButton.extended(
-      key: ValueKey(key),
+      key: const ValueKey(key),
       heroTag: key,
       onPressed: () => createGroup(context, buildContext),
       label: Text(AppLocalizations.of(context).newGroup),

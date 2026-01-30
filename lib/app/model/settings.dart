@@ -1,6 +1,17 @@
 import 'package:flutter/material.dart';
 
 class Settings {
+  Settings({
+    this.themeMode = ThemeMode.light,
+    this.showArchivedItems = false,
+    this.currentUserId = '',
+    this.autoJoinGroups = false,
+    this.autoRejectGroups = false,
+    this.minGroupMembers = 2,
+    this.currentLanguage = 'en',
+    this.closeWithoutConfirmation = false,
+    this.authenticateProtectedActions = true,
+  });
   final ThemeMode themeMode;
   final bool showArchivedItems;
   final String currentUserId;
@@ -11,38 +22,29 @@ class Settings {
   final bool closeWithoutConfirmation;
   final bool authenticateProtectedActions;
 
-  Settings(
-      {this.themeMode = ThemeMode.light,
-      this.showArchivedItems = false,
-      this.currentUserId = '',
-      this.autoJoinGroups = false,
-      this.autoRejectGroups = false,
-      this.minGroupMembers = 2,
-      this.currentLanguage = 'en',
-      this.closeWithoutConfirmation = false,
-      this.authenticateProtectedActions = true});
-
-  Settings copyWith(
-      {ThemeMode? themeMode,
-      bool? showArchivedItems,
-      String? currentUserId,
-      bool? autoJoinGroups,
-      bool? autoRejectGroups,
-      int? minGroupMembers,
-      String? currentLanguage,
-      bool? closeWithoutConfirmation,
-      bool? authenticateProtectedActions}) {
+  Settings copyWith({
+    ThemeMode? themeMode,
+    bool? showArchivedItems,
+    String? currentUserId,
+    bool? autoJoinGroups,
+    bool? autoRejectGroups,
+    int? minGroupMembers,
+    String? currentLanguage,
+    bool? closeWithoutConfirmation,
+    bool? authenticateProtectedActions,
+  }) {
     return Settings(
-        themeMode: themeMode ?? this.themeMode,
-        showArchivedItems: showArchivedItems ?? this.showArchivedItems,
-        currentUserId: currentUserId ?? this.currentUserId,
-        autoJoinGroups: autoJoinGroups ?? this.autoJoinGroups,
-        autoRejectGroups: autoRejectGroups ?? this.autoRejectGroups,
-        minGroupMembers: minGroupMembers ?? this.minGroupMembers,
-        currentLanguage: currentLanguage ?? this.currentLanguage,
-        closeWithoutConfirmation:
-            closeWithoutConfirmation ?? this.closeWithoutConfirmation,
-        authenticateProtectedActions:
-            authenticateProtectedActions ?? this.authenticateProtectedActions);
+      themeMode: themeMode ?? this.themeMode,
+      showArchivedItems: showArchivedItems ?? this.showArchivedItems,
+      currentUserId: currentUserId ?? this.currentUserId,
+      autoJoinGroups: autoJoinGroups ?? this.autoJoinGroups,
+      autoRejectGroups: autoRejectGroups ?? this.autoRejectGroups,
+      minGroupMembers: minGroupMembers ?? this.minGroupMembers,
+      currentLanguage: currentLanguage ?? this.currentLanguage,
+      closeWithoutConfirmation:
+          closeWithoutConfirmation ?? this.closeWithoutConfirmation,
+      authenticateProtectedActions:
+          authenticateProtectedActions ?? this.authenticateProtectedActions,
+    );
   }
 }

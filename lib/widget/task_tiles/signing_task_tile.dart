@@ -1,25 +1,23 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/pages/task_detail_page.dart';
+import 'package:meesign_client/ui_constants.dart';
+import 'package:meesign_client/util/actions/document_signer.dart';
+import 'package:meesign_client/view_model/app_view_model.dart';
+import 'package:meesign_client/widget/entity_chip.dart';
+import 'package:meesign_client/widget/large_square_button.dart';
+import 'package:meesign_client/widget/task_tile.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:open_filex/open_filex.dart';
-import 'package:url_launcher/url_launcher.dart';
-
-import '../../l10n/arb/app_localizations.dart';
 import 'package:provider/provider.dart';
-
-import '../../pages/task_detail_page.dart';
-import '../../ui_constants.dart';
-import '../../util/actions/document_signer.dart';
-import '../../view_model/app_view_model.dart';
-import '../entity_chip.dart';
-import '../large_square_button.dart';
-import '../task_tile.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SigningTaskTile extends StatelessWidget {
   const SigningTaskTile({
-    super.key,
     required this.task,
+    super.key,
   });
 
   final Task<File> task;
@@ -34,11 +32,10 @@ class SigningTaskTile extends StatelessWidget {
       name: task.info.basename,
       showDetailRow: false,
       actionChip: Row(
-        mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           GroupChip(group: task.info.group),
-          SizedBox(
+          const SizedBox(
             width: SMALL_GAP,
           ),
           if (task.state == TaskState.finished) ...[
@@ -46,7 +43,6 @@ class SigningTaskTile extends StatelessWidget {
               style: FilledButton.styleFrom(
                 side: const BorderSide(
                   color: Colors.grey,
-                  width: 1.0,
                 ),
               ),
               onPressed: () => Navigator.push(
@@ -63,9 +59,9 @@ class SigningTaskTile extends StatelessWidget {
                 ),
               ),
               child: Text(AppLocalizations.of(context).view),
-            )
+            ),
           ],
-          SizedBox(
+          const SizedBox(
             width: SMALL_GAP,
           ),
           if (task.state == TaskState.finished ||
@@ -74,34 +70,32 @@ class SigningTaskTile extends StatelessWidget {
               style: FilledButton.styleFrom(
                 side: const BorderSide(
                   color: Colors.grey,
-                  width: 1.0,
                 ),
               ),
               onPressed: () => signDocument(
-                  context: context,
-                  buildContext: context,
-                  templateSignTask: task),
+                context: context,
+                buildContext: context,
+                templateSignTask: task,
+              ),
               child: Text(AppLocalizations.of(context).copy),
             ),
           ],
           if (task.state == TaskState.failed) ...[
-            SizedBox(
+            const SizedBox(
               width: SMALL_GAP,
             ),
             FilledButton.tonal(
               style: FilledButton.styleFrom(
                 side: const BorderSide(
                   color: Colors.grey,
-                  width: 1.0,
                 ),
               ),
-              onPressed: () => _openFile(),
+              onPressed: _openFile,
               child: Text(AppLocalizations.of(context).view),
             ),
           ],
         ],
       ),
-      actions: const [],
       approveActions: [
         LargeSquareButton(
           text: AppLocalizations.of(context).sign,
@@ -109,20 +103,22 @@ class SigningTaskTile extends StatelessWidget {
           onPressed: () {
             model.joinSign(task, agree: true);
           },
-          color: Color(0xFF298E29),
+          color: const Color(0xFF298E29),
         ),
         LargeSquareButton(
-            text: AppLocalizations.of(context).decline,
-            icon: Icons.close,
-            onPressed: () {
-              model.joinSign(task, agree: false);
-            },
-            color: Color(0xFFAA3026)),
+          text: AppLocalizations.of(context).decline,
+          icon: Icons.close,
+          onPressed: () {
+            model.joinSign(task, agree: false);
+          },
+          color: const Color(0xFFAA3026),
+        ),
         Container(
-          margin: EdgeInsets.only(bottom: SMALL_GAP),
+          margin: const EdgeInsets.only(bottom: SMALL_GAP),
           child: SizedBox(
-              height: 50,
-              child: _buildPreviewButton(context: context, model: model)),
+            height: 50,
+            child: _buildPreviewButton(context: context, model: model),
+          ),
         ),
       ],
       onArchiveChange: (archive) => model.archiveTask(task, archive: archive),
@@ -134,25 +130,25 @@ class SigningTaskTile extends StatelessWidget {
     required AppViewModel model,
   }) {
     return ElevatedButton.icon(
-        onPressed: () {
-          _openFile();
-        },
-        style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFF555555),
-            padding: EdgeInsets.all(MEDIUM_PADDING),
-            shape: RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadiusGeometry.circular(SMALL_BORDER_RADIUS))),
-        icon: Icon(Icons.list_alt, color: Colors.white),
-        label: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              AppLocalizations.of(context).previewDocument,
-              style: TextStyle(fontSize: 14, color: Colors.white),
-            )
-          ],
-        ));
+      onPressed: _openFile,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF555555),
+        padding: const EdgeInsets.all(MEDIUM_PADDING),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadiusGeometry.circular(SMALL_BORDER_RADIUS),
+        ),
+      ),
+      icon: const Icon(Icons.list_alt, color: Colors.white),
+      label: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            AppLocalizations.of(context).previewDocument,
+            style: const TextStyle(fontSize: 14, color: Colors.white),
+          ),
+        ],
+      ),
+    );
   }
 
   void _openFile() {

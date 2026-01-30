@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
-import '../enums/screen_layout.dart';
-import '../ui_constants.dart';
-import 'device_icon.dart';
-import 'smart_logo.dart';
+import 'package:meesign_client/enums/screen_layout.dart';
+import 'package:meesign_client/ui_constants.dart';
+import 'package:meesign_client/widget/device_icon.dart';
+import 'package:meesign_client/widget/smart_logo.dart';
 
 PreferredSizeWidget buildAppBar(
-    BuildContext context, ScreenLayout currentLayout) {
+  BuildContext context,
+  ScreenLayout currentLayout,
+) {
   return AppBar(
     forceMaterialTransparency: true,
     surfaceTintColor: Colors.transparent,
@@ -39,34 +41,39 @@ Widget _buildAppBarTitle(BuildContext context, ScreenLayout currentLayout) {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('MeeSign',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: currentLayout == ScreenLayout.mobile
-                            ? smallLogoFontSize
-                            : logoFontSize)),
-                SizedBox(
+                Text(
+                  'MeeSign',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: currentLayout == ScreenLayout.mobile
+                        ? smallLogoFontSize
+                        : logoFontSize,
+                  ),
+                ),
+                const SizedBox(
                   width: SMALL_GAP,
                 ),
                 Transform.translate(
-                  offset: Offset(0, logoVerticalOffset),
+                  offset: const Offset(0, logoVerticalOffset),
                   child: SmartLogo(
-                      logoWidth: currentLayout == ScreenLayout.mobile
-                          ? smallLogoWidth
-                          : logoWidth),
-                )
+                    logoWidth: currentLayout == ScreenLayout.mobile
+                        ? smallLogoWidth
+                        : logoWidth,
+                  ),
+                ),
               ],
             )
           else
             // Show only logo icon on very small screens
             Transform.translate(
-              offset: Offset(0, logoVerticalOffset),
+              offset: const Offset(0, logoVerticalOffset),
               child: SmartLogo(
-                  logoWidth: currentLayout == ScreenLayout.mobile
-                      ? smallLogoWidth
-                      : logoWidth),
+                logoWidth: currentLayout == ScreenLayout.mobile
+                    ? smallLogoWidth
+                    : logoWidth,
+              ),
             ),
-          SizedBox(width: SMALL_PADDING),
+          const SizedBox(width: SMALL_PADDING),
           const Flexible(child: DeviceIcon()),
         ],
       );

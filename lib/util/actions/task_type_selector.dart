@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:meesign_client/enums/task_type.dart';
+import 'package:meesign_client/view_model/app_view_model.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
-
-import '../../enums/task_type.dart';
-import '../../view_model/app_view_model.dart';
 
 Future<TaskType?> showTaskTypeDialog(BuildContext context) async {
   final model = Provider.of<AppViewModel>(context, listen: false);
@@ -14,7 +13,7 @@ Future<TaskType?> showTaskTypeDialog(BuildContext context) async {
     builder: (context) {
       return AlertDialog(
         icon: const Icon(Symbols.quiz),
-        title: const Text("Select task type"),
+        title: const Text('Select task type'),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -47,7 +46,7 @@ Future<TaskType?> showTaskTypeDialog(BuildContext context) async {
                     Navigator.of(context).pop(TaskType.challenge);
                   },
                 ),
-              ]
+              ],
             ],
           ),
         ),

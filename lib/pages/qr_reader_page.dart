@@ -1,11 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/templates/default_page_template.dart';
+import 'package:meesign_client/util/qr_coder.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-
-import '../l10n/arb/app_localizations.dart';
-import '../templates/default_page_template.dart';
-import '../util/qr_coder.dart';
 
 class QrReaderPage extends StatefulWidget {
   const QrReaderPage({super.key});
@@ -38,7 +37,7 @@ class _QrReaderPageState extends State<QrReaderPage> {
       final device = _coder.decode(barcodes.first.rawValue);
       controller.dispose();
       Navigator.pop(context, [device]);
-    } catch (e) {
+    } on FormatException {
       setState(() {
         _recentError = true;
       });
@@ -64,7 +63,6 @@ class _QrReaderPageState extends State<QrReaderPage> {
             ),
           ),
           Expanded(
-            flex: 1,
             child: Center(
               child: _recentError
                   ? Text(
@@ -76,12 +74,12 @@ class _QrReaderPageState extends State<QrReaderPage> {
                   : Text(
                       AppLocalizations.of(context).scanPeerCode,
                       style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color:
-                              Theme.of(context).colorScheme.onSurfaceVariant),
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
             ),
-          )
+          ),
         ],
       ),
     );

@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:meesign_client/theme.dart';
 import 'package:meesign_core/meesign_core.dart';
 
-import '../theme.dart';
-
 class TaskStateIndicator extends StatefulWidget {
-  final Task task;
-
   const TaskStateIndicator(this.task, {super.key});
+  final Task task;
 
   @override
   State<TaskStateIndicator> createState() => _TaskStateIndicatorState();
@@ -17,7 +15,7 @@ class _TaskStateIndicatorState extends State<TaskStateIndicator> {
   @override
   Widget build(BuildContext context) {
     return switch (widget.task.state) {
-      TaskState.created => SizedBox(),
+      TaskState.created => const SizedBox(),
       TaskState.running => _buildProgressIndicator(),
       TaskState.needsCard => const Icon(Symbols.payment, size: 30),
       TaskState.finished => Icon(
@@ -31,7 +29,8 @@ class _TaskStateIndicatorState extends State<TaskStateIndicator> {
             _ => Symbols.error_outline,
           },
           color: Theme.of(context).colorScheme.error,
-          size: 30),
+          size: 30,
+        ),
     };
   }
 
@@ -39,11 +38,11 @@ class _TaskStateIndicatorState extends State<TaskStateIndicator> {
     return SizedBox(
       height: 30,
       width: 30,
-      // TODO: add animation
+      // TODO(dev): add animation
       child: CircularProgressIndicator(
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         value: widget.task.round / widget.task.nRounds,
-        strokeWidth: 3.0,
+        strokeWidth: 3,
       ),
     );
   }

@@ -1,15 +1,14 @@
 import 'dart:typed_data';
 
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
+import 'package:meesign_client/card/card.dart';
 import 'package:meesign_core/meesign_card.dart';
 
-import 'card.dart';
-
 class NfcCard extends Card {
+  NfcCard(this._tag);
+  // Ignore linter
   // ignore: unused_field
   final NFCTag _tag;
-
-  NfcCard(this._tag);
 
   @override
   Future<Uint8List> transceive(Uint8List data) =>
@@ -28,7 +27,7 @@ class NfcCardManager implements CardManager {
     return [NfcCard(tag)];
   }
 
-  // TODO: we might want to throw here if the feature
+  // TODO(dev): we might want to throw here if the feature
   // is not supported at all
   @override
   Future<void> connect() async {}

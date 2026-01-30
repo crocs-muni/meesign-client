@@ -1,26 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:meesign_client/app_container.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/ui_constants.dart';
+import 'package:meesign_client/util/chars.dart';
+import 'package:meesign_client/util/launch_home.dart';
+import 'package:meesign_client/util/set_user_login_prefereces.dart';
+import 'package:meesign_client/widget/existing_user_list.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
-import '../app_container.dart';
-import '../l10n/arb/app_localizations.dart';
-import '../services/settings_controller.dart';
-import '../ui_constants.dart';
-import '../util/chars.dart';
-import '../util/launch_home.dart';
-import '../util/set_user_login_prefereces.dart';
-import 'existing_user_list.dart';
-
 class RegistrationForm extends StatefulWidget {
-  final String prefillName;
-  final String prefillHost;
-
   const RegistrationForm({
     super.key,
     this.prefillHost = '',
     this.prefillName = '',
   });
+  final String prefillName;
+  final String prefillHost;
 
   @override
   State<RegistrationForm> createState() => _RegistrationFormState();
@@ -56,12 +53,12 @@ class _RegistrationFormState extends State<RegistrationForm> {
     _clearHostControllerFocus.addListener(checkFocus);
   }
 
-  void setupHostname() async {
+  Future<void> setupHostname() async {
     final container = context.read<AppContainer>();
-    SettingsController settingsController = container.settingsController;
+    final settingsController = container.settingsController;
 
     // Load last hostname user was connected to
-    String? lastHostname = await settingsController.getLastHostname();
+    final lastHostname = await settingsController.getLastHostname();
 
     if (lastHostname != null && lastHostname.isNotEmpty) {
       _hostController.text = lastHostname;
@@ -96,12 +93,13 @@ class _RegistrationFormState extends State<RegistrationForm> {
   }
 
   Future<void> _register() async {
-    // TODO: let the user cancel previous op?
+    // TODO(dev): let the user cancel previous op?
     if (_working) return;
 
     if (_nameController.text.isEmpty) {
       setState(
-          () => _nameError = AppLocalizations.of(context).nameMustNotBeEmpty);
+        () => _nameError = AppLocalizations.of(context).nameMustNotBeEmpty,
+      );
       return;
     }
 
@@ -117,13 +115,14 @@ class _RegistrationFormState extends State<RegistrationForm> {
     try {
       final session = await container.createAnonymousSession(host);
 
-      bool isNewUser = true;
+      var isNewUser = true;
       User? currentUser;
 
-      final SettingsController settingsController =
-          container.settingsController;
-      String? existingUserId = await settingsController.getSavedUserId(
-          _nameController.text, _hostController.text);
+      final settingsController = container.settingsController;
+      final existingUserId = await settingsController.getSavedUserId(
+        _nameController.text,
+        _hostController.text,
+      );
 
       if (existingUserId != null && existingUserId.isNotEmpty) {
         currentUser = await container.userRepository
@@ -148,7 +147,10 @@ class _RegistrationFormState extends State<RegistrationForm> {
           context,
         );
         launchHome(
-            user: currentUser, context: context, registerNewUser: isNewUser);
+          user: currentUser,
+          context: context,
+          registerNewUser: isNewUser,
+        );
       }
     } catch (e) {
       setState(() {
@@ -175,9 +177,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
                     focusNode: _clearNameControllerFocus,
                     icon: const Icon(Icons.clear),
                     onPressed: () {
-                      setState(() {
-                        _nameController.clear();
-                      });
+                      setState(_nameController.clear);
                     },
                   ),
             labelText: AppLocalizations.of(context).name,
@@ -199,7 +199,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
           inputFormatters: [
             FilteringTextInputFormatter.deny(
               RegExp('[${RegExp.escape(asciiPunctuationChars)}]'),
-            )
+            ),
           ],
         ),
         const SizedBox(
@@ -212,14 +212,12 @@ class _RegistrationFormState extends State<RegistrationForm> {
             suffixIcon: _hostController.text == '' ||
                     (!_hostControllerFocus.hasFocus &&
                         !_clearHostControllerFocus.hasFocus)
-                ? SizedBox()
+                ? const SizedBox()
                 : IconButton(
                     focusNode: _clearHostControllerFocus,
                     icon: const Icon(Icons.clear),
                     onPressed: () {
-                      setState(() {
-                        _hostController.clear();
-                      });
+                      setState(_hostController.clear);
                     },
                   ),
             labelText: AppLocalizations.of(context).server,
@@ -234,7 +232,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
         const SizedBox(
           height: 32,
         ),
-        _buildButtonSection()
+        _buildButtonSection(),
       ],
     );
   }
@@ -252,7 +250,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
               side: _submitFocusNode.hasFocus
                   ? BorderSide(
                       color: Theme.of(context).colorScheme.secondaryContainer,
-                      width: 5)
+                      width: 5,
+                    )
                   : BorderSide.none,
             ),
             onPressed: _register,
@@ -267,26 +266,28 @@ class _RegistrationFormState extends State<RegistrationForm> {
                 : Text(AppLocalizations.of(context).register),
           ),
         ),
-        SizedBox(height: SMALL_GAP),
+        const SizedBox(height: SMALL_GAP),
         ElevatedButton(
           onPressed: () {
             Navigator.push(
               context,
-              PageRouteBuilder(
+              PageRouteBuilder<void>(
                 pageBuilder: (context, animation, secondaryAnimation) =>
-                    ExistingUserList(),
+                    const ExistingUserList(),
                 transitionsBuilder:
                     (context, animation, secondaryAnimation, child) {
                   return ClipRRect(
                     borderRadius: BorderRadius.circular(LARGE_BORDER_RADIUS),
                     child: SlideTransition(
                       position: Tween<Offset>(
-                        begin: const Offset(1.0, 0.0),
+                        begin: const Offset(1, 0),
                         end: Offset.zero,
-                      ).animate(CurvedAnimation(
-                        parent: animation,
-                        curve: Curves.easeInOut,
-                      )),
+                      ).animate(
+                        CurvedAnimation(
+                          parent: animation,
+                          curve: Curves.easeInOut,
+                        ),
+                      ),
                       child: child,
                     ),
                   );
@@ -295,13 +296,14 @@ class _RegistrationFormState extends State<RegistrationForm> {
             );
           },
           style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.transparent,
-              shadowColor: Colors.transparent),
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+          ),
           child: Text(
             AppLocalizations.of(context).useExistingAccount,
             style: TextStyle(color: Theme.of(context).colorScheme.secondary),
           ),
-        )
+        ),
       ],
     );
   }

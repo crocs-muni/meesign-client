@@ -2,17 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:mesh_gradient/mesh_gradient.dart';
 
 class FluidGradient extends StatelessWidget {
-  final double animationSpeed;
-
   const FluidGradient({
     super.key,
     this.animationSpeed = 0.1,
   });
+  final double animationSpeed;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: BoxConstraints.expand(),
+      constraints: const BoxConstraints.expand(),
       child: AnimatedMeshGradient(
         colors: Theme.of(context).brightness == Brightness.dark
             ? const [

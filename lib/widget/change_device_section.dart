@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 
-import '../l10n/arb/app_localizations.dart';
-import '../ui_constants.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/ui_constants.dart';
 
 class ChangeDeviceSection extends StatelessWidget {
-  const ChangeDeviceSection(
-      {super.key,
-      required this.onChangeServer,
-      this.showText = true,
-      this.centerContent = false});
-  final Function onChangeServer;
+  const ChangeDeviceSection({
+    required this.onChangeServer,
+    super.key,
+    this.showText = true,
+    this.centerContent = false,
+  });
+  final VoidCallback onChangeServer;
   final bool showText;
   final bool centerContent;
 
@@ -24,22 +25,20 @@ class ChangeDeviceSection extends StatelessWidget {
             AppLocalizations.of(context).changeServerOrDeviceTitle,
             style: Theme.of(context).textTheme.bodyLarge,
           ),
-          SizedBox(height: SMALL_GAP),
+          const SizedBox(height: SMALL_GAP),
           Text(
             AppLocalizations.of(context).changeServerOrDeviceDescription,
             style: TextStyle(color: Theme.of(context).colorScheme.outline),
           ),
-          SizedBox(height: MEDIUM_GAP),
+          const SizedBox(height: MEDIUM_GAP),
         ],
         FilledButton.icon(
-          onPressed: () {
-            onChangeServer();
-          },
+          onPressed: onChangeServer,
           label: Padding(
-            padding: EdgeInsets.symmetric(vertical: 15),
+            padding: const EdgeInsets.symmetric(vertical: 15),
             child: Text(AppLocalizations.of(context).changeDeviceButton),
           ),
-          icon: Icon(Icons.sync),
+          icon: const Icon(Icons.sync),
           style: ButtonStyle(
             shape: WidgetStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(

@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:meesign_client/app_container.dart';
+import 'package:meesign_client/pages/device_page.dart';
+import 'package:meesign_client/theme.dart';
+import 'package:meesign_client/ui_constants.dart';
+import 'package:meesign_client/util/chars.dart';
+import 'package:meesign_client/view_model/app_view_model.dart';
 import 'package:provider/provider.dart';
-
-import '../app_container.dart';
-import '../pages/device_page.dart';
-import '../theme.dart';
-import '../ui_constants.dart';
-import '../util/chars.dart';
-import '../view_model/app_view_model.dart';
 
 class DeviceIcon extends StatelessWidget {
   const DeviceIcon({super.key, this.showFullName = true});
@@ -30,7 +29,6 @@ class DeviceIcon extends StatelessWidget {
 
             return Row(
               mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 if (shouldShowText) ...[
                   Flexible(
@@ -45,21 +43,22 @@ class DeviceIcon extends StatelessWidget {
                   const SizedBox(width: SMALL_GAP / 2),
                 ],
                 Container(
-                    padding: const EdgeInsets.only(right: SMALL_PADDING),
-                    child: IconButton(
-                      onPressed: () {
-                        final device = model.device;
-                        if (device == null) return;
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute<void>(
-                            builder: (BuildContext context) =>
-                                DevicePage(device: device),
-                          ),
-                        );
-                      },
-                      icon: _buildIndicatorIcon(context, name),
-                    )),
+                  padding: const EdgeInsets.only(right: SMALL_PADDING),
+                  child: IconButton(
+                    onPressed: () {
+                      final device = model.device;
+                      if (device == null) return;
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (BuildContext context) =>
+                              DevicePage(device: device),
+                        ),
+                      );
+                    },
+                    icon: _buildIndicatorIcon(context, name),
+                  ),
+                ),
               ],
             );
           },
@@ -73,20 +72,26 @@ class DeviceIcon extends StatelessWidget {
       return _buildBadge(context, name);
     }
 
-    var session = context.read<AppContainer>().session;
+    final session = context.read<AppContainer>().session;
 
     return AnimatedBuilder(
       animation:
           session != null ? session.sync.subscribed : ValueNotifier(false),
       builder: (context, child) {
-        return _buildBadge(context, name,
-            isOnline: session != null && session.sync.subscribed.value);
+        return _buildBadge(
+          context,
+          name,
+          isOnline: session != null && session.sync.subscribed.value,
+        );
       },
     );
   }
 
-  Widget _buildBadge(BuildContext context, String name,
-      {bool isOnline = false}) {
+  Widget _buildBadge(
+    BuildContext context,
+    String name, {
+    bool isOnline = false,
+  }) {
     return Badge(
       backgroundColor: isOnline
           ? Theme.of(context).extension<CustomColors>()!.success

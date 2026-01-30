@@ -3,13 +3,12 @@ import 'package:meesign_core/meesign_core.dart';
 enum ShareWarningType { manyShares, unnecessaryShares, atLeastTwoShares }
 
 class ShareWarningData {
+  ShareWarningData(this.warningType, [this.warningParams]);
   final ShareWarningType warningType;
   final List<String>? warningParams;
-
-  ShareWarningData(this.warningType, [this.warningParams]);
 }
 
-// TODO: offer fix application?
+// TODO(dev): offer fix application?
 ShareWarningData? getSharesWarning({
   required List<Member> members,
   required int shareCount,

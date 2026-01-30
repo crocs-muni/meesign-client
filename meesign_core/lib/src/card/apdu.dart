@@ -1,8 +1,6 @@
 import 'dart:typed_data';
 
 class CommandApdu {
-  final _builder = BytesBuilder();
-
   CommandApdu(
     int cla,
     int ins, {
@@ -13,18 +11,19 @@ class CommandApdu {
     _builder.add([cla, ins, p1, p2]);
     if (data != null) {
       if (data.isEmpty) return;
-      _builder.addByte(data.length);
-      _builder.add(data);
+      _builder
+        ..addByte(data.length)
+        ..add(data);
     }
   }
+  final _builder = BytesBuilder();
 
   Uint8List takeBytes() => _builder.takeBytes();
 }
 
 class ResponseApdu {
-  final Uint8List _rawData;
-
   ResponseApdu(Uint8List data) : _rawData = data;
+  final Uint8List _rawData;
 
   Uint8List get data =>
       Uint8List.view(_rawData.buffer, 0, _rawData.lengthInBytes - 2)

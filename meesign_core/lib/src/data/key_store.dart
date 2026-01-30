@@ -4,11 +4,10 @@ import 'package:meesign_core/meesign_data.dart';
 import 'package:path/path.dart' as path_pkg;
 
 class KeyStore {
+  KeyStore(this._dir);
   final io.Directory _dir;
 
   static const String fileName = 'key.p12';
-
-  KeyStore(this._dir);
 
   io.File _getFile(Uuid did) {
     return io.File(

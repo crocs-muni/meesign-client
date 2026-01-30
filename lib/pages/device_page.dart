@@ -1,27 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:meesign_client/pages/register_page.dart';
+import 'package:meesign_client/templates/default_page_template.dart';
+import 'package:meesign_client/ui_constants.dart';
+import 'package:meesign_client/util/chars.dart';
+import 'package:meesign_client/util/confirm_device_change.dart';
+import 'package:meesign_client/util/fade_black_page_transition.dart';
+import 'package:meesign_client/widget/avatar_app_bar.dart';
+import 'package:meesign_client/widget/change_device_section.dart';
+import 'package:meesign_client/widget/danger_zone_section.dart';
+import 'package:meesign_client/widget/device_identity.dart';
+import 'package:meesign_client/widget/device_name.dart';
 import 'package:meesign_core/meesign_data.dart';
 
-import '../templates/default_page_template.dart';
-import '../ui_constants.dart';
-import '../util/chars.dart';
-import '../util/confirm_device_change.dart';
-import '../util/fade_black_page_transition.dart';
-import '../widget/avatar_app_bar.dart';
-import '../widget/change_device_section.dart';
-import '../widget/danger_zone_section.dart';
-import '../widget/device_identity.dart';
-import '../widget/device_name.dart';
-import 'register_page.dart';
-
 class DevicePage extends StatefulWidget {
-  final Device device;
-  final bool showActionButtons;
-
   const DevicePage({
-    super.key,
     required this.device,
+    super.key,
     this.showActionButtons = true,
   });
+  final Device device;
+  final bool showActionButtons;
 
   @override
   State<DevicePage> createState() => _DevicePageState();
@@ -43,7 +41,7 @@ class _DevicePageState extends State<DevicePage> {
           ),
           SliverList.list(
             children: [
-              SizedBox(height: XLARGE_GAP),
+              const SizedBox(height: XLARGE_GAP),
               Center(
                 child: SizedBox(
                   width: 256,
@@ -53,36 +51,41 @@ class _DevicePageState extends State<DevicePage> {
               if (widget.showActionButtons) ...[
                 const SizedBox(height: XLARGE_GAP),
                 Center(
-                    child: ChangeDeviceSection(
-                  onChangeServer: () async {
-                    var res = await showChangeServerDialog(context, mounted);
+                  child: ChangeDeviceSection(
+                    onChangeServer: () async {
+                      final res = await showChangeServerDialog(
+                        context,
+                        mounted: mounted,
+                      );
 
-                    if (res == null || res == false) {
-                      return;
-                    }
-
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      if (mounted) {
-                        Navigator.of(context, rootNavigator: true)
-                            .pushAndRemoveUntil(
-                          FadeBlackPageTransition.fadeBlack(
-                              destination: RegisterPage()),
-                          (route) => false,
-                        );
+                      if (res == null || !res) {
+                        return;
                       }
-                    });
-                  },
-                  centerContent: true,
-                  showText: false,
-                )),
+
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (mounted) {
+                          Navigator.of(context, rootNavigator: true)
+                              .pushAndRemoveUntil(
+                            FadeBlackPageTransition.fadeBlack(
+                              destination: const RegisterPage(),
+                            ),
+                            (route) => false,
+                          );
+                        }
+                      });
+                    },
+                    centerContent: true,
+                    showText: false,
+                  ),
+                ),
                 const SizedBox(height: LARGE_GAP),
-                Center(
+                const Center(
                   child: DangerZoneSection(
                     centerContent: true,
                     showText: false,
                   ),
-                )
-              ]
+                ),
+              ],
             ],
           ),
         ],

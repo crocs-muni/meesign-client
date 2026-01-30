@@ -4,14 +4,14 @@ import 'dart:typed_data';
 
 import 'package:ffi/ffi.dart';
 
-import 'dl_util.dart';
-import 'generated/meesign_crypto_lib.dart';
+import 'package:meesign_native/src/dl_util.dart';
+import 'package:meesign_native/src/generated/meesign_crypto_lib.dart';
 
-// TODO: profile the functions in this file
+// TODO(dev): profile the functions in this file
 // many chunks of data are copied, can it be avoided?
 // keygen() and sign() do perform some serialization, is it quick enough?
 
-// TODO: consider newer alternative solutions
+// TODO(dev): consider newer alternative solutions
 // e.g. flutter rust bridge, membrane
 
 extension IntIterConversion on Iterable<int> {
@@ -29,8 +29,8 @@ extension BufferConversion on Buffer {
 }
 
 class ProtocolException implements Exception {
-  final String message;
   ProtocolException(this.message);
+  final String message;
 
   @override
   String toString() {
@@ -39,22 +39,21 @@ class ProtocolException implements Exception {
 }
 
 class ProtocolData {
+  ProtocolData(this.context, this.data, this.recipient);
   final Uint8List context;
   final List<Uint8List> data;
   final int recipient;
-  ProtocolData(this.context, this.data, this.recipient);
 }
 
 final MeeSignCryptoLib _lib = MeeSignCryptoLib(dlOpen('meesign_crypto'));
 
 class Error {
+  Error() : ptr = calloc();
   Pointer<Pointer<Char>> ptr;
 
   bool get occured => ptr.value != nullptr;
 
   String get message => ptr.value.cast<Utf8>().toDartString();
-
-  Error() : ptr = calloc();
 
   static void free(Error error) {
     _lib.error_free(error.ptr.value);
@@ -131,8 +130,8 @@ class ProtocolWrapper {
 
       final proto = _lib.protocol_deserialize(ctxBuf, context.length);
 
-      final List<Uint8List> dartDataOut = [];
-      int recipient = Recipient.Unknown;
+      final dartDataOut = <Uint8List>[];
+      var recipient = Recipient.Unknown;
 
       for (final (i, chunk) in data.indexed) {
         final dataBuf = chunk.dupToNative(alloc);
@@ -176,8 +175,9 @@ class ProtocolWrapper {
 }
 
 class AuthKey {
-  final Uint8List key, csr;
   AuthKey(this.key, this.csr);
+  final Uint8List key;
+  final Uint8List csr;
 }
 
 class AuthWrapper {

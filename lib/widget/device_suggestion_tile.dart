@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:meesign_client/theme.dart';
+import 'package:meesign_client/util/chars.dart';
+import 'package:meesign_client/widget/device_name.dart';
 import 'package:meesign_core/meesign_core.dart';
 
-import '../theme.dart';
-import '../util/chars.dart';
-import 'device_name.dart';
-
 class DeviceSuggestionTile extends StatelessWidget {
-  final Device device;
-  final bool active;
-  final bool selected;
-  final void Function(bool?)? onChanged;
-
   const DeviceSuggestionTile({
-    super.key,
     required this.device,
+    super.key,
     this.active = false,
     this.selected = false,
     this.onChanged,
   });
+  final Device device;
+  final bool active;
+  final bool selected;
+  // Checkbox callback signature requires positional bool parameter.
+  // ignore: avoid_positional_boolean_parameters
+  final void Function(bool?)? onChanged;
 
   @override
   Widget build(BuildContext context) {

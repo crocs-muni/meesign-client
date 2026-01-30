@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class SmartLogo extends StatelessWidget {
-  const SmartLogo({super.key, required this.logoWidth});
+  const SmartLogo({required this.logoWidth, super.key});
 
   final double logoWidth;
   @override

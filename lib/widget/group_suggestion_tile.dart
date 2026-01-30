@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:meesign_client/pages/group_page.dart';
+import 'package:meesign_client/ui_constants.dart';
 import 'package:meesign_core/meesign_core.dart';
 
-import '../pages/group_page.dart';
-import '../ui_constants.dart';
-
 class GroupSuggestionTile extends StatelessWidget {
-  final Group group;
-  final void Function(Group?)? onChanged;
-
   const GroupSuggestionTile({
-    super.key,
     required this.group,
+    super.key,
     this.onChanged,
   });
+  final Group group;
+  final void Function(Group?)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -22,13 +20,15 @@ class GroupSuggestionTile extends StatelessWidget {
       visualDensity: VisualDensity.compact,
       title: Row(
         children: [
-          Text(group.name,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge
-                  ?.copyWith(color: Theme.of(context).colorScheme.secondary)),
-          Spacer(),
-          _buildInfoButton(context)
+          Text(
+            group.name,
+            style: Theme.of(context)
+                .textTheme
+                .bodyLarge
+                ?.copyWith(color: Theme.of(context).colorScheme.secondary),
+          ),
+          const Spacer(),
+          _buildInfoButton(context),
         ],
       ),
     );
@@ -46,12 +46,15 @@ class GroupSuggestionTile extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute<void>(
-                  builder: (context) => GroupPage(group: group)),
+                builder: (context) => GroupPage(group: group),
+              ),
             );
           },
           child: Padding(
-            padding:
-                EdgeInsets.symmetric(horizontal: SMALL_PADDING, vertical: 4),
+            padding: const EdgeInsets.symmetric(
+              horizontal: SMALL_PADDING,
+              vertical: 4,
+            ),
             child: Row(
               children: [
                 Icon(
@@ -59,11 +62,14 @@ class GroupSuggestionTile extends StatelessWidget {
                   size: 15,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                SizedBox(width: 4),
-                Text("Info",
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                const SizedBox(width: 4),
+                Text(
+                  'Info',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.bold))
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
               ],
             ),
           ),

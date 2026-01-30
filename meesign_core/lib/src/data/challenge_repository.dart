@@ -1,29 +1,27 @@
 import 'package:drift/drift.dart';
+import 'package:meesign_core/src/data/key_store.dart';
+import 'package:meesign_core/src/data/network_dispatcher.dart';
+import 'package:meesign_core/src/data/task_repository.dart';
+import 'package:meesign_core/src/database/daos.dart';
+import 'package:meesign_core/src/database/database.dart' as db;
+import 'package:meesign_core/src/model/challenge.dart';
+import 'package:meesign_core/src/model/group.dart';
+import 'package:meesign_core/src/model/protocol.dart';
+import 'package:meesign_core/src/model/task.dart';
+import 'package:meesign_core/src/util/uuid.dart';
 import 'package:meesign_native/meesign_native.dart';
 import 'package:meesign_network/grpc.dart' as rpc;
 
-import '../database/daos.dart';
-import '../database/database.dart' as db;
-import '../model/challenge.dart';
-import '../model/group.dart';
-import '../model/protocol.dart';
-import '../model/task.dart';
-import '../util/uuid.dart';
-import 'network_dispatcher.dart';
-import 'task_repository.dart';
-import 'key_store.dart';
-
 class ChallengeRepository extends TaskRepository<Challenge> {
-  final NetworkDispatcher _dispatcher;
-  final KeyStore _keyStore;
-  final TaskDao _taskDao;
-
   ChallengeRepository(
     this._dispatcher,
     this._keyStore,
     TaskSource taskSource,
     this._taskDao,
   ) : super(rpc.TaskType.SIGN_CHALLENGE, taskSource, _taskDao);
+  final NetworkDispatcher _dispatcher;
+  final KeyStore _keyStore;
+  final TaskDao _taskDao;
 
   // FIXME: same as file repo
   Future<void> sign(String name, List<int> data, List<int> gid) async {
@@ -68,13 +66,15 @@ class ChallengeRepository extends TaskRepository<Challenge> {
   Future<db.Task> initTask(Uuid did, db.Task task, rpc.Task rpcTask) async {
     final group = await _taskDao.getGroup(did.bytes, gid: task.gid);
     return task.copyWith(
-      context: Value(ProtocolWrapper.init(
-        group.protocol.toNative(),
-        group.context,
-        group.certificates!,
-        _keyStore.load(did) as Uint8List,
-        shares: rpcTask.data.length,
-      )),
+      context: Value(
+        ProtocolWrapper.init(
+          group.protocol.toNative(),
+          group.context,
+          group.certificates!,
+          _keyStore.load(did) as Uint8List,
+          shares: rpcTask.data.length,
+        ),
+      ),
     );
   }
 
@@ -90,11 +90,14 @@ class ChallengeRepository extends TaskRepository<Challenge> {
       final group = ct.group.toModel();
       final challenge = Challenge(ct.challenge.name, group, ct.challenge.data);
       return TaskConversion.fromEntity(
-          ct.task, group.protocol.signRounds, challenge);
+        ct.task,
+        group.protocol.signRounds,
+        challenge,
+      );
     }
 
     return _taskDao
         .watchChallengeTasks(did.bytes)
-        .map((list) => list.map((toModel)).toList());
+        .map((list) => list.map(toModel).toList());
   }
 }

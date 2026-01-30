@@ -3,34 +3,34 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:collection/collection.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:meesign_client/enums/task_type.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/pages/groups_listing_page.dart';
+import 'package:meesign_client/templates/default_page_template.dart';
+import 'package:meesign_client/ui_constants.dart';
+import 'package:meesign_client/util/actions/group_creator.dart';
+import 'package:meesign_client/util/pick_pdf_file.dart';
+import 'package:meesign_client/util/platform.dart';
+import 'package:meesign_client/view_model/app_view_model.dart';
+import 'package:meesign_client/widget/error_dialog.dart';
+import 'package:meesign_client/widget/group_suggestion_tile.dart';
+import 'package:meesign_client/widget/option_tile.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:mime/mime.dart';
 import 'package:provider/provider.dart';
-import 'package:collection/collection.dart';
-
-import '../enums/task_type.dart';
-import '../l10n/arb/app_localizations.dart';
-import '../templates/default_page_template.dart';
-import '../ui_constants.dart';
-import '../util/actions/group_creator.dart';
-import '../util/pick_pdf_file.dart';
-import '../util/platform.dart';
-import '../view_model/app_view_model.dart';
-import '../widget/error_dialog.dart';
-import '../widget/group_suggestion_tile.dart';
-import '../widget/option_tile.dart';
-import 'groups_listing_page.dart';
 
 class NewTaskPage extends StatefulWidget {
-  const NewTaskPage(
-      {super.key,
-      this.initialTaskType,
-      this.showTaskTypeSelector = false,
-      this.templateTask});
+  const NewTaskPage({
+    super.key,
+    this.initialTaskType,
+    this.showTaskTypeSelector = false,
+    this.templateTask,
+  });
 
   final KeyType? initialTaskType;
   final Task? templateTask;
@@ -84,8 +84,8 @@ class _NewTaskPageState extends State<NewTaskPage> {
       setState(() {
         _isFromTemplate = true;
         // Set task type based on template group's key type
-        _taskType = template.info.group.keyType;
-        _selectedGroup = template.info.group;
+        _taskType = template.info.group.keyType as KeyType;
+        _selectedGroup = template.info.group as Group;
 
         // Restore task-specific data based on type
         if (template.info is Challenge) {
@@ -140,14 +140,14 @@ class _NewTaskPageState extends State<NewTaskPage> {
             _buildTaskTypeSelector(),
           ],
           _buildGroupSelector(context),
-          Divider(
+          const Divider(
             height: 1,
             thickness: 1,
             indent: MEDIUM_PADDING,
           ),
-          SizedBox(height: MEDIUM_GAP),
+          const SizedBox(height: MEDIUM_GAP),
           _buildTaskBuilder(),
-          SizedBox(height: XLARGE_GAP * 2)
+          const SizedBox(height: XLARGE_GAP * 2),
         ],
       ),
     );
@@ -178,7 +178,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
             ButtonSegment<KeyType>(
               value: KeyType.decrypt,
               label: Text(AppLocalizations.of(context).decrypt),
-            )
+            ),
           ],
         ),
       ],
@@ -197,97 +197,113 @@ class _NewTaskPageState extends State<NewTaskPage> {
   }
 
   Widget _buildTaskBuilder() {
-    return Consumer<AppViewModel>(builder: (context, state, child) {
-      final taskGroups = state.groupTasks
-          .where((task) =>
-              task.state == TaskState.finished &&
-              task.info.keyType == _taskType &&
-              (state.showArchived ? true : !task.archived))
-          .map((task) => task.info)
-          .toList();
+    return Consumer<AppViewModel>(
+      builder: (context, state, child) {
+        final taskGroups = state.groupTasks
+            .where(
+              (task) =>
+                  task.state == TaskState.finished &&
+                  task.info.keyType == _taskType &&
+                  (state.showArchived || !task.archived),
+            )
+            .map((task) => task.info)
+            .toList();
 
-      return GestureDetector(
-        onTap: taskGroups.isEmpty
-            ? () {
-                showDialog(
-                  context: context,
-                  builder: (dialogContext) => AlertDialog(
-                    title: Text(AppLocalizations.of(context)
-                        .noGroupsAvailableForTaskType),
-                    content: Text(AppLocalizations.of(context)
-                        .pleaseCreateNewGroupForTaskType),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(dialogContext);
-                        },
-                        child: Text(AppLocalizations.of(context).cancel),
+        return GestureDetector(
+          onTap: taskGroups.isEmpty
+              ? () {
+                  showDialog(
+                    context: context,
+                    builder: (dialogContext) => AlertDialog(
+                      title: Text(
+                        AppLocalizations.of(context)
+                            .noGroupsAvailableForTaskType,
                       ),
-                      FilledButton.icon(
-                        onPressed: () async {
-                          Navigator.pop(dialogContext);
-
-                          // Navigate to groups listing page (don't await)
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => GroupsListingPage(),
-                          ));
-
-                          // Create a new group
-                          await createGroup(context, context,
-                              groupType: _getTaskType());
-
-                          // Force aggressive refresh to pick up the new group
-                          if (mounted) {
-                            await state.refetchTasks(TaskType.group);
-                            await Future.delayed(
-                                const Duration(milliseconds: 1500));
-                            setState(() {});
-                          }
-                        },
-                        icon: const Icon(Icons.add_rounded),
-                        label: Text(AppLocalizations.of(context).createGroup),
+                      content: Text(
+                        AppLocalizations.of(context)
+                            .pleaseCreateNewGroupForTaskType,
                       ),
-                    ],
-                  ),
-                );
-              }
-            : null,
-        child: Opacity(
-          opacity: taskGroups.isEmpty ? 0.3 : 1.0,
-          child: AbsorbPointer(
-            absorbing: taskGroups.isEmpty,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: MEDIUM_PADDING),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (_taskType == KeyType.signPdf) ...[
-                        _buildPdfSelector(context),
-                      ] else ...[
-                        _buildTaskDesc(),
-                        SizedBox(height: LARGE_GAP),
-                        if (_taskType == KeyType.decrypt) ...[
-                          _buildContentTypeSelector(),
-                        ],
-                        if (_showImageSelector && _taskType == KeyType.decrypt)
-                          ..._buildImageSelector(context),
-                        if (!_showImageSelector ||
-                            _taskType == KeyType.signChallenge)
-                          _buildTaskMessage(),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(dialogContext);
+                          },
+                          child: Text(AppLocalizations.of(context).cancel),
+                        ),
+                        FilledButton.icon(
+                          onPressed: () async {
+                            Navigator.pop(dialogContext);
+
+                            // Navigate to groups listing page (don't await)
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (context) => const GroupsListingPage(),
+                              ),
+                            );
+
+                            // Create a new group
+                            await createGroup(
+                              context,
+                              context,
+                              groupType: _getTaskType(),
+                            );
+
+                            // Force aggressive refresh to pick up the new group
+                            if (mounted) {
+                              await state.refetchTasks(TaskType.group);
+                              await Future<void>.delayed(
+                                const Duration(milliseconds: 1500),
+                              );
+                              setState(() {});
+                            }
+                          },
+                          icon: const Icon(Icons.add_rounded),
+                          label: Text(AppLocalizations.of(context).createGroup),
+                        ),
                       ],
-                    ],
+                    ),
+                  );
+                }
+              : null,
+          child: Opacity(
+            opacity: taskGroups.isEmpty ? 0.3 : 1.0,
+            child: AbsorbPointer(
+              absorbing: taskGroups.isEmpty,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: MEDIUM_PADDING),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (_taskType == KeyType.signPdf) ...[
+                          _buildPdfSelector(context),
+                        ] else ...[
+                          _buildTaskDesc(),
+                          const SizedBox(height: LARGE_GAP),
+                          if (_taskType == KeyType.decrypt) ...[
+                            _buildContentTypeSelector(),
+                          ],
+                          if (_showImageSelector &&
+                              _taskType == KeyType.decrypt)
+                            ..._buildImageSelector(context),
+                          if (!_showImageSelector ||
+                              _taskType == KeyType.signChallenge)
+                            _buildTaskMessage(),
+                        ],
+                      ],
+                    ),
                   ),
-                ),
-                _buildSubmitButton(context),
-              ],
+                  _buildSubmitButton(context),
+                ],
+              ),
             ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
   }
 
   String _getTaskNameHeader() {
@@ -309,7 +325,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
           _getTaskNameHeader(),
           style: Theme.of(context).textTheme.bodyLarge,
         ),
-        SizedBox(height: SMALL_GAP),
+        const SizedBox(height: SMALL_GAP),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -330,9 +346,10 @@ class _NewTaskPageState extends State<NewTaskPage> {
                 border: const OutlineInputBorder(),
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.primary, width: 0),
+                    color: Theme.of(context).colorScheme.primary,
+                    width: 0,
+                  ),
                 ),
-                errorText: null,
               ),
             ),
           ],
@@ -359,7 +376,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
             },
             child: Text(label),
           ),
-        )
+        ),
       ],
     );
   }
@@ -404,7 +421,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
             ],
           ),
         ),
-        SizedBox(height: LARGE_GAP),
+        const SizedBox(height: LARGE_GAP),
       ],
     );
   }
@@ -425,7 +442,6 @@ class _NewTaskPageState extends State<NewTaskPage> {
               decoration: BoxDecoration(
                 border: Border.all(
                   color: Theme.of(context).colorScheme.primary,
-                  width: 1,
                 ),
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -449,7 +465,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
             ),
           ],
         ),
-      ]
+      ],
     ];
   }
 
@@ -459,7 +475,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
         return AppLocalizations.of(context).enterMessageToBeSigned;
       case KeyType.decrypt:
         return AppLocalizations.of(context).enterMessageToBeDecrypted;
-      default:
+      case KeyType.signPdf:
         return AppLocalizations.of(context).enterMessage;
     }
   }
@@ -472,7 +488,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
           _getMessageFieldHeader(),
           style: Theme.of(context).textTheme.bodyLarge,
         ),
-        SizedBox(height: SMALL_GAP),
+        const SizedBox(height: SMALL_GAP),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -493,13 +509,14 @@ class _NewTaskPageState extends State<NewTaskPage> {
                 border: const OutlineInputBorder(),
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.primary, width: 0),
+                    color: Theme.of(context).colorScheme.primary,
+                    width: 0,
+                  ),
                 ),
-                errorText: null,
               ),
             ),
           ],
-        )
+        ),
       ],
     );
   }
@@ -508,10 +525,12 @@ class _NewTaskPageState extends State<NewTaskPage> {
     return Consumer<AppViewModel>(
       builder: (context, state, child) {
         final groups = state.groupTasks
-            .where((task) =>
-                task.state == TaskState.finished &&
-                task.info.keyType == _taskType &&
-                (state.showArchived ? true : !task.archived))
+            .where(
+              (task) =>
+                  task.state == TaskState.finished &&
+                  task.info.keyType == _taskType &&
+                  (state.showArchived || !task.archived),
+            )
             .map((task) => task.info)
             .toList();
 
@@ -530,7 +549,8 @@ class _NewTaskPageState extends State<NewTaskPage> {
         // Update selected group reference to match the refreshed data
         if (_selectedGroup != null && groups.isNotEmpty) {
           final matchingGroup = groups.firstWhereOrNull(
-              (g) => const ListEquality().equals(g.id, _selectedGroup!.id));
+            (g) => const ListEquality<int>().equals(g.id, _selectedGroup!.id),
+          );
           if (matchingGroup != null && matchingGroup != _selectedGroup) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               setState(() {
@@ -552,7 +572,9 @@ class _NewTaskPageState extends State<NewTaskPage> {
           children: [
             Padding(
               padding: const EdgeInsets.only(
-                  left: MEDIUM_PADDING, top: LARGE_PADDING),
+                left: MEDIUM_PADDING,
+                top: LARGE_PADDING,
+              ),
               child: Row(
                 children: [
                   Expanded(
@@ -572,8 +594,9 @@ class _NewTaskPageState extends State<NewTaskPage> {
                             try {
                               await state.refetchTasks(TaskType.group);
                               // Wait a bit for the database to update
-                              await Future.delayed(
-                                  const Duration(milliseconds: 500));
+                              await Future<void>.delayed(
+                                const Duration(milliseconds: 500),
+                              );
                               // Force UI refresh
                               if (mounted) {
                                 setState(() {});
@@ -600,45 +623,52 @@ class _NewTaskPageState extends State<NewTaskPage> {
             ),
             if (groups.isEmpty) ...[
               Padding(
-                  padding: const EdgeInsets.only(
-                      left: MEDIUM_PADDING, top: SMALL_PADDING),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        AppLocalizations.of(context)
-                            .noGroupsAvailableForTaskType,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
-                            ),
-                      ),
-                      SizedBox(height: SMALL_GAP),
-                      FilledButton.icon(
-                        onPressed: () async {
-                          // 1. Navigate to groups listing page
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => GroupsListingPage(),
-                          ));
+                padding: const EdgeInsets.only(
+                  left: MEDIUM_PADDING,
+                  top: SMALL_PADDING,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context).noGroupsAvailableForTaskType,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                    const SizedBox(height: SMALL_GAP),
+                    FilledButton.icon(
+                      onPressed: () async {
+                        // 1. Navigate to groups listing page
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (context) => const GroupsListingPage(),
+                          ),
+                        );
 
-                          // 2. Create a new group
-                          await createGroup(context, context,
-                              groupType: _getTaskType());
+                        // 2. Create a new group
+                        await createGroup(
+                          context,
+                          context,
+                          groupType: _getTaskType(),
+                        );
 
-                          // Force aggressive refresh to pick up the new group
-                          if (mounted) {
-                            await state.refetchTasks(TaskType.group);
-                            await Future.delayed(
-                                const Duration(milliseconds: 1500));
-                            setState(() {});
-                          }
-                        },
-                        icon: const Icon(Icons.add_rounded),
-                        label: Text(_getCreateGroupButtonText()),
-                      ),
-                    ],
-                  )),
+                        // Force aggressive refresh to pick up the new group
+                        if (mounted) {
+                          await state.refetchTasks(TaskType.group);
+                          await Future<void>.delayed(
+                            const Duration(milliseconds: 1500),
+                          );
+                          setState(() {});
+                        }
+                      },
+                      icon: const Icon(Icons.add_rounded),
+                      label: Text(_getCreateGroupButtonText()),
+                    ),
+                  ],
+                ),
+              ),
             ],
             SizedBox(
               height: 100,
@@ -647,9 +677,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
                 controller: _groupScrollController,
                 child: RadioGroup<Group>(
                   groupValue: _selectedGroup,
-                  onChanged: (group) {
-                    _onGroupChanged(group);
-                  },
+                  onChanged: _onGroupChanged,
                   child: ListView.builder(
                     controller: _groupScrollController,
                     itemCount: groups.length,
@@ -702,7 +730,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
   }
 
   Widget _buildSubmitButton(BuildContext context) {
-    bool isEnabled = false;
+    var isEnabled = false;
 
     if (_taskType == KeyType.signChallenge) {
       isEnabled = _selectedGroup != null &&
@@ -741,9 +769,11 @@ class _NewTaskPageState extends State<NewTaskPage> {
               }
             : null,
         label: Padding(
-          padding: EdgeInsets.symmetric(vertical: 15),
-          child: Text(AppLocalizations.of(context)
-              .createTaskButton(_getTaskTypeDescription())),
+          padding: const EdgeInsets.symmetric(vertical: 15),
+          child: Text(
+            AppLocalizations.of(context)
+                .createTaskButton(_getTaskTypeDescription()),
+          ),
         ),
         icon: const Icon(
           Icons.send_rounded,
@@ -764,18 +794,18 @@ class _NewTaskPageState extends State<NewTaskPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text(
               AppLocalizations.of(context).selectPdf,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
-            SizedBox(width: MEDIUM_GAP),
+            const SizedBox(width: MEDIUM_GAP),
             OutlinedButton(
-              child: Text(_pdfFile == null
-                  ? AppLocalizations.of(context).chooseFile
-                  : AppLocalizations.of(context).changeFile),
+              child: Text(
+                _pdfFile == null
+                    ? AppLocalizations.of(context).chooseFile
+                    : AppLocalizations.of(context).changeFile,
+              ),
               onPressed: () async {
                 _pdfFile = await PdfPicker.pickPdfFile();
                 setState(() {
@@ -796,7 +826,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
             ),
           ],
         ),
-        SizedBox(
+        const SizedBox(
           height: MEDIUM_GAP,
         ),
         if (_pdfFile != null) ...[
@@ -810,7 +840,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
                   });
                 },
               ),
-              SizedBox(
+              const SizedBox(
                 width: SMALL_GAP,
               ),
               Text(
@@ -822,7 +852,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
               ),
             ],
           ),
-        ]
+        ],
       ],
     );
   }
@@ -837,16 +867,16 @@ class _NewTaskPageState extends State<NewTaskPage> {
       // Use file_selector for desktop/web platforms (better Linux support)
       file = await openFile(
         acceptedTypeGroups: [
-          XTypeGroup(
+          const XTypeGroup(
             label: 'Images',
-            extensions: const [
+            extensions: [
               'jpg',
               'jpeg',
               'png',
               'gif',
               'bmp',
               'webp',
-              'svg'
+              'svg',
             ],
           ),
         ],
@@ -880,12 +910,13 @@ class _NewTaskPageState extends State<NewTaskPage> {
   }
 
   void _createChallenge(BuildContext context) {
-    var data = utf8.encode(_messageController.text);
-    var description = _descController.text;
+    final data = utf8.encode(_messageController.text);
+    final description = _descController.text;
 
     try {
-      final state = context.read<AppViewModel>();
-      state.challenge(description, data, _selectedGroup!);
+      context
+          .read<AppViewModel>()
+          .challenge(description, data, _selectedGroup!);
       Navigator.pop(context, true);
     } catch (e) {
       if (context.mounted) {
@@ -900,7 +931,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
   }
 
   void _createDecryption(BuildContext context) {
-    var description = _descController.text;
+    final description = _descController.text;
 
     try {
       if (context.mounted) {
@@ -909,7 +940,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
         if (_showImageSelector) {
           state.encrypt(description, _imageMimeType!, _image!, _selectedGroup!);
         } else {
-          var data = utf8.encode(_messageController.text);
+          final data = utf8.encode(_messageController.text);
           state.encrypt(description, MimeType.textUtf8, data, _selectedGroup!);
         }
 
@@ -929,8 +960,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
 
   void _createPdfTask(BuildContext context) {
     try {
-      final state = context.read<AppViewModel>();
-      state.sign(_pdfFile!, _selectedGroup!);
+      context.read<AppViewModel>().sign(_pdfFile!, _selectedGroup!);
       Navigator.pop(context, true);
     } catch (e) {
       if (context.mounted) {

@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:meesign_client/enums/fab_type.dart';
+import 'package:meesign_client/enums/task_type.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/templates/default_page_template.dart';
+import 'package:meesign_client/ui_constants.dart';
+import 'package:meesign_client/util/actions/group_creator.dart';
+import 'package:meesign_client/view_model/app_view_model.dart';
+import 'package:meesign_client/view_model/tabs_view_model.dart';
+import 'package:meesign_client/widget/controlled_lottie_animation.dart';
+import 'package:meesign_client/widget/fab_configurator.dart';
+import 'package:meesign_client/widget/task_list_view.dart';
+import 'package:meesign_client/widget/task_tiles/group_task_tile.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
-
-import '../enums/fab_type.dart';
-import '../enums/task_type.dart';
-import '../l10n/arb/app_localizations.dart';
-import '../templates/default_page_template.dart';
-import '../ui_constants.dart';
-import '../util/actions/group_creator.dart';
-import '../view_model/app_view_model.dart';
-import '../widget/controlled_lottie_animation.dart';
-import '../widget/fab_configurator.dart';
-import '../widget/task_tiles/group_task_tile.dart';
-import '../widget/task_list_view.dart';
-
-import '../view_model/tabs_view_model.dart';
 
 class GroupsListingPage extends StatefulWidget {
   const GroupsListingPage({super.key});
@@ -75,37 +73,39 @@ class _GroupsListingPageState extends State<GroupsListingPage>
     final model = Provider.of<AppViewModel>(context, listen: false);
 
     return StreamBuilder<TaskStream>(
-        stream: model.combinedTaskStream,
-        builder: (context, snapshot) {
-          return DefaultPageTemplate(
-              floatingActionButton: _buildFab(context, model),
-              body: TaskListView<Group>(
-                key: ValueKey('group_task_list'),
-                tasks: model.groupTasks,
-                showHeading: true,
-                customSearchBarHint: 'Search groups by name...',
-                emptyView: _buildEmptyGroups(context),
-                showArchived: model.showArchived,
-                showAllTypes: false,
-                taskBuilder: (context, task) {
-                  final group = task.info;
-                  return GroupTaskTile(task: task, group: group);
-                },
-              ));
-        });
+      stream: model.combinedTaskStream,
+      builder: (context, snapshot) {
+        return DefaultPageTemplate(
+          floatingActionButton: _buildFab(context, model),
+          body: TaskListView<Group>(
+            key: const ValueKey('group_task_list'),
+            tasks: model.groupTasks,
+            customSearchBarHint: 'Search groups by name...',
+            emptyView: _buildEmptyGroups(context),
+            showArchived: model.showArchived,
+            taskBuilder: (context, task) {
+              final group = task.info;
+              return GroupTaskTile(task: task, group: group);
+            },
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildFab(BuildContext context, AppViewModel model) {
     if (model.groupTasks.where((task) => task.archived).isNotEmpty) {
       if (context.read<AppViewModel>().showArchived) {
         return FabConfigurator(
-            fabType: FabType.groupFab, buildContext: context);
+          fabType: FabType.groupFab,
+          buildContext: context,
+        );
       }
     }
 
     // Don't show Fab if the list is empty - placeholder with CTA is shown instead
     if (model.groupTasks.where((task) => !task.archived).isEmpty) {
-      return SizedBox();
+      return const SizedBox();
     }
 
     return FabConfigurator(fabType: FabType.groupFab, buildContext: context);
@@ -118,7 +118,7 @@ class _GroupsListingPageState extends State<GroupsListingPage>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Padding(
-              padding: EdgeInsets.only(bottom: MEDIUM_PADDING),
+              padding: const EdgeInsets.only(bottom: MEDIUM_PADDING),
               child: ControlledLottieAnimation(
                 startAtTabIndex: 3,
                 assetName: Theme.of(context).brightness == Brightness.light
@@ -131,7 +131,7 @@ class _GroupsListingPageState extends State<GroupsListingPage>
             ),
             Text(
               AppLocalizations.of(context).noGroupsYet,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: SMALL_GAP),
             Text(
@@ -144,7 +144,7 @@ class _GroupsListingPageState extends State<GroupsListingPage>
                 createGroup(context, context);
               },
               child: Text(AppLocalizations.of(context).createGroup),
-            )
+            ),
           ],
         ),
       ),

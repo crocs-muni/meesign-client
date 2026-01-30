@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:meesign_client/enums/fab_type.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/templates/default_page_template.dart';
+import 'package:meesign_client/ui_constants.dart';
+import 'package:meesign_client/util/actions/challenge_creator.dart';
+import 'package:meesign_client/view_model/app_view_model.dart';
+import 'package:meesign_client/view_model/tabs_view_model.dart';
+import 'package:meesign_client/widget/controlled_lottie_animation.dart';
+import 'package:meesign_client/widget/fab_configurator.dart';
+import 'package:meesign_client/widget/task_list_view.dart';
+import 'package:meesign_client/widget/task_tiles/challenge_task_tile.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
-
-import '../enums/fab_type.dart';
-import '../l10n/arb/app_localizations.dart';
-import '../templates/default_page_template.dart';
-import '../ui_constants.dart';
-import '../util/actions/challenge_creator.dart';
-import '../view_model/app_view_model.dart';
-import '../view_model/tabs_view_model.dart';
-import '../widget/controlled_lottie_animation.dart';
-import '../widget/fab_configurator.dart';
-import '../widget/task_list_view.dart';
-import '../widget/task_tiles/challenge_task_tile.dart';
 
 enum DataView { hex, text }
 
@@ -24,34 +23,37 @@ class ChallengeListingPage extends StatelessWidget {
     final model = Provider.of<AppViewModel>(context, listen: false);
 
     return StreamBuilder(
-        stream: model.combinedTaskStream,
-        builder: (context, snapshot) {
-          return DefaultPageTemplate(
-            floatingActionButton: _buildFab(context, model),
-            body: TaskListView<Challenge>(
-              tasks: model.challengeTasks,
-              emptyView: _buildEmptyChallengeTasks(context),
-              showArchived: context.read<AppViewModel>().showArchived,
-              taskBuilder: (context, task) {
-                return ChallengeTaskTile(task: task);
-              },
-            ),
-          );
-        });
+      stream: model.combinedTaskStream,
+      builder: (context, snapshot) {
+        return DefaultPageTemplate(
+          floatingActionButton: _buildFab(context, model),
+          body: TaskListView<Challenge>(
+            tasks: model.challengeTasks,
+            emptyView: _buildEmptyChallengeTasks(context),
+            showArchived: context.read<AppViewModel>().showArchived,
+            taskBuilder: (context, task) {
+              return ChallengeTaskTile(task: task);
+            },
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildFab(BuildContext context, AppViewModel model) {
     // Don't show Fab if the list is empty - placeholder with CTA is shown instead
     if (!model.joinedGroupForTaskTypeExists(KeyType.signChallenge)) {
-      return SizedBox();
+      return const SizedBox();
     }
 
     return FabConfigurator(
-        fabType: FabType.challengeFab, buildContext: context);
+      fabType: FabType.challengeFab,
+      buildContext: context,
+    );
   }
 
   Widget _buildEmptyChallengeTasks(BuildContext context) {
-    bool groupForTaskExists = context
+    final groupForTaskExists = context
         .read<AppViewModel>()
         .joinedGroupForTaskTypeExists(KeyType.signChallenge);
 
@@ -63,7 +65,7 @@ class ChallengeListingPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Padding(
-                padding: EdgeInsets.only(bottom: MEDIUM_PADDING),
+                padding: const EdgeInsets.only(bottom: MEDIUM_PADDING),
                 child: ControlledLottieAnimation(
                   startAtTabIndex: 1,
                   assetName: Theme.of(context).brightness == Brightness.light
@@ -76,7 +78,8 @@ class ChallengeListingPage extends StatelessWidget {
               ),
               Text(
                 AppLocalizations.of(context).tryNewChallenge,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: SMALL_GAP),
               Text(
@@ -89,11 +92,10 @@ class ChallengeListingPage extends StatelessWidget {
               if (!groupForTaskExists) ...[
                 ElevatedButton(
                   onPressed: () {
-                    final tabViewModel =
-                        Provider.of<TabsViewModel>(context, listen: false);
-
-                    tabViewModel.setIndex(3,
-                        postNavigationAction: 'createChallengeGroup');
+                    Provider.of<TabsViewModel>(context, listen: false).setIndex(
+                      3,
+                      postNavigationAction: 'createChallengeGroup',
+                    );
                   },
                   child:
                       Text(AppLocalizations.of(context).createChallengeGroup),
@@ -104,8 +106,8 @@ class ChallengeListingPage extends StatelessWidget {
                     createChallenge(context: context, buildContext: context);
                   },
                   child: Text(AppLocalizations.of(context).createChallenge),
-                )
-              ]
+                ),
+              ],
             ],
           ),
         ),

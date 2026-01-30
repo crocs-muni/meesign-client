@@ -2,37 +2,50 @@ import 'dart:async';
 
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/foundation.dart';
+import 'package:meesign_client/enums/task_type.dart';
+import 'package:meesign_client/services/local_auth_service.dart';
+import 'package:meesign_client/services/settings_controller.dart';
+import 'package:meesign_client/util/extensions/task_approvable.dart';
 import 'package:meesign_core/meesign_card.dart';
 import 'package:meesign_core/meesign_data.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../app/model/settings.dart';
-import '../enums/task_type.dart';
-import '../services/local_auth_service.dart';
-import '../services/settings_controller.dart';
-import '../util/extensions/task_approvable.dart';
-
 class TaskStream {
-  final bool showArchived;
-  final List<Task<Decrypt>> decryptTasks;
-  final List<Task<File>> signTasks;
-  final List<Task<Challenge>> challengeTasks;
-
   TaskStream({
     required this.showArchived,
     required this.decryptTasks,
     required this.signTasks,
     required this.challengeTasks,
   });
+  final bool showArchived;
+  final List<Task<Decrypt>> decryptTasks;
+  final List<Task<File>> signTasks;
+  final List<Task<Challenge>> challengeTasks;
 }
 
 class AppViewModel with ChangeNotifier {
+  AppViewModel(
+    User user,
+    DeviceRepository deviceRepository,
+    this._groupRepository,
+    this._fileRepository,
+    this._challengeRepository,
+    this._decryptRepository,
+    this._settingsController,
+  ) {
+    _userDid = user.did;
+    _listen(user.did);
+    deviceRepository.getDevice(user.did).then((value) {
+      device = value;
+      notifyListeners();
+    });
+  }
   // Limit reduced from 8MB to 3MB to account for encryption overhead
   // and stay under gRPC's 4MB message size limit.
   // Currently it is not possible to configure dart's gRPC message size.
-  // TODO: Verify encryption overhead / JSON encoding overhead to find find optimal buffer.
+  // TODO(dev): Verify encryption overhead / JSON encoding overhead to find find optimal buffer.
   // Please follow: https://github.com/grpc/grpc-dart/issues/551
-  static const maxDataSize = 3 * 1024 * 1024; // 3MB
+  static const int maxDataSize = 3 * 1024 * 1024; // 3MB
   Device? device;
 
   final List<Task> allTasks = [];
@@ -112,23 +125,6 @@ class AppViewModel with ChangeNotifier {
         ),
       );
 
-  AppViewModel(
-    User user,
-    DeviceRepository deviceRepository,
-    this._groupRepository,
-    this._fileRepository,
-    this._challengeRepository,
-    this._decryptRepository,
-    this._settingsController,
-  ) {
-    _userDid = user.did;
-    _listen(user.did);
-    deviceRepository.getDevice(user.did).then((value) {
-      device = value;
-      notifyListeners();
-    });
-  }
-
   void _listen(Uuid did) {
     final groupTasksStream = _groupRepository.observeTasks(did);
     final signTasksStream = _fileRepository.observeTasks(did);
@@ -136,9 +132,11 @@ class AppViewModel with ChangeNotifier {
     final decryptTasksStream = _decryptRepository.observeTasks(did);
 
     int pending(List<Task<dynamic>> tasks) => tasks
-        .where((task) =>
-            (task.approvable || task.state == TaskState.needsCard) &&
-            !task.archived)
+        .where(
+          (task) =>
+              (task.approvable || task.state == TaskState.needsCard) &&
+              !task.archived,
+        )
         .length;
     nGroupReqs = groupTasksStream.map(pending).shareValue();
     nSignReqs = signTasksStream.map(pending).shareValue();
@@ -149,9 +147,9 @@ class AppViewModel with ChangeNotifier {
 
     groupTasksStream.listen((tasks) {
       _groupTasksController.add(tasks);
-      Settings currentSettings = _settingsController.currentSettings;
+      final currentSettings = _settingsController.currentSettings;
 
-      for (var task in tasks) {
+      for (final task in tasks) {
         if (task.approvable) {
           if (currentSettings.autoJoinGroups) {
             _groupRepository.approveTask(device!.id, task.id, agree: true);
@@ -162,27 +160,22 @@ class AppViewModel with ChangeNotifier {
       }
     });
 
-    signTasksStream.listen((tasks) {
-      _signTasksController.add(tasks);
-    });
+    signTasksStream.listen(_signTasksController.add);
 
-    challengeTasksStream.listen((tasks) {
-      _challengeTasksController.add(tasks);
-    });
+    challengeTasksStream.listen(_challengeTasksController.add);
 
-    decryptTasksStream.listen((tasks) {
-      _decryptTasksController.add(tasks);
-    });
+    decryptTasksStream.listen(_decryptTasksController.add);
 
     _settingsController.settingsStream.listen((settings) {
       _showArchivedController.add(settings.showArchivedItems);
     });
 
     combinedTaskStream.listen((allTaskStream) {
-      allTasks.clear();
-      allTasks.addAll(allTaskStream.decryptTasks);
-      allTasks.addAll(allTaskStream.signTasks);
-      allTasks.addAll(allTaskStream.challengeTasks);
+      allTasks
+        ..clear()
+        ..addAll(allTaskStream.decryptTasks)
+        ..addAll(allTaskStream.signTasks)
+        ..addAll(allTaskStream.challengeTasks);
     });
   }
 
@@ -200,20 +193,34 @@ class AppViewModel with ChangeNotifier {
       if (poolTarget == TaskType.decrypt) {
         await _decryptRepository.sync(_userDid);
       }
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('Polling error: $e');
     }
   }
 
-  bool hasGroup(KeyType type, {bool? inclArchived}) => groupTasks.any((task) =>
-      task.info.keyType == type &&
-      task.state == TaskState.finished &&
-      (!task.archived || (inclArchived ?? showArchived)));
+  bool hasGroup(KeyType type, {bool? inclArchived}) => groupTasks.any(
+        (task) =>
+            task.info.keyType == type &&
+            task.state == TaskState.finished &&
+            (!task.archived || (inclArchived ?? showArchived)),
+      );
 
-  Future<void> addGroup(String name, List<Member> members, int threshold,
-          Protocol protocol, KeyType keyType, String? note) =>
-      _groupRepository.group(name, members, threshold, protocol, keyType,
-          note: note);
+  Future<void> addGroup(
+    String name,
+    List<Member> members,
+    int threshold,
+    Protocol protocol,
+    KeyType keyType,
+    String? note,
+  ) =>
+      _groupRepository.group(
+        name,
+        members,
+        threshold,
+        protocol,
+        keyType,
+        note: note,
+      );
 
   Future<void> sign(XFile file, Group group) async {
     await _fileRepository.sign(file.name, await file.readAsBytes(), group.id);
@@ -223,14 +230,25 @@ class AppViewModel with ChangeNotifier {
       _challengeRepository.sign(name, data, group.id);
 
   Future<void> encrypt(
-          String description, MimeType mimeType, Uint8List data, Group group) =>
+    String description,
+    MimeType mimeType,
+    Uint8List data,
+    Group group,
+  ) =>
       _decryptRepository.encrypt(description, mimeType, data, group.id);
 
-  Future<void> joinGroup(Task<Group> task,
-      {required bool agree, bool withCard = false}) async {
+  Future<void> joinGroup(
+    Task<Group> task, {
+    required bool agree,
+    bool withCard = false,
+  }) async {
     if (await LocalAuthService.authUser(_settingsController) && agree) {
-      _groupRepository.approveTask(device!.id, task.id,
-          agree: agree, withCard: withCard);
+      _groupRepository.approveTask(
+        device!.id,
+        task.id,
+        agree: agree,
+        withCard: withCard,
+      );
     }
   }
 
@@ -240,8 +258,10 @@ class AppViewModel with ChangeNotifier {
     }
   }
 
-  Future<void> joinChallenge(Task<Challenge> task,
-      {required bool agree}) async {
+  Future<void> joinChallenge(
+    Task<Challenge> task, {
+    required bool agree,
+  }) async {
     if (await LocalAuthService.authUser(_settingsController) && agree) {
       _challengeRepository.approveTask(device!.id, task.id, agree: agree);
     }
@@ -266,23 +286,25 @@ class AppViewModel with ChangeNotifier {
     }
   }
 
-  TaskRepository<T> _selectRepository<T>() {
-    return switch (T) {
-      const (Group) => _groupRepository,
-      const (File) => _fileRepository,
-      const (Challenge) => _challengeRepository,
-      const (Decrypt) => _decryptRepository,
+  TaskRepository<T> _selectRepository<T>(T info) {
+    return switch (info) {
+      Group() => _groupRepository,
+      File() => _fileRepository,
+      Challenge() => _challengeRepository,
+      Decrypt() => _decryptRepository,
       _ => throw TypeError(),
     } as TaskRepository<T>;
   }
 
   Future<void> archiveTask<T>(Task<T> task, {required bool archive}) async {
-    _selectRepository<T>().archiveTask(device!.id, task.id, archive: archive);
+    _selectRepository<T>(task.info)
+        .archiveTask(device!.id, task.id, archive: archive);
   }
 
   bool joinedGroupForTaskTypeExists(KeyType type) {
-    var temp = groupTasks.where((task) =>
-        task.info.keyType == type && task.state == TaskState.finished);
+    final temp = groupTasks.where(
+      (task) => task.info.keyType == type && task.state == TaskState.finished,
+    );
 
     if (showArchived) {
       return temp.isNotEmpty;
@@ -292,7 +314,7 @@ class AppViewModel with ChangeNotifier {
   }
 
   bool anyGroupJoined() {
-    var temp = groupTasks.where((task) => task.state == TaskState.finished);
+    final temp = groupTasks.where((task) => task.state == TaskState.finished);
 
     if (showArchived) {
       return temp.isNotEmpty;

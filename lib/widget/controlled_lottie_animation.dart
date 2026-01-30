@@ -1,26 +1,24 @@
 import 'package:flutter/cupertino.dart';
 import 'package:lottie/lottie.dart';
+import 'package:meesign_client/view_model/tabs_view_model.dart';
 import 'package:provider/provider.dart';
 
-import '../view_model/tabs_view_model.dart';
-
 class ControlledLottieAnimation extends StatefulWidget {
-  final String assetName;
-  final double stopAtPercentage;
-  final double? width;
-  final double? height;
-  final BoxFit? fit;
-  final int? startAtTabIndex;
-
   const ControlledLottieAnimation({
-    super.key,
     required this.assetName,
+    super.key,
     this.stopAtPercentage = 1,
     this.startAtTabIndex,
     this.width,
     this.height,
     this.fit,
   });
+  final String assetName;
+  final double stopAtPercentage;
+  final double? width;
+  final double? height;
+  final BoxFit? fit;
+  final int? startAtTabIndex;
 
   @override
   State<ControlledLottieAnimation> createState() =>

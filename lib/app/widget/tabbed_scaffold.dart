@@ -2,25 +2,24 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:meesign_client/app/model/navigation_tab_model.dart';
+import 'package:meesign_client/app/widget/offstage_navigator.dart';
+import 'package:meesign_client/app_container.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/pages/challenge_listing_page.dart';
+import 'package:meesign_client/pages/decrypt_listing_page.dart';
+import 'package:meesign_client/pages/groups_listing_page.dart';
+import 'package:meesign_client/pages/settings_page.dart';
+import 'package:meesign_client/pages/signing_listing_page.dart';
+import 'package:meesign_client/services/settings_controller.dart';
+import 'package:meesign_client/ui_constants.dart';
+import 'package:meesign_client/util/layout_getter.dart';
+import 'package:meesign_client/view_model/app_view_model.dart';
+import 'package:meesign_client/view_model/tabs_view_model.dart';
+import 'package:meesign_client/widget/counter_badge.dart';
+import 'package:meesign_client/widget/fluid_gradient.dart';
+import 'package:meesign_client/widget/main_app_bar.dart';
 import 'package:provider/provider.dart';
-
-import '../../l10n/arb/app_localizations.dart';
-import '../../pages/settings_page.dart';
-import '../../services/settings_controller.dart';
-import '../../ui_constants.dart';
-import '../../util/layout_getter.dart';
-import '../../view_model/app_view_model.dart';
-import '../../view_model/tabs_view_model.dart';
-import '../../widget/fluid_gradient.dart';
-import '../model/navigation_tab_model.dart';
-import '../../app_container.dart';
-import '../../widget/counter_badge.dart';
-import '../../widget/main_app_bar.dart';
-import '../../pages/challenge_listing_page.dart';
-import '../../pages/decrypt_listing_page.dart';
-import '../../pages/groups_listing_page.dart';
-import '../../pages/signing_listing_page.dart';
-import 'offstage_navigator.dart';
 
 class TabbedScaffold extends StatelessWidget {
   const TabbedScaffold({super.key});
@@ -29,20 +28,23 @@ class TabbedScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final session = context.read<AppContainer>().session!;
 
-    return MultiProvider(providers: [
-      ChangeNotifierProvider(create: (_) => TabsViewModel()),
-      ChangeNotifierProvider(
-        create: (context) => AppViewModel(
-          session.user,
-          session.deviceRepository,
-          session.groupRepository,
-          session.fileRepository,
-          session.challengeRepository,
-          session.decryptRepository,
-          context.read<AppContainer>().settingsController,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => TabsViewModel()),
+        ChangeNotifierProvider(
+          create: (context) => AppViewModel(
+            session.user,
+            session.deviceRepository,
+            session.groupRepository,
+            session.fileRepository,
+            session.challengeRepository,
+            session.decryptRepository,
+            context.read<AppContainer>().settingsController,
+          ),
         ),
-      ),
-    ], child: const HomePageView());
+      ],
+      child: const HomePageView(),
+    );
   }
 }
 
@@ -68,39 +70,39 @@ class _HomePageViewState extends State<HomePageView> {
 
   @override
   Widget build(BuildContext context) {
-    const double borderWidth = 1;
-    const double borderOpacity = 0.2;
-    const double shadowOpacity = 0.12;
+    const borderOpacity = 0.2;
+    const shadowOpacity = 0.12;
     const double shadowRadius = 5;
-    const Color borderColor = Colors.black;
+    const borderColor = Colors.black;
 
     return LayoutBuilder(
       builder: (context, constraints) {
         return Stack(
           children: [
             if (constraints.maxWidth > minTabletLayoutWidth) ...[
-              FluidGradient(),
+              const FluidGradient(),
             ],
             Container(
               padding: EdgeInsets.all(
-                  constraints.maxWidth > minTabletLayoutWidth
-                      ? LARGE_PADDING
-                      : 0),
+                constraints.maxWidth > minTabletLayoutWidth ? LARGE_PADDING : 0,
+              ),
               child: Center(
                 child: Container(
                   padding: EdgeInsets.all(
-                      constraints.maxWidth > minTabletLayoutWidth
-                          ? LARGE_PADDING
-                          : 0),
+                    constraints.maxWidth > minTabletLayoutWidth
+                        ? LARGE_PADDING
+                        : 0,
+                  ),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(
-                        constraints.maxWidth > minTabletLayoutWidth
-                            ? LARGE_BORDER_RADIUS
-                            : 0),
+                      constraints.maxWidth > minTabletLayoutWidth
+                          ? LARGE_BORDER_RADIUS
+                          : 0,
+                    ),
                     border: Border.all(
-                        color: borderColor.withValues(alpha: borderOpacity),
-                        width: borderWidth),
+                      color: borderColor.withValues(alpha: borderOpacity),
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: borderColor.withValues(alpha: shadowOpacity),
@@ -109,19 +111,23 @@ class _HomePageViewState extends State<HomePageView> {
                       ),
                     ],
                   ),
-                  constraints: BoxConstraints(maxWidth: minLaptopLayoutWidth),
+                  constraints:
+                      const BoxConstraints(maxWidth: minLaptopLayoutWidth),
                   child: Scaffold(
-                    appBar: buildAppBar(context,
-                        LayoutGetter.getCurLayout(constraints.maxWidth)),
+                    appBar: buildAppBar(
+                      context,
+                      LayoutGetter.getCurLayout(constraints.maxWidth),
+                    ),
                     body: _buildResponsiveLayout(
-                        _buildIndexedStack(), constraints.maxWidth),
-                    floatingActionButton: null,
+                      _buildIndexedStack(),
+                      constraints.maxWidth,
+                    ),
                     bottomNavigationBar:
                         _buildBottomNavigation(constraints.maxWidth),
                   ),
                 ),
               ),
-            )
+            ),
           ],
         );
       },
@@ -144,7 +150,7 @@ class _HomePageViewState extends State<HomePageView> {
     return <NavigationTabModel>[
       NavigationTabModel(
         label: AppLocalizations.of(context).signings,
-        child: SigningListingPage(),
+        child: const SigningListingPage(),
         icon: _buildCounterIcon(
           stream: context.watch<AppViewModel>().nSignReqs,
           icon: Symbols.draw,
@@ -153,7 +159,7 @@ class _HomePageViewState extends State<HomePageView> {
       ),
       NavigationTabModel(
         label: AppLocalizations.of(context).challenges,
-        child: ChallengeListingPage(),
+        child: const ChallengeListingPage(),
         icon: _buildCounterIcon(
           stream: context.watch<AppViewModel>().nChallengeReqs,
           icon: Symbols.quiz,
@@ -162,7 +168,7 @@ class _HomePageViewState extends State<HomePageView> {
       ),
       NavigationTabModel(
         label: AppLocalizations.of(context).decryptions,
-        child: DecryptListingPage(),
+        child: const DecryptListingPage(),
         icon: _buildCounterIcon(
           stream: context.watch<AppViewModel>().nDecryptReqs,
           icon: Symbols.key,
@@ -171,7 +177,7 @@ class _HomePageViewState extends State<HomePageView> {
       ),
       NavigationTabModel(
         label: AppLocalizations.of(context).groups,
-        child: GroupsListingPage(),
+        child: const GroupsListingPage(),
         icon: _buildCounterIcon(
           stream: context.watch<AppViewModel>().nGroupReqs,
           icon: Symbols.group,
@@ -179,26 +185,29 @@ class _HomePageViewState extends State<HomePageView> {
         ),
       ),
       NavigationTabModel(
-          label: AppLocalizations.of(context).settings,
-          child: SettingsPage(),
-          icon: Icon(Symbols.settings)),
+        label: AppLocalizations.of(context).settings,
+        child: const SettingsPage(),
+        icon: const Icon(Symbols.settings),
+      ),
     ];
   }
 
   Widget _buildIndexedStack() {
-    return _buildPageTransitionSwitcher(IndexedStack(
-      // key: ValueKey<String>("IndexedStack_$_index"), // Causes duplicate global key error
-      index: context.watch<TabsViewModel>().index,
-      children: _tabs.map<OffstageNavigator>(
-        (NavigationTabModel destination) {
-          return OffstageNavigator(
-            index: _tabs.indexOf(destination),
-            currentTabIndex: context.watch<TabsViewModel>().index,
-            navigationTab: destination,
-          );
-        },
-      ).toList(),
-    ));
+    return _buildPageTransitionSwitcher(
+      IndexedStack(
+        // key: ValueKey<String>("IndexedStack_$_index"), // Causes duplicate global key error
+        index: context.watch<TabsViewModel>().index,
+        children: _tabs.map<OffstageNavigator>(
+          (NavigationTabModel destination) {
+            return OffstageNavigator(
+              index: _tabs.indexOf(destination),
+              currentTabIndex: context.watch<TabsViewModel>().index,
+              navigationTab: destination,
+            );
+          },
+        ).toList(),
+      ),
+    );
   }
 
   Widget _buildReactiveTabLabel(NavigationTabModel destination) {
@@ -230,8 +239,9 @@ class _HomePageViewState extends State<HomePageView> {
 
         final tabs = _generateTabs();
         return NavigationDestination(
-            icon: destination.icon,
-            label: tabs[_tabs.indexOf(destination)].label);
+          icon: destination.icon,
+          label: tabs[_tabs.indexOf(destination)].label,
+        );
       },
     );
   }
@@ -240,7 +250,7 @@ class _HomePageViewState extends State<HomePageView> {
     if (width > minLaptopLayoutWidth) {
       return Center(
         child: Container(
-          constraints: BoxConstraints(maxWidth: minLaptopLayoutWidth),
+          constraints: const BoxConstraints(maxWidth: minLaptopLayoutWidth),
           child: Row(
             children: <Widget>[
               NavigationRail(
@@ -296,7 +306,7 @@ class _HomePageViewState extends State<HomePageView> {
   void _onItemTapped(int index) {
     if (context.read<TabsViewModel>().index == index) {
       // If the user taps the current tab again, pop to the root of that tab
-      var navigatorKey = _tabs[index].navigatorKey;
+      final navigatorKey = _tabs[index].navigatorKey;
       navigatorKey.currentState?.popUntil((route) => route.isFirst);
     } else {
       setState(() {
@@ -312,19 +322,20 @@ class _HomePageViewState extends State<HomePageView> {
       return NavigationBar(
         selectedIndex: context.watch<TabsViewModel>().index,
         onDestinationSelected: _onItemTapped,
-        destinations: _tabs.map(
-          (NavigationTabModel destination) {
-            return _buildReactiveNavigationDestination(destination);
-          },
-        ).toList(),
+        destinations: _tabs
+            .map(
+              _buildReactiveNavigationDestination,
+            )
+            .toList(),
       );
     }
   }
 
-  Widget _buildCounterIcon(
-      {required Stream<int> stream,
-      required IconData icon,
-      bool fillIcon = false}) {
+  Widget _buildCounterIcon({
+    required Stream<int> stream,
+    required IconData icon,
+    bool fillIcon = false,
+  }) {
     return CounterBadge(
       stream: stream,
       child: Icon(icon, fill: fillIcon ? 1 : 0),

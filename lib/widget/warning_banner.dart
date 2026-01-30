@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import '../ui_constants.dart';
+import 'package:meesign_client/ui_constants.dart';
 
 class WarningBanner extends StatelessWidget {
+  const WarningBanner({
+    required this.title,
+    required this.text,
+    super.key,
+    this.actions = const [],
+    this.roundedBorder = true,
+  });
   final String title;
   final String text;
   final List<Widget> actions;
   final bool roundedBorder;
-
-  const WarningBanner({
-    super.key,
-    required this.title,
-    required this.text,
-    this.actions = const [],
-    this.roundedBorder = true,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +79,7 @@ class WarningBanner extends StatelessWidget {
                 children: actions,
               ),
             ),
-          ]
+          ],
         ],
       ),
     );

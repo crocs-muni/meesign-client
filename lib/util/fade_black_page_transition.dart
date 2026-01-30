@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 class FadeBlackPageTransition {
-  static PageRouteBuilder fadeBlack(
-      {required Widget destination, int duration = 2}) {
+  static PageRouteBuilder fadeBlack({
+    required Widget destination,
+    int duration = 2,
+  }) {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) {
         return destination;
@@ -12,10 +14,10 @@ class FadeBlackPageTransition {
           children: [
             // Black overlay that fades in first
             FadeTransition(
-              opacity: Tween<double>(begin: 0.0, end: 1.0).animate(
+              opacity: Tween<double>(begin: 0, end: 1).animate(
                 CurvedAnimation(
                   parent: animation,
-                  curve: Interval(0.0, 0.5, curve: Curves.easeInOut),
+                  curve: const Interval(0, 0.5, curve: Curves.easeInOut),
                 ),
               ),
               child: Container(color: Colors.black),
@@ -23,10 +25,10 @@ class FadeBlackPageTransition {
 
             // Actual page that fades in after 1 second
             FadeTransition(
-              opacity: Tween<double>(begin: 0.0, end: 1.0).animate(
+              opacity: Tween<double>(begin: 0, end: 1).animate(
                 CurvedAnimation(
                   parent: animation,
-                  curve: Interval(0.5, 1.0, curve: Curves.easeInOut),
+                  curve: const Interval(0.5, 1, curve: Curves.easeInOut),
                 ),
               ),
               child: child,

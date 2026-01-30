@@ -1,31 +1,28 @@
 import 'dart:io';
 
-import 'package:args/args.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:meesign_client/app/widget/tabbed_scaffold.dart';
+import 'package:meesign_client/app_container.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/pages/about_page.dart';
+import 'package:meesign_client/pages/new_group_page.dart';
+import 'package:meesign_client/pages/qr_reader_page.dart';
+import 'package:meesign_client/pages/register_page.dart';
+import 'package:meesign_client/routes.dart';
+import 'package:meesign_client/theme.dart';
+import 'package:meesign_client/util/app_arg_parser.dart';
+import 'package:meesign_client/util/app_dir_getter.dart';
+import 'package:meesign_client/util/error_logger.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
-
-import 'app_container.dart';
-import 'l10n/arb/app_localizations.dart';
-import 'pages/register_page.dart';
-import 'routes.dart';
-import 'services/settings_controller.dart';
-import 'theme.dart';
-import 'pages/about_page.dart';
-import 'app/widget/tabbed_scaffold.dart';
-import 'pages/new_group_page.dart';
-import 'pages/qr_reader_page.dart';
-import 'util/app_arg_parser.dart';
-import 'util/app_dir_getter.dart';
-import 'util/error_logger.dart';
 
 void main(List<String> args) async {
   // Init error logger
   ErrorLogger().initLogger();
 
   // Parse command line arguments
-  final ArgResults argResults = AppArgParser(args: args).initParser();
+  final argResults = AppArgParser(args: args).initParser();
 
   // Ensure Flutter binding is initialized
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,8 +39,8 @@ void main(List<String> args) async {
       ),
       dispose: (_, appContainer) => appContainer.dispose(),
       child: MeeSignClient(
-        prefillHost: argResults['host'],
-        prefillName: argResults['name'],
+        prefillHost: argResults['host'] as String?,
+        prefillName: argResults['name'] as String?,
       ),
     ),
   );
@@ -57,7 +54,7 @@ Future<void> _prepareWindowManager() async {
     await windowManager.ensureInitialized();
     WindowManager.instance.setMinimumSize(const Size(minWidth, minHeight));
 
-    Size currentSize = await WindowManager.instance.getSize();
+    final currentSize = await WindowManager.instance.getSize();
     if (currentSize.width < minWidth || currentSize.height < minHeight) {
       await WindowManager.instance.setSize(const Size(minWidth, minHeight));
     }
@@ -68,14 +65,13 @@ Future<void> _prepareWindowManager() async {
 }
 
 class MeeSignClient extends StatefulWidget {
-  final String? prefillHost;
-  final String? prefillName;
-
   const MeeSignClient({
     super.key,
     this.prefillHost,
     this.prefillName,
   });
+  final String? prefillHost;
+  final String? prefillName;
 
   @override
   State<MeeSignClient> createState() => _MeeSignClientState();
@@ -86,18 +82,18 @@ class _MeeSignClientState extends State<MeeSignClient> with WindowListener {
 
   @override
   Widget build(BuildContext context) {
-    const String defaultHost = 'meesign.crocs.fi.muni.cz';
+    const defaultHost = 'meesign.crocs.fi.muni.cz';
     configureSystemStyle();
 
-    final AppContainer container = context.read<AppContainer>();
+    final container = context.read<AppContainer>();
 
-    final SettingsController settingsController = container.settingsController;
+    final settingsController = container.settingsController;
 
     return StreamBuilder(
       stream: settingsController.settingsStream,
       builder: (context, settingsSnapshot) {
         if (settingsSnapshot.hasError || !settingsSnapshot.hasData) {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         }
 
         final settings = settingsSnapshot.data!;
@@ -156,11 +152,11 @@ class _MeeSignClientState extends State<MeeSignClient> with WindowListener {
   }
 
   @override
-  void onWindowClose() async {
+  Future<void> onWindowClose() async {
     final context = _navigatorKey.currentContext;
     if (context == null) return;
 
-    final AppContainer container = context.read<AppContainer>();
+    final container = context.read<AppContainer>();
     final settingsController = container.settingsController;
 
     // Check if user previously chose "don't ask again"
@@ -187,7 +183,7 @@ class _MeeSignClientState extends State<MeeSignClient> with WindowListener {
               onPressed: () => Navigator.of(context).pop(yesDontAskKey),
               child: Text(localizations.confirmQuitYesDontAsk),
             ),
-            SizedBox(
+            const SizedBox(
               width: 50,
             ),
             ElevatedButton(
@@ -205,7 +201,9 @@ class _MeeSignClientState extends State<MeeSignClient> with WindowListener {
 
     if (result == yesKey || result == yesDontAskKey) {
       if (result == yesDontAskKey) {
-        settingsController.updateCloseWithoutConfirmation(true);
+        settingsController.updateCloseWithoutConfirmation(
+          closeWithoutConfirmation: true,
+        );
       }
       await windowManager.destroy();
     }

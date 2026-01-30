@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:grpc/grpc.dart';
 
 class BcastRespStream<T> extends StreamView<T> {
-  final Future<void> headers;
   BcastRespStream(super.stream, this.headers);
+  final Future<void> headers;
 }
 
 extension BcastRespStreamExt<T> on ResponseStream<T> {

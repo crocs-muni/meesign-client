@@ -1,12 +1,11 @@
 import 'package:collection/collection.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-
-import '../database/daos.dart';
-import '../database/database.dart' as db;
-import '../util/uuid.dart';
-import 'device.dart';
-import 'key_type.dart';
-import 'protocol.dart';
+import 'package:meesign_core/src/database/daos.dart';
+import 'package:meesign_core/src/database/database.dart' as db;
+import 'package:meesign_core/src/model/device.dart';
+import 'package:meesign_core/src/model/key_type.dart';
+import 'package:meesign_core/src/model/protocol.dart';
+import 'package:meesign_core/src/util/uuid.dart';
 
 part 'group.freezed.dart';
 

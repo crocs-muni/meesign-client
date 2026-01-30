@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path_pkg;
+import 'package:path_provider/path_provider.dart';
 
 class AppDirGetter {
   static Future<Directory> getAppDir() async {

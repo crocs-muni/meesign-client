@@ -2,24 +2,22 @@ import 'dart:convert';
 
 import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/pages/task_detail_page.dart';
+import 'package:meesign_client/ui_constants.dart';
+import 'package:meesign_client/util/actions/challenge_creator.dart';
+import 'package:meesign_client/util/card_reader_launcher.dart';
+import 'package:meesign_client/view_model/app_view_model.dart';
+import 'package:meesign_client/widget/entity_chip.dart';
+import 'package:meesign_client/widget/large_square_button.dart';
+import 'package:meesign_client/widget/task_tile.dart';
 import 'package:meesign_core/meesign_core.dart';
-
-import '../../l10n/arb/app_localizations.dart';
 import 'package:provider/provider.dart';
-
-import '../../pages/task_detail_page.dart';
-import '../../ui_constants.dart';
-import '../../util/actions/challenge_creator.dart';
-import '../../util/card_reader_launcher.dart';
-import '../../view_model/app_view_model.dart';
-import '../entity_chip.dart';
-import '../large_square_button.dart';
-import '../task_tile.dart';
 
 class ChallengeTaskTile extends StatelessWidget {
   const ChallengeTaskTile({
-    super.key,
     required this.task,
+    super.key,
   });
 
   final Task<Challenge> task;
@@ -34,11 +32,10 @@ class ChallengeTaskTile extends StatelessWidget {
       name: task.info.name,
       showDetailRow: false,
       actionChip: Row(
-        mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           GroupChip(group: task.info.group),
-          SizedBox(
+          const SizedBox(
             width: SMALL_GAP,
           ),
           if (task.state == TaskState.finished) ...[
@@ -46,7 +43,6 @@ class ChallengeTaskTile extends StatelessWidget {
               style: FilledButton.styleFrom(
                 side: const BorderSide(
                   color: Colors.grey,
-                  width: 1.0,
                 ),
               ),
               onPressed: () => Navigator.push(
@@ -66,7 +62,7 @@ class ChallengeTaskTile extends StatelessWidget {
               child: Text(AppLocalizations.of(context).view),
             ),
           ],
-          SizedBox(
+          const SizedBox(
             width: SMALL_GAP,
           ),
           if (task.state == TaskState.finished ||
@@ -75,13 +71,13 @@ class ChallengeTaskTile extends StatelessWidget {
               style: FilledButton.styleFrom(
                 side: const BorderSide(
                   color: Colors.grey,
-                  width: 1.0,
                 ),
               ),
               onPressed: () => createChallenge(
-                  context: context,
-                  buildContext: context,
-                  templateChallenge: task),
+                context: context,
+                buildContext: context,
+                templateChallenge: task,
+              ),
               child: Text(AppLocalizations.of(context).copy),
             ),
           ],
@@ -94,24 +90,26 @@ class ChallengeTaskTile extends StatelessWidget {
           onPressed: () {
             model.joinChallenge(task, agree: true);
           },
-          color: Color(0xFF298E29),
+          color: const Color(0xFF298E29),
         ),
         LargeSquareButton(
-            text: AppLocalizations.of(context).decline,
-            icon: Icons.close,
-            onPressed: () {
-              model.joinChallenge(task, agree: false);
-            },
-            color: Color(0xFFAA3026))
+          text: AppLocalizations.of(context).decline,
+          icon: Icons.close,
+          onPressed: () {
+            model.joinChallenge(task, agree: false);
+          },
+          color: const Color(0xFFAA3026),
+        ),
       ],
       cardActions: [
         FilledButton.tonal(
           onPressed: () => launchCardReader(
-              context, (card) => model.advanceChallengeWithCard(task, card)),
+            context,
+            (card) => model.advanceChallengeWithCard(task, card),
+          ),
           child: Text(AppLocalizations.of(context).readCard),
         ),
       ],
-      actions: const [],
       onArchiveChange: (archive) => model.archiveTask(task, archive: archive),
     );
   }

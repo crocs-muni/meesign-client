@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/util/platform.dart';
+import 'package:meesign_client/util/share_decrypt.dart';
 import 'package:meesign_core/meesign_core.dart';
 
-import '../l10n/arb/app_localizations.dart';
-import '../util/platform.dart';
-import '../util/share_decrypt.dart';
-
 class ShareButton extends StatelessWidget {
-  const ShareButton(
-      {super.key,
-      required this.imageDecrypt,
-      this.preShareAction,
-      this.postShareAction});
+  const ShareButton({
+    required this.imageDecrypt,
+    super.key,
+    this.preShareAction,
+    this.postShareAction,
+  });
   final Decrypt? imageDecrypt;
   final Function? preShareAction;
   final Function? postShareAction;

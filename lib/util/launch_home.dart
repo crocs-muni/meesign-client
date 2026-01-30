@@ -1,10 +1,9 @@
 import 'package:flutter/cupertino.dart';
+import 'package:meesign_client/app/widget/tabbed_scaffold.dart';
+import 'package:meesign_client/app_container.dart';
+import 'package:meesign_client/util/fade_black_page_transition.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
-
-import '../app/widget/tabbed_scaffold.dart';
-import '../app_container.dart';
-import 'fade_black_page_transition.dart';
 
 Future<void> launchHome({
   required User user,
@@ -21,16 +20,16 @@ Future<void> launchHome({
   }
 
   final currentSession = container.session;
-  final session = currentSession != null && currentSession.user == user
-      ? currentSession
-      : await container.startUserSession(user);
-  session.startSync();
+  (currentSession != null && currentSession.user == user
+          ? currentSession
+          : await container.startUserSession(user))
+      .startSync();
 
   // Delay transition to show loading indicator inside button
-  await Future.delayed(Duration(milliseconds: delayMilliseconds));
+  await Future<void>.delayed(Duration(milliseconds: delayMilliseconds));
 
   navigator.pushAndRemoveUntil(
-    FadeBlackPageTransition.fadeBlack(destination: TabbedScaffold()),
+    FadeBlackPageTransition.fadeBlack(destination: const TabbedScaffold()),
     (Route<dynamic> route) => false,
   );
 }

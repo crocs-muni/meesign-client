@@ -1,11 +1,10 @@
 import 'dart:typed_data';
 
 import 'package:file_selector/file_selector.dart';
+import 'package:meesign_client/util/platform.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:mime/mime.dart';
 import 'package:share_plus/share_plus.dart';
-
-import 'platform.dart';
 
 class ShareController {
   static Future<void> shareDecrypt(Decrypt decrypt) async {
@@ -25,10 +24,12 @@ class ShareController {
       }
     }
     if (PlatformGroup.isMobile) {
-      await SharePlus.instance.share(ShareParams(
-        files: [file],
-        text: decrypt.name,
-      ));
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [file],
+          text: decrypt.name,
+        ),
+      );
     }
   }
 }

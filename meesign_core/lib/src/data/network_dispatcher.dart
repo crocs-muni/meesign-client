@@ -1,25 +1,28 @@
 import 'dart:collection';
 
+import 'package:meesign_core/src/data/key_store.dart';
+import 'package:meesign_core/src/util/uuid.dart';
 import 'package:meesign_network/grpc.dart' as rpc;
 import 'package:meesign_network/meesign_network.dart' show ClientFactory;
 
-import '../util/uuid.dart';
-import 'key_store.dart';
-
 class NetworkDispatcher {
+  NetworkDispatcher(
+    this.host,
+    this._keyStore, {
+    this.serverCerts,
+    this.allowBadCerts = false,
+    this.port = 1337,
+  });
   final String host;
   final int port;
   final KeyStore _keyStore;
   final List<int>? serverCerts;
   final bool allowBadCerts;
 
-  // TODO: shutdown?
+  // TODO(dev): shutdown?
   final Map<Uuid, rpc.MeeSignClient> _clients = HashMap();
 
-  late final unauth = _createClient(certKey: null);
-
-  NetworkDispatcher(this.host, this._keyStore,
-      {this.serverCerts, this.allowBadCerts = false, this.port = 1337});
+  late final rpc.MeeSignClient unauth = _createClient();
 
   rpc.MeeSignClient _createClient({List<int>? certKey}) => ClientFactory.create(
         host,

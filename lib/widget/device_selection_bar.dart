@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:meesign_client/ui_constants.dart';
+import 'package:meesign_client/widget/entity_chip.dart';
 import 'package:meesign_core/meesign_core.dart';
 
-import '../ui_constants.dart';
-import 'entity_chip.dart';
-
 class DeviceSelectionBar extends StatefulWidget implements PreferredSizeWidget {
+  const DeviceSelectionBar({
+    required this.devices,
+    required this.onDeleted,
+    super.key,
+    this.showNoPeerSelected = true,
+  });
   final List<Device> devices;
   final void Function(Device) onDeleted;
   final bool showNoPeerSelected;
-
-  const DeviceSelectionBar({
-    super.key,
-    required this.devices,
-    required this.onDeleted,
-    this.showNoPeerSelected = true,
-  });
 
   @override
   State<DeviceSelectionBar> createState() => _DeviceSelectionBarState();
@@ -29,7 +27,7 @@ class _DeviceSelectionBarState extends State<DeviceSelectionBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: SMALL_PADDING),
+      padding: const EdgeInsets.symmetric(horizontal: SMALL_PADDING),
       height: widget.preferredSize.height,
       child: Scrollbar(
         controller: _scrollController,
@@ -61,8 +59,8 @@ class _DeviceSelectionBarState extends State<DeviceSelectionBar> {
         alignment: Alignment.topCenter,
         child: device == null
             ? widget.showNoPeerSelected
-                ? InputChip(
-                    label: Text("No peer selected"),
+                ? const InputChip(
+                    label: Text('No peer selected'),
                   )
                 : const SizedBox.shrink()
             : DeviceChip(

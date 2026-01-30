@@ -35,7 +35,7 @@ class Sync {
 
     try {
       await Future.wait(
-        [for (var r in _repositories) setUp(r)],
+        [for (final r in _repositories) setUp(r)],
       );
       subscribed.value = true;
     } on Exception {
@@ -64,7 +64,7 @@ class Sync {
     _retryTimer = null;
 
     await Future.wait([
-      for (var r in _repositories) r.unsubscribe(_did),
+      for (final r in _repositories) r.unsubscribe(_did),
     ]);
 
     subscribed.value = false;

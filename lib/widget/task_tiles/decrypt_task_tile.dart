@@ -2,24 +2,22 @@ import 'dart:convert';
 
 import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/pages/task_detail_page.dart';
+import 'package:meesign_client/ui_constants.dart';
+import 'package:meesign_client/util/actions/encrypt_data.dart';
+import 'package:meesign_client/util/status_message.dart';
+import 'package:meesign_client/view_model/app_view_model.dart';
+import 'package:meesign_client/widget/entity_chip.dart';
+import 'package:meesign_client/widget/large_square_button.dart';
+import 'package:meesign_client/widget/task_tile.dart';
 import 'package:meesign_core/meesign_core.dart';
-
-import '../../l10n/arb/app_localizations.dart';
 import 'package:provider/provider.dart';
-
-import '../../pages/task_detail_page.dart';
-import '../../ui_constants.dart';
-import '../../util/actions/encrypt_data.dart';
-import '../../util/status_message.dart';
-import '../../view_model/app_view_model.dart';
-import '../entity_chip.dart';
-import '../large_square_button.dart';
-import '../task_tile.dart';
 
 class DecryptTaskTile extends StatelessWidget {
   const DecryptTaskTile({
-    super.key,
     required this.task,
+    super.key,
   });
 
   final Task<Decrypt> task;
@@ -35,11 +33,10 @@ class DecryptTaskTile extends StatelessWidget {
       showDetailRow: false,
       desc: StatusMessage.getStatusMessage(task, context),
       actionChip: Row(
-        mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           GroupChip(group: task.info.group),
-          SizedBox(
+          const SizedBox(
             width: SMALL_GAP,
           ),
           if (task.state == TaskState.finished) ...[
@@ -47,7 +44,6 @@ class DecryptTaskTile extends StatelessWidget {
               style: FilledButton.styleFrom(
                 side: const BorderSide(
                   color: Colors.grey,
-                  width: 1.0,
                 ),
               ),
               onPressed: () => Navigator.push(
@@ -74,7 +70,7 @@ class DecryptTaskTile extends StatelessWidget {
               child: Text(AppLocalizations.of(context).view),
             ),
           ],
-          SizedBox(
+          const SizedBox(
             width: SMALL_GAP,
           ),
           if (task.state == TaskState.finished ||
@@ -83,7 +79,6 @@ class DecryptTaskTile extends StatelessWidget {
               style: FilledButton.styleFrom(
                 side: const BorderSide(
                   color: Colors.grey,
-                  width: 1.0,
                 ),
               ),
               onPressed: () => encryptData(
@@ -103,17 +98,17 @@ class DecryptTaskTile extends StatelessWidget {
           onPressed: () {
             model.joinDecrypt(task, agree: true);
           },
-          color: Color(0xFF298E29),
+          color: const Color(0xFF298E29),
         ),
         LargeSquareButton(
-            text: AppLocalizations.of(context).decline,
-            icon: Icons.close,
-            onPressed: () {
-              model.joinDecrypt(task, agree: false);
-            },
-            color: Color(0xFFAA3026)),
+          text: AppLocalizations.of(context).decline,
+          icon: Icons.close,
+          onPressed: () {
+            model.joinDecrypt(task, agree: false);
+          },
+          color: const Color(0xFFAA3026),
+        ),
       ],
-      actions: const [],
       onArchiveChange: (archive) => model.archiveTask(task, archive: archive),
     );
   }

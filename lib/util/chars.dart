@@ -8,10 +8,12 @@ extension Initials on String {
 
 extension SplitByLength on String {
   Iterable<String> splitByLength(int length) {
-    assert(length > 1);
-    int count = (this.length + 1) ~/ length;
+    assert(length > 1, 'length must be greater than 1');
+    final count = (this.length + 1) ~/ length;
     return Iterable.generate(
-        count, (int i) => substring(i * length, (i + 1) * length));
+      count,
+      (int i) => substring(i * length, (i + 1) * length),
+    );
   }
 }
 

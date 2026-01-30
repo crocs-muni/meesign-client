@@ -1,8 +1,7 @@
+import 'package:meesign_core/src/database/database.dart' as db;
+import 'package:meesign_core/src/util/uuid.dart';
 import 'package:meesign_network/grpc.dart' as rpc;
 import 'package:meta/meta.dart';
-
-import '../database/database.dart' as db;
-import '../util/uuid.dart';
 
 enum DeviceKind { user, bot }
 
@@ -21,14 +20,18 @@ extension DeviceKindConversion on DeviceKind {
 
 @immutable
 class Device {
+  const Device(
+    this.name,
+    this.id,
+    this.kind,
+    this.lastActive, {
+    this.isLocal = false,
+  });
   final String name;
   final Uuid id;
   final DeviceKind kind;
   final DateTime lastActive;
   final bool isLocal;
-
-  const Device(this.name, this.id, this.kind, this.lastActive,
-      {this.isLocal = false});
 
   Device copyWith({
     String? name,

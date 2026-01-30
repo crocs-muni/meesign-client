@@ -1,9 +1,8 @@
 import 'dart:collection';
 
 class DefaultMap<K, V> extends MapView<K, V> {
-  final V Function() defaultValue;
-
   DefaultMap(super.map, this.defaultValue);
+  final V Function() defaultValue;
 
   @override
   V operator [](Object? key) {

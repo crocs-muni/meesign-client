@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 
-import '../model/navigation_tab_model.dart';
+import 'package:meesign_client/app/model/navigation_tab_model.dart';
 
 class OffstageNavigator extends StatelessWidget {
-  final int index;
-  final int currentTabIndex;
-  final NavigationTabModel navigationTab;
-
   const OffstageNavigator({
-    super.key,
     required this.index,
     required this.currentTabIndex,
     required this.navigationTab,
+    super.key,
   });
+  final int index;
+  final int currentTabIndex;
+  final NavigationTabModel navigationTab;
 
   @override
   Widget build(BuildContext context) {
@@ -21,9 +20,11 @@ class OffstageNavigator extends StatelessWidget {
       child: Navigator(
         key: navigationTab.navigatorKey,
         onGenerateRoute: (routeSettings) {
-          return MaterialPageRoute(builder: (context) {
-            return navigationTab.child;
-          });
+          return MaterialPageRoute(
+            builder: (context) {
+              return navigationTab.child;
+            },
+          );
         },
       ),
     );

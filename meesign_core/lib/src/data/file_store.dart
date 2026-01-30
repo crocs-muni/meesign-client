@@ -1,15 +1,13 @@
 import 'dart:io' as io;
 
+import 'package:meesign_core/src/util/uuid.dart';
 import 'package:path/path.dart' as path_pkg;
 
-import '../util/uuid.dart';
-
 class FileStore {
+  FileStore(this._dir);
   final io.Directory _dir;
 
-  FileStore(this._dir);
-
-  // TODO: when to remove work files? (issues with file locks,
+  // TODO(dev): when to remove work files? (issues with file locks,
   // https://github.com/crocs-muni/meesign-client/issues/3)
 
   String getFilePath(Uuid did, Uuid id, String name, {bool work = false}) {
@@ -22,8 +20,13 @@ class FileStore {
     );
   }
 
-  Future<String> storeFile(Uuid did, Uuid id, String name, List<int> data,
-      {bool work = false}) async {
+  Future<String> storeFile(
+    Uuid did,
+    Uuid id,
+    String name,
+    List<int> data, {
+    bool work = false,
+  }) async {
     final path = getFilePath(did, id, name, work: work);
     await io.Directory(path_pkg.dirname(path)).create(recursive: true);
     await io.File(path).writeAsBytes(data, flush: true);

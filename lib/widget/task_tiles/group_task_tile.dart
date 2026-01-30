@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:meesign_client/card/card.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/pages/group_page.dart';
+import 'package:meesign_client/ui_constants.dart';
+import 'package:meesign_client/util/actions/group_creator.dart';
+import 'package:meesign_client/util/card_reader_launcher.dart';
+import 'package:meesign_client/util/chars.dart';
+import 'package:meesign_client/view_model/app_view_model.dart';
+import 'package:meesign_client/widget/entity_chip.dart';
+import 'package:meesign_client/widget/large_square_button.dart';
+import 'package:meesign_client/widget/task_tile.dart';
 import 'package:meesign_core/meesign_core.dart';
-
-import '../../l10n/arb/app_localizations.dart';
 import 'package:provider/provider.dart';
 
-import '../../card/card.dart';
-import '../../pages/group_page.dart';
-import '../../ui_constants.dart';
-import '../../util/actions/group_creator.dart';
-import '../../util/card_reader_launcher.dart';
-import '../../util/chars.dart';
-import '../../view_model/app_view_model.dart';
-import '../entity_chip.dart';
-import '../large_square_button.dart';
-import '../task_tile.dart';
-
 class GroupTaskTile extends StatelessWidget {
-  const GroupTaskTile({super.key, required this.task, required this.group});
+  const GroupTaskTile({required this.task, required this.group, super.key});
 
   final Task<Group> task;
   final Group group;
@@ -45,31 +43,32 @@ class GroupTaskTile extends StatelessWidget {
           onPressed: () {
             model.joinGroup(task, agree: true);
           },
-          color: Color(0xFF298E29),
+          color: const Color(0xFF298E29),
         ),
         LargeSquareButton(
-            text: AppLocalizations.of(context).decline,
-            icon: Icons.close,
-            onPressed: () {
-              model.joinGroup(task, agree: false);
-            },
-            color: Color(0xFFAA3026)),
+          text: AppLocalizations.of(context).decline,
+          icon: Icons.close,
+          onPressed: () {
+            model.joinGroup(task, agree: false);
+          },
+          color: const Color(0xFFAA3026),
+        ),
         if (CardManager.platformSupported &&
             group.protocol.cardSupport &&
             thisMember.shares == 1) ...[
           _buildJoinWithCardButton(context: context, model: model),
-        ]
+        ],
       ],
-      actions: const [],
       cardActions: [
         FilledButton.tonal(
           onPressed: () => launchCardReader(
-              context, (card) => model.advanceGroupWithCard(task, card)),
+            context,
+            (card) => model.advanceGroupWithCard(task, card),
+          ),
           child: Text(AppLocalizations.of(context).readCard),
         ),
       ],
       actionChip: Row(
-        mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -77,10 +76,10 @@ class GroupTaskTile extends StatelessWidget {
             child: Wrap(
               spacing: 8,
               runSpacing: 4,
-              children: [for (var m in members) DeviceChip(device: m.device)],
+              children: [for (final m in members) DeviceChip(device: m.device)],
             ),
           ),
-          SizedBox(
+          const SizedBox(
             width: SMALL_GAP,
           ),
           if (task.state == TaskState.finished ||
@@ -94,7 +93,6 @@ class GroupTaskTile extends StatelessWidget {
                       style: FilledButton.styleFrom(
                         side: const BorderSide(
                           color: Colors.grey,
-                          width: 1.0,
                         ),
                       ),
                       onPressed: () {
@@ -110,7 +108,7 @@ class GroupTaskTile extends StatelessWidget {
                       child: Text(AppLocalizations.of(context).view),
                     ),
                   ],
-                  SizedBox(
+                  const SizedBox(
                     width: SMALL_GAP,
                   ),
                   if (task.state == TaskState.finished ||
@@ -119,7 +117,6 @@ class GroupTaskTile extends StatelessWidget {
                       style: FilledButton.styleFrom(
                         side: const BorderSide(
                           color: Colors.grey,
-                          width: 1.0,
                         ),
                       ),
                       onPressed: () =>
@@ -129,8 +126,8 @@ class GroupTaskTile extends StatelessWidget {
                   ],
                 ],
               ),
-            )
-          ]
+            ),
+          ],
         ],
       ),
       onArchiveChange: (archive) => model.archiveTask(task, archive: archive),
@@ -142,24 +139,26 @@ class GroupTaskTile extends StatelessWidget {
     required AppViewModel model,
   }) {
     return ElevatedButton.icon(
-        onPressed: () {
-          model.joinGroup(task, agree: true, withCard: true);
-        },
-        style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFF555555),
-            padding: EdgeInsets.all(MEDIUM_PADDING),
-            shape: RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadiusGeometry.circular(SMALL_BORDER_RADIUS))),
-        icon: Icon(Icons.credit_card, color: Colors.white),
-        label: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              AppLocalizations.of(context).joinWithCard,
-              style: TextStyle(fontSize: 14, color: Colors.white),
-            )
-          ],
-        ));
+      onPressed: () {
+        model.joinGroup(task, agree: true, withCard: true);
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF555555),
+        padding: const EdgeInsets.all(MEDIUM_PADDING),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadiusGeometry.circular(SMALL_BORDER_RADIUS),
+        ),
+      ),
+      icon: const Icon(Icons.credit_card, color: Colors.white),
+      label: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            AppLocalizations.of(context).joinWithCard,
+            style: const TextStyle(fontSize: 14, color: Colors.white),
+          ),
+        ],
+      ),
+    );
   }
 }

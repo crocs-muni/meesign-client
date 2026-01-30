@@ -4,35 +4,35 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/templates/default_page_template.dart';
+import 'package:meesign_client/ui_constants.dart';
+import 'package:meesign_client/util/actions/challenge_creator.dart';
+import 'package:meesign_client/util/actions/document_signer.dart';
+import 'package:meesign_client/util/actions/encrypt_data.dart';
+import 'package:meesign_client/widget/copy_button.dart';
+import 'package:meesign_client/widget/entity_chip.dart';
+import 'package:meesign_client/widget/share_button.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../l10n/arb/app_localizations.dart';
-import '../templates/default_page_template.dart';
-import '../ui_constants.dart';
-import '../util/actions/challenge_creator.dart';
-import '../util/actions/document_signer.dart';
-import '../util/actions/encrypt_data.dart';
-import '../widget/copy_button.dart';
-import '../widget/entity_chip.dart';
-import '../widget/share_button.dart';
-
 class TaskDetailPage extends StatefulWidget {
-  const TaskDetailPage(
-      {super.key,
-      required this.task,
-      required this.title,
-      required this.group,
-      required this.keyType,
-      this.textValue,
-      this.hexValue,
-      this.imageDecrypt,
-      this.timedAutoClose = false,
-      this.autoCloseDurationInSeconds = 15,
-      this.filePath,
-      this.isArchived = false});
+  const TaskDetailPage({
+    required this.task,
+    required this.title,
+    required this.group,
+    required this.keyType,
+    super.key,
+    this.textValue,
+    this.hexValue,
+    this.imageDecrypt,
+    this.timedAutoClose = false,
+    this.autoCloseDurationInSeconds = 15,
+    this.filePath,
+    this.isArchived = false,
+  });
 
   final String title;
   final String? textValue;
@@ -52,7 +52,7 @@ class TaskDetailPage extends StatefulWidget {
 
 class _TaskDetailPageState extends State<TaskDetailPage> {
   late final Duration duration;
-  final refreshInterval = Duration(milliseconds: 20);
+  static const refreshInterval = Duration(milliseconds: 20);
   final countdownSubject = BehaviorSubject<int>();
   late final int steps;
   late final StreamSubscription<int> sub;
@@ -76,10 +76,10 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
   }
 
   void _closePage() {
-    if (mounted && ModalRoute.of(context)?.isCurrent == true) {
+    if (mounted && (ModalRoute.of(context)?.isCurrent ?? false)) {
       Navigator.of(context).pop();
     } else if (mounted) {
-      Future.delayed(Duration(milliseconds: 250), () => _closePage());
+      Future.delayed(const Duration(milliseconds: 250), _closePage);
     }
   }
 
@@ -93,25 +93,25 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
   @override
   Widget build(BuildContext context) {
     return DefaultPageTemplate(
-        showAppBar: true,
-        includePadding: true,
-        body: _buildPageBody(context),
-        wrapInScroll: true,
-        customAppBar: AppBar(
-          scrolledUnderElevation: 0,
-          surfaceTintColor: Colors.transparent,
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          foregroundColor: Theme.of(context).colorScheme.onSurface,
-          title: Row(
-            children: [
-              Text(AppLocalizations.of(context).taskDetail),
-              if (widget.timedAutoClose) ...[
-                SizedBox(width: MEDIUM_GAP),
-                _buildLoadingIndicator(context),
-              ]
+      showAppBar: true,
+      body: _buildPageBody(context),
+      wrapInScroll: true,
+      customAppBar: AppBar(
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        foregroundColor: Theme.of(context).colorScheme.onSurface,
+        title: Row(
+          children: [
+            Text(AppLocalizations.of(context).taskDetail),
+            if (widget.timedAutoClose) ...[
+              const SizedBox(width: MEDIUM_GAP),
+              _buildLoadingIndicator(context),
             ],
-          ),
-        ));
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildHeader(BuildContext context, String title) {
@@ -150,10 +150,10 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
         _openFile(widget.filePath!);
       },
       label: Padding(
-        padding: EdgeInsets.symmetric(vertical: 15),
+        padding: const EdgeInsets.symmetric(vertical: 15),
         child: Text(AppLocalizations.of(context).openPdfFile),
       ),
-      icon: Icon(Icons.open_in_new),
+      icon: const Icon(Icons.open_in_new),
       style: ButtonStyle(
         shape: WidgetStateProperty.all<RoundedRectangleBorder>(
           RoundedRectangleBorder(
@@ -174,7 +174,6 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
               ? AppLocalizations.of(context).taskName
               : AppLocalizations.of(context).fileName,
           content: widget.title,
-          showCopyButton: true,
         ),
         if (widget.textValue != null) ...[
           const SizedBox(height: SMALL_GAP),
@@ -182,7 +181,6 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
             context: context,
             title: AppLocalizations.of(context).taskValue,
             content: widget.textValue!,
-            showCopyButton: true,
           ),
         ],
         if (widget.imageDecrypt != null) ...[
@@ -206,16 +204,16 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
             context: context,
             title: AppLocalizations.of(context).hexValue,
             content: widget.hexValue!,
-            showCopyButton: true,
           ),
         ],
         const SizedBox(height: MEDIUM_GAP),
         if (widget.isArchived) ...[
           _buildSection(
-              title: AppLocalizations.of(context).taskState,
-              context: context,
-              content: AppLocalizations.of(context).archived,
-              showCopyButton: false),
+            title: AppLocalizations.of(context).taskState,
+            context: context,
+            content: AppLocalizations.of(context).archived,
+            showCopyButton: false,
+          ),
         ],
         const SizedBox(height: MEDIUM_GAP),
         _buildGroupSection(context: context, group: widget.group),
@@ -226,29 +224,32 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
             bool? redirectBack = false;
             if (widget.keyType == KeyType.signChallenge) {
               redirectBack = await createChallenge(
-                  context: context,
-                  buildContext: context,
-                  templateChallenge: widget.task);
+                context: context,
+                buildContext: context,
+                templateChallenge: widget.task,
+              );
             } else if (widget.keyType == KeyType.decrypt) {
               redirectBack = await encryptData(
-                  context: context,
-                  buildContext: context,
-                  templateDecryptTask: widget.task);
+                context: context,
+                buildContext: context,
+                templateDecryptTask: widget.task,
+              );
             } else if (widget.keyType == KeyType.signPdf) {
               redirectBack = await signDocument(
-                  context: context,
-                  buildContext: context,
-                  templateSignTask: widget.task);
+                context: context,
+                buildContext: context,
+                templateSignTask: widget.task,
+              );
             }
 
             sub.resume();
 
-            if (redirectBack == true && context.mounted) {
+            if ((redirectBack ?? false) && context.mounted) {
               Navigator.of(context).pop();
             }
           },
           label: Padding(
-            padding: EdgeInsets.symmetric(vertical: 15),
+            padding: const EdgeInsets.symmetric(vertical: 15),
             child: Text(AppLocalizations.of(context).useTemplateForTask),
           ),
           icon: const Icon(
@@ -277,21 +278,21 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
         Row(
           children: [
             _buildHeader(context, title),
-            Spacer(),
+            const Spacer(),
             if (widget.imageDecrypt != null) ...[
               ShareButton(
                 imageDecrypt: widget.imageDecrypt,
                 preShareAction: () => sub.pause(),
                 postShareAction: () => sub.resume(),
-              )
-            ]
+              ),
+            ],
           ],
         ),
         ClipRRect(
           borderRadius: BorderRadius.circular(SMALL_BORDER_RADIUS),
           child: Image.memory(imageData as Uint8List),
         ),
-        SizedBox(height: SMALL_GAP),
+        const SizedBox(height: SMALL_GAP),
       ],
     );
   }
@@ -308,10 +309,10 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
         Row(
           children: [
             _buildHeader(context, title),
-            Spacer(),
+            const Spacer(),
             if (showCopyButton) ...[
               CopyButton(textToCopy: content),
-            ]
+            ],
           ],
         ),
         Text(
@@ -321,9 +322,9 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
               .bodyLarge
               ?.copyWith(color: Theme.of(context).colorScheme.secondary),
         ),
-        SizedBox(
+        const SizedBox(
           height: SMALL_GAP,
-        )
+        ),
       ],
     );
   }
@@ -336,7 +337,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildHeader(context, AppLocalizations.of(context).taskGroup),
-        SizedBox(height: SMALL_GAP),
+        const SizedBox(height: SMALL_GAP),
         GroupChip(group: group),
       ],
     );

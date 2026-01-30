@@ -6,8 +6,8 @@ enum KeyType {
   signChallenge([Protocol.gg18, Protocol.frost, Protocol.musig2]),
   decrypt([Protocol.elgamal]);
 
-  final List<Protocol> supportedProtocols;
   const KeyType(this.supportedProtocols);
+  final List<Protocol> supportedProtocols;
 }
 
 extension KeyTypeConversion on KeyType {

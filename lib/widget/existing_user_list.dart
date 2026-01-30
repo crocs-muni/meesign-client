@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:meesign_client/app_container.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/templates/default_page_template.dart';
+import 'package:meesign_client/ui_constants.dart';
+import 'package:meesign_client/util/chars.dart';
+import 'package:meesign_client/util/launch_home.dart';
+import 'package:meesign_client/util/set_user_login_prefereces.dart';
+import 'package:meesign_client/widget/confirmation_dialog.dart';
+import 'package:meesign_client/widget/no_results_placeholder.dart';
+import 'package:meesign_client/widget/skeletonizer_template.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
-
-import '../app_container.dart';
-import '../l10n/arb/app_localizations.dart';
-import '../services/settings_controller.dart';
-import '../templates/default_page_template.dart';
-import '../ui_constants.dart';
-import '../util/chars.dart';
-import '../util/launch_home.dart';
-import '../util/set_user_login_prefereces.dart';
-import '../widget/confirmation_dialog.dart';
-import 'no_results_placeholder.dart';
-import 'skeletonizer_template.dart';
 
 class ExistingUserList extends StatefulWidget {
   const ExistingUserList({super.key});
@@ -34,7 +32,7 @@ class ExistingUserListState extends State<ExistingUserList> {
     fetchUsers();
   }
 
-  void fetchUsers() async {
+  Future<void> fetchUsers() async {
     final container = context.read<AppContainer>();
     _users = await container.userRepository.getAllUsers();
     _usersFetched = true;
@@ -49,13 +47,14 @@ class ExistingUserListState extends State<ExistingUserList> {
   Widget build(BuildContext context) {
     return Container(
       color: Theme.of(context).colorScheme.surface,
-      padding: EdgeInsets.only(top: MEDIUM_PADDING, bottom: LARGE_PADDING),
+      padding:
+          const EdgeInsets.only(top: MEDIUM_PADDING, bottom: LARGE_PADDING),
       child: DefaultPageTemplate(
         transparentBackground: true,
         appBarTitle: AppLocalizations.of(context).selectAccount,
         showAppBar: true,
         body: Container(
-          padding: EdgeInsets.all(MEDIUM_PADDING),
+          padding: const EdgeInsets.all(MEDIUM_PADDING),
           child: _buildUserTable(),
         ),
         appBarActions: [_buildAppBarEditAction()],
@@ -82,7 +81,8 @@ class ExistingUserListState extends State<ExistingUserList> {
                   ? AppLocalizations.of(context).cancel
                   : AppLocalizations.of(context).delete,
               style: TextStyle(
-                  color: _selectedUsers.isEmpty ? null : Colors.redAccent),
+                color: _selectedUsers.isEmpty ? null : Colors.redAccent,
+              ),
             ),
             icon: Icon(
               _selectedUsers.isEmpty ? Icons.close : Icons.delete,
@@ -101,21 +101,22 @@ class ExistingUserListState extends State<ExistingUserList> {
             label: Text(
               AppLocalizations.of(context).edit,
             ),
-            icon: Icon(Icons.edit),
+            icon: const Icon(Icons.edit),
           );
   }
 
   Widget _buildUserTable() {
     if (!_usersFetched) {
-      return Center(
+      return const Center(
         child: CircularProgressIndicator(),
       );
     }
 
     if (_users.isEmpty) {
       return NoResultsPlaceholder(
-          label: AppLocalizations.of(context).noAccountsFound,
-          icon: Icons.supervisor_account);
+        label: AppLocalizations.of(context).noAccountsFound,
+        icon: Icons.supervisor_account,
+      );
     }
 
     return SlidableAutoCloseBehavior(
@@ -123,7 +124,7 @@ class ExistingUserListState extends State<ExistingUserList> {
         itemCount: _users.length,
         separatorBuilder: (context, index) {
           return Padding(
-            padding: EdgeInsets.symmetric(vertical: SMALL_PADDING),
+            padding: const EdgeInsets.symmetric(vertical: SMALL_PADDING),
             child: Divider(
               color: Theme.of(context).colorScheme.onSecondary,
               height: 0,
@@ -134,12 +135,10 @@ class ExistingUserListState extends State<ExistingUserList> {
           return Slidable(
             key: ValueKey('userRow-$index'),
             enabled: !_isEditing,
-            closeOnScroll: true,
             endActionPane: ActionPane(
               motion: const ScrollMotion(),
               children: [
                 SlidableAction(
-                  autoClose: true,
                   onPressed: (BuildContext context) {
                     triggerDeleteUserDialog(specificUserIndex: index);
                   },
@@ -179,7 +178,7 @@ class ExistingUserListState extends State<ExistingUserList> {
   }
 
   void triggerDeleteUserDialog({int? specificUserIndex}) {
-    bool multiDelete = _selectedUsers.length > 1;
+    final multiDelete = _selectedUsers.length > 1;
 
     showConfirmationDialog(
         context,
@@ -196,28 +195,33 @@ class ExistingUserListState extends State<ExistingUserList> {
         _selectedUsers.add(specificUserIndex);
       }
 
-      for (int index in _selectedUsers) {
-        User user = _users[index];
+      for (final index in _selectedUsers) {
+        final user = _users[index];
         await container.deleteDevice(user.did);
 
         // Since container.deleteDevice() uses user session, which we don't have, we also
         // have to manually delete the device from the local db.
-        var tempSession = await container.createAnonymousSession(user.host);
+        final tempSession = await container.createAnonymousSession(user.host);
         await tempSession.deviceRepository.deleteLocalDevice(user.did.bytes);
       }
 
       setState(() {
         try {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            width: 350,
-            behavior: SnackBarBehavior.floating,
-            content: Text(multiDelete
-                ? AppLocalizations.of(context)
-                    .devicesDeleted(_selectedUsers.length)
-                : AppLocalizations.of(context)
-                    .deviceDeleted(_selectedUsers.length)),
-          ));
-        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              width: 350,
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                multiDelete
+                    ? AppLocalizations.of(context)
+                        .devicesDeleted(_selectedUsers.length)
+                    : AppLocalizations.of(context)
+                        .deviceDeleted(_selectedUsers.length),
+              ),
+            ),
+          );
+        } on Exception catch (e) {
+          // Logging exception in non-critical UI callback.
           // ignore: avoid_print
           print(e);
         }
@@ -232,16 +236,16 @@ class ExistingUserListState extends State<ExistingUserList> {
 
   Widget _buildTransition(Widget child, Animation<double> animation) {
     final inAnimation = Tween<Offset>(
-      begin: Offset(0.5, 0.0),
-      end: Offset(0.0, 0.0),
+      begin: const Offset(0.5, 0),
+      end: Offset.zero,
     ).animate(animation);
 
     final outAnimation = Tween<Offset>(
-      begin: Offset(-0.5, 0.0),
-      end: Offset(0, 0.0),
+      begin: const Offset(-0.5, 0),
+      end: Offset.zero,
     ).animate(animation);
 
-    if (child.key == ValueKey('arrow')) {
+    if (child.key == const ValueKey('arrow')) {
       return SlideTransition(
         position: inAnimation,
         child: FadeTransition(
@@ -263,78 +267,78 @@ class ExistingUserListState extends State<ExistingUserList> {
   Widget _buildUserRow(User user, int index) {
     const double actionButtonSize = 48;
     final container = context.read<AppContainer>();
-    final SettingsController settingsController = container.settingsController;
-    String name = "";
+    final settingsController = container.settingsController;
+    var name = '';
 
     return FutureBuilder(
-        future: settingsController
-            .getNameById(String.fromCharCodes(user.did.bytes)),
-        builder: (context, snapshot) {
-          name = snapshot.data ?? "";
-          return SkeletonizerTemplate(
-            isLoading: !snapshot.hasData,
-            child: ListTile(
-              leading: Container(
-                padding: EdgeInsets.only(right: SMALL_PADDING),
-                child: CircleAvatar(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    child: Text(
-                      name.initials,
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.onPrimary),
-                    )),
-              ),
-              title: Text(name),
-              subtitle: Text(user.host),
-              trailing: SizedBox(
-                width: actionButtonSize,
-                height: actionButtonSize,
-                child: AnimatedSwitcher(
-                  duration: Duration(milliseconds: 300),
-                  transitionBuilder:
-                      (Widget child, Animation<double> animation) {
-                    return _buildTransition(child, animation);
-                  },
-                  child: _isEditing
-                      ? SizedBox(
-                          key: ValueKey('delete'),
-                          width: actionButtonSize,
-                          height: actionButtonSize,
-                          child: _buildDeleteButton(user, index),
-                        )
-                      : SizedBox(
-                          key: ValueKey('arrow'),
-                          width: actionButtonSize,
-                          height: actionButtonSize,
-                          child: Center(
-                            child: Icon(Icons.arrow_forward_ios),
-                          ),
-                        ),
+      future:
+          settingsController.getNameById(String.fromCharCodes(user.did.bytes)),
+      builder: (context, snapshot) {
+        name = snapshot.data ?? '';
+        return SkeletonizerTemplate(
+          isLoading: !snapshot.hasData,
+          child: ListTile(
+            leading: Container(
+              padding: const EdgeInsets.only(right: SMALL_PADDING),
+              child: CircleAvatar(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                child: Text(
+                  name.initials,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
                 ),
               ),
-              onTap: _isEditing
-                  ? () {
-                      setState(() {
-                        if (_selectedUsers.contains(index)) {
-                          _selectedUsers.remove(index);
-                        } else {
-                          _selectedUsers.add(index);
-                        }
-                      });
-                    }
-                  : () => loginSelectedUser(user, name),
             ),
-          );
-        });
+            title: Text(name),
+            subtitle: Text(user.host),
+            trailing: SizedBox(
+              width: actionButtonSize,
+              height: actionButtonSize,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                transitionBuilder: _buildTransition,
+                child: _isEditing
+                    ? SizedBox(
+                        key: const ValueKey('delete'),
+                        width: actionButtonSize,
+                        height: actionButtonSize,
+                        child: _buildDeleteButton(user, index),
+                      )
+                    : const SizedBox(
+                        key: ValueKey('arrow'),
+                        width: actionButtonSize,
+                        height: actionButtonSize,
+                        child: Center(
+                          child: Icon(Icons.arrow_forward_ios),
+                        ),
+                      ),
+              ),
+            ),
+            onTap: _isEditing
+                ? () {
+                    setState(() {
+                      if (_selectedUsers.contains(index)) {
+                        _selectedUsers.remove(index);
+                      } else {
+                        _selectedUsers.add(index);
+                      }
+                    });
+                  }
+                : () => loginSelectedUser(user, name),
+          ),
+        );
+      },
+    );
   }
 
-  void loginSelectedUser(User user, String name) async {
+  Future<void> loginSelectedUser(User user, String name) async {
     updateUserSessionPreferences(
       user.did.bytes,
       name,
       user.host,
       context,
     );
-    await launchHome(user: user, context: context, registerNewUser: false);
+    await launchHome(user: user, context: context);
   }
 }

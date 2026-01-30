@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/pages/register_page.dart';
+import 'package:meesign_client/templates/default_page_template.dart';
+import 'package:meesign_client/ui_constants.dart';
+import 'package:meesign_client/util/confirm_device_change.dart';
+import 'package:meesign_client/util/fade_black_page_transition.dart';
+import 'package:meesign_client/view_model/app_view_model.dart';
+import 'package:meesign_client/widget/change_device_section.dart';
+import 'package:meesign_client/widget/danger_zone_section.dart';
 import 'package:provider/provider.dart';
-
-import '../l10n/arb/app_localizations.dart';
-import '../templates/default_page_template.dart';
-import '../ui_constants.dart';
-import '../util/confirm_device_change.dart';
-import '../util/fade_black_page_transition.dart';
-import '../view_model/app_view_model.dart';
-import '../widget/change_device_section.dart';
-import '../widget/danger_zone_section.dart';
-import 'register_page.dart';
 
 class DeviceSettingsPage extends StatefulWidget {
   const DeviceSettingsPage({super.key});
@@ -56,13 +55,12 @@ class _DeviceSettingsPageState extends State<DeviceSettingsPage> {
       wrapInScroll: true,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           _buildDeviceNameSection(),
-          SizedBox(height: XLARGE_GAP),
+          const SizedBox(height: XLARGE_GAP),
           _buildChangeServerSection(),
-          SizedBox(height: XLARGE_GAP * 2),
-          _buildDangerZone()
+          const SizedBox(height: XLARGE_GAP * 2),
+          _buildDangerZone(),
         ],
       ),
     );
@@ -76,7 +74,7 @@ class _DeviceSettingsPageState extends State<DeviceSettingsPage> {
           AppLocalizations.of(context).deviceName,
           style: Theme.of(context).textTheme.bodyLarge,
         ),
-        SizedBox(height: SMALL_GAP),
+        const SizedBox(height: SMALL_GAP),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -88,15 +86,12 @@ class _DeviceSettingsPageState extends State<DeviceSettingsPage> {
               onChanged: (_) => setState(() {}),
               decoration: InputDecoration(
                 suffixIcon:
-                    _nameController.text == "" || !_nameControllerFocus.hasFocus
+                    _nameController.text == '' || !_nameControllerFocus.hasFocus
                         ? null
                         : IconButton(
-                            // Icon to
                             icon: const Icon(Icons.clear),
                             onPressed: () {
-                              setState(() {
-                                _nameController.clear();
-                              });
+                              setState(_nameController.clear);
                             },
                           ),
                 filled: true,
@@ -108,37 +103,42 @@ class _DeviceSettingsPageState extends State<DeviceSettingsPage> {
                 border: const OutlineInputBorder(),
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.primary, width: 0),
+                    color: Theme.of(context).colorScheme.primary,
+                    width: 0,
+                  ),
                 ),
-                errorText: null,
               ),
             ),
           ],
-        )
+        ),
       ],
     );
   }
 
   Widget _buildChangeServerSection() {
-    return ChangeDeviceSection(onChangeServer: () async {
-      var res = await showChangeServerDialog(context, mounted);
+    return ChangeDeviceSection(
+      onChangeServer: () async {
+        final res = await showChangeServerDialog(context, mounted: mounted);
 
-      if (res == null || res == false) {
-        return;
-      }
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-            FadeBlackPageTransition.fadeBlack(destination: RegisterPage()),
-            (route) => false,
-          );
+        if (res == null || !res) {
+          return;
         }
-      });
-    });
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+              FadeBlackPageTransition.fadeBlack(
+                destination: const RegisterPage(),
+              ),
+              (route) => false,
+            );
+          }
+        });
+      },
+    );
   }
 
   Widget _buildDangerZone() {
-    return DangerZoneSection();
+    return const DangerZoneSection();
   }
 }

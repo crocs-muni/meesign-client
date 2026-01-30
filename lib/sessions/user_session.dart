@@ -1,28 +1,26 @@
+import 'package:meesign_client/sessions/anonymous_session.dart';
+import 'package:meesign_client/sync.dart';
 import 'package:meesign_core/meesign_core.dart';
 
-import '../sync.dart';
-import 'anonymous_session.dart';
-
 class UserSession extends AnonymousSession {
-  final User user;
-
-  final Sync sync = Sync();
-
   UserSession(
     this.user,
     List<int>? serverCerts,
-    bool allowBadCerts,
     KeyStore keyStore,
     FileStore fileStore,
-    Database database,
-  ) : super(
+    Database database, {
+    required bool allowBadCerts,
+  }) : super(
           user.host,
           serverCerts,
-          allowBadCerts,
           keyStore,
           fileStore,
           database,
+          allowBadCerts: allowBadCerts,
         );
+  final User user;
+
+  final Sync sync = Sync();
 
   void startSync() {
     sync.init(user.did, [

@@ -1,10 +1,11 @@
 import 'dart:async';
-import 'dart:io' hide File;
-import 'dart:io' as io;
 import 'dart:convert';
+import 'dart:io' as io;
+import 'dart:io' hide File;
 
 import 'package:args/args.dart';
 import 'package:meesign_core/meesign_core.dart';
+import 'package:meesign_core/src/util/logger_service.dart';
 import 'package:meta/meta.dart';
 
 extension Range<T> on Comparable<T> {
@@ -14,9 +15,6 @@ extension Range<T> on Comparable<T> {
 
 @immutable
 class Time implements Comparable<Time> {
-  final int hour;
-  final int minute;
-
   const Time({required this.hour, required this.minute});
 
   factory Time.now() {
@@ -24,17 +22,21 @@ class Time implements Comparable<Time> {
     return Time(hour: now.hour, minute: now.minute);
   }
 
-  static Time parse(String string) {
+  factory Time.parse(String string) {
     final parts = string.trim().split(':');
-    if (parts.length != 2) throw FormatException('Invalid time format');
+    if (parts.length != 2) throw const FormatException('Invalid time format');
 
     final hour = int.parse(parts[0]);
-    if (!hour.within(0, 23)) throw FormatException('Hour out of range');
+    if (!hour.within(0, 23)) throw const FormatException('Hour out of range');
     final minute = int.parse(parts[1]);
-    if (!minute.within(0, 59)) throw FormatException('Minute out of range');
+    if (!minute.within(0, 59)) {
+      throw const FormatException('Minute out of range');
+    }
 
     return Time(hour: hour, minute: minute);
   }
+  final int hour;
+  final int minute;
 
   @override
   String toString() {
@@ -77,16 +79,16 @@ extension TaskDecision<T> on TaskRepository<T> {
     });
   }
 
-  void decide(Uuid did, Map<String, dynamic> basePolicy) async {
+  Future<void> decide(Uuid did, Map<String, dynamic> basePolicy) async {
     final tasks = await observeTasks(did).first;
 
-    for (var task in tasks) {
+    for (final task in tasks) {
       if (task.approved) continue;
 
       final group = getGroup(task);
       late final Map<String, dynamic> extPolicy;
       try {
-        extPolicy = jsonDecode(group.note ?? '{}');
+        extPolicy = jsonDecode(group.note ?? '{}') as Map<String, dynamic>;
       } on Exception {
         extPolicy = {};
       }
@@ -94,9 +96,9 @@ extension TaskDecision<T> on TaskRepository<T> {
       final result = evalPolicy(basePolicy, extPolicy, task);
       if (result != null) {
         if (result) {
-          print('Approved task: ${getName(task)} $extPolicy');
+          LoggerService.logDebug('Approved task: ${getName(task)} $extPolicy');
         } else {
-          print('Declined task: ${getName(task)} $extPolicy');
+          LoggerService.logDebug('Declined task: ${getName(task)} $extPolicy');
         }
         await approveTask(did, task.id, agree: result);
       }
@@ -121,8 +123,9 @@ class DummyFileStore implements FileStore {
 }
 
 void printUsage(ArgParser parser, IOSink sink) {
-  sink.writeln('Usage:');
-  sink.writeln(parser.usage);
+  sink
+    ..writeln('Usage:')
+    ..writeln(parser.usage);
 }
 
 bool? evalPolicy<T>(
@@ -131,31 +134,31 @@ bool? evalPolicy<T>(
   Task<T> task,
 ) {
   var policy = basePolicy;
-  if (policy["overridable"] ?? true) {
+  if (policy['overridable'] as bool? ?? true) {
     policy = {...basePolicy, ...extPolicy};
   }
   var result = true;
 
-  if (policy["fail"] ?? false) {
+  if (policy['fail'] as bool? ?? false) {
     result = false;
   }
 
   try {
-    final after = Time.parse(policy["after"] ?? "00:00");
-    final before = Time.parse(policy["before"] ?? "23:59");
+    final after = Time.parse(policy['after'] as String? ?? '00:00');
+    final before = Time.parse(policy['before'] as String? ?? '23:59');
     if (after.compareTo(before) > 0) {
       result = result && Time.now().outside(before, after);
     } else {
       result = result && Time.now().within(after, before);
     }
   } on Exception catch (e) {
-    print("Error parsing after: $e");
+    LoggerService.logWarning('Error parsing after: $e');
   }
 
   if (result) {
     return true;
   }
-  if (policy["decline"] ?? false) {
+  if (policy['decline'] as bool? ?? false) {
     return false;
   }
   return null;
@@ -186,7 +189,7 @@ void main(List<String> args) async {
     printUsage(parser, stderr);
     return;
   }
-  if (options['help']) {
+  if (options['help'] as bool) {
     printUsage(parser, stdout);
     return;
   }
@@ -194,7 +197,9 @@ void main(List<String> args) async {
   var policyData = <String, dynamic>{};
   if (options['policy'] != null) {
     try {
-      policyData = jsonDecode(io.File(options['policy']).readAsStringSync());
+      policyData =
+          jsonDecode(io.File(options['policy'] as String).readAsStringSync())
+              as Map<String, dynamic>;
     } on Exception catch (e) {
       stderr.writeln('Failed to read policy file: $e');
       return;
@@ -209,7 +214,7 @@ void main(List<String> args) async {
 
   final keyStore = KeyStore(appDir);
   final dispatcher = NetworkDispatcher(
-    options['host'],
+    options['host'] as String,
     keyStore,
     allowBadCerts: true,
   );
@@ -247,20 +252,24 @@ void main(List<String> args) async {
     taskDao,
   );
 
-  var user = await userRepository.getUser();
+  final user = await userRepository.getUser();
   Device device;
   if (user == null) {
     device = await deviceRepository.register(
-      options['name'],
+      options['name'] as String,
       kind: DeviceKind.bot,
     );
-    userRepository.setUser(User(device.id, options['host']));
-    print('No credentials found, registering as ${device.name}');
+    userRepository.setUser(User(device.id, options['host'] as String));
+    LoggerService.logDebug(
+      'No credentials found, registering as ${device.name}',
+    );
   } else {
     device = await deviceRepository.getDevice(user.did);
   }
-  print('Logged in as ${device.name}#${device.id.encode().substring(0, 4)}');
-  print('Base policy: $policyData');
+  LoggerService.logDebug(
+    'Logged in as ${device.name}#${device.id.encode().substring(0, 4)}',
+  );
+  LoggerService.logDebug('Base policy: $policyData');
 
   await groupRepository.subscribe(device.id);
   await fileRepository.subscribe(device.id);
@@ -269,13 +278,13 @@ void main(List<String> args) async {
 
   groupRepository.approveAll(device.id);
 
-  Timer.periodic(Duration(seconds: 1), (_) {
+  Timer.periodic(const Duration(seconds: 1), (_) {
     fileRepository.decide(device.id, policyData);
   });
-  Timer.periodic(Duration(seconds: 1), (_) {
+  Timer.periodic(const Duration(seconds: 1), (_) {
     challengeRepository.decide(device.id, policyData);
   });
-  Timer.periodic(Duration(seconds: 1), (_) {
+  Timer.periodic(const Duration(seconds: 1), (_) {
     decryptRepository.decide(device.id, policyData);
   });
 

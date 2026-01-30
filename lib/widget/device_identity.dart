@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:meesign_client/util/qr_coder.dart';
+import 'package:meesign_client/widget/hex_table.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-import '../util/qr_coder.dart';
-import 'hex_table.dart';
-
 class DeviceIdentity extends StatelessWidget {
+  const DeviceIdentity({required this.device, super.key});
   final Device device;
-
-  const DeviceIdentity({super.key, required this.device});
 
   @override
   Widget build(BuildContext context) {

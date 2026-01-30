@@ -15,12 +15,9 @@ import 'matcher.dart';
 extension ListStream<T> on Stream<Iterable<T>> {
   Future<T> firstElement() async =>
       (await firstWhere((iter) => iter.isNotEmpty)).first;
-
-  Future<T> firstElementWhere(bool Function(T) test) =>
-      map((iter) => iter.where(test)).firstElement();
 }
 
-// TODO: use stream matchers?
+// TODO(dev): use stream matchers?
 
 Future<void> approveFirst(
   TaskRepository taskRepository,
@@ -57,11 +54,9 @@ void main() {
   late DecryptRepository decryptRepository;
 
   List<int>? serverCerts;
-  final String? serverCertsPath = io.Platform.environment['SERVER_CERTS'];
-  final String? meesignServerDomain =
-      io.Platform.environment['MEESIGN_SERVER_DOMAIN'];
-  final String? meesignServerPort =
-      io.Platform.environment['MEESIGN_SERVER_PORT'];
+  final serverCertsPath = io.Platform.environment['SERVER_CERTS'];
+  final meesignServerDomain = io.Platform.environment['MEESIGN_SERVER_DOMAIN'];
+  final meesignServerPort = io.Platform.environment['MEESIGN_SERVER_PORT'];
 
   if (serverCertsPath != null) {
     serverCerts = io.File(serverCertsPath).readAsBytesSync();
@@ -71,12 +66,12 @@ void main() {
     database = Database(appDir);
     keyStore = KeyStore(appDir);
     dispatcher = NetworkDispatcher(
-      meesignServerDomain ?? "localhost",
+      meesignServerDomain ?? 'localhost',
       keyStore,
       serverCerts: serverCerts,
       allowBadCerts: serverCerts == null,
-      // TODO is there a better way to set the default?
-      port: int.tryParse(meesignServerPort ?? "") ?? 1337,
+      // TODOis there a better way to set the default?
+      port: int.tryParse(meesignServerPort ?? '') ?? 1337,
     );
     deviceRepository = DeviceRepository(
       dispatcher,
@@ -118,10 +113,10 @@ void main() {
     TaskRepository<T> taskRepository,
     KeyType keyType,
     Protocol protocol, {
-    int? n,
-    List<int>? shares,
     required int t,
     required Future<void> Function(TaskRepository, Group) createTask,
+    int? n,
+    List<int>? shares,
   }) async {
     n ??= shares!.length;
     shares ??= List.filled(n, 1);
@@ -151,12 +146,12 @@ void main() {
     await Future.wait(ds.map((d) => taskRepository.subscribe(d.id)));
     await createTask(taskRepository, gs.first);
     approveAllFirst(taskRepository, ds.take(t));
-    return await Future.wait(
+    return Future.wait(
       ds.map((d) => taskRepository.observeResults(d.id).firstElement()),
     );
   }
 
-  Future<void> testSignPdf({int? n, List<int>? shares, required int t}) async {
+  Future<void> testSignPdf({required int t, int? n, List<int>? shares}) async {
     final files = await testRepository(
       fileRepository,
       KeyType.signPdf,
@@ -170,16 +165,16 @@ void main() {
       },
     );
 
-    for (var file in files) {
+    for (final file in files) {
       await verifyPdfSignature(file.path);
     }
   }
 
   Future<void> testSignChallenge(
     Protocol protocol, {
+    required int t,
     int? n,
     List<int>? shares,
-    required int t,
   }) async {
     final rng = Random();
     final message = List.generate(1024, (_) => rng.nextInt(256));
@@ -196,10 +191,10 @@ void main() {
       },
     );
 
-    // TODO: verify signatures
+    // TODO(dev): verify signatures
   }
 
-  Future<void> testDecrypt({int? n, List<int>? shares, required int t}) async {
+  Future<void> testDecrypt({required int t, int? n, List<int>? shares}) async {
     final rng = Random();
     final message = List.generate(1024, (_) => rng.nextInt(256));
 
@@ -219,7 +214,7 @@ void main() {
         );
       },
     );
-    final results = [for (var d in decrypts) d.data];
+    final results = [for (final d in decrypts) d.data];
 
     expect(results, allEqual);
     expect(results.first, equals(message));
@@ -280,9 +275,9 @@ void main() {
   tearDown(() async {
     try {
       // FIXME: not all db updates are written when the test finishes
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future<void>.delayed(const Duration(milliseconds: 100));
       await database.close();
       appDir.deleteSync(recursive: true);
-    } catch (_) {}
+    } on Exception catch (_) {}
   });
 }

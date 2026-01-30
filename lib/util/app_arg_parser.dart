@@ -3,10 +3,9 @@ import 'dart:io';
 import 'package:args/args.dart';
 
 class AppArgParser {
+  AppArgParser({required this.args});
   final List<String> args;
   late final ArgResults _results;
-
-  AppArgParser({required this.args});
 
   ArgResults initParser() {
     final parser = ArgParser()
@@ -27,7 +26,7 @@ class AppArgParser {
 
     try {
       _results = parser.parse(args);
-      if (_results['help']) printUsage(parser, stdout);
+      if (_results['help'] as bool) printUsage(parser, stdout);
     } on ArgParserException catch (e) {
       stderr.writeln(e.message);
       printUsage(parser, stderr);
@@ -37,7 +36,8 @@ class AppArgParser {
   }
 
   void printUsage(ArgParser parser, IOSink sink) {
-    sink.writeln('Usage:');
-    sink.writeln(parser.usage);
+    sink
+      ..writeln('Usage:')
+      ..writeln(parser.usage);
   }
 }

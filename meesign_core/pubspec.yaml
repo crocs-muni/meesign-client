@@ -12,6 +12,7 @@ dependencies:
   convert: ^3.1.1
   drift: ^2.26.1
   freezed_annotation: ^3.1.0
+  logger: ^2.6.2
   meesign_native: {path: ../meesign_native}
   meesign_network: {path: ../meesign_network}
   meta: ^1.7.0
@@ -26,3 +27,4 @@ dev_dependencies:
   freezed: ^3.2.3
   lints: ^6.0.0
   test: ^1.16.0
+  very_good_analysis: ^10.0.0

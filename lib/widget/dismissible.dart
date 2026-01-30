@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 
-import '../l10n/arb/app_localizations.dart';
+import 'package:meesign_client/l10n/arb/app_localizations.dart';
 
 class DismissibleBackground extends StatelessWidget {
-  final AlignmentGeometry alignment;
-  final Color? color;
-  final IconData? icon;
-
   const DismissibleBackground({
-    super.key,
     required this.alignment,
+    super.key,
     this.color,
     this.icon,
   });
+  final AlignmentGeometry alignment;
+  final Color? color;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -56,17 +55,10 @@ Future<bool?> showConfirmationDialog({
 }
 
 class Deletable extends StatefulWidget {
-  final Key dismissibleKey;
-  final Widget Function(bool isDragging) childBuilder;
-  final Color color;
-  final IconData icon;
-  final Future<bool?> Function(DismissDirection)? confirmDismiss;
-  final void Function(DismissDirection)? onDeleted;
-
   Deletable({
-    super.key,
     required this.dismissibleKey,
     required Widget child,
+    super.key,
     this.color = Colors.red,
     this.icon = Icons.delete,
     this.confirmDismiss,
@@ -74,14 +66,22 @@ class Deletable extends StatefulWidget {
   }) : childBuilder = ((isDragging) => child);
 
   const Deletable.builder({
-    super.key,
     required this.dismissibleKey,
     required this.childBuilder,
+    super.key,
     this.color = Colors.red,
     this.icon = Icons.delete,
     this.confirmDismiss,
     this.onDeleted,
   });
+  final Key dismissibleKey;
+  // Builder pattern requires positional bool for drag state.
+  // ignore: avoid_positional_boolean_parameters
+  final Widget Function(bool isDragging) childBuilder;
+  final Color color;
+  final IconData icon;
+  final Future<bool?> Function(DismissDirection)? confirmDismiss;
+  final void Function(DismissDirection)? onDeleted;
 
   @override
   State<Deletable> createState() => _DeletableState();

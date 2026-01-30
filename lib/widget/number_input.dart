@@ -3,14 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class NumberInput extends StatefulWidget {
-  final int value;
-  final void Function(int)? onUpdate;
-
   const NumberInput({
     required this.value,
     this.onUpdate,
     super.key,
   });
+  final int value;
+  final void Function(int)? onUpdate;
 
   @override
   State<NumberInput> createState() => _NumberInputState();
@@ -65,29 +64,30 @@ class _NumberInputState extends State<NumberInput> {
               : null,
         ),
         Container(
-            alignment: Alignment.center,
-            width: 25,
-            child: TextField(
-              controller: _numberController,
-              maxLength: 7,
-              onChanged: (text) {
-                final newValue = int.tryParse(text);
-                if (newValue != null && widget.onUpdate != null) {
-                  widget.onUpdate!(newValue);
-                }
-              },
-              keyboardType: TextInputType.number,
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-              ],
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.labelLarge,
-              decoration: const InputDecoration(
-                counterText: '',
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.zero,
-              ),
-            )),
+          alignment: Alignment.center,
+          width: 25,
+          child: TextField(
+            controller: _numberController,
+            maxLength: 7,
+            onChanged: (text) {
+              final newValue = int.tryParse(text);
+              if (newValue != null && widget.onUpdate != null) {
+                widget.onUpdate!(newValue);
+              }
+            },
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+            ],
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.labelLarge,
+            decoration: const InputDecoration(
+              counterText: '',
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.zero,
+            ),
+          ),
+        ),
         IconButton(
           icon: const Icon(Symbols.chevron_right),
           onPressed: widget.onUpdate != null

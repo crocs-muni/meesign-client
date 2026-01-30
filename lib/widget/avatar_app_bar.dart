@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 
 class FlexibleAvatarAppBar extends StatelessWidget {
-  final Widget avatar;
-  final Widget title;
-
   const FlexibleAvatarAppBar({
-    super.key,
     required this.avatar,
     required this.title,
+    super.key,
   });
+  final Widget avatar;
+  final Widget title;
 
   @override
   Widget build(BuildContext context) {
