@@ -25,7 +25,7 @@ if (flutterVersionName == null) {
 android {
     namespace 'com.example.meesign_client'
 
-    compileSdk 35
+    compileSdk 36
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -77,5 +77,5 @@ flutter {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.0"
 }
