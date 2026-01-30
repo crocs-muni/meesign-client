@@ -1,4 +1,6 @@
 @Timeout(Duration(seconds: 180))
+library;
+
 import 'dart:async';
 import 'dart:io' as io;
 import 'dart:io';

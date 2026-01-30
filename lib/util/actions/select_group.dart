@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../view_model/app_view_model.dart';
 
-Future<Group?> selectGroup(keyType, BuildContext buildContext) async {
+Future<Group?> selectGroup(KeyType keyType, BuildContext buildContext) async {
   final state = buildContext.read<AppViewModel>();
   final groups = state.groupTasks
       .where((task) =>

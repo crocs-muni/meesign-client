@@ -1,4 +1,4 @@
-library meesign_data;
+library;
 
 export 'meesign_model.dart';
 

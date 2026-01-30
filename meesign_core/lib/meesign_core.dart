@@ -1,4 +1,4 @@
-library meesign_core;
+library;
 
 export 'meesign_card.dart';
 export 'meesign_data.dart';

@@ -1,4 +1,4 @@
-library meesign_model;
+library;
 
 export 'src/model/device.dart';
 export 'src/model/task.dart';
