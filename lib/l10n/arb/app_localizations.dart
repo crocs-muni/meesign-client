@@ -1329,6 +1329,24 @@ abstract class AppLocalizations {
   /// **'Show confirmation on exit'**
   String get confirmCloseSettings;
 
+  /// No description provided for @authenticateProtectedActionsSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication settings'**
+  String get authenticateProtectedActionsSettingsTitle;
+
+  /// No description provided for @authenticateProtectedActionsSettingsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Require biometric or device authentication for sensitive actions to enhance security.'**
+  String get authenticateProtectedActionsSettingsDesc;
+
+  /// No description provided for @authenticateProtectedActionsSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Authenticate protected actions'**
+  String get authenticateProtectedActionsSettings;
+
   /// No description provided for @confirmQuitTitle.
   ///
   /// In en, this message translates to:

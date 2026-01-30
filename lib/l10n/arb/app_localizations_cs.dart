@@ -677,6 +677,18 @@ class AppLocalizationsCs extends AppLocalizations {
   String get confirmCloseSettings => 'Potvrdit zavření aplikace';
 
   @override
+  String get authenticateProtectedActionsSettingsTitle =>
+      'Nastavení autentizace';
+
+  @override
+  String get authenticateProtectedActionsSettingsDesc =>
+      'Vyžadovat biometrickou nebo zařízení autentizaci pro citlivé akce pro zvýšení bezpečnosti.';
+
+  @override
+  String get authenticateProtectedActionsSettings =>
+      'Autentizovat chráněné akce';
+
+  @override
   String get confirmQuitTitle => 'Opravdu chcete aplikaci ukončit?';
 
   @override
