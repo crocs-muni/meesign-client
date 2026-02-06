@@ -48,3 +48,6 @@ app.*.map.json
 
 # FVM Version Cache
 .fvm/
+
+# Machine-specific Cargo config
+meesign_native/native/meesign-crypto/.cargo/config.toml

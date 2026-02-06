@@ -129,7 +129,7 @@ jobs:
     - name: Set up Rust for Android
       if: matrix.target == 'Android'
       env:
-        ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk/25.2.9519653
+        ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk/27.0.12077973
         ANDROID_API: 33
       # add rust android targets,
       # point cargo to local Android NDK installation
