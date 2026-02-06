@@ -1,7 +1,10 @@
-import 'dart:io';
-
 import 'package:logger/logger.dart';
 import 'package:meta/meta.dart';
+
+/// Web detection without depending on package:flutter/foundation.dart.
+/// On web platforms, int and double are the same type, so identical(0, 0.0)
+/// is true. On native platforms, they are different types, so it is false.
+const bool _kIsWeb = identical(0, 0.0);
 
 /// Dart singleton pattern implemented with a factory constructor
 /// For more see: https://stackoverflow.com/questions/12649573/how-do-you-build-a-singleton-in-dart
@@ -22,7 +25,15 @@ class LoggerService {
   /// log output and avoid triggering external log providers.
   /// Automatically enabled when running under `flutter test`.
   @visibleForTesting
-  static bool isTestMode = Platform.environment['FLUTTER_TEST'] == 'true';
+  static bool isTestMode = !_kIsWeb && _isFlutterTest();
+
+  static bool _isFlutterTest() {
+    try {
+      return const bool.fromEnvironment('FLUTTER_TEST');
+    } on Object catch (_) {
+      return false;
+    }
+  }
 
   // TODO(dev): Add Crashlytics or Sentry integration for error reporting
   static final _logger = Logger(

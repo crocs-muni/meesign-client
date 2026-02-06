@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
 
 import 'package:collection/collection.dart';
@@ -17,6 +16,7 @@ import 'package:meesign_client/templates/default_page_template.dart';
 import 'package:meesign_client/ui_constants.dart';
 import 'package:meesign_client/util/chars.dart';
 import 'package:meesign_client/util/get_shares_warning.dart';
+import 'package:meesign_client/util/platform.dart';
 import 'package:meesign_client/widget/device_name.dart';
 import 'package:meesign_client/widget/number_input.dart';
 import 'package:meesign_client/widget/option_tile.dart';
@@ -37,14 +37,24 @@ class NewGroupPage extends StatefulWidget {
 
 const int _minThreshold = 2;
 
+List<Protocol> _availableProtocols(KeyType keyType) {
+  if (PlatformGroup.isWeb) {
+    return keyType.supportedProtocols.where((p) => p.webSupported).toList();
+  }
+  return keyType.supportedProtocols;
+}
+
+final List<KeyType> _availableKeyTypes =
+    KeyType.values.where((kt) => _availableProtocols(kt).isNotEmpty).toList();
+
 class _NewGroupPageState extends State<NewGroupPage> {
   Group newGroup = Group(
     name: '',
     id: const [],
     members: const [],
     threshold: _minThreshold,
-    protocol: KeyType.signPdf.supportedProtocols.first,
-    keyType: KeyType.signPdf,
+    protocol: _availableProtocols(_availableKeyTypes.first).first,
+    keyType: _availableKeyTypes.first,
   );
 
   final List<Device> _devices = [];
@@ -104,20 +114,18 @@ class _NewGroupPageState extends State<NewGroupPage> {
 
       // Set initial purpose
       setState(() {
+        KeyType? keyType;
         if (widget.initialGroupType == TaskType.decrypt) {
-          newGroup = newGroup.copyWith(
-            keyType: KeyType.decrypt,
-            protocol: KeyType.decrypt.supportedProtocols.first,
-          );
+          keyType = KeyType.decrypt;
         } else if (widget.initialGroupType == TaskType.sign) {
-          newGroup = newGroup.copyWith(
-            keyType: KeyType.signPdf,
-            protocol: KeyType.signPdf.supportedProtocols.first,
-          );
+          keyType = KeyType.signPdf;
         } else if (widget.initialGroupType == TaskType.challenge) {
+          keyType = KeyType.signChallenge;
+        }
+        if (keyType != null && _availableKeyTypes.contains(keyType)) {
           newGroup = newGroup.copyWith(
-            keyType: KeyType.signChallenge,
-            protocol: KeyType.signChallenge.supportedProtocols.first,
+            keyType: keyType,
+            protocol: _availableProtocols(keyType).first,
           );
         }
       });
@@ -534,7 +542,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
               ),
             ),
             const SizedBox(width: 8),
-            if (Platform.isAndroid || Platform.isIOS)
+            if (PlatformGroup.isMobile)
               Expanded(
                 child: FilledButton.tonalIcon(
                   icon: const Icon(Symbols.qr_code),
@@ -716,7 +724,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
             setState(() {
               newGroup = newGroup.copyWith(
                 keyType: value.first,
-                protocol: value.first.supportedProtocols.first,
+                protocol: _availableProtocols(value.first).first,
               );
 
               if (newGroup.protocol.thresholdType == ThresholdType.nOfN) {
@@ -724,19 +732,22 @@ class _NewGroupPageState extends State<NewGroupPage> {
               }
             });
           },
-          segments: const [
-            ButtonSegment<KeyType>(
-              value: KeyType.signPdf,
-              label: Text('Sign PDF'),
-            ),
-            ButtonSegment<KeyType>(
-              value: KeyType.signChallenge,
-              label: Text('Challenge'),
-            ),
-            ButtonSegment<KeyType>(
-              value: KeyType.decrypt,
-              label: Text('Decrypt'),
-            ),
+          segments: [
+            if (_availableKeyTypes.contains(KeyType.signPdf))
+              const ButtonSegment<KeyType>(
+                value: KeyType.signPdf,
+                label: Text('Sign PDF'),
+              ),
+            if (_availableKeyTypes.contains(KeyType.signChallenge))
+              const ButtonSegment<KeyType>(
+                value: KeyType.signChallenge,
+                label: Text('Challenge'),
+              ),
+            if (_availableKeyTypes.contains(KeyType.decrypt))
+              const ButtonSegment<KeyType>(
+                value: KeyType.decrypt,
+                label: Text('Decrypt'),
+              ),
           ],
         ),
       ],
@@ -845,7 +856,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
                 });
               },
               segments: [
-                for (final protocol in newGroup.keyType.supportedProtocols)
+                for (final protocol in _availableProtocols(newGroup.keyType))
                   ButtonSegment<Protocol>(
                     value: protocol,
                     label: Text(protocol.name.toUpperCase()),

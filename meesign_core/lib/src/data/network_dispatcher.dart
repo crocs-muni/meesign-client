@@ -24,7 +24,11 @@ class NetworkDispatcher {
 
   late final rpc.MeeSignClient unauth = _createClient();
 
-  rpc.MeeSignClient _createClient({List<int>? certKey}) => ClientFactory.create(
+  rpc.MeeSignClient _createClient({
+    List<int>? certKey,
+    String? authToken,
+  }) =>
+      ClientFactory.create(
         host,
         key: certKey,
         password: '',
@@ -33,10 +37,14 @@ class NetworkDispatcher {
         allowBadCerts: allowBadCerts,
         port: port,
         connectTimeout: const Duration(seconds: 8),
+        authToken: authToken,
       );
 
   rpc.MeeSignClient operator [](Uuid did) {
-    _clients[did] ??= _createClient(certKey: _keyStore.load(did));
+    _clients[did] ??= _createClient(
+      certKey: _keyStore.load(did),
+      authToken: _keyStore.loadToken(did),
+    );
     return _clients[did]!;
   }
 }

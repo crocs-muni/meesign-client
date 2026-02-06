@@ -741,7 +741,7 @@ packages:
     source: path
     version: "0.4.2"
   meesign_native:
-    dependency: transitive
+    dependency: "direct main"
     description:
       path: meesign_native
       relative: true

@@ -1,10 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:meesign_client/l10n/arb/app_localizations.dart';
 import 'package:meesign_client/pages/task_detail_page.dart';
 import 'package:meesign_client/ui_constants.dart';
 import 'package:meesign_client/util/actions/document_signer.dart';
+import 'package:meesign_client/util/platform.dart';
 import 'package:meesign_client/view_model/app_view_model.dart';
 import 'package:meesign_client/widget/entity_chip.dart';
 import 'package:meesign_client/widget/large_square_button.dart';
@@ -152,7 +151,9 @@ class SigningTaskTile extends StatelessWidget {
   }
 
   void _openFile() {
-    if (Platform.isLinux) {
+    if (PlatformGroup.isWeb) {
+      return;
+    } else if (PlatformGroup.isLinux) {
       launchUrl(Uri.file(task.info.path));
     } else {
       OpenFilex.open(task.info.path);

@@ -18,7 +18,6 @@ extension ListStream<T> on Stream<Iterable<T>> {
 }
 
 // TODO(dev): use stream matchers?
-
 Future<void> approveFirst(
   TaskRepository taskRepository,
   Device d, {
@@ -63,8 +62,8 @@ void main() {
   }
 
   setUp(() {
-    database = Database(appDir);
-    keyStore = KeyStore(appDir);
+    database = Database(openDatabaseConnection(appDir.path));
+    keyStore = KeyStore(appDir.path);
     dispatcher = NetworkDispatcher(
       meesignServerDomain ?? 'localhost',
       keyStore,
@@ -87,7 +86,7 @@ void main() {
       taskDao,
       deviceRepository,
     );
-    final fileStore = FileStore(appDir);
+    final fileStore = FileStore(appDir.path);
     fileRepository = FileRepository(
       dispatcher,
       keyStore,

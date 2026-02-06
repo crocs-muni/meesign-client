@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 import 'package:meesign_client/reporter.dart';
@@ -9,11 +7,11 @@ import 'package:meesign_client/sessions/user_session.dart';
 import 'package:meesign_core/meesign_data.dart';
 
 class AppContainer {
-  AppContainer({required Directory appDirectory})
-      : dataDirectory = Directory('${appDirectory.path}/data/') {
+  AppContainer({required String appDirectory})
+      : dataPath = '$appDirectory/data/' {
     _init();
   }
-  final Directory dataDirectory;
+  final String dataPath;
 
   late KeyStore keyStore;
   late FileStore fileStore;
@@ -34,9 +32,9 @@ class AppContainer {
   }
 
   void _init() {
-    keyStore = KeyStore(dataDirectory);
-    fileStore = FileStore(dataDirectory);
-    database = Database(dataDirectory);
+    keyStore = KeyStore(dataPath);
+    fileStore = FileStore(dataPath);
+    database = Database(openDatabaseConnection(dataPath));
     userRepository = UserRepository(database.userDao);
     settingsController = SettingsController();
   }
@@ -59,7 +57,7 @@ class AppContainer {
   }
 
   Future<void> deleteDevice(Uuid userDid) async {
-    final userDataPath = '${dataDirectory.path}${userDid.encode()}/';
+    final userDataPath = '$dataPath${userDid.encode()}/';
 
     // 1. Delete user from local DB
     await userRepository.deleteUser(userDid.bytes);
@@ -67,9 +65,8 @@ class AppContainer {
     // 2. Delete device from local db
     await session?.deviceRepository.deleteLocalDevice(userDid.bytes);
 
-    // 3. Delete user data from the user's directory
-    final usedDataDirectory = Directory(userDataPath);
-    await usedDataDirectory.delete(recursive: true);
+    // 3. Delete user data
+    await fileStore.deleteDirectory(userDataPath);
   }
 
   Future<AnonymousSession> createAnonymousSession(String host) async {

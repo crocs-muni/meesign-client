@@ -120,6 +120,9 @@ class DummyFileStore implements FileStore {
     bool work = false,
   }) async =>
       getFilePath(did, id, name, work: work);
+
+  @override
+  Future<void> deleteDirectory(String path) async {}
 }
 
 void printUsage(ArgParser parser, IOSink sink) {
@@ -208,11 +211,11 @@ void main(List<String> args) async {
 
   final appDir = Directory('app/');
 
-  final database = Database(appDir);
+  final database = Database(openDatabaseConnection(appDir.path));
   final userDao = database.userDao;
   final userRepository = UserRepository(userDao);
 
-  final keyStore = KeyStore(appDir);
+  final keyStore = KeyStore(appDir.path);
   final dispatcher = NetworkDispatcher(
     options['host'] as String,
     keyStore,

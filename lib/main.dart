@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:meesign_client/app/widget/tabbed_scaffold.dart';
@@ -14,6 +12,8 @@ import 'package:meesign_client/theme.dart';
 import 'package:meesign_client/util/app_arg_parser.dart';
 import 'package:meesign_client/util/app_dir_getter.dart';
 import 'package:meesign_client/util/error_logger.dart';
+import 'package:meesign_client/util/platform.dart';
+import 'package:meesign_native/meesign_native.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -26,6 +26,9 @@ void main(List<String> args) async {
 
   // Ensure Flutter binding is initialized
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize crypto subsystem (async on web — awaits WASM module)
+  await createCryptoInstance();
 
   // Prepare window manager
   await _prepareWindowManager();
@@ -47,21 +50,21 @@ void main(List<String> args) async {
 }
 
 Future<void> _prepareWindowManager() async {
+  if (!PlatformGroup.isDesktop) return;
+
   const double minWidth = 600;
   const double minHeight = 800;
 
-  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-    await windowManager.ensureInitialized();
-    WindowManager.instance.setMinimumSize(const Size(minWidth, minHeight));
+  await windowManager.ensureInitialized();
+  WindowManager.instance.setMinimumSize(const Size(minWidth, minHeight));
 
-    final currentSize = await WindowManager.instance.getSize();
-    if (currentSize.width < minWidth || currentSize.height < minHeight) {
-      await WindowManager.instance.setSize(const Size(minWidth, minHeight));
-    }
-
-    WindowManager.instance.center();
-    await windowManager.setPreventClose(true);
+  final currentSize = await WindowManager.instance.getSize();
+  if (currentSize.width < minWidth || currentSize.height < minHeight) {
+    await WindowManager.instance.setSize(const Size(minWidth, minHeight));
   }
+
+  WindowManager.instance.center();
+  await windowManager.setPreventClose(true);
 }
 
 class MeeSignClient extends StatefulWidget {
@@ -138,14 +141,14 @@ class _MeeSignClientState extends State<MeeSignClient> with WindowListener {
   @override
   void initState() {
     super.initState();
-    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    if (PlatformGroup.isDesktop) {
       windowManager.addListener(this);
     }
   }
 
   @override
   void dispose() {
-    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    if (PlatformGroup.isDesktop) {
       windowManager.removeListener(this);
     }
     super.dispose();

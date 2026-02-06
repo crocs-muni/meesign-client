@@ -12,6 +12,9 @@ class LocalAuthService {
   /// Use this function for protected actions like approving tasks or
   /// joining groups ...
   static Future<bool> authUser(SettingsController settingsController) async {
+    // local_auth plugin is not available on web
+    if (kIsWeb) return true;
+
     final auth = LocalAuthentication();
     final canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
     final canAuthenticate =

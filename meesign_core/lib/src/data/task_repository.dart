@@ -4,7 +4,6 @@ import 'dart:collection';
 import 'package:collection/collection.dart';
 import 'package:convert/convert.dart';
 import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
 import 'package:meesign_core/src/card/apdu.dart';
 import 'package:meesign_core/src/card/card.dart';
 import 'package:meesign_core/src/card/iso7816.dart';
@@ -229,8 +228,7 @@ abstract class TaskRepository<T> {
         return await operation();
       } catch (e) {
         // Check if it's a database lock error (SQLite error code 5)
-        final isLockError = e.toString().contains('database is locked') ||
-            (e is SqliteException && e.extendedResultCode == 5);
+        final isLockError = e.toString().contains('database is locked');
 
         // If it's not a lock error or we've reached max retries, rethrow
         if (!isLockError || retryCount >= maxRetries) {

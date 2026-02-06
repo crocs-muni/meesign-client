@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -10,6 +9,7 @@ import 'package:meesign_client/ui_constants.dart';
 import 'package:meesign_client/util/actions/challenge_creator.dart';
 import 'package:meesign_client/util/actions/document_signer.dart';
 import 'package:meesign_client/util/actions/encrypt_data.dart';
+import 'package:meesign_client/util/platform.dart';
 import 'package:meesign_client/widget/copy_button.dart';
 import 'package:meesign_client/widget/entity_chip.dart';
 import 'package:meesign_client/widget/share_button.dart';
@@ -344,7 +344,9 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
   }
 
   void _openFile(String path) {
-    if (Platform.isLinux) {
+    if (PlatformGroup.isWeb) {
+      return;
+    } else if (PlatformGroup.isLinux) {
       launchUrl(Uri.file(path));
     } else {
       OpenFilex.open(path);

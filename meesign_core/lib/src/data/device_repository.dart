@@ -40,6 +40,9 @@ class DeviceRepository {
     final pkcs12 = AuthWrapper.certKeyToPkcs12(key.key, resp.certificate);
     // TODO(dev): store key in db for consistency?
     await _keyStore.store(did, pkcs12);
+    if (resp.hasAuthToken()) {
+      await _keyStore.storeToken(did, resp.authToken);
+    }
     await _deviceDao.insertDevice(
       db.DevicesCompanion.insert(
         id: did.bytes,
