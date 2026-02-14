@@ -26,12 +26,11 @@ class TaskStream {
 }
 
 class AppViewModel with ChangeNotifier {
-  // Limit reduced from 8MB to 3MB to account for encryption overhead
-  // and stay under gRPC's 4MB message size limit.
-  // Currently it is not possible to configure dart's gRPC message size.
-  // TODO: Verify encryption overhead / JSON encoding overhead to find find optimal buffer.
-  // Please follow: https://github.com/grpc/grpc-dart/issues/551
-  static const maxDataSize = 3 * 1024 * 1024; // 3MB
+  // Be aware of the max gRPC message size limit:
+  // https://github.com/grpc/grpc-dart/issues/551
+
+  // For upload of large files (PDFs, images) use gRPC streaming!
+  static const maxDataSize = 8 * 1024 * 1024; // 8MB
   Device? device;
 
   final List<Task> allTasks = [];

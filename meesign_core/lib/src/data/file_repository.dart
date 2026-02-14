@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:fixnum/fixnum.dart';
 import 'package:meesign_core/src/model/group.dart';
 import 'package:meesign_native/meesign_native.dart';
 import 'package:meesign_network/grpc.dart' as rpc;
@@ -33,12 +34,45 @@ class FileRepository extends TaskRepository<File> {
   ) : super(rpc.TaskType.SIGN_PDF, taskSource, _taskDao);
 
   Future<void> sign(String name, List<int> data, List<int> gid) async {
-    await _dispatcher.unauth.sign(
-      rpc.SignRequest()
-        ..groupId = gid
-        ..name = name
-        ..data = data,
-    );
+    // Use streaming for large files (> 1MB)
+    if (data.length > 1024 * 1024) {
+      await _signStreaming(name, data, gid);
+    } else {
+      // Use regular RPC for small files
+      await _dispatcher.unauth.sign(
+        rpc.SignRequest()
+          ..groupId = gid
+          ..name = name
+          ..data = data,
+      );
+    }
+  }
+
+  /// Stream large PDF files in chunks to avoid gRPC message size limits.
+  Future<void> _signStreaming(
+    String name,
+    List<int> data,
+    List<int> gid,
+  ) async {
+    const chunkSize = 256 * 1024; // 256KB chunks
+
+    Stream<rpc.SignRequestChunk> chunks() async* {
+      // First chunk: metadata
+      yield rpc.SignRequestChunk()
+        ..metadata = (rpc.SignMetadata()
+          ..name = name
+          ..groupId = gid
+          ..totalSize = Int64(data.length));
+
+      // Subsequent chunks: data
+      for (var i = 0; i < data.length; i += chunkSize) {
+        final end = (i + chunkSize < data.length) ? i + chunkSize : data.length;
+
+        yield rpc.SignRequestChunk()..chunk = data.sublist(i, end);
+      }
+    }
+
+    await _dispatcher.unauth.signStream(chunks());
   }
 
   @override
