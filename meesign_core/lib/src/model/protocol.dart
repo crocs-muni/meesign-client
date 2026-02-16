@@ -7,7 +7,7 @@ enum ThresholdType {
 }
 
 enum Protocol {
-  gg18(10, 10, ThresholdType.tOfN),
+  gg18(10, 10, ThresholdType.tOfN, webSupported: true),
   elgamal(6, 2, ThresholdType.tOfN, webSupported: true),
   frost(
     4,
@@ -16,7 +16,7 @@ enum Protocol {
     aid: '6a6366726f7374617070',
     webSupported: true,
   ),
-  musig2(2, 3, ThresholdType.nOfN, aid: '01ffff04050607081101');
+  musig2(2, 3, ThresholdType.nOfN, aid: '01ffff04050607081101', webSupported: true);
 
   const Protocol(
     this.keygenRounds,
