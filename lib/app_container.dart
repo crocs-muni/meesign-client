@@ -7,11 +7,14 @@ import 'package:meesign_client/sessions/user_session.dart';
 import 'package:meesign_core/meesign_data.dart';
 
 class AppContainer {
-  AppContainer({required String appDirectory})
-      : dataPath = '$appDirectory/data/' {
-    _init();
-  }
+  AppContainer._({required this.dataPath});
   final String dataPath;
+
+  static Future<AppContainer> create({required String appDirectory}) async {
+    final container = AppContainer._(dataPath: '$appDirectory/data/');
+    await container._init();
+    return container;
+  }
 
   late KeyStore keyStore;
   late FileStore fileStore;
@@ -31,9 +34,11 @@ class AppContainer {
     return data.lengthInBytes == 0 ? null : data.buffer.asUint8List();
   }
 
-  void _init() {
+  Future<void> _init() async {
     keyStore = KeyStore(dataPath);
     fileStore = FileStore(dataPath);
+    await keyStore.init();
+    await fileStore.init();
     database = Database(openDatabaseConnection(dataPath));
     userRepository = UserRepository(database.userDao);
     settingsController = SettingsController();
@@ -53,7 +58,7 @@ class AppContainer {
     } on Exception catch (e) {
       Logger.root.severe(e.toString(), e);
     }
-    _init();
+    await _init();
   }
 
   Future<void> deleteDevice(Uuid userDid) async {

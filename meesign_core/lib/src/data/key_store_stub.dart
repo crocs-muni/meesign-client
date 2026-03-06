@@ -5,6 +5,8 @@ class KeyStore {
   // ignore: avoid_unused_constructor_parameters
   KeyStore([String? dirPath]);
 
+  Future<void> init() async {}
+
   Future<void> store(Uuid did, List<int> key) async {
     throw UnsupportedError('KeyStore not available on this platform.');
   }

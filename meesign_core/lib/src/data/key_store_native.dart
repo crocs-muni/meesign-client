@@ -7,6 +7,8 @@ class KeyStore {
   KeyStore(String dirPath) : _dirPath = dirPath;
   final String _dirPath;
 
+  Future<void> init() async {}
+
   static const String fileName = 'key.p12';
 
   io.File _getFile(Uuid did) {

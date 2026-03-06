@@ -34,12 +34,11 @@ void main(List<String> args) async {
   await _prepareWindowManager();
 
   final appDir = await AppDirGetter.getAppDir();
+  final appContainer = await AppContainer.create(appDirectory: appDir);
 
   runApp(
     Provider<AppContainer>(
-      create: (_) => AppContainer(
-        appDirectory: appDir,
-      ),
+      create: (_) => appContainer,
       dispose: (_, appContainer) => appContainer.dispose(),
       child: MeeSignClient(
         prefillHost: argResults['host'] as String?,

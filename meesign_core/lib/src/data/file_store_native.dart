@@ -7,6 +7,8 @@ class FileStore {
   FileStore(String dirPath) : _dirPath = dirPath;
   final String _dirPath;
 
+  Future<void> init() async {}
+
   // TODO(dev): when to remove work files? (issues with file locks,
   // https://github.com/crocs-muni/meesign-client/issues/3)
 

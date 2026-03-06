@@ -10,7 +10,7 @@ This document describes the implementation of web browser support for the MeeSig
 4. [Authentication: mTLS to JWT](#authentication-mtls-to-jwt)
 5. [Networking: gRPC to gRPC-Web](#networking-grpc-to-grpc-web)
 6. [Database: SQLite via WASM](#database-sqlite-via-wasm)
-7. [Storage: In-Memory Adapters](#storage-in-memory-adapters)
+7. [Storage: IndexedDB Persistence](#storage-indexeddb-persistence)
 8. [Platform Guards](#platform-guards)
 9. [Server Changes](#server-changes)
 10. [Web Assets](#web-assets)
@@ -29,8 +29,8 @@ The native client uses `dart:ffi` for Rust crypto, `dart:io` for file/network op
 | Authentication | mTLS client certificates | JWT Bearer tokens |
 | gRPC transport | HTTP/2 with `ClientChannel` | gRPC-Web over HTTP/1.1 with XHR |
 | Database | SQLite via `drift/native` | SQLite via `drift/wasm` (OPFS) |
-| Key storage | PKCS12 files on disk | In-memory `Map` |
-| File storage | Filesystem directories | In-memory `Map` with browser download |
+| Key storage | PKCS12 files on disk | IndexedDB (`meesign_storage`) + in-memory cache |
+| File storage | Filesystem directories | IndexedDB (`meesign_storage`) + in-memory cache |
 | Biometrics | `local_auth` plugin | Skipped (`kIsWeb` guard) |
 | Smart cards | NFC / PC/SC plugins | Not available |
 
@@ -86,7 +86,7 @@ On web, the same Rust code is compiled to WebAssembly using `wasm-pack` with the
 
 ```bash
 cd meesign_native/native/meesign-crypto
-wasm-pack build --target no-modules --no-default-features --features "wasm,elgamal,frost"
+wasm-pack build --target no-modules --no-default-features --features "wasm,elgamal,frost,gg18,musig2"
 ```
 
 The `--target no-modules` flag is critical: it produces a script that declares `wasm_bindgen` as a `let` variable (not an ES module), making it accessible after manual assignment to `window`.
@@ -307,17 +307,37 @@ Two files must be served alongside the Flutter web build:
 
 ---
 
-## Storage: In-Memory Adapters
+## Storage: IndexedDB Persistence
+
+### Architecture
+
+On web, `KeyStore` and `FileStore` persist data in a dedicated IndexedDB database (`meesign_storage`) separate from Drift's SQLite database (`meesign_db`). This separation exists because Drift's WASM database is a serialized SQLite blob inside IndexedDB — mixing large binary blobs (files up to 8 MB) into it would bloat the WAL and complicate migrations.
+
+The `IndexedDbStore` helper class (`indexed_db_store.dart`) wraps the IndexedDB API using `package:web` typed bindings. It manages two object stores:
+
+| Object Store | Key Path | Contents |
+|---|---|---|
+| `keys` | `id` (device UUID) | PKCS#12 certificate (`Uint8Array`) + JWT token (`string?`) |
+| `files` | `path` (virtual path) | File data (`Uint8Array`) |
+
+### Cache-on-init pattern
+
+Both web stores use an in-memory `Map` as a read-through cache. This is necessary because `KeyStore.load()` is synchronous (matching the native API which uses `readAsBytesSync`). The lifecycle is:
+
+1. **`init()`** — Called at startup; loads all entries from IndexedDB into the in-memory cache.
+2. **`store()`/`storeFile()`** — Writes to both the cache and IndexedDB (write-through).
+3. **`load()`/`getFileBytes()`** — Reads from the cache only (synchronous).
+4. **`deleteDirectory()`** — Removes matching entries from both cache and IndexedDB.
 
 ### KeyStore
 
-- **Native:** Stores PKCS12 files at `<appDir>/<deviceId>/key.p12` and tokens at `<appDir>/<deviceId>/token`.
-- **Web:** Uses `Map<String, List<int>>` for keys and `Map<String, String>` for JWT tokens. Data is lost on page refresh (Future work could use IndexedDB).
+- **Native:** Stores PKCS12 files at `<appDir>/<deviceId>/key.p12`. Token methods are no-ops (mTLS is used).
+- **Web:** Persists keys and JWT tokens in IndexedDB (`meesign_storage/keys`), cached in memory at startup.
 
 ### FileStore
 
-- **Native:** Stores signed PDFs and other files in a directory hierarchy under the app directory.
-- **Web:** Uses `Map<String, Uint8List>` for in-memory file storage. Files can be retrieved for browser download via `getFileBytes()`.
+- **Native:** Stores files in a directory hierarchy under the app directory.
+- **Web:** Persists files in IndexedDB (`meesign_storage/files`), cached in memory at startup. Files can be retrieved for browser download via `getFileBytes()`.
 
 ---
 
@@ -350,14 +370,14 @@ On web platforms, `int` and `double` are the same JavaScript `number` type, so `
 
 ### Feature filtering
 
-The `Protocol` enum has a `webSupported` flag indicating which protocols are available in the WASM build:
+The `Protocol` enum has a `webSupported` flag indicating which protocols are available in the WASM build. All four protocols are currently supported on web:
 
 ```dart
 enum Protocol {
-  gg18(10, 10, ThresholdType.tOfN),                              // webSupported: false
+  gg18(10, 10, ThresholdType.tOfN, webSupported: true),
   elgamal(6, 2, ThresholdType.tOfN, webSupported: true),
   frost(4, 3, ThresholdType.tOfN, ..., webSupported: true),
-  musig2(2, 3, ThresholdType.nOfN, ...);                         // webSupported: false
+  musig2(2, 3, ThresholdType.nOfN, ..., webSupported: true);
 }
 ```
 
@@ -409,7 +429,7 @@ The `web/` directory contains the following runtime assets:
 | File | Source | Size | Purpose |
 |------|--------|------|---------|
 | `meesign_crypto.js` | `wasm-pack build` output | ~20 KB | wasm-bindgen JS glue code |
-| `meesign_crypto_bg.wasm` | `wasm-pack build` output | ~2.5 MB | WASM crypto binary (ElGamal + FROST) |
+| `meesign_crypto_bg.wasm` | `wasm-pack build` output | ~4.9 MB | WASM crypto binary (all protocols) |
 | `sqlite3.wasm` | `sqlite3` Dart package release | ~714 KB | SQLite compiled to WASM |
 | `drift_worker.js` | `drift` package release | ~347 KB | Drift database web worker |
 | `index.html` | Flutter template (modified) | ~1 KB | Entry point with WASM init scripts |
@@ -429,7 +449,7 @@ The `web/` directory contains the following runtime assets:
 
 ```bash
 cd meesign_native/native/meesign-crypto
-wasm-pack build --target no-modules --no-default-features --features "wasm,elgamal,frost"
+wasm-pack build --target no-modules --no-default-features --features "wasm,elgamal,frost,gg18,musig2"
 cp pkg/meesign_crypto_bg.wasm ../../web/
 cp pkg/meesign_crypto.js ../../web/
 ```
@@ -463,15 +483,12 @@ Note: The server uses a self-signed TLS certificate by default. You'll need to a
 
 ## Known Limitations
 
-### Unavailable protocols on web
+### Storage limitations
 
-GG18 and MuSig2 cannot compile to WASM because they depend on `secp256k1-sys`, which requires C compilation (incompatible with `wasm32-unknown-unknown`). Only **FROST** and **ElGamal** are available on web.
-
-Consequence: **Sign PDF** functionality is not available on web (it requires GG18). **Challenge signing** works with FROST, and **Decryption** works with ElGamal.
-
-### Ephemeral storage
-
-The web `KeyStore` and `FileStore` use in-memory maps. All keys and tokens are lost on page refresh. A future improvement could persist them in IndexedDB or localStorage.
+- **Private keys and JWT tokens** are persisted in IndexedDB (`meesign_storage`, `keys` store). This survives page refreshes and browser restarts. **Private/incognito browsing** may restrict IndexedDB availability or quota — if unavailable, `init()` will fail and the app cannot start.
+- **Keys are stored unencrypted** in IndexedDB, accessible to any JS running on the same origin (same security model as the native implementation, which stores unencrypted files on disk).
+- **PDF files** from sign tasks are persisted in IndexedDB (`meesign_storage`, `files` store) and loaded into an in-memory cache at startup. Users with many large stored files may experience increased memory usage.
+- **Decrypt task data** (encrypted and decrypted payloads) is stored in the Drift/SQLite database (OPFS), not in IndexedDB.
 
 ### No smart card support
 

@@ -1,10 +1,14 @@
+import 'dart:js_interop';
+import 'dart:js_interop_unsafe';
 import 'dart:typed_data';
 
 import 'package:meesign_core/meesign_data.dart';
+import 'package:meesign_core/src/data/indexed_db_store.dart';
 
-/// Web implementation of KeyStore using in-memory storage.
-/// Keys are persisted via the web database (Drift wasm) through
-/// the application's session management.
+/// Web implementation of KeyStore backed by IndexedDB.
+///
+/// All entries are loaded into an in-memory cache during [init] so that
+/// the synchronous [load] method works without async DB access.
 class KeyStore {
   // Parameter unused on web but matches native KeyStore constructor signature.
   // ignore: avoid_unused_constructor_parameters
@@ -12,9 +16,31 @@ class KeyStore {
 
   final Map<String, List<int>> _keys = {};
   final Map<String, String> _tokens = {};
+  late IndexedDbStore _db;
+
+  /// Load all persisted keys into the in-memory cache.
+  /// Must be called once at startup before any [load] calls.
+  Future<void> init() async {
+    _db = await IndexedDbStore.open();
+    final entries = await _db.getAll(IndexedDbStore.keysStore);
+    for (final entry in entries) {
+      final id = (entry['id']! as JSString).toDart;
+      _keys[id] = (entry['key']! as JSUint8Array).toDart;
+      final token = entry['token'];
+      if (token != null && !token.isUndefined) {
+        _tokens[id] = (token as JSString).toDart;
+      }
+    }
+  }
 
   Future<void> store(Uuid did, List<int> key) async {
-    _keys[did.encode()] = Uint8List.fromList(key);
+    final encoded = did.encode();
+    final bytes = Uint8List.fromList(key);
+    _keys[encoded] = bytes;
+    await _db.put(
+      IndexedDbStore.keysStore,
+      makeKeyEntry(id: encoded, key: bytes, token: _tokens[encoded]),
+    );
   }
 
   List<int> load(Uuid did) {
@@ -26,7 +52,19 @@ class KeyStore {
   }
 
   Future<void> storeToken(Uuid did, String token) async {
-    _tokens[did.encode()] = token;
+    final encoded = did.encode();
+    _tokens[encoded] = token;
+    final existingKey = _keys[encoded];
+    if (existingKey != null) {
+      await _db.put(
+        IndexedDbStore.keysStore,
+        makeKeyEntry(
+          id: encoded,
+          key: Uint8List.fromList(existingKey),
+          token: token,
+        ),
+      );
+    }
   }
 
   String? loadToken(Uuid did) {

@@ -5,6 +5,8 @@ class FileStore {
   // ignore: avoid_unused_constructor_parameters
   FileStore([String? dirPath]);
 
+  Future<void> init() async {}
+
   String getFilePath(Uuid did, Uuid id, String name, {bool work = false}) {
     throw UnsupportedError('FileStore not available on this platform.');
   }
