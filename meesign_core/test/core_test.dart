@@ -8,6 +8,7 @@ import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:meesign_core/meesign_core.dart';
+import 'package:meesign_native/meesign_native.dart';
 import 'package:test/test.dart';
 
 import 'matcher.dart';
@@ -60,6 +61,10 @@ void main() {
   if (serverCertsPath != null) {
     serverCerts = io.File(serverCertsPath).readAsBytesSync();
   }
+
+  setUpAll(() async {
+    await createCryptoInstance();
+  });
 
   setUp(() {
     database = Database(openDatabaseConnection(appDir.path));

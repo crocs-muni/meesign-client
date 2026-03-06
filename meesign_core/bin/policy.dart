@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io' as io;
 import 'dart:io' hide File;
+import 'dart:typed_data';
 
 import 'package:args/args.dart';
 import 'package:meesign_core/meesign_core.dart';
@@ -120,6 +121,12 @@ class DummyFileStore implements FileStore {
     bool work = false,
   }) async =>
       getFilePath(did, id, name, work: work);
+
+  @override
+  Future<void> init() async {}
+
+  @override
+  Uint8List? getFileBytes(String path) => null;
 
   @override
   Future<void> deleteDirectory(String path) async {}
