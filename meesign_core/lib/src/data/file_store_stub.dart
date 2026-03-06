@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:meesign_core/src/util/uuid.dart';
 
 class FileStore {
@@ -18,6 +20,10 @@ class FileStore {
     List<int> data, {
     bool work = false,
   }) async {
+    throw UnsupportedError('FileStore not available on this platform.');
+  }
+
+  Uint8List? getFileBytes(String path) {
     throw UnsupportedError('FileStore not available on this platform.');
   }
 

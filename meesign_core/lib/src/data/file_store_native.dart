@@ -1,4 +1,5 @@
 import 'dart:io' as io;
+import 'dart:typed_data';
 
 import 'package:meesign_core/src/util/uuid.dart';
 import 'package:path/path.dart' as path_pkg;
@@ -33,6 +34,12 @@ class FileStore {
     await io.Directory(path_pkg.dirname(path)).create(recursive: true);
     await io.File(path).writeAsBytes(data, flush: true);
     return path;
+  }
+
+  Uint8List? getFileBytes(String path) {
+    final file = io.File(path);
+    if (file.existsSync()) return file.readAsBytesSync();
+    return null;
   }
 
   Future<void> deleteDirectory(String path) async {

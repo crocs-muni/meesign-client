@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:meesign_client/app_container.dart';
 import 'package:meesign_client/l10n/arb/app_localizations.dart';
 import 'package:meesign_client/templates/default_page_template.dart';
 import 'package:meesign_client/ui_constants.dart';
@@ -10,11 +11,14 @@ import 'package:meesign_client/util/actions/challenge_creator.dart';
 import 'package:meesign_client/util/actions/document_signer.dart';
 import 'package:meesign_client/util/actions/encrypt_data.dart';
 import 'package:meesign_client/util/platform.dart';
+import 'package:meesign_client/util/web_file_opener.dart';
 import 'package:meesign_client/widget/copy_button.dart';
 import 'package:meesign_client/widget/entity_chip.dart';
 import 'package:meesign_client/widget/share_button.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:path/path.dart' as path_pkg;
+import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -345,7 +349,11 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
 
   void _openFile(String path) {
     if (PlatformGroup.isWeb) {
-      return;
+      final fileStore = context.read<AppContainer>().fileStore;
+      final bytes = fileStore.getFileBytes(path);
+      if (bytes != null) {
+        downloadFileOnWeb(bytes, path_pkg.basename(path));
+      }
     } else if (PlatformGroup.isLinux) {
       launchUrl(Uri.file(path));
     } else {

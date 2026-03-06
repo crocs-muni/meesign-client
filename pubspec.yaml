@@ -79,6 +79,7 @@ dependencies:
   skeletonizer: ^2.0.1
   sqlite3_flutter_libs: ^0.5.13
   url_launcher: ^6.3.1
+  web: ^1.1.0
   window_manager: ^0.5.1
 
 dev_dependencies:
