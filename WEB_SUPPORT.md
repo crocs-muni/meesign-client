@@ -31,6 +31,7 @@ The native client uses `dart:ffi` for Rust crypto, `dart:io` for file/network op
 | Database | SQLite via `drift/native` | SQLite via `drift/wasm` (OPFS) |
 | Key storage | PKCS12 files on disk | IndexedDB (`meesign_storage`) + in-memory cache |
 | File storage | Filesystem directories | IndexedDB (`meesign_storage`) + in-memory cache |
+| File open/share | `open_filex` / `share_plus` | Browser download via Blob URL |
 | Biometrics | `local_auth` plugin | Skipped (`kIsWeb` guard) |
 | Smart cards | NFC / PC/SC plugins | Not available |
 
@@ -65,6 +66,7 @@ Every platform-dependent module follows the **three-file pattern**:
 | App directory | `app_dir_getter.dart` | `app_dir_getter_native.dart` | `app_dir_getter_web.dart` | `app_dir_getter_stub.dart` |
 | Platform info | `platform.dart` | `platform_io.dart` | *(uses `kIsWeb`)* | `platform_io_stub.dart` |
 | Smart cards | `card.dart` | `card_factory_native.dart` | *(not available)* | `card_factory_stub.dart` |
+| File download | `web_file_opener.dart` | *(uses `open_filex`/`share_plus`)* | `web_file_opener_web.dart` | `web_file_opener_stub.dart` |
 
 ### Why this pattern?
 
@@ -337,7 +339,7 @@ Both web stores use an in-memory `Map` as a read-through cache. This is necessar
 ### FileStore
 
 - **Native:** Stores files in a directory hierarchy under the app directory.
-- **Web:** Persists files in IndexedDB (`meesign_storage/files`), cached in memory at startup. Files can be retrieved for browser download via `getFileBytes()`.
+- **Web:** Persists files in IndexedDB (`meesign_storage/files`), cached in memory at startup. Files can be retrieved via `getFileBytes()` and downloaded through the browser using `downloadFileOnWeb()` (creates a Blob URL and triggers a download via a hidden `<a>` element).
 
 ---
 
