@@ -368,10 +368,15 @@ abstract class TaskRepository<T> {
       onError: onError,
     );
 
-    // Don't block on headers — on gRPC-Web (XHR), this future may not
-    // resolve until data starts flowing, which would delay the connection
-    // indicator. The stream listener is already active at this point.
-    stream.headers.catchError((_) {});
+    // Await headers to ensure the subscription is established before the
+    // caller continues (important for subscribe-then-create flows).
+    // On gRPC-Web, headers may not resolve until data flows, so use a timeout.
+    try {
+      await stream.headers.timeout(const Duration(seconds: 5));
+    } on Object {
+      // Ignore timeout and header errors — the stream listener is already
+      // active and handles errors separately.
+    }
   }
 
   Future<void> unsubscribe(Uuid did) async =>
