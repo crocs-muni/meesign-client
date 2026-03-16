@@ -1113,6 +1113,12 @@ abstract class AppLocalizations {
   /// **'Archived'**
   String get archived;
 
+  /// No description provided for @selfDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'(self)'**
+  String get selfDevice;
+
   /// No description provided for @myGroups.
   ///
   /// In en, this message translates to:

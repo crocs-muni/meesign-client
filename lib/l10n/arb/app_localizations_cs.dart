@@ -557,6 +557,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get archived => 'Archivováno';
 
   @override
+  String get selfDevice => '(vlastní)';
+
+  @override
   String get myGroups => 'Moje skupiny';
 
   @override

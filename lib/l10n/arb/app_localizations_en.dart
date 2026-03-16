@@ -557,6 +557,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get archived => 'Archived';
 
   @override
+  String get selfDevice => '(self)';
+
+  @override
   String get myGroups => 'My Groups';
 
   @override

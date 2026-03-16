@@ -235,6 +235,7 @@
     "select": "Select",
     "enterInput": "Enter input",
     "archived": "Archived",
+    "selfDevice": "(self)",
     "myGroups": "My Groups",
     "otherGroups": "Other Groups",
     "noOtherGroupsAvailable": "No other decryption groups available.",

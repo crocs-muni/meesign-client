@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:meesign_client/app/model/settings.dart';
 import 'package:meesign_client/app_container.dart';
 import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/services/local_auth_service.dart';
 import 'package:meesign_client/services/settings_controller.dart';
 import 'package:meesign_client/templates/default_page_template.dart';
 import 'package:meesign_client/ui_constants.dart';
@@ -234,7 +235,11 @@ class GeneralSettingsPage extends StatelessWidget {
             style: theme.textTheme.bodyMedium,
           ),
           value: settings.authenticateProtectedActions,
-          onChanged: (value) {
+          onChanged: (value) async {
+            if (!value) {
+              final authenticated = await LocalAuthService.authUser(controller);
+              if (!authenticated) return;
+            }
             controller.updateAuthenticateProtectedActions(
               authenticateProtectedActions: value,
             );

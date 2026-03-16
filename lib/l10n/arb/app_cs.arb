@@ -235,6 +235,7 @@
     "select": "Vybrat",
     "enterInput": "Zadejte vstup",
     "archived": "Archivováno",
+    "selfDevice": "(vlastní)",
     "myGroups": "Moje skupiny",
     "otherGroups": "Ostatní skupiny",
     "noOtherGroupsAvailable": "Žádné další dešifrovací skupiny nejsou k dispozici.",

@@ -15,20 +15,21 @@ class LocalAuthService {
     // local_auth plugin is not available on web
     if (kIsWeb) return true;
 
-    final auth = LocalAuthentication();
-    final canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
-    final canAuthenticate =
-        canAuthenticateWithBiometrics || await auth.isDeviceSupported();
-
-    // If user turned of local auth, just return true to fake success
+    // Check settings first to avoid unnecessary biometrics queries
     final currentSettings = settingsController.currentSettings;
     if (!currentSettings.authenticateProtectedActions) {
       return true;
     }
 
-    // If the device doesn't have any way to authenticate (pin/faceID/fingerprint...)
+    final auth = LocalAuthentication();
+    final canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
+    final canAuthenticate =
+        canAuthenticateWithBiometrics || await auth.isDeviceSupported();
+
+    // If the device has no auth method (no PIN/biometrics), allow the action
+    // rather than blocking the user entirely
     if (!canAuthenticate) {
-      return false;
+      return true;
     }
 
     try {
