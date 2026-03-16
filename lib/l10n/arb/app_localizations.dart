@@ -1113,6 +1113,24 @@ abstract class AppLocalizations {
   /// **'Archived'**
   String get archived;
 
+  /// No description provided for @myGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'My Groups'**
+  String get myGroups;
+
+  /// No description provided for @otherGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'Other Groups'**
+  String get otherGroups;
+
+  /// No description provided for @noOtherGroupsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No other decryption groups available.'**
+  String get noOtherGroupsAvailable;
+
   /// No description provided for @noGroupsYet.
   ///
   /// In en, this message translates to:

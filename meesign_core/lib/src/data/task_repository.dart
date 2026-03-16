@@ -114,6 +114,10 @@ abstract class TaskRepository<T> {
   // TODO(dev): better way to compare states?
 
   Future<db.Task> _syncCreated(Uuid did, db.Task task, rpc.Task rpcTask) async {
+    // Store accept count in round field so UI can show voting progress
+    if (task.round != rpcTask.accept) {
+      return task.copyWith(round: rpcTask.accept);
+    }
     return task;
   }
 
@@ -157,20 +161,27 @@ abstract class TaskRepository<T> {
       return task;
     }
 
-    final activeParticipant = task.context != null || rpcTask.data.isNotEmpty;
+    // Reset round when transitioning from created (voting) to running,
+    // since round was used for accept count during voting phase.
+    var currentTask = task;
+    if (currentTask.state == TaskState.created) {
+      currentTask = currentTask.copyWith(state: TaskState.running, round: 0);
+    }
+
+    final activeParticipant =
+        currentTask.context != null || rpcTask.data.isNotEmpty;
     if (!activeParticipant) {
-      return task.copyWith(
+      return currentTask.copyWith(
         state: TaskState.running,
         round: rpcTask.round,
       );
     }
 
-    if (!task.approved) throw StateException();
-    if (rpcTask.data.isEmpty) return task; // nothing to do
-    if (rpcTask.round <= task.round) return task;
-    if (rpcTask.round != task.round + 1) throw StateException();
+    if (!currentTask.approved) throw StateException();
+    if (rpcTask.data.isEmpty) return currentTask; // nothing to do
+    if (rpcTask.round <= currentTask.round) return currentTask;
+    if (rpcTask.round != currentTask.round + 1) throw StateException();
 
-    var currentTask = task;
     if (currentTask.round == 0) {
       currentTask = await initTask(did, currentTask, rpcTask);
     }
@@ -317,6 +328,12 @@ abstract class TaskRepository<T> {
     }
   }
 
+  /// Hook for subclasses to handle subscription updates before normal sync.
+  /// Return true if the update was handled and should not be processed further.
+  @protected
+  Future<bool> handleSubscriptionUpdate(Uuid did, rpc.Task rpcTask) async =>
+      false;
+
   Future<void> _syncTask(Uuid did, rpc.Task rpcTask) async {
     final tid = Uuid(rpcTask.id);
     try {
@@ -359,6 +376,7 @@ abstract class TaskRepository<T> {
     _subscriptions[did] = stream.listen(
       (rpcTask) async {
         if (rpcTask.type != _taskType) return;
+        if (await handleSubscriptionUpdate(did, rpcTask)) return;
         await _syncTask(did, rpcTask);
       },
       onDone: () {

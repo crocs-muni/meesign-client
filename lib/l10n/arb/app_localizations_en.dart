@@ -557,6 +557,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get archived => 'Archived';
 
   @override
+  String get myGroups => 'My Groups';
+
+  @override
+  String get otherGroups => 'Other Groups';
+
+  @override
+  String get noOtherGroupsAvailable => 'No other decryption groups available.';
+
+  @override
   String get noGroupsYet => 'No groups yet';
 
   @override

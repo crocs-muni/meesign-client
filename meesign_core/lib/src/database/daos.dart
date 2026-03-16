@@ -56,7 +56,16 @@ class UserDao extends DatabaseAccessor<Database> with _$UserDaoMixin {
 }
 
 @DriftAccessor(
-  tables: [Tasks, Groups, GroupMembers, Devices, Files, Challenges, Decrypts],
+  tables: [
+    Tasks,
+    Groups,
+    GroupMembers,
+    Devices,
+    Files,
+    Challenges,
+    Decrypts,
+    ObservedTasks,
+  ],
 )
 class TaskDao extends DatabaseAccessor<Database> with _$TaskDaoMixin {
   TaskDao(super.attachedDatabase);
@@ -212,6 +221,27 @@ class TaskDao extends DatabaseAccessor<Database> with _$TaskDaoMixin {
 
   Future<void> updateDecrypt(DecryptsCompanion entity) =>
       (update(decrypts)..whereSamePrimaryKey(entity)).write(entity);
+
+  Future<void> insertObservedTask(ObservedTasksCompanion entity) =>
+      into(observedTasks).insert(entity, mode: InsertMode.insertOrReplace);
+
+  Future<void> updateObservedTask(ObservedTasksCompanion entity) =>
+      (update(observedTasks)..whereSamePrimaryKey(entity)).write(entity);
+
+  Stream<List<ObservedTask>> watchObservedTasks(Uint8List did) {
+    final query = select(observedTasks)..where((t) => t.did.equals(did));
+    return query.watch();
+  }
+
+  Future<List<ObservedTask>> getObservedTasks(Uint8List did) {
+    final query = select(observedTasks)..where((t) => t.did.equals(did));
+    return query.get();
+  }
+
+  Future<void> deleteObservedTask(Uint8List tid, Uint8List did) =>
+      (delete(observedTasks)
+            ..where((t) => t.tid.equals(tid) & t.did.equals(did)))
+          .go();
 
   // TODO(dev): is there a way to reduce the repetition?
   Stream<List<DecryptTask>> watchDecryptTasks(Uint8List did) {

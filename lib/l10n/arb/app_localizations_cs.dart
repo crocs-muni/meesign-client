@@ -557,6 +557,16 @@ class AppLocalizationsCs extends AppLocalizations {
   String get archived => 'Archivováno';
 
   @override
+  String get myGroups => 'Moje skupiny';
+
+  @override
+  String get otherGroups => 'Ostatní skupiny';
+
+  @override
+  String get noOtherGroupsAvailable =>
+      'Žádné další dešifrovací skupiny nejsou k dispozici.';
+
+  @override
   String get noGroupsYet => 'Zatím nejsou vytvořeny žádné skupiny.';
 
   @override

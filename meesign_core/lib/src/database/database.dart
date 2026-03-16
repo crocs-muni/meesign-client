@@ -25,6 +25,7 @@ part 'database.g.dart';
     Files,
     Challenges,
     Decrypts,
+    ObservedTasks,
   ],
   daos: [DeviceDao, UserDao, TaskDao],
 )
@@ -33,15 +34,5 @@ class Database extends _$Database {
   static const fileName = 'db.sqlite';
 
   @override
-  int get schemaVersion => 2;
-
-  @override
-  MigrationStrategy get migration => MigrationStrategy(
-        onUpgrade: (Migrator m, int from, int to) async {
-          if (from < 2) {
-            // Add isLocal column to Devices table with default value false
-            await m.addColumn(devices, devices.isLocal);
-          }
-        },
-      );
+  int get schemaVersion => 1;
 }

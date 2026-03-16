@@ -2652,6 +2652,524 @@ class DecryptsCompanion extends UpdateCompanion<Decrypt> {
   }
 }
 
+class $ObservedTasksTable extends ObservedTasks
+    with TableInfo<$ObservedTasksTable, ObservedTask> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ObservedTasksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _tidMeta = const VerificationMeta('tid');
+  @override
+  late final GeneratedColumn<Uint8List> tid = GeneratedColumn<Uint8List>(
+      'tid', aliasedName, false,
+      type: DriftSqlType.blob, requiredDuringInsert: true);
+  static const VerificationMeta _didMeta = const VerificationMeta('did');
+  @override
+  late final GeneratedColumn<Uint8List> did = GeneratedColumn<Uint8List>(
+      'did', aliasedName, false,
+      type: DriftSqlType.blob, requiredDuringInsert: true);
+  static const VerificationMeta _gidMeta = const VerificationMeta('gid');
+  @override
+  late final GeneratedColumn<Uint8List> gid = GeneratedColumn<Uint8List>(
+      'gid', aliasedName, false,
+      type: DriftSqlType.blob, requiredDuringInsert: true);
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _dataTypeMeta =
+      const VerificationMeta('dataType');
+  @override
+  late final GeneratedColumn<String> dataType = GeneratedColumn<String>(
+      'data_type', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _dataMeta = const VerificationMeta('data');
+  @override
+  late final GeneratedColumn<Uint8List> data = GeneratedColumn<Uint8List>(
+      'data', aliasedName, false,
+      type: DriftSqlType.blob, requiredDuringInsert: true);
+  @override
+  late final GeneratedColumnWithTypeConverter<TaskState, String> state =
+      GeneratedColumn<String>('state', aliasedName, false,
+              type: DriftSqlType.string, requiredDuringInsert: true)
+          .withConverter<TaskState>($ObservedTasksTable.$converterstate);
+  static const VerificationMeta _acceptCountMeta =
+      const VerificationMeta('acceptCount');
+  @override
+  late final GeneratedColumn<int> acceptCount = GeneratedColumn<int>(
+      'accept_count', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _rejectCountMeta =
+      const VerificationMeta('rejectCount');
+  @override
+  late final GeneratedColumn<int> rejectCount = GeneratedColumn<int>(
+      'reject_count', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [
+        tid,
+        did,
+        gid,
+        name,
+        dataType,
+        data,
+        state,
+        acceptCount,
+        rejectCount,
+        createdAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'observed_tasks';
+  @override
+  VerificationContext validateIntegrity(Insertable<ObservedTask> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('tid')) {
+      context.handle(
+          _tidMeta, tid.isAcceptableOrUnknown(data['tid']!, _tidMeta));
+    } else if (isInserting) {
+      context.missing(_tidMeta);
+    }
+    if (data.containsKey('did')) {
+      context.handle(
+          _didMeta, did.isAcceptableOrUnknown(data['did']!, _didMeta));
+    } else if (isInserting) {
+      context.missing(_didMeta);
+    }
+    if (data.containsKey('gid')) {
+      context.handle(
+          _gidMeta, gid.isAcceptableOrUnknown(data['gid']!, _gidMeta));
+    } else if (isInserting) {
+      context.missing(_gidMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('data_type')) {
+      context.handle(_dataTypeMeta,
+          dataType.isAcceptableOrUnknown(data['data_type']!, _dataTypeMeta));
+    } else if (isInserting) {
+      context.missing(_dataTypeMeta);
+    }
+    if (data.containsKey('data')) {
+      context.handle(
+          _dataMeta, this.data.isAcceptableOrUnknown(data['data']!, _dataMeta));
+    } else if (isInserting) {
+      context.missing(_dataMeta);
+    }
+    if (data.containsKey('accept_count')) {
+      context.handle(
+          _acceptCountMeta,
+          acceptCount.isAcceptableOrUnknown(
+              data['accept_count']!, _acceptCountMeta));
+    }
+    if (data.containsKey('reject_count')) {
+      context.handle(
+          _rejectCountMeta,
+          rejectCount.isAcceptableOrUnknown(
+              data['reject_count']!, _rejectCountMeta));
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {tid, did};
+  @override
+  ObservedTask map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ObservedTask(
+      tid: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}tid'])!,
+      did: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}did'])!,
+      gid: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}gid'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      dataType: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}data_type'])!,
+      data: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}data'])!,
+      state: $ObservedTasksTable.$converterstate.fromSql(attachedDatabase
+          .typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}state'])!),
+      acceptCount: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}accept_count'])!,
+      rejectCount: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}reject_count'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+    );
+  }
+
+  @override
+  $ObservedTasksTable createAlias(String alias) {
+    return $ObservedTasksTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<TaskState, String, String> $converterstate =
+      const EnumNameConverter<TaskState>(TaskState.values);
+}
+
+class ObservedTask extends DataClass implements Insertable<ObservedTask> {
+  final Uint8List tid;
+  final Uint8List did;
+  final Uint8List gid;
+  final String name;
+  final String dataType;
+  final Uint8List data;
+  final TaskState state;
+  final int acceptCount;
+  final int rejectCount;
+  final DateTime createdAt;
+  const ObservedTask(
+      {required this.tid,
+      required this.did,
+      required this.gid,
+      required this.name,
+      required this.dataType,
+      required this.data,
+      required this.state,
+      required this.acceptCount,
+      required this.rejectCount,
+      required this.createdAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['tid'] = Variable<Uint8List>(tid);
+    map['did'] = Variable<Uint8List>(did);
+    map['gid'] = Variable<Uint8List>(gid);
+    map['name'] = Variable<String>(name);
+    map['data_type'] = Variable<String>(dataType);
+    map['data'] = Variable<Uint8List>(data);
+    {
+      map['state'] =
+          Variable<String>($ObservedTasksTable.$converterstate.toSql(state));
+    }
+    map['accept_count'] = Variable<int>(acceptCount);
+    map['reject_count'] = Variable<int>(rejectCount);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  ObservedTasksCompanion toCompanion(bool nullToAbsent) {
+    return ObservedTasksCompanion(
+      tid: Value(tid),
+      did: Value(did),
+      gid: Value(gid),
+      name: Value(name),
+      dataType: Value(dataType),
+      data: Value(data),
+      state: Value(state),
+      acceptCount: Value(acceptCount),
+      rejectCount: Value(rejectCount),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory ObservedTask.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ObservedTask(
+      tid: serializer.fromJson<Uint8List>(json['tid']),
+      did: serializer.fromJson<Uint8List>(json['did']),
+      gid: serializer.fromJson<Uint8List>(json['gid']),
+      name: serializer.fromJson<String>(json['name']),
+      dataType: serializer.fromJson<String>(json['dataType']),
+      data: serializer.fromJson<Uint8List>(json['data']),
+      state: $ObservedTasksTable.$converterstate
+          .fromJson(serializer.fromJson<String>(json['state'])),
+      acceptCount: serializer.fromJson<int>(json['acceptCount']),
+      rejectCount: serializer.fromJson<int>(json['rejectCount']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'tid': serializer.toJson<Uint8List>(tid),
+      'did': serializer.toJson<Uint8List>(did),
+      'gid': serializer.toJson<Uint8List>(gid),
+      'name': serializer.toJson<String>(name),
+      'dataType': serializer.toJson<String>(dataType),
+      'data': serializer.toJson<Uint8List>(data),
+      'state': serializer
+          .toJson<String>($ObservedTasksTable.$converterstate.toJson(state)),
+      'acceptCount': serializer.toJson<int>(acceptCount),
+      'rejectCount': serializer.toJson<int>(rejectCount),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  ObservedTask copyWith(
+          {Uint8List? tid,
+          Uint8List? did,
+          Uint8List? gid,
+          String? name,
+          String? dataType,
+          Uint8List? data,
+          TaskState? state,
+          int? acceptCount,
+          int? rejectCount,
+          DateTime? createdAt}) =>
+      ObservedTask(
+        tid: tid ?? this.tid,
+        did: did ?? this.did,
+        gid: gid ?? this.gid,
+        name: name ?? this.name,
+        dataType: dataType ?? this.dataType,
+        data: data ?? this.data,
+        state: state ?? this.state,
+        acceptCount: acceptCount ?? this.acceptCount,
+        rejectCount: rejectCount ?? this.rejectCount,
+        createdAt: createdAt ?? this.createdAt,
+      );
+  ObservedTask copyWithCompanion(ObservedTasksCompanion data) {
+    return ObservedTask(
+      tid: data.tid.present ? data.tid.value : this.tid,
+      did: data.did.present ? data.did.value : this.did,
+      gid: data.gid.present ? data.gid.value : this.gid,
+      name: data.name.present ? data.name.value : this.name,
+      dataType: data.dataType.present ? data.dataType.value : this.dataType,
+      data: data.data.present ? data.data.value : this.data,
+      state: data.state.present ? data.state.value : this.state,
+      acceptCount:
+          data.acceptCount.present ? data.acceptCount.value : this.acceptCount,
+      rejectCount:
+          data.rejectCount.present ? data.rejectCount.value : this.rejectCount,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ObservedTask(')
+          ..write('tid: $tid, ')
+          ..write('did: $did, ')
+          ..write('gid: $gid, ')
+          ..write('name: $name, ')
+          ..write('dataType: $dataType, ')
+          ..write('data: $data, ')
+          ..write('state: $state, ')
+          ..write('acceptCount: $acceptCount, ')
+          ..write('rejectCount: $rejectCount, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      $driftBlobEquality.hash(tid),
+      $driftBlobEquality.hash(did),
+      $driftBlobEquality.hash(gid),
+      name,
+      dataType,
+      $driftBlobEquality.hash(data),
+      state,
+      acceptCount,
+      rejectCount,
+      createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ObservedTask &&
+          $driftBlobEquality.equals(other.tid, this.tid) &&
+          $driftBlobEquality.equals(other.did, this.did) &&
+          $driftBlobEquality.equals(other.gid, this.gid) &&
+          other.name == this.name &&
+          other.dataType == this.dataType &&
+          $driftBlobEquality.equals(other.data, this.data) &&
+          other.state == this.state &&
+          other.acceptCount == this.acceptCount &&
+          other.rejectCount == this.rejectCount &&
+          other.createdAt == this.createdAt);
+}
+
+class ObservedTasksCompanion extends UpdateCompanion<ObservedTask> {
+  final Value<Uint8List> tid;
+  final Value<Uint8List> did;
+  final Value<Uint8List> gid;
+  final Value<String> name;
+  final Value<String> dataType;
+  final Value<Uint8List> data;
+  final Value<TaskState> state;
+  final Value<int> acceptCount;
+  final Value<int> rejectCount;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const ObservedTasksCompanion({
+    this.tid = const Value.absent(),
+    this.did = const Value.absent(),
+    this.gid = const Value.absent(),
+    this.name = const Value.absent(),
+    this.dataType = const Value.absent(),
+    this.data = const Value.absent(),
+    this.state = const Value.absent(),
+    this.acceptCount = const Value.absent(),
+    this.rejectCount = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ObservedTasksCompanion.insert({
+    required Uint8List tid,
+    required Uint8List did,
+    required Uint8List gid,
+    required String name,
+    required String dataType,
+    required Uint8List data,
+    required TaskState state,
+    this.acceptCount = const Value.absent(),
+    this.rejectCount = const Value.absent(),
+    required DateTime createdAt,
+    this.rowid = const Value.absent(),
+  })  : tid = Value(tid),
+        did = Value(did),
+        gid = Value(gid),
+        name = Value(name),
+        dataType = Value(dataType),
+        data = Value(data),
+        state = Value(state),
+        createdAt = Value(createdAt);
+  static Insertable<ObservedTask> custom({
+    Expression<Uint8List>? tid,
+    Expression<Uint8List>? did,
+    Expression<Uint8List>? gid,
+    Expression<String>? name,
+    Expression<String>? dataType,
+    Expression<Uint8List>? data,
+    Expression<String>? state,
+    Expression<int>? acceptCount,
+    Expression<int>? rejectCount,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (tid != null) 'tid': tid,
+      if (did != null) 'did': did,
+      if (gid != null) 'gid': gid,
+      if (name != null) 'name': name,
+      if (dataType != null) 'data_type': dataType,
+      if (data != null) 'data': data,
+      if (state != null) 'state': state,
+      if (acceptCount != null) 'accept_count': acceptCount,
+      if (rejectCount != null) 'reject_count': rejectCount,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ObservedTasksCompanion copyWith(
+      {Value<Uint8List>? tid,
+      Value<Uint8List>? did,
+      Value<Uint8List>? gid,
+      Value<String>? name,
+      Value<String>? dataType,
+      Value<Uint8List>? data,
+      Value<TaskState>? state,
+      Value<int>? acceptCount,
+      Value<int>? rejectCount,
+      Value<DateTime>? createdAt,
+      Value<int>? rowid}) {
+    return ObservedTasksCompanion(
+      tid: tid ?? this.tid,
+      did: did ?? this.did,
+      gid: gid ?? this.gid,
+      name: name ?? this.name,
+      dataType: dataType ?? this.dataType,
+      data: data ?? this.data,
+      state: state ?? this.state,
+      acceptCount: acceptCount ?? this.acceptCount,
+      rejectCount: rejectCount ?? this.rejectCount,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (tid.present) {
+      map['tid'] = Variable<Uint8List>(tid.value);
+    }
+    if (did.present) {
+      map['did'] = Variable<Uint8List>(did.value);
+    }
+    if (gid.present) {
+      map['gid'] = Variable<Uint8List>(gid.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (dataType.present) {
+      map['data_type'] = Variable<String>(dataType.value);
+    }
+    if (data.present) {
+      map['data'] = Variable<Uint8List>(data.value);
+    }
+    if (state.present) {
+      map['state'] = Variable<String>(
+          $ObservedTasksTable.$converterstate.toSql(state.value));
+    }
+    if (acceptCount.present) {
+      map['accept_count'] = Variable<int>(acceptCount.value);
+    }
+    if (rejectCount.present) {
+      map['reject_count'] = Variable<int>(rejectCount.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ObservedTasksCompanion(')
+          ..write('tid: $tid, ')
+          ..write('did: $did, ')
+          ..write('gid: $gid, ')
+          ..write('name: $name, ')
+          ..write('dataType: $dataType, ')
+          ..write('data: $data, ')
+          ..write('state: $state, ')
+          ..write('acceptCount: $acceptCount, ')
+          ..write('rejectCount: $rejectCount, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$Database extends GeneratedDatabase {
   _$Database(QueryExecutor e) : super(e);
   $DatabaseManager get managers => $DatabaseManager(this);
@@ -2663,6 +3181,7 @@ abstract class _$Database extends GeneratedDatabase {
   late final $FilesTable files = $FilesTable(this);
   late final $ChallengesTable challenges = $ChallengesTable(this);
   late final $DecryptsTable decrypts = $DecryptsTable(this);
+  late final $ObservedTasksTable observedTasks = $ObservedTasksTable(this);
   late final DeviceDao deviceDao = DeviceDao(this as Database);
   late final UserDao userDao = UserDao(this as Database);
   late final TaskDao taskDao = TaskDao(this as Database);
@@ -2678,7 +3197,8 @@ abstract class _$Database extends GeneratedDatabase {
         groupMembers,
         files,
         challenges,
-        decrypts
+        decrypts,
+        observedTasks
       ];
 }
 
@@ -3248,8 +3768,8 @@ final class $$GroupsTableReferences
           aliasName: $_aliasNameGenerator(db.groups.id, db.tasks.gid));
 
   $$TasksTableProcessedTableManager get tasksRefs {
-    final manager = $$TasksTableTableManager($_db, $_db.tasks).filter(
-        (f) => f.gid.id.sqlEquals($_itemColumn<Uint8List>('id') as Uint8List));
+    final manager = $$TasksTableTableManager($_db, $_db.tasks)
+        .filter((f) => f.gid.id.sqlEquals($_itemColumn<Uint8List>('id')));
 
     final cache = $_typedResult.readTableOrNull(_tasksRefsTable($_db));
     return ProcessedTableManager(
@@ -3263,8 +3783,7 @@ final class $$GroupsTableReferences
 
   $$GroupMembersTableProcessedTableManager get groupMembersRefs {
     final manager = $$GroupMembersTableTableManager($_db, $_db.groupMembers)
-        .filter((f) =>
-            f.tid.id.sqlEquals($_itemColumn<Uint8List>('id') as Uint8List));
+        .filter((f) => f.tid.id.sqlEquals($_itemColumn<Uint8List>('id')));
 
     final cache = $_typedResult.readTableOrNull(_groupMembersRefsTable($_db));
     return ProcessedTableManager(
@@ -4763,6 +5282,256 @@ typedef $$DecryptsTableProcessedTableManager = ProcessedTableManager<
     (Decrypt, BaseReferences<_$Database, $DecryptsTable, Decrypt>),
     Decrypt,
     PrefetchHooks Function()>;
+typedef $$ObservedTasksTableCreateCompanionBuilder = ObservedTasksCompanion
+    Function({
+  required Uint8List tid,
+  required Uint8List did,
+  required Uint8List gid,
+  required String name,
+  required String dataType,
+  required Uint8List data,
+  required TaskState state,
+  Value<int> acceptCount,
+  Value<int> rejectCount,
+  required DateTime createdAt,
+  Value<int> rowid,
+});
+typedef $$ObservedTasksTableUpdateCompanionBuilder = ObservedTasksCompanion
+    Function({
+  Value<Uint8List> tid,
+  Value<Uint8List> did,
+  Value<Uint8List> gid,
+  Value<String> name,
+  Value<String> dataType,
+  Value<Uint8List> data,
+  Value<TaskState> state,
+  Value<int> acceptCount,
+  Value<int> rejectCount,
+  Value<DateTime> createdAt,
+  Value<int> rowid,
+});
+
+class $$ObservedTasksTableFilterComposer
+    extends Composer<_$Database, $ObservedTasksTable> {
+  $$ObservedTasksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<Uint8List> get tid => $composableBuilder(
+      column: $table.tid, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<Uint8List> get did => $composableBuilder(
+      column: $table.did, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<Uint8List> get gid => $composableBuilder(
+      column: $table.gid, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get dataType => $composableBuilder(
+      column: $table.dataType, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<Uint8List> get data => $composableBuilder(
+      column: $table.data, builder: (column) => ColumnFilters(column));
+
+  ColumnWithTypeConverterFilters<TaskState, TaskState, String> get state =>
+      $composableBuilder(
+          column: $table.state,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  ColumnFilters<int> get acceptCount => $composableBuilder(
+      column: $table.acceptCount, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get rejectCount => $composableBuilder(
+      column: $table.rejectCount, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$ObservedTasksTableOrderingComposer
+    extends Composer<_$Database, $ObservedTasksTable> {
+  $$ObservedTasksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<Uint8List> get tid => $composableBuilder(
+      column: $table.tid, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<Uint8List> get did => $composableBuilder(
+      column: $table.did, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<Uint8List> get gid => $composableBuilder(
+      column: $table.gid, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get dataType => $composableBuilder(
+      column: $table.dataType, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<Uint8List> get data => $composableBuilder(
+      column: $table.data, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get state => $composableBuilder(
+      column: $table.state, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get acceptCount => $composableBuilder(
+      column: $table.acceptCount, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get rejectCount => $composableBuilder(
+      column: $table.rejectCount, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$ObservedTasksTableAnnotationComposer
+    extends Composer<_$Database, $ObservedTasksTable> {
+  $$ObservedTasksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<Uint8List> get tid =>
+      $composableBuilder(column: $table.tid, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get did =>
+      $composableBuilder(column: $table.did, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get gid =>
+      $composableBuilder(column: $table.gid, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get dataType =>
+      $composableBuilder(column: $table.dataType, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get data =>
+      $composableBuilder(column: $table.data, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<TaskState, String> get state =>
+      $composableBuilder(column: $table.state, builder: (column) => column);
+
+  GeneratedColumn<int> get acceptCount => $composableBuilder(
+      column: $table.acceptCount, builder: (column) => column);
+
+  GeneratedColumn<int> get rejectCount => $composableBuilder(
+      column: $table.rejectCount, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$ObservedTasksTableTableManager extends RootTableManager<
+    _$Database,
+    $ObservedTasksTable,
+    ObservedTask,
+    $$ObservedTasksTableFilterComposer,
+    $$ObservedTasksTableOrderingComposer,
+    $$ObservedTasksTableAnnotationComposer,
+    $$ObservedTasksTableCreateCompanionBuilder,
+    $$ObservedTasksTableUpdateCompanionBuilder,
+    (
+      ObservedTask,
+      BaseReferences<_$Database, $ObservedTasksTable, ObservedTask>
+    ),
+    ObservedTask,
+    PrefetchHooks Function()> {
+  $$ObservedTasksTableTableManager(_$Database db, $ObservedTasksTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ObservedTasksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ObservedTasksTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ObservedTasksTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<Uint8List> tid = const Value.absent(),
+            Value<Uint8List> did = const Value.absent(),
+            Value<Uint8List> gid = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<String> dataType = const Value.absent(),
+            Value<Uint8List> data = const Value.absent(),
+            Value<TaskState> state = const Value.absent(),
+            Value<int> acceptCount = const Value.absent(),
+            Value<int> rejectCount = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ObservedTasksCompanion(
+            tid: tid,
+            did: did,
+            gid: gid,
+            name: name,
+            dataType: dataType,
+            data: data,
+            state: state,
+            acceptCount: acceptCount,
+            rejectCount: rejectCount,
+            createdAt: createdAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required Uint8List tid,
+            required Uint8List did,
+            required Uint8List gid,
+            required String name,
+            required String dataType,
+            required Uint8List data,
+            required TaskState state,
+            Value<int> acceptCount = const Value.absent(),
+            Value<int> rejectCount = const Value.absent(),
+            required DateTime createdAt,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ObservedTasksCompanion.insert(
+            tid: tid,
+            did: did,
+            gid: gid,
+            name: name,
+            dataType: dataType,
+            data: data,
+            state: state,
+            acceptCount: acceptCount,
+            rejectCount: rejectCount,
+            createdAt: createdAt,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$ObservedTasksTableProcessedTableManager = ProcessedTableManager<
+    _$Database,
+    $ObservedTasksTable,
+    ObservedTask,
+    $$ObservedTasksTableFilterComposer,
+    $$ObservedTasksTableOrderingComposer,
+    $$ObservedTasksTableAnnotationComposer,
+    $$ObservedTasksTableCreateCompanionBuilder,
+    $$ObservedTasksTableUpdateCompanionBuilder,
+    (
+      ObservedTask,
+      BaseReferences<_$Database, $ObservedTasksTable, ObservedTask>
+    ),
+    ObservedTask,
+    PrefetchHooks Function()>;
 
 class $DatabaseManager {
   final _$Database _db;
@@ -4783,4 +5552,6 @@ class $DatabaseManager {
       $$ChallengesTableTableManager(_db, _db.challenges);
   $$DecryptsTableTableManager get decrypts =>
       $$DecryptsTableTableManager(_db, _db.decrypts);
+  $$ObservedTasksTableTableManager get observedTasks =>
+      $$ObservedTasksTableTableManager(_db, _db.observedTasks);
 }

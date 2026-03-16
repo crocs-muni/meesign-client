@@ -211,6 +211,7 @@ void main() {
       t: t,
       createTask: (_, Group g) async {
         await decryptRepository.encrypt(
+          g.members.first.device.id,
           'test secret',
           MimeType.octetStream,
           message,

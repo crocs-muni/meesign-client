@@ -100,3 +100,19 @@ class Decrypts extends Table {
   @override
   Set<Column> get primaryKey => {tid, did};
 }
+
+class ObservedTasks extends Table {
+  BlobColumn get tid => blob()();
+  BlobColumn get did => blob()();
+  BlobColumn get gid => blob()();
+  TextColumn get name => text()();
+  TextColumn get dataType => text()();
+  BlobColumn get data => blob()();
+  TextColumn get state => textEnum<TaskState>()();
+  IntColumn get acceptCount => integer().withDefault(const Constant(0))();
+  IntColumn get rejectCount => integer().withDefault(const Constant(0))();
+  DateTimeColumn get createdAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {tid, did};
+}

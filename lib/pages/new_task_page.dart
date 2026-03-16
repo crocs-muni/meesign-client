@@ -209,8 +209,11 @@ class _NewTaskPageState extends State<NewTaskPage> {
             .map((task) => task.info)
             .toList();
 
+        final hasAvailableGroups = taskGroups.isNotEmpty ||
+            (_taskType == KeyType.decrypt && state.externalGroups.isNotEmpty);
+
         return GestureDetector(
-          onTap: taskGroups.isEmpty
+          onTap: !hasAvailableGroups
               ? () {
                   showDialog(
                     context: context,
@@ -266,9 +269,9 @@ class _NewTaskPageState extends State<NewTaskPage> {
                 }
               : null,
           child: Opacity(
-            opacity: taskGroups.isEmpty ? 0.3 : 1.0,
+            opacity: !hasAvailableGroups ? 0.3 : 1.0,
             child: AbsorbPointer(
-              absorbing: taskGroups.isEmpty,
+              absorbing: !hasAvailableGroups,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -524,7 +527,7 @@ class _NewTaskPageState extends State<NewTaskPage> {
   Widget _buildGroupSelector(BuildContext buildContext) {
     return Consumer<AppViewModel>(
       builder: (context, state, child) {
-        final groups = state.groupTasks
+        final myGroups = state.groupTasks
             .where(
               (task) =>
                   task.state == TaskState.finished &&
@@ -533,6 +536,15 @@ class _NewTaskPageState extends State<NewTaskPage> {
             )
             .map((task) => task.info)
             .toList();
+
+        // For decrypt, also include external groups (not member of)
+        final otherGroups = _taskType == KeyType.decrypt
+            ? state.externalGroups
+                .where((g) => g.keyType == KeyType.decrypt)
+                .toList()
+            : <Group>[];
+
+        final groups = [...myGroups, ...otherGroups];
 
         // Select the first group of task type if none is selected
         if (_selectedGroup == null &&
@@ -593,6 +605,9 @@ class _NewTaskPageState extends State<NewTaskPage> {
 
                             try {
                               await state.refetchTasks(TaskType.group);
+                              if (_taskType == KeyType.decrypt) {
+                                await state.fetchExternalGroups();
+                              }
                               // Wait a bit for the database to update
                               await Future<void>.delayed(
                                 const Duration(milliseconds: 500),
