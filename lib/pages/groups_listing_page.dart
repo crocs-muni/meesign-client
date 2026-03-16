@@ -123,6 +123,7 @@ class _GroupsListingPageState extends State<GroupsListingPage>
             WidgetStateProperty.resolveWith((states) => Colors.transparent),
         labelColor: Theme.of(context).colorScheme.onPrimary,
         unselectedLabelColor: Theme.of(context).colorScheme.onPrimaryContainer,
+        labelStyle: const TextStyle(fontWeight: FontWeight.bold),
         tabs: [
           Tab(text: AppLocalizations.of(context).myGroups),
           Tab(text: AppLocalizations.of(context).otherGroups),

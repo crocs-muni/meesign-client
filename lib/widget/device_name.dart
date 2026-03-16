@@ -34,6 +34,7 @@ class DeviceName extends StatelessWidget {
         ],
         Flexible(
           child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 name,

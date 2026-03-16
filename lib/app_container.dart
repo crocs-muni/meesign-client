@@ -86,6 +86,9 @@ class AppContainer {
   }
 
   Future<UserSession> startUserSession(User user) async {
+    // End any existing session before starting a new one
+    await endUserSession();
+
     session = UserSession(
       user,
       await caCerts,

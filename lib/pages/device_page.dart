@@ -36,7 +36,13 @@ class _DevicePageState extends State<DevicePage> {
             pinned: true,
             flexibleSpace: FlexibleAvatarAppBar(
               avatar: Text(widget.device.name.initials),
-              title: DeviceName(widget.device.name, kind: widget.device.kind),
+              title: Align(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: MEDIUM_PADDING),
+                  child:
+                      DeviceName(widget.device.name, kind: widget.device.kind),
+                ),
+              ),
             ),
           ),
           SliverList.list(
