@@ -242,7 +242,7 @@ class AppViewModel with ChangeNotifier {
     required bool agree,
     bool withCard = false,
   }) async {
-    if (await LocalAuthService.authUser(_settingsController) && agree) {
+    if (!agree || await LocalAuthService.authUser(_settingsController)) {
       _groupRepository.approveTask(
         device!.id,
         task.id,
@@ -253,7 +253,7 @@ class AppViewModel with ChangeNotifier {
   }
 
   Future<void> joinSign(Task<File> task, {required bool agree}) async {
-    if (await LocalAuthService.authUser(_settingsController) && agree) {
+    if (!agree || await LocalAuthService.authUser(_settingsController)) {
       _fileRepository.approveTask(device!.id, task.id, agree: agree);
     }
   }
@@ -262,13 +262,13 @@ class AppViewModel with ChangeNotifier {
     Task<Challenge> task, {
     required bool agree,
   }) async {
-    if (await LocalAuthService.authUser(_settingsController) && agree) {
+    if (!agree || await LocalAuthService.authUser(_settingsController)) {
       _challengeRepository.approveTask(device!.id, task.id, agree: agree);
     }
   }
 
   Future<void> joinDecrypt(Task<Decrypt> task, {required bool agree}) async {
-    if (await LocalAuthService.authUser(_settingsController) && agree) {
+    if (!agree || await LocalAuthService.authUser(_settingsController)) {
       _decryptRepository.approveTask(device!.id, task.id, agree: agree);
     }
   }
