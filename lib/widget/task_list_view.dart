@@ -270,31 +270,18 @@ class _TaskListViewState<T> extends State<TaskListView<T>> {
     List<Task<T>> requestsTasks,
     List<Task<T>> remainingTasks,
   ) {
-    final categories = ['requests', 'remaining'];
-    final orderedCategorizedTasks = <String, List<Task<T>>>{
-      categories[0]: requestsTasks,
-      categories[1]: remainingTasks,
-    };
+    final allTasks = [...requestsTasks, ...remainingTasks];
 
     return RefreshIndicator(
-      child: ListView(
-        children: categories.map((taskCategory) {
-          final sectionTasks =
-              orderedCategorizedTasks[taskCategory] ?? <Task<T>>[];
-          if (sectionTasks.isEmpty) return const SizedBox.shrink();
-
-          return Theme(
-            // This is to remove the default divider color of ExpansionTile
-            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                for (final task in sectionTasks)
-                  widget.taskBuilder(context, task),
-              ],
-            ),
-          );
-        }).toList(),
+      child: Theme(
+        // This is to remove the default divider color of ExpansionTile
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ListView.builder(
+          itemCount: allTasks.length,
+          itemBuilder: (context, index) {
+            return widget.taskBuilder(context, allTasks[index]);
+          },
+        ),
       ),
       onRefresh: () {
         _triggerReloadAnimation();
