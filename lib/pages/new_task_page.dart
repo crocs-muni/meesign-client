@@ -525,6 +525,9 @@ class _NewTaskPageState extends State<NewTaskPage> {
   }
 
   Widget _buildGroupSelector(BuildContext buildContext) {
+    const maxGroupSectionHeight = 225.0;
+    const groupItemHeight = 50.0;
+
     return Consumer<AppViewModel>(
       builder: (context, state, child) {
         final myGroups = state.groupTasks
@@ -686,7 +689,9 @@ class _NewTaskPageState extends State<NewTaskPage> {
               ),
             ],
             SizedBox(
-              height: 100,
+              height: groupItemHeight * groups.length > maxGroupSectionHeight
+                  ? maxGroupSectionHeight
+                  : groupItemHeight * groups.length.toDouble(),
               child: Scrollbar(
                 thumbVisibility: true,
                 controller: _groupScrollController,
