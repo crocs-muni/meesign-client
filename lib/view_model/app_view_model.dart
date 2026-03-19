@@ -224,7 +224,11 @@ class AppViewModel with ChangeNotifier {
   Future<void> fetchExternalGroups() async {
     try {
       final allGroups = await _groupRepository.fetchAllGroups();
-      final external = allGroups.where((g) => !g.hasMember(_userDid)).toList();
+      final external = allGroups
+          .where(
+            (g) => !g.hasMember(_userDid) && g.keyType == KeyType.decrypt,
+          )
+          .toList();
       _externalGroupsController.add(external);
     } on Exception catch (e) {
       debugPrint('Failed to fetch external groups: $e');

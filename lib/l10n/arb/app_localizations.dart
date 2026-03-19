@@ -1128,7 +1128,7 @@ abstract class AppLocalizations {
   /// No description provided for @otherGroups.
   ///
   /// In en, this message translates to:
-  /// **'Other Groups'**
+  /// **'Other Decryption Groups'**
   String get otherGroups;
 
   /// No description provided for @noOtherGroupsAvailable.
