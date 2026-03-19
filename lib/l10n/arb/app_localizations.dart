@@ -1371,6 +1371,12 @@ abstract class AppLocalizations {
   /// **'Authenticate protected actions'**
   String get authenticateProtectedActionsSettings;
 
+  /// No description provided for @authenticationNotSupported.
+  ///
+  /// In en, this message translates to:
+  /// **'This device does not support local authentication'**
+  String get authenticationNotSupported;
+
   /// No description provided for @confirmQuitTitle.
   ///
   /// In en, this message translates to:

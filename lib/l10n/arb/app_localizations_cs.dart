@@ -702,6 +702,10 @@ class AppLocalizationsCs extends AppLocalizations {
       'Autentizovat chráněné akce';
 
   @override
+  String get authenticationNotSupported =>
+      'Toto zařízení nepodporuje lokální autentizaci';
+
+  @override
   String get confirmQuitTitle => 'Opravdu chcete aplikaci ukončit?';
 
   @override

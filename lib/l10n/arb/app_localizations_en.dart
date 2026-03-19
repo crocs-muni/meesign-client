@@ -698,6 +698,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Authenticate protected actions';
 
   @override
+  String get authenticationNotSupported =>
+      'This device does not support local authentication';
+
+  @override
   String get confirmQuitTitle => 'Do you really want to quit?';
 
   @override

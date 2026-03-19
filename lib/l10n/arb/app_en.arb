@@ -296,6 +296,7 @@
     "authenticateProtectedActionsSettingsTitle": "Authentication settings",
     "authenticateProtectedActionsSettingsDesc": "Require biometric or device authentication for sensitive actions to enhance security.",
     "authenticateProtectedActionsSettings": "Authenticate protected actions",
+    "authenticationNotSupported": "This device does not support local authentication",
     "confirmQuitTitle": "Do you really want to quit?",
     "confirmQuitYesDontAsk": "Yes, don't ask again",
     "no": "No",

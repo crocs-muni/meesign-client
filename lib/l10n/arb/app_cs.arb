@@ -296,6 +296,7 @@
     "authenticateProtectedActionsSettingsTitle": "Nastavení autentizace",
     "authenticateProtectedActionsSettingsDesc": "Vyžadovat biometrickou nebo zařízení autentizaci pro citlivé akce pro zvýšení bezpečnosti.",
     "authenticateProtectedActionsSettings": "Autentizovat chráněné akce",
+    "authenticationNotSupported": "Toto zařízení nepodporuje lokální autentizaci",
     "confirmQuitTitle": "Opravdu chcete aplikaci ukončit?",
     "confirmQuitYesDontAsk": "Ano, příště se již neptat",
     "no": "Ne",
