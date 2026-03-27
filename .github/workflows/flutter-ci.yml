@@ -238,11 +238,12 @@ jobs:
         working-directory: meesign_native/native/meesign-crypto
 
       - name: Build PolicyBot
-        run: cd meesign_core; dart pub get; dart compile exe bin/policy.dart -o meesign_policybot
+        run: cd meesign_core; dart pub get; dart build cli --target bin/policy.dart -o build
 
       - name: Package build outputs
         run: |
           cp meesign_native/native/meesign-crypto/target/release/libmeesign_crypto.so meesign_core/
+          cp meesign_core/build/bundle/bin/policy meesign_core/meesign_policybot
           tar czf $GITHUB_WORKSPACE/meesign_policybot.tar.gz -C meesign_core meesign_policybot libmeesign_crypto.so
 
       - name: Upload build outputs
