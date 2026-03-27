@@ -58,10 +58,32 @@ jobs:
           wget https://raw.githubusercontent.com/crocs-muni/meesign-server/main/generate_keys.sh
           bash generate_keys.sh
           chmod a+r keys/*
+
+          podman network create meesign-test
+
+          podman run --detach \
+            --name meesign-db \
+            --network meesign-test \
+            --env POSTGRES_USER=meesign \
+            --env POSTGRES_PASSWORD=meesign \
+            --env POSTGRES_DB=meesign \
+            postgres:17
+
+          for i in $(seq 1 30); do
+            podman exec meesign-db pg_isready -U meesign && break
+            sleep 1
+          done
+
           podman pull crocsmuni/meesign:nightly
           podman run --detach \
-            --publish 1337:1337 --volume $(pwd)/keys/:/meesign/keys/:Z \
+            --name meesign-server \
+            --network meesign-test \
+            --publish 1337:1337 \
+            --volume $(pwd)/keys/:/meesign/keys/:Z \
+            --env DATABASE_URL=postgres://meesign:meesign@meesign-db:5432/meesign \
             crocsmuni/meesign:nightly
+
+          sleep 10
 
       - name: Run tests
         run: cd meesign_core; dart test
