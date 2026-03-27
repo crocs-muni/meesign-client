@@ -30,8 +30,12 @@ class AppContainer {
 
   final bool allowBadCerts = const bool.fromEnvironment('ALLOW_BAD_CERTS');
   Future<List<int>?> get caCerts async {
-    final data = await rootBundle.load('assets/ca-cert.pem');
-    return data.lengthInBytes == 0 ? null : data.buffer.asUint8List();
+    try {
+      final data = await rootBundle.load('assets/ca-cert.pem');
+      return data.lengthInBytes == 0 ? null : data.buffer.asUint8List();
+    } on Exception catch (_) {
+      return null;
+    }
   }
 
   Future<void> _init() async {

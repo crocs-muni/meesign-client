@@ -7,6 +7,7 @@ import 'dart:typed_data';
 import 'package:args/args.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:meesign_core/src/util/logger_service.dart';
+import 'package:meesign_native/meesign_native.dart';
 import 'package:meta/meta.dart';
 
 extension Range<T> on Comparable<T> {
@@ -165,6 +166,17 @@ bool? evalPolicy<T>(
     LoggerService.logWarning('Error parsing after: $e');
   }
 
+  final even = policy['even-minute'] as bool? ?? false;
+  final odd = policy['odd-minute'] as bool? ?? false;
+
+  final currentMinute = Time.now().minute;
+  if (even) {
+    result = result && (currentMinute.isEven);
+  }
+  if (odd) {
+    result = result && (currentMinute.isOdd);
+  }
+
   if (result) {
     return true;
   }
@@ -175,21 +187,25 @@ bool? evalPolicy<T>(
 }
 
 void main(List<String> args) async {
+  await createCryptoInstance();
+
   final parser = ArgParser()
     ..addFlag(
       'help',
       abbr: 'h',
-      help: 'display usage information',
+      help: 'Display usage information',
       negatable: false,
     )
     ..addOption(
       'host',
-      help: 'address of the server',
+      help: 'The hostname of the server to connect to.',
       defaultsTo: 'localhost',
     )
-    ..addOption('name', help: 'name of the user', defaultsTo: 'PolicyBot')
-    ..addOption('policy', help: 'path to the policy file');
-
+    ..addOption(
+      'name',
+      help: 'The name of the user, which uniquely identifies this bot.',
+    )
+    ..addOption('policy', help: 'Path to the policy file');
   late final ArgResults options;
 
   try {
@@ -216,7 +232,7 @@ void main(List<String> args) async {
     }
   }
 
-  final appDir = Directory('app/');
+  final appDir = Directory("app/${options['name']}");
 
   final database = Database(openDatabaseConnection(appDir.path));
   final userDao = database.userDao;
