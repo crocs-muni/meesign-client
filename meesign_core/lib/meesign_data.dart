@@ -12,4 +12,4 @@ export 'src/data/network_dispatcher.dart';
 export 'src/data/support_services.dart';
 export 'src/data/task_repository.dart';
 export 'src/data/user_repository.dart';
-export 'src/database/database.dart' show Database;
+export 'src/database/database.dart' show Database, openDatabaseConnection;

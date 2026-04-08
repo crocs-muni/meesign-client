@@ -1,32 +1,3 @@
-import 'dart:io' as io;
-
-import 'package:meesign_core/meesign_data.dart';
-import 'package:path/path.dart' as path_pkg;
-
-class KeyStore {
-  KeyStore(this._dir);
-  final io.Directory _dir;
-
-  static const String fileName = 'key.p12';
-
-  io.File _getFile(Uuid did) {
-    return io.File(
-      path_pkg.join(
-        _dir.path,
-        did.encode(),
-        fileName,
-      ),
-    );
-  }
-
-  Future<void> store(Uuid did, List<int> key) async {
-    final file = _getFile(did);
-    await file.parent.create(recursive: true);
-    await file.writeAsBytes(key);
-  }
-
-  List<int> load(Uuid did) {
-    // FIXME: blocks
-    return _getFile(did).readAsBytesSync();
-  }
-}
+export 'key_store_stub.dart'
+    if (dart.library.io) 'key_store_native.dart'
+    if (dart.library.js_interop) 'key_store_web.dart';

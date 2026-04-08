@@ -37,6 +37,7 @@ class DeviceSuggestionTile extends StatelessWidget {
         device.name,
         kind: device.kind,
         iconSize: 20,
+        isLocalDevice: device.isLocal,
       ),
       subtitle: Text(
         device.id.encode().splitByLength(4).join(' '),

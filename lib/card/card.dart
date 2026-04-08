@@ -1,19 +1,10 @@
-import 'dart:io';
-
-import 'package:meesign_client/card/nfc_card.dart';
-import 'package:meesign_client/card/pcsc_card.dart';
+import 'package:meesign_client/card/card_factory_stub.dart'
+    if (dart.library.io) 'card_factory_native.dart' as card_factory;
+import 'package:meesign_client/util/platform.dart';
 import 'package:meesign_core/meesign_card.dart';
 
 abstract class CardManager {
-  factory CardManager() {
-    if (Platform.isAndroid || Platform.isIOS) {
-      return NfcCardManager();
-    }
-    if (Platform.isLinux || Platform.isWindows) {
-      return PcscCardManager();
-    }
-    throw UnsupportedError('Platform not supported');
-  }
+  factory CardManager() => card_factory.create() as CardManager;
   Future<void> connect();
   Future<void> disconnect();
 
@@ -22,8 +13,8 @@ abstract class CardManager {
   Future<List<String>> get readers;
 
   static bool get platformSupported =>
-      Platform.isAndroid ||
-      Platform.isIOS ||
-      Platform.isLinux ||
-      Platform.isWindows;
+      PlatformGroup.isAndroid ||
+      PlatformGroup.isIOS ||
+      PlatformGroup.isLinux ||
+      PlatformGroup.isWindows;
 }

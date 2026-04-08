@@ -557,6 +557,19 @@ class AppLocalizationsCs extends AppLocalizations {
   String get archived => 'Archivováno';
 
   @override
+  String get selfDevice => '(vlastní)';
+
+  @override
+  String get myGroups => 'Moje skupiny';
+
+  @override
+  String get otherGroups => 'Ostatní skupiny';
+
+  @override
+  String get noOtherGroupsAvailable =>
+      'Žádné další dešifrovací skupiny nejsou k dispozici.';
+
+  @override
   String get noGroupsYet => 'Zatím nejsou vytvořeny žádné skupiny.';
 
   @override
@@ -687,6 +700,10 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get authenticateProtectedActionsSettings =>
       'Autentizovat chráněné akce';
+
+  @override
+  String get authenticationNotSupported =>
+      'Toto zařízení nepodporuje lokální autentizaci';
 
   @override
   String get confirmQuitTitle => 'Opravdu chcete aplikaci ukončit?';

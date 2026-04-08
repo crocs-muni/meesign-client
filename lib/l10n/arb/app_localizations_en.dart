@@ -557,6 +557,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get archived => 'Archived';
 
   @override
+  String get selfDevice => '(self)';
+
+  @override
+  String get myGroups => 'My Groups';
+
+  @override
+  String get otherGroups => 'Other Decryption Groups';
+
+  @override
+  String get noOtherGroupsAvailable => 'No other decryption groups available.';
+
+  @override
   String get noGroupsYet => 'No groups yet';
 
   @override
@@ -684,6 +696,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get authenticateProtectedActionsSettings =>
       'Authenticate protected actions';
+
+  @override
+  String get authenticationNotSupported =>
+      'This device does not support local authentication';
 
   @override
   String get confirmQuitTitle => 'Do you really want to quit?';

@@ -13,7 +13,7 @@ import 'package:meesign_client/widget/task_state_indicator.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:provider/provider.dart';
 
-class TaskTile<T> extends StatelessWidget {
+class TaskTile<T> extends StatefulWidget {
   const TaskTile({
     required this.task,
     required this.name,
@@ -52,20 +52,40 @@ class TaskTile<T> extends StatelessWidget {
   final bool isGroupTask;
 
   @override
+  State<TaskTile<T>> createState() => _TaskTileState<T>();
+}
+
+class _TaskTileState<T> extends State<TaskTile<T>> {
+  late bool _isExpanded;
+  bool _initialized = false;
+
+  @override
   Widget build(BuildContext context) {
-    final desc = this.desc ?? StatusMessage.getStatusMessage(task, context);
+    final task = widget.task;
+
+    // Compute the default expansion based on task state
+    final defaultExpanded = !task.archived &&
+        task.state != TaskState.finished &&
+        task.state != TaskState.failed;
+
+    // Initialize only once; after that, preserve user's toggle
+    if (!_initialized) {
+      _isExpanded = defaultExpanded;
+      _initialized = true;
+    }
+    final desc = widget.desc ?? StatusMessage.getStatusMessage(task, context);
     final trailing = TaskStateIndicator(task);
-    final allActions = actions +
+    final allActions = widget.actions +
         (task.approvable ? _buildConditionalApproveActions(context) : []) +
-        (task.state == TaskState.needsCard ? cardActions : []);
+        (task.state == TaskState.needsCard ? widget.cardActions : []);
     final appViewModel = Provider.of<AppViewModel>(context);
 
-    final actionRow = allActions.isNotEmpty || actionChip != null
+    final actionRow = allActions.isNotEmpty || widget.actionChip != null
         ? Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (actionChip != null) ...[
-                actionChip!,
+              if (widget.actionChip != null) ...[
+                widget.actionChip!,
                 const SizedBox(width: 8),
               ],
               const SizedBox(height: MEDIUM_GAP),
@@ -85,8 +105,8 @@ class TaskTile<T> extends StatelessWidget {
         icon: task.archived ? Symbols.unarchive : Symbols.archive,
         color: Colors.transparent,
         confirmDismiss: (_) async {
-          if (onArchiveChange != null) {
-            onArchiveChange!(!task.archived);
+          if (widget.onArchiveChange != null) {
+            widget.onArchiveChange!(!task.archived);
             return !appViewModel.showArchived;
           }
           return false;
@@ -102,13 +122,13 @@ class TaskTile<T> extends StatelessWidget {
               runSpacing: SMALL_GAP,
               children: [
                 Text(
-                  name,
+                  widget.name,
                   overflow: TextOverflow.visible,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                if (showTaskTypeInfo) _buildTaskTypeInfo(task, context),
+                if (widget.showTaskTypeInfo) _buildTaskTypeInfo(task, context),
               ],
             ),
             subtitle: desc != null
@@ -117,17 +137,19 @@ class TaskTile<T> extends StatelessWidget {
                     child: Text(desc),
                   )
                 : null,
-            initiallyExpanded: !task.archived &&
-                task.state != TaskState.finished &&
-                task.state != TaskState.failed,
-            leading: MediaQuery.sizeOf(context).width > 400 ? leading : null,
+            initiallyExpanded: _isExpanded,
+            onExpansionChanged: (expanded) {
+              _isExpanded = expanded;
+            },
+            leading:
+                MediaQuery.sizeOf(context).width > 400 ? widget.leading : null,
             trailing: trailing,
             childrenPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 8,
             ),
             children: [
-              ...children,
+              ...widget.children,
               if (actionRow != null) actionRow,
             ].intersperse(
               const SizedBox(height: 8),
@@ -139,18 +161,17 @@ class TaskTile<T> extends StatelessWidget {
   }
 
   List<Widget> _buildConditionalApproveActions(BuildContext context) {
-    if (isGroupTask) {
+    if (widget.isGroupTask) {
       if (!Provider.of<AppContainer>(context, listen: false)
           .settingsController
           .currentSettings
           .autoJoinGroups) {
-        return approveActions;
+        return widget.approveActions;
       } else {
-        // If auto-join is enabled, we don't show the approve actions
         return [];
       }
     } else {
-      return approveActions;
+      return widget.approveActions;
     }
   }
 
@@ -210,7 +231,7 @@ class TaskTile<T> extends StatelessWidget {
     return Row(
       children: [
         _buildGroupMetaDataRow(Symbols.flag, text, context),
-        if (showDetailRow) ...[
+        if (widget.showDetailRow) ...[
           LayoutBuilder(
             builder: (context, constraints) {
               return Row(
@@ -235,7 +256,7 @@ class TaskTile<T> extends StatelessWidget {
             },
           ),
         ],
-        if (showDate) ...[
+        if (widget.showDate) ...[
           LayoutBuilder(
             builder: (context, constraints) {
               return Row(

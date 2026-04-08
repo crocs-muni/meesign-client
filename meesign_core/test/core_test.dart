@@ -8,6 +8,7 @@ import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:meesign_core/meesign_core.dart';
+import 'package:meesign_native/meesign_native.dart';
 import 'package:test/test.dart';
 
 import 'matcher.dart';
@@ -18,7 +19,6 @@ extension ListStream<T> on Stream<Iterable<T>> {
 }
 
 // TODO(dev): use stream matchers?
-
 Future<void> approveFirst(
   TaskRepository taskRepository,
   Device d, {
@@ -62,9 +62,13 @@ void main() {
     serverCerts = io.File(serverCertsPath).readAsBytesSync();
   }
 
+  setUpAll(() async {
+    await createCryptoInstance();
+  });
+
   setUp(() {
-    database = Database(appDir);
-    keyStore = KeyStore(appDir);
+    database = Database(openDatabaseConnection(appDir.path));
+    keyStore = KeyStore(appDir.path);
     dispatcher = NetworkDispatcher(
       meesignServerDomain ?? 'localhost',
       keyStore,
@@ -87,7 +91,7 @@ void main() {
       taskDao,
       deviceRepository,
     );
-    final fileStore = FileStore(appDir);
+    final fileStore = FileStore(appDir.path);
     fileRepository = FileRepository(
       dispatcher,
       keyStore,
@@ -207,6 +211,7 @@ void main() {
       t: t,
       createTask: (_, Group g) async {
         await decryptRepository.encrypt(
+          g.members.first.device.id,
           'test secret',
           MimeType.octetStream,
           message,

@@ -1,16 +1,18 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:meesign_client/app_container.dart';
 import 'package:meesign_client/l10n/arb/app_localizations.dart';
 import 'package:meesign_client/pages/task_detail_page.dart';
 import 'package:meesign_client/ui_constants.dart';
 import 'package:meesign_client/util/actions/document_signer.dart';
+import 'package:meesign_client/util/platform.dart';
+import 'package:meesign_client/util/web_file_opener.dart';
 import 'package:meesign_client/view_model/app_view_model.dart';
 import 'package:meesign_client/widget/entity_chip.dart';
 import 'package:meesign_client/widget/large_square_button.dart';
 import 'package:meesign_client/widget/task_tile.dart';
 import 'package:meesign_core/meesign_core.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:path/path.dart' as path_pkg;
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -90,7 +92,7 @@ class SigningTaskTile extends StatelessWidget {
                   color: Colors.grey,
                 ),
               ),
-              onPressed: _openFile,
+              onPressed: () => _openFile(context),
               child: Text(AppLocalizations.of(context).view),
             ),
           ],
@@ -130,7 +132,7 @@ class SigningTaskTile extends StatelessWidget {
     required AppViewModel model,
   }) {
     return ElevatedButton.icon(
-      onPressed: _openFile,
+      onPressed: () => _openFile(context),
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF555555),
         padding: const EdgeInsets.all(MEDIUM_PADDING),
@@ -151,8 +153,14 @@ class SigningTaskTile extends StatelessWidget {
     );
   }
 
-  void _openFile() {
-    if (Platform.isLinux) {
+  void _openFile(BuildContext context) {
+    if (PlatformGroup.isWeb) {
+      final fileStore = context.read<AppContainer>().fileStore;
+      final bytes = fileStore.getFileBytes(task.info.path);
+      if (bytes != null) {
+        downloadFileOnWeb(bytes, path_pkg.basename(task.info.path));
+      }
+    } else if (PlatformGroup.isLinux) {
       launchUrl(Uri.file(task.info.path));
     } else {
       OpenFilex.open(task.info.path);

@@ -74,13 +74,21 @@ class AppViewModel with ChangeNotifier {
   Stream<bool> get showArchivedStream => _showArchivedController.stream;
   bool get showArchived => _showArchivedController.valueOrNull ?? false;
 
-  // Decrypt tasks stream
+  // Decrypt tasks stream (regular + observed)
   final BehaviorSubject<List<Task<Decrypt>>> _decryptTasksController =
       BehaviorSubject<List<Task<Decrypt>>>();
-  Stream<List<Task<Decrypt>>> get decryptTasksStream =>
-      _decryptTasksController.stream;
-  List<Task<Decrypt>> get decryptTasks =>
-      _decryptTasksController.valueOrNull ?? [];
+  final BehaviorSubject<List<Task<Decrypt>>> _observedDecryptTasksController =
+      BehaviorSubject<List<Task<Decrypt>>>.seeded([]);
+  Stream<List<Task<Decrypt>>> get decryptTasksStream => Rx.combineLatest2<
+          List<Task<Decrypt>>, List<Task<Decrypt>>, List<Task<Decrypt>>>(
+        _decryptTasksController.stream,
+        _observedDecryptTasksController.stream,
+        (regular, observed) => [...regular, ...observed],
+      );
+  List<Task<Decrypt>> get decryptTasks => [
+        ..._decryptTasksController.valueOrNull ?? [],
+        ..._observedDecryptTasksController.valueOrNull ?? [],
+      ];
 
   // Group tasks stream
   final BehaviorSubject<List<Task<Group>>> _groupTasksController =
@@ -102,6 +110,13 @@ class AppViewModel with ChangeNotifier {
       _challengeTasksController.stream;
   List<Task<Challenge>> get challengeTasks =>
       _challengeTasksController.valueOrNull ?? [];
+
+  // External groups (decrypt groups user is NOT a member of)
+  final BehaviorSubject<List<Group>> _externalGroupsController =
+      BehaviorSubject<List<Group>>.seeded([]);
+  Stream<List<Group>> get externalGroupsStream =>
+      _externalGroupsController.stream;
+  List<Group> get externalGroups => _externalGroupsController.valueOrNull ?? [];
 
   // General stream of all tasks + the show archived items setting
   Stream<TaskStream> get combinedTaskStream => Rx.combineLatest5<
@@ -166,9 +181,16 @@ class AppViewModel with ChangeNotifier {
 
     decryptTasksStream.listen(_decryptTasksController.add);
 
+    _decryptRepository
+        .observeObservedTasks(did, () => externalGroups)
+        .listen(_observedDecryptTasksController.add);
+
     _settingsController.settingsStream.listen((settings) {
       _showArchivedController.add(settings.showArchivedItems);
     });
+
+    fetchExternalGroups();
+    _decryptRepository.pollObservedTasks(did);
 
     combinedTaskStream.listen((allTaskStream) {
       allTasks
@@ -192,9 +214,24 @@ class AppViewModel with ChangeNotifier {
       }
       if (poolTarget == TaskType.decrypt) {
         await _decryptRepository.sync(_userDid);
+        await _decryptRepository.pollObservedTasks(_userDid);
       }
     } on Exception catch (e) {
       debugPrint('Polling error: $e');
+    }
+  }
+
+  Future<void> fetchExternalGroups() async {
+    try {
+      final allGroups = await _groupRepository.fetchAllGroups();
+      final external = allGroups
+          .where(
+            (g) => !g.hasMember(_userDid) && g.keyType == KeyType.decrypt,
+          )
+          .toList();
+      _externalGroupsController.add(external);
+    } on Exception catch (e) {
+      debugPrint('Failed to fetch external groups: $e');
     }
   }
 
@@ -234,15 +271,35 @@ class AppViewModel with ChangeNotifier {
     MimeType mimeType,
     Uint8List data,
     Group group,
-  ) =>
-      _decryptRepository.encrypt(description, mimeType, data, group.id);
+  ) async {
+    final taskId = await _decryptRepository.encrypt(
+      _userDid,
+      description,
+      mimeType,
+      data,
+      group.id,
+    );
+
+    // If this is an external group, save as observed task
+    final isExternal = !group.hasMember(_userDid);
+    if (isExternal) {
+      await _decryptRepository.saveObservedTask(
+        _userDid,
+        taskId,
+        group.id,
+        description,
+        mimeType.value,
+        data,
+      );
+    }
+  }
 
   Future<void> joinGroup(
     Task<Group> task, {
     required bool agree,
     bool withCard = false,
   }) async {
-    if (await LocalAuthService.authUser(_settingsController) && agree) {
+    if (!agree || await LocalAuthService.authUser(_settingsController)) {
       _groupRepository.approveTask(
         device!.id,
         task.id,
@@ -253,7 +310,7 @@ class AppViewModel with ChangeNotifier {
   }
 
   Future<void> joinSign(Task<File> task, {required bool agree}) async {
-    if (await LocalAuthService.authUser(_settingsController) && agree) {
+    if (!agree || await LocalAuthService.authUser(_settingsController)) {
       _fileRepository.approveTask(device!.id, task.id, agree: agree);
     }
   }
@@ -262,13 +319,13 @@ class AppViewModel with ChangeNotifier {
     Task<Challenge> task, {
     required bool agree,
   }) async {
-    if (await LocalAuthService.authUser(_settingsController) && agree) {
+    if (!agree || await LocalAuthService.authUser(_settingsController)) {
       _challengeRepository.approveTask(device!.id, task.id, agree: agree);
     }
   }
 
   Future<void> joinDecrypt(Task<Decrypt> task, {required bool agree}) async {
-    if (await LocalAuthService.authUser(_settingsController) && agree) {
+    if (!agree || await LocalAuthService.authUser(_settingsController)) {
       _decryptRepository.approveTask(device!.id, task.id, agree: agree);
     }
   }
@@ -306,11 +363,15 @@ class AppViewModel with ChangeNotifier {
       (task) => task.info.keyType == type && task.state == TaskState.finished,
     );
 
-    if (showArchived) {
-      return temp.isNotEmpty;
-    } else {
-      return temp.any((task) => !task.archived);
+    final hasOwn =
+        showArchived ? temp.isNotEmpty : temp.any((task) => !task.archived);
+
+    // For decrypt, also consider external groups
+    if (type == KeyType.decrypt && !hasOwn) {
+      return externalGroups.any((g) => g.keyType == KeyType.decrypt);
     }
+
+    return hasOwn;
   }
 
   bool anyGroupJoined() {

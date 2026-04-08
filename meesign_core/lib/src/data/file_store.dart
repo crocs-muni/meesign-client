@@ -1,35 +1,3 @@
-import 'dart:io' as io;
-
-import 'package:meesign_core/src/util/uuid.dart';
-import 'package:path/path.dart' as path_pkg;
-
-class FileStore {
-  FileStore(this._dir);
-  final io.Directory _dir;
-
-  // TODO(dev): when to remove work files? (issues with file locks,
-  // https://github.com/crocs-muni/meesign-client/issues/3)
-
-  String getFilePath(Uuid did, Uuid id, String name, {bool work = false}) {
-    return path_pkg.join(
-      _dir.path,
-      did.encode(),
-      work ? 'workfiles' : 'outputs',
-      id.encode(),
-      name,
-    );
-  }
-
-  Future<String> storeFile(
-    Uuid did,
-    Uuid id,
-    String name,
-    List<int> data, {
-    bool work = false,
-  }) async {
-    final path = getFilePath(did, id, name, work: work);
-    await io.Directory(path_pkg.dirname(path)).create(recursive: true);
-    await io.File(path).writeAsBytes(data, flush: true);
-    return path;
-  }
-}
+export 'file_store_stub.dart'
+    if (dart.library.io) 'file_store_native.dart'
+    if (dart.library.js_interop) 'file_store_web.dart';

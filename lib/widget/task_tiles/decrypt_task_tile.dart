@@ -25,6 +25,7 @@ class DecryptTaskTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final model = Provider.of<AppViewModel>(context, listen: false);
+    final isObserved = !task.info.group.hasMember(model.device!.id);
 
     return TaskTile(
       key: ValueKey('decrypt-task-${task.id}'),
@@ -36,15 +37,11 @@ class DecryptTaskTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           GroupChip(group: task.info.group),
-          const SizedBox(
-            width: SMALL_GAP,
-          ),
+          const SizedBox(width: SMALL_GAP),
           if (task.state == TaskState.finished) ...[
             FilledButton.tonal(
               style: FilledButton.styleFrom(
-                side: const BorderSide(
-                  color: Colors.grey,
-                ),
+                side: const BorderSide(color: Colors.grey),
               ),
               onPressed: () => Navigator.push(
                 context,
@@ -70,16 +67,13 @@ class DecryptTaskTile extends StatelessWidget {
               child: Text(AppLocalizations.of(context).view),
             ),
           ],
-          const SizedBox(
-            width: SMALL_GAP,
-          ),
-          if (task.state == TaskState.finished ||
-              task.state == TaskState.failed) ...[
+          const SizedBox(width: SMALL_GAP),
+          if (!isObserved &&
+              (task.state == TaskState.finished ||
+                  task.state == TaskState.failed)) ...[
             FilledButton.tonal(
               style: FilledButton.styleFrom(
-                side: const BorderSide(
-                  color: Colors.grey,
-                ),
+                side: const BorderSide(color: Colors.grey),
               ),
               onPressed: () => encryptData(
                 context: context,
@@ -91,25 +85,29 @@ class DecryptTaskTile extends StatelessWidget {
           ],
         ],
       ),
-      approveActions: [
-        LargeSquareButton(
-          text: AppLocalizations.of(context).decrypt,
-          icon: Icons.check,
-          onPressed: () {
-            model.joinDecrypt(task, agree: true);
-          },
-          color: const Color(0xFF298E29),
-        ),
-        LargeSquareButton(
-          text: AppLocalizations.of(context).decline,
-          icon: Icons.close,
-          onPressed: () {
-            model.joinDecrypt(task, agree: false);
-          },
-          color: const Color(0xFFAA3026),
-        ),
-      ],
-      onArchiveChange: (archive) => model.archiveTask(task, archive: archive),
+      approveActions: isObserved
+          ? []
+          : [
+              LargeSquareButton(
+                text: AppLocalizations.of(context).decrypt,
+                icon: Icons.check,
+                onPressed: () {
+                  model.joinDecrypt(task, agree: true);
+                },
+                color: const Color(0xFF298E29),
+              ),
+              LargeSquareButton(
+                text: AppLocalizations.of(context).decline,
+                icon: Icons.close,
+                onPressed: () {
+                  model.joinDecrypt(task, agree: false);
+                },
+                color: const Color(0xFFAA3026),
+              ),
+            ],
+      onArchiveChange: isObserved
+          ? null
+          : (archive) => model.archiveTask(task, archive: archive),
     );
   }
 }

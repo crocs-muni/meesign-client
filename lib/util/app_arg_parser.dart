@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:args/args.dart';
 
 class AppArgParser {
@@ -26,18 +24,20 @@ class AppArgParser {
 
     try {
       _results = parser.parse(args);
-      if (_results['help'] as bool) printUsage(parser, stdout);
+      if (_results['help'] as bool) _printUsage(parser);
     } on ArgParserException catch (e) {
-      stderr.writeln(e.message);
-      printUsage(parser, stderr);
+      // needed for CLI output without Flutter logger
+      // ignore: avoid_print
+      print(e.message);
+      _printUsage(parser);
     }
 
     return _results;
   }
 
-  void printUsage(ArgParser parser, IOSink sink) {
-    sink
-      ..writeln('Usage:')
-      ..writeln(parser.usage);
+  void _printUsage(ArgParser parser) {
+    // needed for CLI output without Flutter logger
+    // ignore: avoid_print
+    print('Usage:\n${parser.usage}');
   }
 }

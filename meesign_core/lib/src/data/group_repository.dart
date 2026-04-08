@@ -7,6 +7,7 @@ import 'package:meesign_core/src/data/network_dispatcher.dart';
 import 'package:meesign_core/src/data/task_repository.dart';
 import 'package:meesign_core/src/database/daos.dart';
 import 'package:meesign_core/src/database/database.dart' as db;
+import 'package:meesign_core/src/model/device.dart';
 import 'package:meesign_core/src/model/group.dart';
 import 'package:meesign_core/src/model/key_type.dart';
 import 'package:meesign_core/src/model/protocol.dart';
@@ -176,4 +177,47 @@ class GroupRepository extends TaskRepository<Group> {
   }
 
   Stream<List<Group>> observeGroups(Uuid did) => observeResults(did);
+
+  /// Fetch all groups from the server (regardless of device membership).
+  Future<List<Group>> fetchAllGroups() async {
+    final response = await _dispatcher.unauth.getGroups(rpc.GroupsRequest());
+    final rpcGroups = response.groups;
+
+    // Collect all unique device IDs across all groups
+    final allDeviceIds = <Uuid>{};
+    for (final g in rpcGroups) {
+      for (final did in g.deviceIds) {
+        allDeviceIds.add(Uuid(did));
+      }
+    }
+
+    // Resolve device info
+    final devices = await _deviceRepository.getDevices(allDeviceIds.toList());
+    final deviceMap = {for (final d in devices) d.id: d};
+
+    return rpcGroups.map((g) {
+      // Count shares per device (device_ids has one entry per share)
+      final idShares = HashMap<Uuid, int>();
+      for (final did in g.deviceIds) {
+        final uuid = Uuid(did);
+        idShares.update(uuid, (v) => v + 1, ifAbsent: () => 1);
+      }
+
+      final members = idShares.entries.map((entry) {
+        final device = deviceMap[entry.key] ??
+            Device('Unknown', entry.key, DeviceKind.user, DateTime.now());
+        return Member(device, entry.value);
+      }).toList();
+
+      return Group(
+        id: g.identifier.toList(),
+        name: g.name,
+        members: members,
+        threshold: g.threshold,
+        protocol: ProtocolConversion.fromNetwork(g.protocol),
+        keyType: KeyTypeConversion.fromNetwork(g.keyType),
+        note: g.hasNote() ? g.note : null,
+      );
+    }).toList();
+  }
 }

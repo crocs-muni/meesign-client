@@ -7,22 +7,36 @@ enum ThresholdType {
 }
 
 enum Protocol {
-  gg18(10, 10, ThresholdType.tOfN),
-  elgamal(6, 2, ThresholdType.tOfN),
-  frost(4, 3, ThresholdType.tOfN, aid: '6a6366726f7374617070'),
-  musig2(2, 3, ThresholdType.nOfN, aid: '01ffff04050607081101');
+  gg18(10, 10, ThresholdType.tOfN, webSupported: true),
+  elgamal(6, 2, ThresholdType.tOfN, webSupported: true),
+  frost(
+    4,
+    3,
+    ThresholdType.tOfN,
+    aid: '6a6366726f7374617070',
+    webSupported: true,
+  ),
+  musig2(
+    2,
+    3,
+    ThresholdType.nOfN,
+    aid: '01ffff04050607081101',
+    webSupported: true,
+  );
 
   const Protocol(
     this.keygenRounds,
     this.signRounds,
     this.thresholdType, {
     this.aid,
+    this.webSupported = false,
   });
 
   final int keygenRounds;
   final int signRounds;
   final ThresholdType thresholdType;
   final String? aid;
+  final bool webSupported;
 
   bool get cardSupport => aid != null;
 }

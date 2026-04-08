@@ -51,10 +51,6 @@ class _SearchPeerPageState extends State<SearchPeerPage> {
       // Fetch devices from server
       results = await deviceRepository.search(_queryController.text);
 
-      // Filter out local devices (except current device)
-      results = results
-          .where((dev) => !dev.isLocal || dev.id == widget.currentDevice.id);
-
       setState(() => _loaded = true);
     } on Exception catch (_) {}
 

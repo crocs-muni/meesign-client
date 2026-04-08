@@ -1113,6 +1113,30 @@ abstract class AppLocalizations {
   /// **'Archived'**
   String get archived;
 
+  /// No description provided for @selfDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'(self)'**
+  String get selfDevice;
+
+  /// No description provided for @myGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'My Groups'**
+  String get myGroups;
+
+  /// No description provided for @otherGroups.
+  ///
+  /// In en, this message translates to:
+  /// **'Other Decryption Groups'**
+  String get otherGroups;
+
+  /// No description provided for @noOtherGroupsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No other decryption groups available.'**
+  String get noOtherGroupsAvailable;
+
   /// No description provided for @noGroupsYet.
   ///
   /// In en, this message translates to:
@@ -1346,6 +1370,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Authenticate protected actions'**
   String get authenticateProtectedActionsSettings;
+
+  /// No description provided for @authenticationNotSupported.
+  ///
+  /// In en, this message translates to:
+  /// **'This device does not support local authentication'**
+  String get authenticationNotSupported;
 
   /// No description provided for @confirmQuitTitle.
   ///

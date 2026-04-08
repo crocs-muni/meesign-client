@@ -1,22 +1,3 @@
-import 'dart:io';
-
-import 'package:path/path.dart' as path_pkg;
-import 'package:path_provider/path_provider.dart';
-
-class AppDirGetter {
-  static Future<Directory> getAppDir() async {
-    if (Platform.isIOS || Platform.isMacOS) {
-      return getLibraryDirectory();
-    }
-
-    if (Platform.isAndroid) {
-      return getApplicationSupportDirectory();
-    }
-
-    final path = path_pkg.join(
-      path_pkg.dirname(Platform.resolvedExecutable),
-      'app',
-    );
-    return Directory(path);
-  }
-}
+export 'app_dir_getter_stub.dart'
+    if (dart.library.io) 'app_dir_getter_native.dart'
+    if (dart.library.js_interop) 'app_dir_getter_web.dart';

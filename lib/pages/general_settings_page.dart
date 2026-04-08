@@ -1,8 +1,11 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:meesign_client/app/model/settings.dart';
 import 'package:meesign_client/app_container.dart';
 import 'package:meesign_client/l10n/arb/app_localizations.dart';
+import 'package:meesign_client/services/local_auth_service.dart';
 import 'package:meesign_client/services/settings_controller.dart';
 import 'package:meesign_client/templates/default_page_template.dart';
 import 'package:meesign_client/ui_constants.dart';
@@ -203,6 +206,13 @@ class GeneralSettingsPage extends StatelessWidget {
     );
   }
 
+  Future<bool> _isDeviceAuthSupported() async {
+    if (kIsWeb) return false;
+    final auth = LocalAuthentication();
+    final canCheckBiometrics = await auth.canCheckBiometrics;
+    return canCheckBiometrics || await auth.isDeviceSupported();
+  }
+
   Widget _buildAuthenticateProtectedActionsSettingsSection(
     SettingsController controller,
     Settings settings,
@@ -210,37 +220,60 @@ class GeneralSettingsPage extends StatelessWidget {
   ) {
     final theme = Theme.of(context);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          AppLocalizations.of(context)
-              .authenticateProtectedActionsSettingsTitle,
-          style: Theme.of(context)
-              .textTheme
-              .bodyLarge
-              ?.copyWith(fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: SMALL_GAP),
-        Text(
-          AppLocalizations.of(context).authenticateProtectedActionsSettingsDesc,
-          style: theme.textTheme.bodyMedium
-              ?.copyWith(color: theme.colorScheme.outline),
-        ),
-        const SizedBox(height: SMALL_GAP),
-        SwitchListTile(
-          title: Text(
-            AppLocalizations.of(context).authenticateProtectedActionsSettings,
-            style: theme.textTheme.bodyMedium,
-          ),
-          value: settings.authenticateProtectedActions,
-          onChanged: (value) {
-            controller.updateAuthenticateProtectedActions(
-              authenticateProtectedActions: value,
-            );
-          },
-        ),
-      ],
+    return FutureBuilder<bool>(
+      future: _isDeviceAuthSupported(),
+      builder: (context, snapshot) {
+        final isSupported = snapshot.data ?? false;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppLocalizations.of(context)
+                  .authenticateProtectedActionsSettingsTitle,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge
+                  ?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: SMALL_GAP),
+            Text(
+              AppLocalizations.of(context)
+                  .authenticateProtectedActionsSettingsDesc,
+              style: theme.textTheme.bodyMedium
+                  ?.copyWith(color: theme.colorScheme.outline),
+            ),
+            const SizedBox(height: SMALL_GAP),
+            SwitchListTile(
+              title: Text(
+                AppLocalizations.of(context)
+                    .authenticateProtectedActionsSettings,
+                style: theme.textTheme.bodyMedium,
+              ),
+              subtitle: !isSupported
+                  ? Text(
+                      AppLocalizations.of(context).authenticationNotSupported,
+                      style: theme.textTheme.bodySmall
+                          ?.copyWith(color: theme.colorScheme.primary),
+                    )
+                  : null,
+              value: isSupported && settings.authenticateProtectedActions,
+              onChanged: isSupported
+                  ? (value) async {
+                      if (!value) {
+                        final authenticated =
+                            await LocalAuthService.authUser(controller);
+                        if (!authenticated) return;
+                      }
+                      controller.updateAuthenticateProtectedActions(
+                        authenticateProtectedActions: value,
+                      );
+                    }
+                  : null,
+            ),
+          ],
+        );
+      },
     );
   }
 

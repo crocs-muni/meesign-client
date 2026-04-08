@@ -23,9 +23,11 @@ Future<bool?> showConfirmationDialog(
             child: Text(AppLocalizations.of(context).cancel),
           ),
           TextButton(
-            onPressed: () {
-              onConfirm();
-              Navigator.pop(dialogContext, true);
+            onPressed: () async {
+              await onConfirm();
+              if (dialogContext.mounted) {
+                Navigator.pop(dialogContext, true);
+              }
             },
             child: Text(confirmButtonText),
           ),

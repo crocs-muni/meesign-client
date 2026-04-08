@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 Future<Group?> selectGroup(KeyType keyType, BuildContext buildContext) async {
   final state = buildContext.read<AppViewModel>();
-  final groups = state.groupTasks
+  final myGroups = state.groupTasks
       .where(
         (task) =>
             task.state == TaskState.finished &&
@@ -14,12 +14,19 @@ Future<Group?> selectGroup(KeyType keyType, BuildContext buildContext) async {
       )
       .map((task) => task.info);
 
+  // For decrypt, also include external groups
+  final otherGroups = keyType == KeyType.decrypt
+      ? state.externalGroups.where((g) => g.keyType == KeyType.decrypt).toList()
+      : <Group>[];
+
+  final allGroups = [...myGroups, ...otherGroups];
+
   return showDialog<Group?>(
     context: buildContext,
     builder: (context) {
       return SimpleDialog(
         title: const Text('Select group'),
-        children: groups
+        children: allGroups
             .map(
               (group) => SimpleDialogOption(
                 child: Text(group.name),
