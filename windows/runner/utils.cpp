@@ -7,6 +7,22 @@
 
 #include <iostream>
 
+const char kUsageText[] =
+    "MeeSign client.\n"
+    "\n"
+    "Usage: meesign_client.exe [options]\n"
+    "\n"
+    "Options:\n"
+    "  -h, --help              display usage information\n"
+    "      --version           print version and exit\n"
+    "      --host <addr>       server address\n"
+    "      --name <name>       user name\n"
+    "      --app-dir <dir>     override application support directory\n"
+    "      --temp-dir <dir>    override temporary directory\n"
+    "      --downloads-dir <dir>\n"
+    "      --documents-dir <dir>\n"
+    "      --cache-dir <dir>\n";
+
 void CreateAndAttachConsole() {
   if (::AllocConsole()) {
     FILE *unused;

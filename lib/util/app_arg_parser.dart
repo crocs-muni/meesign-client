@@ -7,8 +7,8 @@ class AppArgParser {
   final List<String> args;
   late final ArgResults _results;
 
-  ArgResults initParser() {
-    final parser = ArgParser()
+  static ArgParser buildParser() {
+    return ArgParser()
       ..addFlag(
         'help',
         abbr: 'h',
@@ -22,7 +22,36 @@ class AppArgParser {
       ..addOption(
         'name',
         help: 'name of the user',
+      )
+      ..addOption(
+        'app-dir',
+        help: 'override application support directory '
+            '(database, keys, files; default: platform-specific)',
+      )
+      ..addOption(
+        'temp-dir',
+        help: 'override temporary directory '
+            '(short-lived files; default: platform-specific)',
+      )
+      ..addOption(
+        'downloads-dir',
+        help: 'override downloads directory '
+            '(user-visible received files; default: platform-specific)',
+      )
+      ..addOption(
+        'documents-dir',
+        help: 'override documents directory '
+            '(user-generated files; default: platform-specific)',
+      )
+      ..addOption(
+        'cache-dir',
+        help: 'override cache directory '
+            '(re-downloadable data; default: platform-specific)',
       );
+  }
+
+  ArgResults initParser() {
+    final parser = buildParser();
 
     try {
       _results = parser.parse(args);

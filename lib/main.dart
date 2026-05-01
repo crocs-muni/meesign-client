@@ -30,7 +30,9 @@ void main(List<String> args) async {
   // Prepare window manager
   await _prepareWindowManager();
 
-  final appDir = await AppDirGetter.getAppDir();
+  final appDir = await AppDirGetter.getAppDir(
+    override: argResults['app-dir'] as String?,
+  );
 
   runApp(
     Provider<AppContainer>(
