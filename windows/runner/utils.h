@@ -4,6 +4,11 @@
 #include <string>
 #include <vector>
 
+// Kept in sync with lib/util/app_arg_parser.dart and the Linux/macOS
+// runners. See windows/runner/main.cpp for the consumer.
+constexpr const char* kAppVersion = "0.5.1";
+extern const char kUsageText[];
+
 // Creates a console for the process, and redirects stdout and stderr to
 // it for both the runner and the Flutter library.
 void CreateAndAttachConsole();

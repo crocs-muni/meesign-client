@@ -44,6 +44,7 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTK REQUIRED IMPORTED_TARGET gtk+-3.0)
 
 add_definitions(-DAPPLICATION_ID="${APPLICATION_ID}")
+add_definitions(-DAPP_VERSION="0.5.1")
 
 # Application build
 add_executable(${BINARY_NAME}

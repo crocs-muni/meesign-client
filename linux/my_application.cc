@@ -9,6 +9,25 @@
 
 static const gchar* app_title = "MeeSign";
 
+// Kept in sync with lib/util/app_arg_parser.dart. The Dart parser remains
+// canonical; this string only exists so --help can short-circuit before
+// any GTK init (otherwise the window briefly appears, then vanishes).
+static const gchar* USAGE_TEXT =
+    "MeeSign client.\n"
+    "\n"
+    "Usage: meesign_client [options]\n"
+    "\n"
+    "Options:\n"
+    "  -h, --help              display usage information\n"
+    "      --version           print version and exit\n"
+    "      --host <addr>       server address\n"
+    "      --name <name>       user name\n"
+    "      --app-dir <dir>     override application support directory\n"
+    "      --temp-dir <dir>    override temporary directory\n"
+    "      --downloads-dir <dir>\n"
+    "      --documents-dir <dir>\n"
+    "      --cache-dir <dir>\n";
+
 struct _MyApplication {
   GtkApplication parent_instance;
   char** dart_entrypoint_arguments;
@@ -67,6 +86,22 @@ static void my_application_activate(GApplication* application) {
 // Implements GApplication::local_command_line.
 static gboolean my_application_local_command_line(GApplication* application, gchar*** arguments, int* exit_status) {
   MyApplication* self = MY_APPLICATION(application);
+
+  // Short-circuit on --help / --version before g_application_activate so
+  // no window is ever shown. Other flags fall through to Dart unchanged.
+  for (gchar** a = *arguments + 1; *a != nullptr; a++) {
+    if (g_strcmp0(*a, "--help") == 0 || g_strcmp0(*a, "-h") == 0) {
+      g_print("%s", USAGE_TEXT);
+      *exit_status = 0;
+      return TRUE;
+    }
+    if (g_strcmp0(*a, "--version") == 0) {
+      g_print("MeeSign %s\n", APP_VERSION);
+      *exit_status = 0;
+      return TRUE;
+    }
+  }
+
   // Strip out the first argument as it is the binary name.
   self->dart_entrypoint_arguments = g_strdupv(*arguments + 1);
 
