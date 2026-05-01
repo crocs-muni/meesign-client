@@ -1,4 +1,4 @@
-package com.example.meesign_client
+package cz.muni.meesign
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 
